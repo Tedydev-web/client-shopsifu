@@ -1,0 +1,1 @@
+signin = http://localhost:3000/buyer/sign-in
