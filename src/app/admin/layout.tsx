@@ -9,9 +9,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex h-screen overflow-hidden">
+      {/* Sidebar: truyền isOpen + hàm toggle */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       <div className="flex flex-col flex-1">
+        {/* Topbar: cũng truyền setIsOpen để bấm nút menu */}
         <Topbar onMenuClick={() => setSidebarOpen(prev => !prev)} />
 
         <main className="flex-1 overflow-y-auto bg-muted p-4">
@@ -19,6 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
 
+      {/* Overlay khi Sidebar mở (mobile only) */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"
