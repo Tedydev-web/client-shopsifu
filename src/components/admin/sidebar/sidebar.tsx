@@ -1,17 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
   Home,
   ShoppingCart,
   Users,
-  PlusCircle,
-  Layers,
-  Boxes,
   ChevronDown,
   ChevronRight,
-  Menu,
   X,
 } from 'lucide-react';
 import React, { useState } from 'react';
@@ -36,7 +33,7 @@ function SidebarItem({ icon, label, children, href }: SidebarItemProps) {
       <div
         onClick={toggle}
         className={cn(
-          'flex items-center justify-between rounded px-2 py-1.5 hover:bg-gray-100 hover:text-primary transition cursor-pointer',
+          'flex items-center justify-between rounded px-2 py-1.5 hover:bg-[#D0201C]/20 hover:text-[#D0201C] transition cursor-pointer',
           hasChildren && 'select-none'
         )}
       >
@@ -44,14 +41,13 @@ function SidebarItem({ icon, label, children, href }: SidebarItemProps) {
           {icon}
           {href ? (
             <Link href={href}>
-              <span>{label}</span>
+              <span className="hover:underline">{label}</span>
             </Link>
           ) : (
             <span>{label}</span>
           )}
         </div>
-        {hasChildren &&
-          (open ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+        {hasChildren && (open ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
       </div>
 
       {hasChildren && open && (
@@ -65,7 +61,7 @@ function SubItem({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="text-muted-foreground hover:text-primary text-sm transition"
+      className="text-[#F0F4F8]/70 hover:text-[#D0201C] text-sm transition"
     >
       {label}
     </Link>
@@ -85,13 +81,12 @@ export function Sidebar({
     <>
       <aside
         className={cn(
-          'fixed md:static top-0 left-0 z-50 h-full w-64 shrink-0 border-r bg-white p-6 shadow-sm transition-transform transform',
+          'fixed md:static top-0 left-0 z-50 h-full w-64 shrink-0 border-r bg-[#042940] text-[#F0F4F8] p-6 shadow-sm transition-transform transform',
           isOpen ? 'translate-x-0' : '-translate-x-full',
           'md:translate-x-0 md:relative',
           className
         )}
       >
-        {/* Header (Mobile only) */}
         <div className="flex items-center justify-between mb-6 md:hidden">
           <div className="text-2xl font-bold">Admin Panel</div>
           <button onClick={() => setIsOpen(false)}>
@@ -99,8 +94,10 @@ export function Sidebar({
           </button>
         </div>
 
-        {/* Title (Desktop only) */}
-        <div className="hidden md:block mb-8 text-2xl font-bold">Admin Panel</div>
+        <div className="flex items-center gap-2 mb-8">
+          <Image src="/logo.svg" alt="Logo" width={32} height={32} />
+          <span className="text-xl font-bold text-white">Admin Panel</span>
+        </div>
 
         <nav className="flex flex-col space-y-2 text-sm font-medium">
           <SidebarItem href="/admin/dashboard" icon={<Home size={18} />} label="Dashboard" />
