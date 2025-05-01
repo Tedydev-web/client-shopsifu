@@ -13,7 +13,7 @@ export function useSignup() {
     // Simulate successful registration
     setTimeout(() => {
       setLoading(false)
-      router.push('/dashboard') // Redirect after registration
+      router.push('/buyer/sign-in') // Redirect after registration
     }, 2000)
   }
 

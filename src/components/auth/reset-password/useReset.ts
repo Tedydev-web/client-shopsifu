@@ -14,7 +14,7 @@ export function useReset() {
     setTimeout(() => {
       setLoading(false)
       alert('Password has been reset successfully!')
-      router.push('/admin/login') // Redirect after password reset
+      router.push('/buyer/sign-in') // Redirect after password reset
     }, 2000)
   }
 

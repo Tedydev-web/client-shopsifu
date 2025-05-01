@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import StoreProvider from "@/store/StoreProvider"
+// import StoreProvider from "@/store/StoreProvider"
 import { Toast } from "@/components/ui/toastify"
 import { Inter } from 'next/font/google';
 
@@ -28,10 +28,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${inter.variable} antialiased`}
       >
-        <StoreProvider>
+        {/* <StoreProvider> */}
           <Toast/>
           {children}
-        </StoreProvider>
+        {/* </StoreProvider> */}
       </body>
     </html>
   );

@@ -22,6 +22,7 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
+import { routes } from '@/constants/route'
 
 export function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { loading, onSubmit } = useSignup()
@@ -147,7 +148,7 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
             <div className="text-center text-sm">
               Đã có tài khoản?{' '}
               <Link
-                href="/sign-in"
+                href={routes.buyersignIn}
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
                 Đăng nhập

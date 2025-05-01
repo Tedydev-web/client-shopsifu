@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
+import { routes } from '@/constants/route'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { onSubmit, loading } = useSignin()
@@ -72,7 +73,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                     <div className="flex items-center justify-between">
                       <FormLabel>Mật khẩu</FormLabel>
                       <Link
-                        href="/forgot-password"
+                        href={routes.buyerforgotPassword}
                         className="text-sm text-primary hover:underline underline-offset-4"
                       >
                         Quên mật khẩu?
@@ -116,7 +117,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
             <div className="text-center text-sm">
               Chưa có tài khoản?{' '}
               <Link
-                href="/sign-up"
+                href={routes.buyersignUp}
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
                 Đăng ký tại đây

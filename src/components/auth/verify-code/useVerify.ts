@@ -13,7 +13,7 @@ export function useVerify() {
     // Simulate OTP verification success
     setTimeout(() => {
       setLoading(false)
-      router.push('/admin/reset-password') // Redirect after verification
+      router.push('/dashboard') // Redirect after verification
     }, 2000)
   }
 

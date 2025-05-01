@@ -22,6 +22,7 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
+import { routes } from '@/constants/route'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { loading, onSubmit } = useForgotPassword()
@@ -83,7 +84,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             <div className="text-center text-sm">
               Đã nhớ mật khẩu?{' '}
               <Link
-                href="/sign-in"
+                href={routes.buyersignIn}
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
                 Đăng nhập
