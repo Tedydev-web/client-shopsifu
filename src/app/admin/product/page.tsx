@@ -33,7 +33,7 @@ export default function ProductPage() {
           <div
             key={product.id}
             className="border rounded-xl shadow-sm p-4 flex flex-col gap-3 
-              hover:shadow-lg hover:scale-105 transition-transform duration-300 bg-white"
+              hover:shadow-lg hover:scale-105 transition-transform duration-300 #042940"
           >
             <Image
               src={product.image}

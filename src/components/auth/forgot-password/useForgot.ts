@@ -10,11 +10,11 @@ export function useForgotPassword() {
   const onSubmit = async (data: z.infer<typeof ForgotPasswordSchema>) => {
     setLoading(true)
     console.log(data)
-    // Simulate sending reset password email
+    // Giả lập gửi email đặt lại mật khẩu
     setTimeout(() => {
       setLoading(false)
       alert('If the email exists, you will receive instructions to reset your password.')
-      router.push('/admin/verify') // Redirect after sending email
+      router.push('/admin/verify') // Chuyển hướng sau khi gửi email
     }, 2000)
   }
 
