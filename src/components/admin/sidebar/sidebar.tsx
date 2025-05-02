@@ -1,45 +1,48 @@
-// sidebar.tsx
 'use client';
 
+import { X, Home, ShoppingCart, Users } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import { X } from 'lucide-react';
-import { DashboardItem, ProductItem, UserItem } from './sidebaritem';
+import { ProductSubItems } from './productitem';
 
-export function Sidebar({
-  className,
-  isOpen,
-  setIsOpen,
-}: {
-  className?: string;
+type SidebarProps = {
   isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-}) {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed md:static top-0 left-0 z-50 h-full w-64 shrink-0 border-r bg-[#042940] text-[#F0F4F8] p-6 shadow-sm transition-transform transform',
-        isOpen ? 'translate-x-0' : '-translate-x-full',
-        'md:translate-x-0 md:relative',
-        className
+        'fixed z-50 inset-y-0 left-0 w-64 bg-[#042940] p-4 transition-transform transform md:translate-x-0 md:static md:inset-0',
+        isOpen ? 'translate-x-0' : '-translate-x-full'
       )}
     >
-      <div className="flex items-center justify-between mb-6 md:hidden">
-        <div className="text-2xl font-bold">Admin Panel</div>
+      <div className="flex justify-between items-center mb-6 md:hidden">
+        <h2 className="text-lg font-semibold text-white">Menu</h2>
         <button onClick={() => setIsOpen(false)}>
-          <X size={24} />
+          <X className="text-white" />
         </button>
       </div>
 
-      <div className="flex items-center gap-2 mb-8">
-        <Image src="/logo.svg" alt="Logo" width={32} height={32} />
-        <span className="text-xl font-bold text-white">Admin Panel</span>
-      </div>
+      <nav className="space-y-2 text-[#F0F4F8]">
+        <Link href="/admin/dashboard" className="flex items-center gap-2 p-2 hover:bg-[#064663] rounded">
+          <Home size={18} />
+          Dashboard
+        </Link>
 
-      <nav className="flex flex-col space-y-2 text-sm font-medium">
-        <DashboardItem />
-        <ProductItem />
-        <UserItem />
+        <div>
+          <div className="flex items-center gap-2 p-2 hover:bg-[#064663] rounded">
+            <ShoppingCart size={18} />
+            Products
+          </div>
+          <ProductSubItems />
+        </div>
+
+        <Link href="/admin/users" className="flex items-center gap-2 p-2 hover:bg-[#064663] rounded">
+          <Users size={18} />
+          Users
+        </Link>
       </nav>
     </aside>
   );
