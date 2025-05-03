@@ -147,7 +147,7 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
             <div className="text-center text-sm">
               Đã có tài khoản?{' '}
               <Link
-                href="/sign-in"
+                href="/buyer/sign-in"
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
                 Đăng nhập

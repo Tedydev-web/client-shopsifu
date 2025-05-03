@@ -100,7 +100,7 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
             <div className="text-center text-sm">
               Nhớ mật khẩu?{' '}
               <Link
-                href="/sign-in"
+                href="/buyer/sign-in"
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
                 Đăng nhập
