@@ -20,5 +20,33 @@ export const metadataConfig = {
       title: 'Xác minh mã OTP tài khoản - Mua sắm Online | Shopsifu Việt Nam',
       description: 'Xác minh tài khoản của bạn bằng mã OTP.',
     },
+    '/seller/sign-in': {
+      title: 'Đăng nhập tài khoản - Mua sắm Online | Shopsifu Việt Nam',
+      description: 'Đăng nhập tài khoản để tiếp tục mua sắm cùng Shopsifu.',
+    },
+
+    // --------------------------------SELLER------------------------------------ //
+    '/seller/sign-up': {
+      title: 'Đăng ký tài khoản - Mua sắm Online | Shopsifu Việt Nam',
+      description: 'Tạo tài khoản mới và bắt đầu mua sắm ngay.',
+    },
+    '/seller/forgot-password': {
+      title: 'Quên mật khẩu tài khoản - Mua sắm Online | Shopsifu Việt Nam',
+      description: 'Đặt lại mật khẩu một cách nhanh chóng.',
+    },
+    '/seller/reset-password': {
+      title: 'Đặt lại mật khẩu tài khoản - Mua sắm Online | Shopsifu Việt Nam',
+      description: 'Nhập mật khẩu mới để khôi phục tài khoản của bạn.',
+    },
+    '/seller/verify-code': {
+      title: 'Xác minh mã OTP tài khoản - Mua sắm Online | Shopsifu Việt Nam',
+      description: 'Xác minh tài khoản của bạn bằng mã OTP.',
+    },
+
+    // --------------------------------ADMIN------------------------------------ //
+    '/admin':{
+      title:'Shopsifu - Kênh người bán',
+      description:'Shopsifu - Tổng quan bán hàng'
+    }
   } satisfies Record<string, { title: string; description: string }>
   

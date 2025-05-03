@@ -82,16 +82,8 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 h-screen bg-white border-r fixed left-0 top-0 overflow-y-auto z-40">
+    <aside className="w-64 h-[calc(100vh-4rem)] bg-white border-r fixed left-0 top-16 overflow-y-auto z-20">
       <div className="p-4">
-        <div className="flex items-center justify-center mb-4">
-          <img
-            src="/images/logo/logofullred.png"
-            alt="Logo"
-            className="h-16 w-auto"
-          />
-        </div>
-
         <nav className="space-y-2">
           {sidebarConfig.map(item => renderItem(item))}
         </nav>

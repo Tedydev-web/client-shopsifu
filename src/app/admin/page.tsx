@@ -1,5 +1,5 @@
-'use client'
-
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
 import { Card } from '@/components/ui/card'
 import { 
   ShoppingCart, 
@@ -41,6 +41,7 @@ const stats = [
   }
 ]
 
+export const metadata: Metadata = metadataConfig['/admin']
 export default function AdminDashboard() {
   return (
     <div className="space-y-6">
