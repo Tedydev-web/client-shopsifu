@@ -20,6 +20,12 @@ const mockProducts = [
     name: 'Giày thể thao',
     price: 499000,
     image: '/images/products/shoes1.jpg'
+  },
+  {
+    id: 4,
+    name: 'Áo sơ mi',
+    price: 250000,
+    image: '/images/products/shirt2.jpg'
   }
 ]
 
@@ -28,12 +34,12 @@ export default function ProductPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Danh sách sản phẩm</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {mockProducts.map((product) => (
           <div
             key={product.id}
             className="border rounded-xl shadow-sm p-4 flex flex-col gap-3 
-              hover:shadow-lg hover:scale-105 transition-transform duration-300 #042940"
+              hover:shadow-2xl hover:scale-105 transition-transform duration-300 hover:border-[#D0201C]"
           >
             <Image
               src={product.image}

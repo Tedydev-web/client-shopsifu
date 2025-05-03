@@ -7,7 +7,7 @@ export function ProductSubItems() {
         Product List
       </Link>
       <Link href="/admin/products/add" className="block px-2 py-1 hover:text-white">
-        Add Product
+        Add Products
       </Link>
       <Link href="/admin/products/categories" className="block px-2 py-1 hover:text-white">
         Categories

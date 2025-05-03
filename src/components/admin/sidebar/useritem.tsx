@@ -5,7 +5,7 @@ import { Users } from 'lucide-react';
 
 export function UserItem() {
   return (
-    <div className="flex items-center gap-2 p-2 hover:bg-[#0a384f] rounded">
+    <div className="flex items-center gap-2 p-2 hover:bg-[#D0201C] rounded">
       <Users size={18} />
       <span className="text-white">Users</span>
     </div>

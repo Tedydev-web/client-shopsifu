@@ -8,13 +8,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-white text-[#1A1A1A]">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       <div className="flex flex-col flex-1">
         <Topbar onMenuClick={() => setSidebarOpen((prev) => !prev)} />
 
-        <main className="flex-1 overflow-y-auto p-6 text-[#F0F4F8] bg-gradient-to-b from-[#001E2B] via-[#042940] to-[#001E2B]">
+        <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
       </div>
