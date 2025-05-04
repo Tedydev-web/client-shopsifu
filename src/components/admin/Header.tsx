@@ -1,17 +1,31 @@
+'use client'
+
 import Link from 'next/link'
-import { 
-  Bell, 
-  Search, 
-  Settings, 
-  User,
-  ChevronDown
-} from 'lucide-react'
 import Image from 'next/image'
+import {
+  Bell,
+  Search,
+  Settings,
+  User,
+  ChevronDown,
+  Store,
+  Globe,
+  LogOut
+} from 'lucide-react'
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 
 export function Header() {
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-16 shadow-sm">
       <div className="flex items-center justify-between h-full px-6">
+
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/admin" className="flex items-center">
@@ -37,25 +51,64 @@ export function Header() {
 
         {/* Right section: notifications, settings, profile */}
         <div className="flex items-center space-x-4">
+
           <button className="p-2 rounded-full hover:bg-gray-100 relative">
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
           </button>
-          
+
           <button className="p-2 rounded-full hover:bg-gray-100">
             <Settings className="h-5 w-5 text-gray-600" />
           </button>
-          
-          <div className="flex items-center cursor-pointer">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <User className="h-5 w-5 text-gray-600" />
-            </div>
-            <div className="ml-2 hidden md:block">
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-gray-500">admin@shopsifu.com</p>
-            </div>
-            <ChevronDown className="h-4 w-4 text-gray-400 ml-1" />
-          </div>
+
+          {/* Dropdown Profile */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center cursor-pointer space-x-2 px-2 py-1 hover:bg-gray-100 rounded-md">
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                  <User className="h-5 w-5 text-gray-600" />
+                </div>
+                <span className="hidden md:inline text-sm font-medium text-gray-700">
+                  Hello, tung63soi
+                </span>
+                <ChevronDown className="h-4 w-4 text-gray-400" />
+              </div>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-64 mr-4">
+              <div className="flex flex-col items-center py-4">
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mb-2">
+                  <User className="h-6 w-6 text-gray-600" />
+                </div>
+                <p className="text-sm font-medium">tung63soi</p>
+              </div>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem>
+                <Store className="w-4 h-4 mr-2" />
+                Hồ Sơ Shop
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <Settings className="w-4 h-4 mr-2" />
+                Thiết Lập Shop
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <Globe className="w-4 h-4 mr-2" />
+                Tiếng Việt (Vietnamese)
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem className="text-red-600">
+                <LogOut className="w-4 h-4 mr-2" />
+                Đăng xuất
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         </div>
       </div>
     </header>
