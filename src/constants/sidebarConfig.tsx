@@ -96,5 +96,48 @@ export const sidebarConfig: SidebarItem[] = [
     title: 'Hỗ trợ',
     href: '/admin/support',
     icon: <HelpCircle className="w-5 h-5" />,
+  },
+  {
+    title: 'Hệ thống',
+    href: '/admin/orders',
+    icon: <ShoppingCart className="w-5 h-5" />,
+    subItems: [
+      {
+        title: 'Nhật ký hoạt động',
+        href: '/admin/Activity_log',
+        icon: null,
+      },
+      {
+        title: 'Quản lý người dùng',
+        href: '/admin/Users',
+        icon: null,
+      },
+      {
+        title: 'Quản lý người bán hàng',
+        href: '/admin/sellers',
+        icon: null,
+      },
+      {
+        title: 'Phân quyền tính năng',
+        href: '/admin/feature',
+        icon: null,
+      },
+      {
+        title: 'Quản lý role',
+        href: '/admin/orders/processed',
+        icon: null,
+      },
+      {
+        title: 'Quản lý danh mục sidebar',
+        href: '/admin/orders/processed',
+        icon: null,
+      },
+      {
+        title: 'Quản lý danh mục của client',
+        href: '/admin/orders/processed',
+        icon: null,
+      },
+    ],
   }
+  
 ]
