@@ -10,9 +10,10 @@ import {
   ChevronDown,
   Store,
   Globe,
-  LogOut
+  LogOut,
+  Menu
 } from 'lucide-react'
-
+import { useResponsive } from '@/hooks/useResponsive'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -21,13 +22,24 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 
-export function Header() {
+interface HeaderProps {
+  onToggleSidebar: () => void;
+}
+
+export function Header({ onToggleSidebar }: HeaderProps) {
+  const { isMobile } = useResponsive()
+
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-16 shadow-sm">
-      <div className="flex items-center justify-between h-full px-6">
+      <div className="flex items-center justify-between h-full px-4 md:px-6">
 
-        {/* Logo */}
-        <div className="flex items-center">
+        {/* Logo + Hamburger */}
+        <div className="flex items-center gap-4">
+          {isMobile && (
+            <button onClick={onToggleSidebar} className="text-gray-700">
+              <Menu className="w-6 h-6" />
+            </button>
+          )}
           <Link href="/admin" className="flex items-center">
             <Image 
               src="/images/logo/logofullred.png" 
@@ -40,18 +52,19 @@ export function Header() {
         </div>
 
         {/* Search bar */}
-        <div className="hidden md:flex items-center max-w-md w-full relative">
-          <Search className="absolute left-3 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          />
-        </div>
+        {!isMobile && (
+          <div className="flex items-center max-w-md w-full relative">
+            <Search className="absolute left-3 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm..."
+              className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            />
+          </div>
+        )}
 
-        {/* Right section: notifications, settings, profile */}
+        {/* Right section */}
         <div className="flex items-center space-x-4">
-
           <button className="p-2 rounded-full hover:bg-gray-100 relative">
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
@@ -89,12 +102,10 @@ export function Header() {
                 <Store className="w-4 h-4 mr-2" />
                 Hồ Sơ Shop
               </DropdownMenuItem>
-
               <DropdownMenuItem>
                 <Settings className="w-4 h-4 mr-2" />
                 Thiết Lập Shop
               </DropdownMenuItem>
-
               <DropdownMenuItem>
                 <Globe className="w-4 h-4 mr-2" />
                 Tiếng Việt (Vietnamese)
@@ -108,7 +119,6 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
         </div>
       </div>
     </header>

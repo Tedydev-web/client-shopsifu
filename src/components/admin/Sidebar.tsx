@@ -4,12 +4,26 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { sidebarConfig, SidebarItem } from '@/constants/sidebarConfig'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useResponsive } from '@/hooks/useResponsive'
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
   const pathname = usePathname()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const [internalOpen, setInternalOpen] = useState(false)
+  const { isMobile } = useResponsive()
+
+  const open = externalOpen ?? internalOpen
+  const setOpen = (value: boolean) => {
+    setInternalOpen(value)
+    onOpenChange?.(value)
+  }
 
   const toggleItem = (href: string) => {
     setExpandedItems(prev =>
@@ -19,9 +33,7 @@ export function Sidebar() {
     )
   }
 
-  const isActive = (href: string) => {
-    return pathname === href || pathname.startsWith(href + '/')
-  }
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
   const renderItem = (item: SidebarItem, level: number = 0) => {
     const hasSubItems = item.subItems && item.subItems.length > 0
@@ -33,7 +45,7 @@ export function Sidebar() {
         <div
           className={cn(
             'flex items-center justify-between px-4 py-2 rounded-md',
-            'transition-colors duration-200',
+            'transition-colors duration-200 cursor-pointer',
             level === 0 && 'hover:bg-primary/10',
             level > 0 && 'hover:text-primary',
             isItemActive && level === 0 && 'bg-primary/10 text-primary',
@@ -42,32 +54,24 @@ export function Sidebar() {
           onClick={() => hasSubItems ? toggleItem(item.href) : undefined}
         >
           {hasSubItems ? (
-            <div className="flex items-center gap-3 flex-1 cursor-pointer">
+            <div className="flex items-center gap-3 flex-1">
               {level === 0 && item.icon}
-              <span className={cn(
-                "text-sm font-medium",
-                level > 0 && "text-muted-foreground"
-              )}>{item.title}</span>
+              <span className={cn("text-sm font-medium", level > 0 && "text-muted-foreground")}>
+                {item.title}
+              </span>
             </div>
           ) : (
-            <Link
-              href={item.href}
-              className="flex items-center gap-3 flex-1"
-            >
+            <Link href={item.href} className="flex items-center gap-3 flex-1">
               {level === 0 && item.icon}
-              <span className={cn(
-                "text-sm font-medium",
-                level > 0 && "text-muted-foreground"
-              )}>{item.title}</span>
+              <span className={cn("text-sm font-medium", level > 0 && "text-muted-foreground")}>
+                {item.title}
+              </span>
             </Link>
           )}
 
           {hasSubItems && (
             <ChevronDown
-              className={cn(
-                'w-4 h-4 transition-transform duration-200 text-muted-foreground',
-                isExpanded && 'rotate-180'
-              )}
+              className={cn('w-4 h-4 transition-transform duration-200 text-muted-foreground', isExpanded && 'rotate-180')}
             />
           )}
         </div>
@@ -82,12 +86,34 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 h-[calc(100vh-4rem)] bg-white border-r fixed left-0 top-16 overflow-y-auto z-20">
-      <div className="p-4">
-        <nav className="space-y-2">
-          {sidebarConfig.map(item => renderItem(item))}
-        </nav>
-      </div>
-    </aside>
+    <>
+      {/* Overlay when mobile menu is open */}
+      {isMobile && open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={cn(
+        'w-64 h-[calc(100vh-4rem)] border-r bg-white overflow-y-auto',
+        isMobile ? 'fixed top-16 z-40 transition-transform duration-300' : 'sticky top-16',
+        isMobile && !open && '-translate-x-full'
+      )}>
+        {isMobile && (
+          <div className="flex justify-end p-4">
+            <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-red-500">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+        <div className="p-4 pt-0">
+          <nav className="space-y-2">
+            {sidebarConfig.map(item => renderItem(item))}
+          </nav>
+        </div>
+      </aside>
+    </>
   )
 }
