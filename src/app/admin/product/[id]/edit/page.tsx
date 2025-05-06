@@ -1,0 +1,1 @@
+localhost:3000/admin/product/10/edit

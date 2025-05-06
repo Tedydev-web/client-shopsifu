@@ -99,7 +99,7 @@ export const sidebarConfig: SidebarItem[] = [
   },
   {
     title: 'Hệ thống',
-    href: '/admin/orders',
+    href: '/admin/system',
     icon: <ShoppingCart className="w-5 h-5" />,
     subItems: [
       {
