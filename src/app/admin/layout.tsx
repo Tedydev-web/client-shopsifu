@@ -19,20 +19,22 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen bg-background">
       <Header onToggleSidebar={handleToggleSidebar} />
-      <div className="pt-16 flex">
-        <Sidebar isOpen={sidebarOpen} onOpenChange={setSidebarOpen} />
-        <div className={cn(
-          "flex-1 transition-[margin] duration-300 ease-in-out",
-          !isMobile && (sidebarOpen ? "ml-64" : "ml-0")
-        )}>
-          <main className="p-6">
-            <div className="max-w-[2000px] mx-auto">
-              {children}
-            </div>
-          </main>
-        </div>
+      <Sidebar isOpen={sidebarOpen} onOpenChange={setSidebarOpen} />
+      <div
+        className={cn(
+          "min-h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out",
+          isMobile
+            ? "mt-16"
+            : "mt-16 ml-64" // Always keep margin for desktop/laptop
+        )}
+      >
+        <main className="p-6">
+          <div className="max-w-[2000px] mx-auto">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   )

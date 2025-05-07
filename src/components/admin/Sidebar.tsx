@@ -41,7 +41,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
     const isItemActive = isActive(item.href)
 
     return (
-      <div key={item.href}>
+      <div key={item.href} className={cn(level > 0 && "pt-1")}>
         <div
           className={cn(
             'flex items-center justify-between px-4 py-2 rounded-md',
@@ -49,7 +49,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
             level === 0 && 'hover:bg-primary/10',
             level > 0 && 'hover:text-primary',
             isItemActive && level === 0 && 'bg-primary/10 text-primary',
-            level > 0 && 'pl-8'
+            level > 0 && 'pl-10'
           )}
           onClick={() => hasSubItems ? toggleItem(item.href) : undefined}
         >
@@ -77,7 +77,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
         </div>
 
         {hasSubItems && isExpanded && (
-          <div className="mt-1 space-y-1">
+          <div className="mt-1 space-y-0.5">
             {item.subItems?.map(subItem => renderItem(subItem, level + 1))}
           </div>
         )}
@@ -90,26 +90,38 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
       {/* Overlay when mobile menu is open */}
       {isMobile && open && (
         <div
-          className="fixed inset-0 bg-black/40 z-30"
+          className="fixed inset-0 bg-black/40 z-40"
           onClick={() => setOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        'w-64 h-[calc(100vh-4rem)] border-r bg-white overflow-y-auto',
-        isMobile ? 'fixed top-16 z-40 transition-transform duration-300' : 'sticky top-16',
-        isMobile && !open && '-translate-x-full'
+        'w-64 bg-white border-r h-[calc(100vh-4rem)] fixed top-16',
+        {
+          // Mobile styles
+          'inset-y-0 left-0 z-50 h-screen transition-transform duration-300': isMobile,
+          '-translate-x-full': isMobile && !open,
+        }
       )}>
         {isMobile && (
-          <div className="flex justify-end p-4">
-            <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-red-500">
+          <div className="flex items-center justify-between h-16 px-4 border-b">
+            <Link href="/admin" className="flex items-center gap-2">
+              <span className="text-lg font-semibold text-primary">ShopSifu Admin</span>
+            </Link>
+            <button 
+              onClick={() => setOpen(false)}
+              className="text-gray-500 hover:text-red-500"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
         )}
-        <div className="p-4 pt-0">
-          <nav className="space-y-2">
+        <div className={cn(
+          "h-full overflow-y-auto",
+          isMobile && "h-[calc(100vh-4rem)]"
+        )}>
+          <nav className="p-4 space-y-2">
             {sidebarConfig.map(item => renderItem(item))}
           </nav>
         </div>
