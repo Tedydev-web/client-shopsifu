@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { sidebarConfig, SidebarItem } from '@/constants/sidebarConfig'
 import { ChevronDown, X } from 'lucide-react'
@@ -106,8 +107,14 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
       )}>
         {isMobile && (
           <div className="flex items-center justify-between h-16 px-4 border-b">
-            <Link href="/admin" className="flex items-center gap-2">
-              <span className="text-lg font-semibold text-primary">ShopSifu Admin</span>
+            <Link href="/admin" className="flex items-center">
+              <Image 
+                src="/images/logo/logofullred.png" 
+                alt="Shopsifu Logo" 
+                width={116} 
+                height={66} 
+                className="mr-2"
+              />
             </Link>
             <button 
               onClick={() => setOpen(false)}
