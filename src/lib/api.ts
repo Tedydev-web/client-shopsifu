@@ -5,6 +5,8 @@ import axios, {
     InternalAxiosRequestConfig,
   } from 'axios';
 import { getToken, setToken, removeToken } from './auth';
+import { ErrorResponse } from '@/types/base.interface'
+
   
   // Định nghĩa URL gốc cho API, lấy từ biến môi trường
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
@@ -23,10 +25,42 @@ import { getToken, setToken, removeToken } from './auth';
   //
   // ==================== PUBLIC AXIOS (Không cần token) ====================
   //
-  export const publicAxios = axios.create({
+  // export const publicAxios = axios.create({
+  //   baseURL: BASE_URL,
+  //   withCredentials: false, // Gửi kèm cookie nếu có
+  // });
+
+
+
+export const publicAxios = axios.create({
     baseURL: BASE_URL,
-    withCredentials: true, // Gửi kèm cookie nếu có
-  });
+    withCredentials: false // Giữ nếu cần cookie, hoặc false nếu không cần
+})
+
+// ✅ Interceptors: handle SUCCESS + ERROR
+publicAxios.interceptors.response.use(
+    (response: AxiosResponse) => {
+        // 🟢 Handle thành công
+        console.log('✅ API success:', response)
+        return response
+    },
+    (error) => {
+        // 🔴 Handle lỗi
+        if (axios.isAxiosError(error)) {
+            const errorResponse = error.response?.data as ErrorResponse
+
+            console.error('❌ API error:', errorResponse)
+
+            // NÉM RA lỗi chuẩn
+            return Promise.reject(errorResponse)
+        }
+
+        // Trường hợp không phải lỗi Axios (ví dụ mạng bị mất)
+        return Promise.reject(error)
+    }
+)
+
+
   
   //
   // ==================== REFRESH AXIOS (Dùng riêng để refresh token) ====================

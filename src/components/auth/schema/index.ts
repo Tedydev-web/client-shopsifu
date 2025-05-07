@@ -1,5 +1,12 @@
 import * as z from 'zod';
 
+
+
+export const EmailSchema = z.object({
+  email: z.string().email({ message: 'Email không hợp lệ' })
+})
+
+
 export const RegisterSchema = z.object({
   email: z.string().email({
     message: 'Vui lòng nhập một địa chỉ email hợp lệ'
@@ -7,6 +14,8 @@ export const RegisterSchema = z.object({
   name: z.string().min(1, {
     message: 'Vui lòng nhập họ và tên của bạn'
   }),
+  phoneNumber: z.string().min(10, { message: 'Số điện thoại phải có ít nhất 10 số' }),
+  code: z.string().min(6, { message: 'Mã xác thực phải có 6 chữ số' }),
   password: z
     .string()
     .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
