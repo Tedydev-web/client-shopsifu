@@ -40,6 +40,12 @@ export default function ProductsPage() {
     // Thêm nhiều sản phẩm mẫu khác...
   ])
 
+  // Mock categories data - sẽ được thay thế bằng dữ liệu thật từ API
+  const [categories] = useState([
+    { id: "1", name: "Danh mục 1" },
+    { id: "2", name: "Danh mục 2" },
+  ])
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -54,7 +60,7 @@ export default function ProductsPage() {
           Thêm sản phẩm
         </Button>
       </div>
-      <DataTable columns={columns} data={products} />
+      <DataTable columns={columns} data={products} categories={categories} />
     </div>
-  ) // Added missing closing parenthesis
+  )
 }

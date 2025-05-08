@@ -52,7 +52,7 @@ export const sidebarConfig: SidebarItem[] = [
     subItems: [
       {
         title: 'Danh sách sản phẩm',
-        href: '/admin/products',
+        href: '/admin/product',
         icon: null,
       },
       {

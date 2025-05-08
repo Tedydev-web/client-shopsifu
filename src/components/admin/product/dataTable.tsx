@@ -2,7 +2,19 @@
 
 import * as React from "react"
 import Image from "next/image"
-import {
+import { 
+  Download,
+  FileSpreadsheet,
+  FileText,
+  Settings2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Filter
+} from "lucide-react"
+import { 
   ColumnDef,
   ColumnFiltersState,
   SortingState,
@@ -16,8 +28,8 @@ import {
   getSortedRowModel,
   useReactTable,
   Table as TableInstance,
+  Column
 } from "@tanstack/react-table"
-import { X, Settings2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Table,
@@ -36,6 +48,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import {
   Select,
@@ -44,6 +62,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 
 interface Product {
   id: string
@@ -55,8 +74,89 @@ interface Product {
   status: string
 }
 
+// DataTableFacetedFilter Component
+interface DataTableFacetedFilterProps<TData> {
+  column?: Column<TData, unknown>
+  title?: string
+  options: {
+    label: string
+    value: string
+  }[]
+}
+
+export function DataTableFacetedFilter<TData>({
+  column,
+  title,
+  options,
+}: DataTableFacetedFilterProps<TData>) {
+  if (!column) return null;
+  
+  const facets = column.getFacetedUniqueValues()
+  const selectedValues = new Set(column.getFilterValue() as string[])
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-8">
+          <Filter className="mr-2 h-4 w-4" />
+          {title}
+          {selectedValues?.size > 0 && (
+            <>
+              <Badge
+                variant="secondary"
+                className="rounded-sm px-1 font-normal lg:hidden"
+              >
+                {selectedValues.size}
+              </Badge>
+              <div className="hidden space-x-1 lg:flex">
+                {selectedValues.size > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="rounded-sm px-1 font-normal"
+                  >
+                    {selectedValues.size}
+                  </Badge>
+                )}
+              </div>
+            </>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-[200px]">
+        <DropdownMenuLabel>{title}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {options.map((option) => {
+          const isSelected = selectedValues.has(option.value)
+          return (
+            <DropdownMenuCheckboxItem
+              key={option.value}
+              checked={isSelected}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  selectedValues.add(option.value)
+                } else {
+                  selectedValues.delete(option.value)
+                }
+                const filterValues = Array.from(selectedValues)
+                column?.setFilterValue(filterValues.length ? filterValues : undefined)
+              }}
+            >
+              {option.label}
+              {facets?.get(option.value) && (
+                <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                  {facets.get(option.value)}
+                </span>
+              )}
+            </DropdownMenuCheckboxItem>
+          )
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 // DataTableViewOptions Component
-function DataTableViewOptions<TData>({
+export function DataTableViewOptions<TData>({
   table,
 }: {
   table: TableInstance<TData>
@@ -180,49 +280,127 @@ function DataTablePagination<TData>({
 }
 
 // DataTableToolbar Component
-function DataTableToolbar<TData>({
+interface DataTableToolbarProps<TData> {
+  table: TableInstance<TData>;
+  categories: { id: string; name: string }[];
+}
+
+export function DataTableToolbar<TData>({
   table,
-}: {
-  table: TableInstance<TData>
-}) {
-  const isFiltered = table.getState().columnFilters.length > 0
+  categories
+}: DataTableToolbarProps<TData>) {
+  const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Tìm kiếm sản phẩm..."
+          placeholder="Search products..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
+        {/* Category filter */}
+        {table.getColumn("category") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("category")}
+            title="Category"
+            options={categories.map(cat => ({
+              label: cat.name,
+              value: cat.id.toString()
+            }))}
+          />
+        )}
+        {/* Status filter */}
+        {table.getColumn("status") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("status")}
+            title="Status"
+            options={[
+              { label: "Active", value: "active" },
+              { label: "Inactive", value: "inactive" }
+            ]}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
             className="h-8 px-2 lg:px-3"
           >
-            Xóa bộ lọc
+            Reset
             <X className="ml-2 h-4 w-4" />
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="ml-auto h-8">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Export Options</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup value="all">
+            <DropdownMenuRadioItem value="today" onClick={() => exportData('excel', 'today')}>
+              Today&apos;s Data
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="week" onClick={() => exportData('excel', 'week')}>
+              This Week
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="month" onClick={() => exportData('excel', 'month')}>
+              This Month
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="all" onClick={() => exportData('excel', 'all')}>
+              All Time
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Export Format</DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem onClick={() => exportData('excel', 'all')}>
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportData('pdf', 'all')}>
+                <FileText className="mr-2 h-4 w-4" />
+                PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportData('csv', 'all')}>
+                <FileText className="mr-2 h-4 w-4" />
+                CSV
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
-  )
+  );
+}
+
+// Add the exportData function before the DataTable component
+function exportData(format: 'excel' | 'pdf' | 'csv', timeRange: string) {
+  // This is a placeholder function - implement actual export logic here
+  console.log(`Exporting data in ${format} format for time range: ${timeRange}`)
+  // You would typically make an API call here to get the data in the desired format
 }
 
 // Main DataTable Component
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  categories: { id: string; name: string }[]
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  categories,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -253,7 +431,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} categories={categories} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
