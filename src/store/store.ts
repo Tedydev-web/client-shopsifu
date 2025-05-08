@@ -11,6 +11,15 @@ const encryptor = encryptTransform({
   onError: (err) => console.error('Encrypt error:', err),
 });
 
+// // Mã hoá dữ liệu khi lưu Redux persist (chỉ khi có secretKey)
+// const encryptor = secretKey
+//   ? encryptTransform({
+//       secretKey,
+//       onError: (err) => console.error('Encrypt error:', err),
+//     })
+//   : undefined;
+
+
 // Kết hợp reducer
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -24,7 +33,7 @@ const persistConfig = {
   transforms: [encryptor],
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(persistConfig, rootReducer);
 
 export const makeStore = () => {
   const store = configureStore({

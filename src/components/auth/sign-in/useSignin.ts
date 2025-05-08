@@ -8,6 +8,7 @@ import { ROUTES } from '@/constants/route'
 import { showToast } from '@/components/ui/toastify'
 import { setCredentials } from '@/store/features/auth/authSlide'
 import { AppDispatch } from '@/store/store'
+import { ErrorResponse } from '@/types/base.interface'
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)
@@ -16,23 +17,34 @@ export function useSignin() {
 
   const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
     try {
-      setLoading(true)
-      const response = await authService.login(data)
-      
-      // Lưu token vào Redux store
+      setLoading(true);
+      const response = await authService.login(data);
+
+      // Lưu token vào Redux
       dispatch(setCredentials({
         token: response.accessToken
-      }))
-      
-      showToast('Đăng nhập thành công!', 'success')
-      router.push(ROUTES.ADMIN.DASHBOARD)
+      }));
+
+      showToast('Đăng nhập thành công!', 'success');
+      router.push(ROUTES.ADMIN.DASHBOARD); // hoặc '/buyer' tuỳ theo vai trò
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại'
-      showToast(errorMessage, 'error')
+      let firstMessage = 'Đăng nhập thất bại'
+      console.error('Login error:', error)
+
+      // Đảm bảo error là object và có field message
+      const errMsg = error?.response?.data?.message || error?.message;
+
+      if (Array.isArray(errMsg)) {
+        firstMessage = errMsg[0]?.message || firstMessage;
+      } else if (typeof errMsg === 'string') {
+        firstMessage = errMsg;
+      }
+
+      showToast(firstMessage, 'error');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return { onSubmit, loading }
 }
