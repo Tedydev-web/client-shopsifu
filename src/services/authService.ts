@@ -20,11 +20,6 @@ export const authService = {
     return response.data;
   },
 
-  // sendOTP: async (data: SendOTPRequest): Promise<SendOTPResponse> => {
-  //   const response = await publicAxios.post<SendOTPResponse>(API_ENDPOINTS.AUTH.SEND_OTP, data);
-  //   return response.data;
-  // },
-
   sendOTP: async (data: SendOTPRequest): Promise<SendOTPResponse> => {
     const response = await publicAxios.post<SendOTPResponse>(
         API_ENDPOINTS.AUTH.SEND_OTP,
@@ -32,7 +27,6 @@ export const authService = {
     )
     return response.data
   },
-
 
   refreshToken: async (): Promise<{ token: string }> => {
     const response = await publicAxios.post<{ token: string }>(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
