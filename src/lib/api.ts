@@ -22,14 +22,7 @@ import { ErrorResponse } from '@/types/base.interface'
     _retry?: boolean;
   }
   
-  //
   // ==================== PUBLIC AXIOS (Không cần token) ====================
-  //
-  // export const publicAxios = axios.create({
-  //   baseURL: BASE_URL,
-  //   withCredentials: false, // Gửi kèm cookie nếu có
-  // });
-
 
 
 export const publicAxios = axios.create({
