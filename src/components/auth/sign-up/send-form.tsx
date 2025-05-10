@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import {
   Form,
@@ -22,6 +21,7 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
+import { OAuthForm } from '../layout/OAuthForm'
 
 interface SendFormProps {
   onSuccess: (email: string) => void
@@ -94,21 +94,7 @@ export function SendForm({ onSuccess, className }: SendFormProps) {
 
       {/* Google Sign In and Login Link */}
       <div className="mt-8 space-y-6">
-        <AnimatedFormItem>
-          <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-            <span className="relative z-10 bg-background px-2 text-muted-foreground">
-              Hoặc tiếp tục với
-            </span>
-          </div>
-        </AnimatedFormItem>
-
-        <AnimatedButton
-          variant="outline"
-          className="w-full hover:border-primary hover:text-primary"
-        >
-          <Image src="/iconSvg/google.svg" alt="Google" width={20} height={20} />
-          Đăng nhập với Google
-        </AnimatedButton>
+        <OAuthForm type="signup" />
 
         <AnimatedFormItem>
           <div className="text-center text-sm">
