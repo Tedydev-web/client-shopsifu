@@ -2,7 +2,7 @@
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import {
@@ -14,7 +14,7 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import { ForgotPasswordSchema } from '../schema/index'
 import { useForgotPassword } from './useForgot'
 import {
@@ -25,7 +25,7 @@ import {
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { loading, onSubmit } = useForgotPassword()
-  const router = useRouter()
+  // const router = useRouter()
 
   const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
     resolver: zodResolver(ForgotPasswordSchema),
