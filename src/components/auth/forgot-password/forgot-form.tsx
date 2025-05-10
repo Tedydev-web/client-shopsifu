@@ -71,7 +71,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             <AnimatedButton
               size="xl"
               type="submit"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
               {loading ? 'Đang gửi...' : 'Xác nhận'}
@@ -82,7 +82,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           <AnimatedFormItem>
             <div className="text-center text-sm">
               Đã nhớ mật khẩu?{' '}
-              <Link
+              <Link 
                 href="/buyer/sign-in"
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
