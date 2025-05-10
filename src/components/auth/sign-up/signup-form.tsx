@@ -24,6 +24,7 @@ import {
   AnimatedButton
 } from '@/components/ui/animated-form'
 import { useState, useEffect } from 'react'
+import { PasswordInput } from '../passwordinput'
 
 interface SignupFormProps {
   email: string
@@ -153,7 +154,7 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
                     <FormItem>
                       <FormLabel>Mật khẩu</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="******" />
+                        <PasswordInput {...field} type="password" placeholder="******" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -169,7 +170,7 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
                     <FormItem>
                       <FormLabel>Xác nhận mật khẩu</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="******" />
+                        <PasswordInput {...field} type="password" placeholder="******" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

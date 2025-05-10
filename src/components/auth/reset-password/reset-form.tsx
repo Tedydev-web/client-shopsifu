@@ -21,6 +21,7 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
+import { PasswordInput } from '../passwordinput'
 
 export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const form = useForm<z.infer<typeof resetPasswordSchema>>({
@@ -59,7 +60,7 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
                   <FormItem>
                     <FormLabel>Mật khẩu mới</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" placeholder="******" />
+                      <PasswordInput {...field} type="password" placeholder="******" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -76,7 +77,7 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
                   <FormItem>
                     <FormLabel>Xác nhận mật khẩu mới</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" placeholder="******" />
+                      <PasswordInput {...field} type="password" placeholder="******" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
+import { PasswordInput } from '../passwordinput'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handlesignin, loading } = useSignin()
@@ -79,7 +80,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                       </Link>
                     </div>
                     <FormControl>
-                      <Input {...field} type="password" placeholder="******" />
+                      <PasswordInput {...field} type="password" placeholder="******" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
