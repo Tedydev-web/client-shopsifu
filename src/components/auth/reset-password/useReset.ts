@@ -7,7 +7,7 @@ export function useReset() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
+  const handleresetpassword = async (data: z.infer<typeof resetPasswordSchema>) => {
     setLoading(true)
     console.log(data)
     // Simulate successful password reset
@@ -18,5 +18,5 @@ export function useReset() {
     }, 2000)
   }
 
-  return { loading, onSubmit }
+  return { loading, handleresetpassword }
 }

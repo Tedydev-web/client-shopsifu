@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/animated-form'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-  const { loading, onSubmit } = useForgotPassword()
+  const { loading, handleforgotpassword } = useForgotPassword()
   const router = useRouter()
 
   const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
@@ -35,7 +35,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handleforgotpassword)}
         className={cn('flex flex-col gap-6', className)}
         {...props}
       >

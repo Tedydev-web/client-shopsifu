@@ -14,14 +14,15 @@ export function useSignin() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
 
-  const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
+  const handlesignin = async (data: z.infer<typeof LoginSchema>) => {
     try {
       setLoading(true)
       const response = await authService.login(data)
       
       // Lưu token vào Redux store
       dispatch(setCredentials({
-        token: response.accessToken
+        token: response.accessToken,
+        refreshToken: response.refreshToken
       }))
       
       showToast('Đăng nhập thành công!', 'success')
@@ -34,5 +35,5 @@ export function useSignin() {
     }
   }
 
-  return { onSubmit, loading }
+  return { handlesignin, loading }
 }

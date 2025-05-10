@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { useLogout } from '@/hooks/useLogout'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -28,6 +29,7 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
+  const { handleLogout, loading } = useLogout() // Sử dụng hook useLogout để lấy handleLogout và loading
 
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-16 shadow-sm">
@@ -113,9 +115,14 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="text-red-600">
+              {/* Đăng xuất */}
+              <DropdownMenuItem 
+                className="text-red-600" 
+                onClick={handleLogout} 
+                disabled={loading} // Vô hiệu hóa nút khi đang loading
+              >
                 <LogOut className="w-4 h-4 mr-2" />
-                Đăng xuất
+                {loading ? 'Đang đăng xuất...' : 'Đăng xuất'} {/* Hiển thị loading */}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

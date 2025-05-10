@@ -5,12 +5,14 @@ export const revertAll = createAction('REVERT_ALL');
 
 export interface AuthState {
   user: { id: string; name: string } | null;
-  token: string;
+  token: string; // access token
+  refreshToken: string;
 }
 
 const initialState: AuthState = {
   user: null,
   token: '',
+  refreshToken: '',
 };
 
 const authSlice = createSlice({
@@ -18,18 +20,22 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
+      console.log('action.payload', action.payload);
       state.user = action.payload.user;
-      state.token = action.payload.token;
+      state.token = action.payload.token; // access token
+      state.refreshToken = action.payload.refreshToken;
     },
     logOut: (state) => {
       state.user = null;
       state.token = '';
+      state.refreshToken = '';
     },
   },
   extraReducers: (builder) => {
     builder.addCase(revertAll, () => initialState);
   },
 });
+
 
 export const { setCredentials, logOut } = authSlice.actions;
 

@@ -33,8 +33,20 @@ export const authService = {
     return response.data;
   },
 
-  logout: async (): Promise<void> => {
-    await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT);
+  // logout: async (): Promise<void> => {
+  //   await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT);
+  // },
+  logout: async (accessToken: string, refreshToken: string): Promise<void> => {
+    // Gửi yêu cầu POST với Bearer token trong header và refresh token trong body
+    await privateAxios.post(
+      API_ENDPOINTS.AUTH.LOGOUT,
+      { refreshToken }, // refresh token gửi trong body
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // access token gửi trong header
+        },
+      }
+    );
   },
 
   getProfile: async () => {
