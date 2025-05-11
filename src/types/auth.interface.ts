@@ -1,4 +1,3 @@
-
 // LOGIN
 export interface LoginRequest {
   email: string;
@@ -45,6 +44,29 @@ export interface SendOTPResponse {
   type: string;
   expiresAt: string;
   createdAt: string;
+}
+
+export interface VerifyOTPRequest {
+  email: string;
+  code: string;
+  type: string;
+}
+
+export interface VerifyOTPResponse {
+  token: string;
+  email: string;
+  type: string;
+  verified: boolean;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
 }
 
 

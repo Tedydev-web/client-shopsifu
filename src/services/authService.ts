@@ -6,7 +6,11 @@ import {
   RegisterResponse,
   SendOTPRequest,
   SendOTPResponse,
-  oAuthLoginResponse 
+  oAuthLoginResponse,
+  VerifyOTPRequest,
+  VerifyOTPResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse 
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -26,6 +30,22 @@ export const authService = {
     const response = await publicAxios.post<SendOTPResponse>(
         API_ENDPOINTS.AUTH.SEND_OTP,
         data
+    )
+    return response.data
+  },
+
+  verifyOTP: async (data: VerifyOTPRequest): Promise<VerifyOTPResponse> => {
+    const response = await publicAxios.post<VerifyOTPResponse>(
+      API_ENDPOINTS.AUTH.VERIFY_OTP,
+      data
+    )
+    return response.data
+  },
+
+  resetPassword: async (data: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
+    const response = await publicAxios.post<ResetPasswordResponse>(
+      API_ENDPOINTS.AUTH.RESET_PASSWORD,
+      data
     )
     return response.data
   },

@@ -16,7 +16,7 @@ import {
   InputOTPGroup,
   InputOTPSlot
 } from '@/components/ui/input-otp'
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import { otpSchema } from '../schema/index'
 import { useVerify } from './useVerify'
 import {
@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/animated-form'
 
 export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-  const { loading, handleVerifyCode } = useVerify()
+  const { loading, onSubmit, resendOTP } = useVerify()
 
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
@@ -78,7 +78,7 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
           <AnimatedButton
             size="xl"
             type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
             disabled={loading}
           >
             {loading ? 'Đang xác minh...' : 'Xác minh OTP'}
@@ -90,7 +90,9 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
               Không nhận được mã?{' '}
               <button
                 type="button"
-                className="underline underline-offset-4 text-primary hover:text-primary/90"
+                onClick={resendOTP}
+                disabled={loading}
+                className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
               >
                 Gửi lại OTP
               </button>

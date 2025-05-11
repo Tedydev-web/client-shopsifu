@@ -2,7 +2,7 @@
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import {
@@ -14,7 +14,7 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import { ForgotPasswordSchema } from '../schema/index'
 import { useForgotPassword } from './useForgot'
 import {
@@ -24,8 +24,8 @@ import {
 } from '@/components/ui/animated-form'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-  const { loading, handleForgotPassword } = useForgotPassword()
-  const router = useRouter()
+  const { loading, onSubmit } = useForgotPassword()
+  // const router = useRouter()
 
   const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
     resolver: zodResolver(ForgotPasswordSchema),
@@ -71,7 +71,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             <AnimatedButton
               size="xl"
               type="submit"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
               {loading ? 'Đang gửi...' : 'Xác nhận'}
@@ -82,7 +82,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           <AnimatedFormItem>
             <div className="text-center text-sm">
               Đã nhớ mật khẩu?{' '}
-              <Link
+              <Link 
                 href="/buyer/sign-in"
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
