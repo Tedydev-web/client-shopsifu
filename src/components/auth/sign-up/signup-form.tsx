@@ -24,6 +24,7 @@ import {
   AnimatedButton
 } from '@/components/ui/animated-form'
 import { useState, useEffect } from 'react'
+import { OAuthForm } from '../layout/OAuthForm'
 
 interface SignupFormProps {
   email: string
@@ -194,9 +195,12 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                   disabled={loading}
                 >
-                  {loading ? 'Đang xử lý...' : 'Đăng ký'}
+                  {loading ? 'Đang đăng ký...' : 'Đăng ký'}
                 </AnimatedButton>
               </div>
+
+              {/* OAuth Form */}
+              <OAuthForm type="signup" />
             </div>
           </AnimatedForm>
         </form>

@@ -10,6 +10,10 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
+export interface oAuthLoginResponse{
+  url: string;
+} 
+
 // REGISTER
 export interface RegisterRequest {
   name: string;

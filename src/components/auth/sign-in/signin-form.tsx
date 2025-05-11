@@ -3,7 +3,6 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import {
   Form,
@@ -14,10 +13,10 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
+import { OAuthForm } from '../layout/OAuthForm'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { onSubmit, loading } = useSignin()
@@ -96,33 +95,22 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
               {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </AnimatedButton>
 
-            {/* Hoặc login bằng Google */}
+            {/* OAuth Form */}
+            <OAuthForm type="signin" />
+
+            {/* Link đến đăng ký */}
             <AnimatedFormItem>
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                  Hoặc tiếp tục với
-                </span>
+              <div className="text-center text-sm">
+                Chưa có tài khoản?{' '}
+                <Link
+                  href="/buyer/sign-up"
+                  className="underline underline-offset-4 text-primary hover:text-primary/90"
+                >
+                  Đăng ký tại đây
+                </Link>
               </div>
             </AnimatedFormItem>
-
-            <AnimatedButton variant="outline" className="w-full hover:border-primary hover:text-primary">
-              <Image src="/iconSvg/google.svg" alt="Google" width={20} height={20} />
-              Đăng nhập bằng Google
-            </AnimatedButton>
           </div>
-
-          {/* Link đến đăng ký */}
-          <AnimatedFormItem>
-            <div className="text-center text-sm">
-              Chưa có tài khoản?{' '}
-              <Link
-                href="/buyer/sign-up"
-                className="underline underline-offset-4 text-primary hover:text-primary/90"
-              >
-                Đăng ký tại đây
-              </Link>
-            </div>
-          </AnimatedFormItem>
         </AnimatedForm>
       </form>
     </Form>

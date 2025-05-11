@@ -5,7 +5,8 @@ import {
   RegisterRequest, 
   RegisterResponse,
   SendOTPRequest,
-  SendOTPResponse 
+  SendOTPResponse,
+  oAuthLoginResponse 
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -15,6 +16,7 @@ export const authService = {
     return response.data;
   },
 
+  
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
     const response = await publicAxios.post<RegisterResponse>(API_ENDPOINTS.AUTH.SIGNUP, data);
     return response.data;
@@ -39,6 +41,11 @@ export const authService = {
 
   getProfile: async () => {
     const response = await privateAxios.get(API_ENDPOINTS.AUTH.PROFILE);
+    return response.data;
+  },
+
+  getGoogleLoginUrl: async (): Promise<oAuthLoginResponse> => {
+    const response = await publicAxios.get<oAuthLoginResponse>(API_ENDPOINTS.AUTH.GOOGLE_LOGIN);
     return response.data;
   }
 };
