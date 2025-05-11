@@ -20,7 +20,6 @@ export const authService = {
     return response.data;
   },
 
-  
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
     const response = await publicAxios.post<RegisterResponse>(API_ENDPOINTS.AUTH.SIGNUP, data);
     return response.data;
@@ -55,9 +54,6 @@ export const authService = {
     return response.data;
   },
 
-  // logout: async (): Promise<void> => {
-  //   await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT);
-  // },
   logout: async (accessToken: string, refreshToken: string): Promise<void> => {
     // Gửi yêu cầu POST với Bearer token trong header và refresh token trong body
     await privateAxios.post(

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
-import { toast } from 'react-hot-toast'
+import { showToast } from '@/components/ui/toastify'
 import { resetPasswordSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { ResetPasswordRequest } from '@/types/auth.interface'
@@ -15,13 +15,13 @@ export function useReset() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
+  const handleResetPassword = async (data: z.infer<typeof resetPasswordSchema>) => {
     try {
       // Lấy token từ sessionStorage
       const token = sessionStorage.getItem(RESET_PASSWORD_TOKEN_KEY)
       
       if (!token) {
-        toast.error('Phiên làm việc đã hết hạn')
+        showToast('Phiên làm việc đã hết hạn', 'info')
         router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
         return
       }
@@ -38,7 +38,7 @@ export function useReset() {
       // Xóa token sau khi đổi mật khẩu thành công
       sessionStorage.removeItem(RESET_PASSWORD_TOKEN_KEY)
       
-      toast.success('Đổi mật khẩu thành công!')
+      showToast('Đổi mật khẩu thành công!', 'success')
       router.replace(ROUTES.BUYER.SIGNIN)
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -47,17 +47,17 @@ export function useReset() {
 
         switch (firstMessage) {
           case 'Error.InvalidToken':
-            toast.error('Token không hợp lệ hoặc đã hết hạn')
+            showToast('Token không hợp lệ hoặc đã hết hạn', 'error')
             router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
             break
           case 'Error.InvalidPassword':
-            toast.error('Mật khẩu không hợp lệ')
+            showToast('Mật khẩu không hợp lệ', 'error')
             break
           case 'Error.PasswordMismatch':
-            toast.error('Mật khẩu không khớp')
+            showToast('Mật khẩu không khớp', 'error')
             break
           default:
-            toast.error(firstMessage || 'Có lỗi xảy ra. Vui lòng thử lại sau.')
+            showToast(firstMessage || 'Có lỗi xảy ra. Vui lòng thử lại sau.', 'error')
         }
       }
     } finally {
