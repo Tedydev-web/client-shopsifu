@@ -56,7 +56,7 @@ export function useSignup() {
   }
 
 
-  const onSubmit = async (data: z.infer<typeof RegisterSchema>) => {
+  const handleSignup = async (data: z.infer<typeof RegisterSchema>) => {
     try {
       setLoading(true)
       await authService.register({
@@ -79,5 +79,5 @@ export function useSignup() {
     }
   }
 
-  return { loading, onSubmit, handleSendOTP }
+  return { loading, handleSignup, handleSendOTP }
 }

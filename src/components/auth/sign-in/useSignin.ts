@@ -15,7 +15,7 @@ export function useSignin() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
 
-  const handlesignin = async (data: z.infer<typeof LoginSchema>) => {
+  const handleSignin = async (data: z.infer<typeof LoginSchema>) => {
     try {
       setLoading(true);
       const response = await authService.login(data);
@@ -47,5 +47,5 @@ export function useSignin() {
     }
   };
 
-  return { handlesignin, loading }
+  return { handleSignin, loading }
 }

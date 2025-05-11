@@ -33,7 +33,7 @@ interface SignupFormProps {
 }
 
 export function SignupForm({ email, onBack, className }: SignupFormProps) {
-  const { loading, onSubmit } = useSignup()
+  const { loading, handleSignup } = useSignup()
   const router = useRouter()
 
   const registerForm = useForm<z.infer<typeof RegisterSchema>>({
@@ -61,7 +61,7 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
     <>
       <Form {...registerForm}>
         <form
-          onSubmit={registerForm.handleSubmit(onSubmit)}
+          onSubmit={registerForm.handleSubmit(handleSignup)}
           className={cn('flex flex-col gap-6', className)}
         >
           <AnimatedForm>

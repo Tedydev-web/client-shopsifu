@@ -7,7 +7,7 @@ export function useForgotPassword() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleforgotpassword = async (data: z.infer<typeof ForgotPasswordSchema>) => {
+  const handleForgotPassword = async (data: z.infer<typeof ForgotPasswordSchema>) => {
     setLoading(true)
     console.log(data)
     // Simulate sending reset password email
@@ -18,5 +18,5 @@ export function useForgotPassword() {
     }, 2000)
   }
 
-  return { loading, handleforgotpassword }
+  return { loading, handleForgotPassword }
 }
