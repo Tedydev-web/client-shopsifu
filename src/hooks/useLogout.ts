@@ -33,7 +33,7 @@ export function useLogout() {
       showToast('Đăng xuất thành công!', 'success');
 
       // Điều hướng
-      router.push(ROUTES.LOGIN);
+      router.push(ROUTES.BUYER.SIGNIN);
     } catch (error) {
       console.error('Logout failed:', error);
       showToast('Đăng xuất thất bại. Vui lòng thử lại.', 'error');

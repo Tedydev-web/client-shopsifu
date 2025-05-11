@@ -9,7 +9,7 @@ import { ErrorResponse } from '@/types/base.interface'
 import { ROUTES } from '@/constants/route'
 import { AxiosError } from 'axios'
 
-const RESET_PASSWORD_TOKEN_KEY = 'reset_password_token'
+const RESET_PASSWORD_TOKEN_KEY = 'token_verify_code'
 
 export function useReset() {
   const [loading, setLoading] = useState(false)
@@ -18,7 +18,7 @@ export function useReset() {
   const handleResetPassword = async (data: z.infer<typeof resetPasswordSchema>) => {
     try {
       // Lấy token từ sessionStorage
-      const token = sessionStorage.getItem(RESET_PASSWORD_TOKEN_KEY)
+      const token = localStorage.getItem(RESET_PASSWORD_TOKEN_KEY)
       
       if (!token) {
         showToast('Phiên làm việc đã hết hạn', 'info')
@@ -36,7 +36,7 @@ export function useReset() {
       await authService.resetPassword(resetData)
 
       // Xóa token sau khi đổi mật khẩu thành công
-      sessionStorage.removeItem(RESET_PASSWORD_TOKEN_KEY)
+      localStorage.removeItem(RESET_PASSWORD_TOKEN_KEY)
       
       showToast('Đổi mật khẩu thành công!', 'success')
       router.replace(ROUTES.BUYER.SIGNIN)

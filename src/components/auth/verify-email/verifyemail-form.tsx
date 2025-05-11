@@ -21,6 +21,7 @@ import {
   AnimatedButton
 } from '@/components/ui/animated-form'
 import { useVerifyEmail } from './useVerifyEmail'
+import { OAuthForm } from '../layout/OAuthForm'
 
 interface VerifyEmailFormProps {
   className?: string
@@ -84,64 +85,70 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
   const content = getFormContent()
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('flex flex-col gap-6', className)}
-      >
-        <AnimatedForm>
-          {/* Tiêu đề */}
-          <AnimatedFormItem>
-            <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-4xl font-bold">{content.title}</h1>
-              <p className="text-balance text-md text-muted-foreground">
-                {content.subtitle}
-              </p>
-            </div>
-          </AnimatedFormItem>
-
-          {/* Form */}
-          <div className="grid gap-6">
+    <>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className={cn('flex flex-col gap-6', className)}
+        >
+          <AnimatedForm>
+            {/* Tiêu đề */}
             <AnimatedFormItem>
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="email" placeholder="m@example.com" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col items-center gap-2 text-center">
+                <h1 className="text-4xl font-bold">{content.title}</h1>
+                <p className="text-balance text-md text-muted-foreground">
+                  {content.subtitle}
+                </p>
+              </div>
             </AnimatedFormItem>
 
-            <AnimatedButton
-              size="xl"
-              type="submit"
-              className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={loading}
-            >
-              {loading ? 'Đang xử lý...' : content.buttonText}
-            </AnimatedButton>
-          </div>
+            {/* Form */}
+            <div className="grid gap-6">
+              <AnimatedFormItem>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="email" placeholder="m@example.com" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </AnimatedFormItem>
 
-          {/* Link chuyển hướng */}
-          <AnimatedFormItem>
-            <div className="text-center text-sm">
-              {content.linkText}{' '}
-              <Link 
-                href={content.linkHref}
-                className="underline underline-offset-4 text-primary hover:text-primary/90"
+              <AnimatedButton
+                size="xl"
+                type="submit"
+                className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={loading}
               >
-                {content.linkLabel}
-              </Link>
+                {loading ? 'Đang xử lý...' : content.buttonText}
+              </AnimatedButton>
             </div>
-          </AnimatedFormItem>
-        </AnimatedForm>
-      </form>
-    </Form>
+            {/* OAuth Form */}
+            {action === 'signup' && <OAuthForm type="signup"/>}
+
+            {/* Link chuyển hướng */}
+            <AnimatedFormItem>
+              <div className="text-center text-sm">
+                {content.linkText}{' '}
+                <Link 
+                  href={content.linkHref}
+                  className="underline underline-offset-4 text-primary hover:text-primary/90"
+                >
+                  {content.linkLabel}
+                </Link>
+              </div>
+            </AnimatedFormItem>
+          </AnimatedForm>
+        </form>
+      </Form>
+
+      
+    </>
   )
 }
