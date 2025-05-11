@@ -11,29 +11,6 @@ export function useSignup() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-//   const handleSendOTP = async (email: string) => {
-//     try {
-//         setLoading(true)
-//         await authService.sendOTP({
-//             email,
-//             type: 'REGISTER'
-//         })
-//         showToast('Mã xác thực đã được gửi đến email của bạn', 'success')
-//         // Thay vì push, chúng ta sẽ cập nhật URL params
-//       const params = new URLSearchParams(searchParams.toString())
-//       params.set('email', email)
-//       router.replace(`/buyer/sign-up?${params.toString()}`)
-//     } catch (error) {
-//         const err = error as ErrorResponse
-//         const firstMessage = err?.message?.[0]?.message
-//         showToast(firstMessage || 'Có lỗi xảy ra khi gửi mã xác thực', 'error')
-//         console.error('Send OTP error:', error)
-//     } finally {
-//         setLoading(false)
-//     }
-// }
-
-
   const handleSendOTP = async (email: string): Promise<boolean> => {
     try {
         setLoading(true)
