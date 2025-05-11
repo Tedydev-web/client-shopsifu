@@ -14,14 +14,14 @@ export function useLogout() {
   const dispatch = useDispatch<AppDispatch>();
 
   // Lấy token từ Redux state
-  const { token, refreshToken } = useSelector((state: any) => state.auth); 
+  const { refreshToken } = useSelector((state: any) => state.auth); 
 
   const handleLogout = async () => {
     try {
       setLoading(true);
 
       // Gọi API logout và truyền token vào header và body
-      await authService.logout(token, refreshToken); // Gửi token vào yêu cầu logout
+      await authService.logout(refreshToken); // Gửi token vào yêu cầu logout
 
       // Xoá token local
       removeToken();

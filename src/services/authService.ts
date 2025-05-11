@@ -54,18 +54,23 @@ export const authService = {
     return response.data;
   },
 
-  logout: async (accessToken: string, refreshToken: string): Promise<void> => {
-    // Gửi yêu cầu POST với Bearer token trong header và refresh token trong body
-    await privateAxios.post(
-      API_ENDPOINTS.AUTH.LOGOUT,
-      { refreshToken }, // refresh token gửi trong body
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`, // access token gửi trong header
-        },
-      }
-    );
+  // logout: async (accessToken: string, refreshToken: string): Promise<void> => {
+  //   // Gửi yêu cầu POST với Bearer token trong header và refresh token trong body
+  //   await privateAxios.post(
+  //     API_ENDPOINTS.AUTH.LOGOUT,
+  //     { refreshToken }, // refresh token gửi trong body
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`, // access token gửi trong header
+  //       },
+  //     }
+  //   );
+  // },
+
+  logout: async (refreshToken: string): Promise<void> => {
+    await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
   },
+  
 
   getProfile: async () => {
     const response = await privateAxios.get(API_ENDPOINTS.AUTH.PROFILE);
