@@ -4,9 +4,9 @@ import axios, {
     AxiosResponse,
     InternalAxiosRequestConfig,
   } from 'axios';
-import { getToken, setToken, removeToken } from './auth';
+import { getAccessToken, setToken, removeToken, getRefreshToken } from './auth';
 import { ErrorResponse } from '@/types/base.interface'
-
+import { getStore } from '@/store/store'; // đã có
   
   // Định nghĩa URL gốc cho API, lấy từ biến môi trường
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
@@ -73,7 +73,7 @@ publicAxios.interceptors.response.use(
   //
   export const privateAxios = axios.create({
     baseURL: BASE_URL,
-    withCredentials: true,
+    // withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -84,9 +84,10 @@ publicAxios.interceptors.response.use(
   //
   privateAxios.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      // Chỉ chạy ở client-side
       if (typeof window !== 'undefined') {
-        const token = getToken(); // Lấy token từ Redux store
+        const store = getStore().store;
+        const token = store.getState().auth?.token;
+  
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -96,11 +97,14 @@ publicAxios.interceptors.response.use(
     (error) => Promise.reject(error)
   );
   
+  
   //
   // === Hàm retry request sau khi đã refresh token thành công ===
   //
   const retryRequest = (originalConfig: AxiosRequestConfig): Promise<any> => {
-    const newToken = getToken(); // Lấy token mới từ Redux store
+    const store = getStore().store;
+    const newToken = store.getState().auth!.token;
+    const refreshToken = store.getState().auth!.refreshToken; // Lấy token mới từ Redux store
   
     // Nếu không có token mới, redirect về login
     if (!newToken) {
@@ -159,9 +163,10 @@ publicAxios.interceptors.response.use(
           refreshPromise = refreshAxios.post('/auth/refresh-token');
           const response = await refreshPromise;
   
-          const newToken = response.data?.token;
-          if (newToken) {
-            setToken(newToken); // Lưu token mới vào Redux store
+          // const newToken = response.data?.token;
+          const { token: newToken, refreshToken: newRefreshToken } = response.data;
+          if (newToken && newRefreshToken) {
+            setToken(newToken, newRefreshToken);
           }
   
           return retryRequest(originalConfig); // Retry lại request cũ

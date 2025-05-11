@@ -15,18 +15,19 @@ export function useSignin() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
 
-  const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
+  const handlesignin = async (data: z.infer<typeof LoginSchema>) => {
     try {
       setLoading(true);
       const response = await authService.login(data);
 
       // Lưu token vào Redux
       dispatch(setCredentials({
-        token: response.accessToken
-      }));
-
-      showToast('Đăng nhập thành công!', 'success');
-      router.push(ROUTES.ADMIN.DASHBOARD); // hoặc '/buyer' tuỳ theo vai trò
+        token: response.accessToken,
+        refreshToken: response.refreshToken
+      }))
+      
+      showToast('Đăng nhập thành công!', 'success')
+      router.push(ROUTES.ADMIN.DASHBOARD)
     } catch (error: any) {
       let firstMessage = 'Đăng nhập thất bại'
       console.error('Login error:', error)
@@ -46,5 +47,5 @@ export function useSignin() {
     }
   };
 
-  return { onSubmit, loading }
+  return { handlesignin, loading }
 }

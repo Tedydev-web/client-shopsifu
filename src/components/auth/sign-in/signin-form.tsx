@@ -19,7 +19,7 @@ import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/
 import { OAuthForm } from '../layout/OAuthForm'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-  const { onSubmit, loading } = useSignin()
+  const { handlesignin, loading } = useSignin()
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -29,7 +29,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handlesignin)}
         className={cn('flex flex-col gap-6', className)}
         {...props}
       >

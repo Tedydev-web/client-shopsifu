@@ -7,7 +7,7 @@ export function useVerify() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const onSubmit = async (data: z.infer<typeof otpSchema>) => {
+  const handleverifycode = async (data: z.infer<typeof otpSchema>) => {
     setLoading(true)
     console.log(data)
     // Simulate OTP verification success
@@ -17,5 +17,5 @@ export function useVerify() {
     }, 2000)
   }
 
-  return { loading, onSubmit }
+  return { loading, handleverifycode }
 }

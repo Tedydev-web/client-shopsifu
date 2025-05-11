@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/animated-form'
 
 export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-  const { loading, onSubmit } = useVerify()
+  const { loading, handleverifycode } = useVerify()
 
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
@@ -36,7 +36,7 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handleverifycode)}
         className={cn('flex flex-col gap-6', className)}
         {...props}
       >

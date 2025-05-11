@@ -28,12 +28,12 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
     defaultValues: { password: '', confirmPassword: '' }
   })
 
-  const { loading, onSubmit } = useReset()
+  const { loading, handleresetpassword } = useReset()
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handleresetpassword)}
         className={cn('flex flex-col gap-6', className)}
         {...props}
       >
