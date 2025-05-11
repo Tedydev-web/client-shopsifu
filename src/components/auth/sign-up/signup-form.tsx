@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   Form,
@@ -16,25 +15,23 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { RegisterSchema, EmailSchema } from '../schema/index'
+import { RegisterSchema } from '../schema/index'
 import { useSignup } from './useSignup'
 import {
   AnimatedForm,
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { OAuthForm } from '../layout/OAuthForm'
 
 interface SignupFormProps {
   email: string
-  onBack: () => void
   className?: string
 }
 
-export function SignupForm({ email, onBack, className }: SignupFormProps) {
+export function SignupForm({ email, className }: SignupFormProps) {
   const { loading, handleSignup } = useSignup()
-  const router = useRouter()
 
   const registerForm = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -44,18 +41,13 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
       password: '', 
       confirmPassword: '',
       phoneNumber: '',
-      code: ''
+      token: ''
     }
   })
 
   useEffect(() => {
     registerForm.setValue('email', email, { shouldValidate: true })
   }, [email, registerForm])
-
-  const handleBack = () => {
-    onBack()
-    registerForm.reset()
-  }
 
   return (
     <>
@@ -133,22 +125,6 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
               <AnimatedFormItem>
                 <FormField
                   control={registerForm.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mã xác thực</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Nhập mã xác thực" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </AnimatedFormItem>
-
-              <AnimatedFormItem>
-                <FormField
-                  control={registerForm.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
@@ -178,26 +154,14 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
                 />
               </AnimatedFormItem>
 
-              <div className="flex gap-2">
-                <AnimatedButton
-                  size="xl"
-                  type="button"
-                  variant="outline"
-                  onClick={handleBack}
-                  className="w-full"
-                  disabled={loading}
-                >
-                  Quay lại
-                </AnimatedButton>
-                <AnimatedButton
-                  size="xl"
-                  type="submit"
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={loading}
-                >
-                  {loading ? 'Đang đăng ký...' : 'Đăng ký'}
-                </AnimatedButton>
-              </div>
+              <AnimatedButton
+                size="xl"
+                type="submit"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={loading}
+              >
+                {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+              </AnimatedButton>
 
               {/* OAuth Form */}
               <OAuthForm type="signup" />
@@ -208,22 +172,6 @@ export function SignupForm({ email, onBack, className }: SignupFormProps) {
 
       {/* Google Sign In and Login Link */}
       <div className="mt-8 space-y-6">
-        <AnimatedFormItem>
-          <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-            <span className="relative z-10 bg-background px-2 text-muted-foreground">
-              Hoặc tiếp tục với
-            </span>
-          </div>
-        </AnimatedFormItem>
-
-        <AnimatedButton
-          variant="outline"
-          className="w-full hover:border-primary hover:text-primary"
-        >
-          <Image src="/iconSvg/google.svg" alt="Google" width={20} height={20} />
-          Đăng nhập với Google
-        </AnimatedButton>
-
         <AnimatedFormItem>
           <div className="text-center text-sm">
             Đã có tài khoản?{' '}

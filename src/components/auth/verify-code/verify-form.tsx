@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/animated-form'
 
 export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-  const { loading, onSubmit, resendOTP } = useVerify()
+  const { loading, handleVerifyCode, resendOTP } = useVerify()
 
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),

@@ -20,7 +20,7 @@ export interface RegisterRequest {
   password: string;
   confirmPassword: string;
   phoneNumber: string;
-  code: string;
+  token: string;
 }
 
 export interface RegisterResponse {

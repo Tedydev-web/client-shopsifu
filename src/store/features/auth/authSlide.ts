@@ -5,29 +5,29 @@ export const revertAll = createAction('REVERT_ALL');
 
 export interface AuthState {
   user: { id: string; name: string } | null;
-  token: string; // access token
+  accessToken: string; // access token
   refreshToken: string;
 }
 
 const initialState: AuthState = {
   user: null,
-  token: '',
+  accessToken: '',
   refreshToken: '',
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: 'authShopsifu',
   initialState,
   reducers: {
     setCredentials: (state, action) => {
       console.log('action.payload', action.payload);
       state.user = action.payload.user;
-      state.token = action.payload.token; // access token
+      state.accessToken = action.payload.accessToken; // access token
       state.refreshToken = action.payload.refreshToken;
     },
     logOut: (state) => {
       state.user = null;
-      state.token = '';
+      state.accessToken = '';
       state.refreshToken = '';
     },
   },

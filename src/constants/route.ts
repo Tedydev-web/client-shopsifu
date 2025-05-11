@@ -8,7 +8,7 @@ export const ROUTES = {
     RESET_PASSWORD: '/buyer/reset-password'
   },
   ADMIN: {
-    DASHBOARD: '/admin/dashboard',
+    DASHBOARD: '/admin',
     PRODUCTS: '/admin/products',
     ORDERS: '/admin/orders'
   }

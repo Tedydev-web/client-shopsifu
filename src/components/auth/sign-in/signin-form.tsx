@@ -71,7 +71,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                     <div className="flex items-center justify-between">
                       <FormLabel>Mật khẩu</FormLabel>
                       <Link
-                        href="/buyer/forgot-password"
+                        href="/buyer/verify-email?action=forgot"
                         className="text-sm text-primary hover:underline underline-offset-4"
                       >
                         Quên mật khẩu?
@@ -103,7 +103,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
               <div className="text-center text-sm">
                 Chưa có tài khoản?{' '}
                 <Link
-                  href="/buyer/sign-up"
+                  href="/buyer/verify-email?action=signup"
                   className="underline underline-offset-4 text-primary hover:text-primary/90"
                 >
                   Đăng ký tại đây
