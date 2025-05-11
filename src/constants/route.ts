@@ -1,11 +1,15 @@
 export const ROUTES = {
   HOME: '/',
-  LOGIN: '/login',
-  REGISTER: '/register',
+  BUYER: {
+    SIGNIN: '/buyer/sign-in',
+    SIGNUP: '/buyer/sign-up',
+    FORGOT_PASSWORD: '/buyer/forgot-password',
+    VERIFY_CODE: '/buyer/verify-code',
+    RESET_PASSWORD: '/buyer/reset-password'
+  },
   ADMIN: {
     DASHBOARD: '/admin/dashboard',
     PRODUCTS: '/admin/products',
     ORDERS: '/admin/orders'
   }
-  // ... các routes khác
 }

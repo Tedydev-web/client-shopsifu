@@ -9,7 +9,8 @@ export const API_ENDPOINTS = {
     LOGOUT: `${API_BASE}/auth/logout`,
     PROFILE: `${API_BASE}/auth/profile`,
     SEND_OTP: `${API_BASE}/auth/otp`,
-    VERIFY_OTP: `${API_BASE}/auth/verify-code`
+    VERIFY_OTP: `${API_BASE}/auth/verify-code`,
+    RESET_PASSWORD: `${API_BASE}/auth/reset-password`
   },
   PRODUCTS: {
     LIST: `${API_BASE}/products`,

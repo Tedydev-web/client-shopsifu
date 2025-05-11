@@ -49,9 +49,20 @@ export interface VerifyOTPRequest {
 }
 
 export interface VerifyOTPResponse {
+  token: string;
   email: string;
   type: string;
   verified: boolean;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
 }
 
 

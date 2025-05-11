@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { z } from 'zod'
+import { toast } from 'react-hot-toast'
 import { otpSchema } from '../schema/index'
 import { authService } from '@/services/authService'
-import { toast } from 'react-hot-toast'
 import { VerifyOTPRequest } from '@/types/auth.interface'
+import { ErrorResponse } from '@/types/base.interface'
+import { ROUTES } from '@/constants/route'
+import { AxiosError } from 'axios'
 
-interface ErrorResponse {
-  message?: Array<{ message: string }>
-}
+const RESET_PASSWORD_TOKEN_KEY = 'reset_password_token'
 
 export function useVerify() {
   const [loading, setLoading] = useState(false)
@@ -19,7 +20,7 @@ export function useVerify() {
   const verifyOTP = async (otp: string) => {
     if (!email) {
       toast.error('Không tìm thấy email, vui lòng thử lại')
-      router.replace('/buyer/forgot-password')
+      router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
       return
     }
 
@@ -30,30 +31,33 @@ export function useVerify() {
         code: otp,
         type: 'FORGOT_PASSWORD'
       }
-      console.log('Sending verify request:', request) // Debug log
-      await authService.verifyOTP(request)
-      toast.success('Xác thực thành công')
-      router.replace(`/buyer/reset-password?email=${encodeURIComponent(email)}`)
-    } catch (error) {
-      const err = error as ErrorResponse
-      const firstMessage = err?.message?.[0]?.message
-      console.error('Full error response:', error) // Debug log
+
+      const response = await authService.verifyOTP(request)
       
-      // Hiển thị thông báo lỗi dễ hiểu cho người dùng
-      switch (firstMessage) {
-        case 'Error.InvalidOTP':
-          toast.error('Mã OTP không chính xác')
-          break
-        case 'Error.OTPExpired':
-          toast.error('Mã OTP đã hết hạn')
-          break
-        case 'Error.TooManyAttempts':
-          toast.error('Bạn đã thử quá nhiều lần. Vui lòng thử lại sau')
-          break
-        default:
-          toast.error('Có lỗi xảy ra khi xác thực OTP')
+      // Lưu token vào sessionStorage
+      if (response.token) {
+        sessionStorage.setItem(RESET_PASSWORD_TOKEN_KEY, response.token)
+        toast.success('Xác thực thành công')
+        router.replace(ROUTES.BUYER.RESET_PASSWORD)
+      } else {
+        throw new Error('Token không hợp lệ')
       }
-      console.error('Verify OTP error:', error)
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const err: ErrorResponse = error.response?.data
+        const firstMessage = err?.message?.[0]?.message
+
+        switch (firstMessage) {
+          case 'Error.InvalidOTP':
+            toast.error('Mã OTP không chính xác')
+            break
+          case 'Error.OTPExpired':
+            toast.error('Mã OTP đã hết hạn')
+            break
+          default:
+            toast.error(firstMessage || 'Có lỗi xảy ra. Vui lòng thử lại sau.')
+        }
+      }
     } finally {
       setLoading(false)
     }
@@ -62,7 +66,7 @@ export function useVerify() {
   const resendOTP = async () => {
     if (!email) {
       toast.error('Không tìm thấy email, vui lòng thử lại')
-      router.replace('/buyer/forgot-password')
+      router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
       return
     }
 
