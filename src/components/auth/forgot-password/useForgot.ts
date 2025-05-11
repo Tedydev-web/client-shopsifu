@@ -4,7 +4,7 @@ import * as z from 'zod'
 import { ForgotPasswordSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { toast } from 'react-hot-toast'
-import { SendOTPRequest, SendOTPResponse } from '@/types/auth.interface'
+import { SendOTPRequest } from '@/types/auth.interface'
 
 interface ErrorResponse {
   message?: Array<{ message: string }>
@@ -21,21 +21,38 @@ export function useForgotPassword() {
         email,
         type: 'FORGOT_PASSWORD'
       }
-      const response: SendOTPResponse = await authService.sendOTP(request)
+      await authService.sendOTP(request)
       toast.success('Mã xác thực đã được gửi đến email của bạn')
       
-      const params = new URLSearchParams()
-      params.set('email', response.email)
-      router.replace(`/buyer/verify-code?${params.toString()}`)
+      // Chuyển hướng với email trong query params
+      router.replace(`/buyer/verify-code?email=${encodeURIComponent(email)}`)
     } catch (error) {
       const err = error as ErrorResponse
       const firstMessage = err?.message?.[0]?.message
-      if (firstMessage === 'Error.EmailNotFound') {
-        toast.error('Email không tồn tại trong hệ thống')
-      } else {
-        toast.error(firstMessage || 'Có lỗi xảy ra khi gửi mã xác thực')
+      
+      // Hiển thị thông báo lỗi dễ hiểu cho người dùng
+      switch (firstMessage) {
+        case 'Error.EmailNotFound':
+          toast.error('Email này chưa được đăng ký trong hệ thống')
+          break
+        case 'Error.EmailInvalid':
+          toast.error('Email không hợp lệ, vui lòng kiểm tra lại')
+          break
+        case 'Error.TooManyRequests':
+          toast.error('Bạn đã yêu cầu quá nhiều lần. Vui lòng thử lại sau ít phút')
+          break
+        case 'Error.ServerError':
+          toast.error('Hệ thống đang gặp sự cố, vui lòng thử lại sau')
+          break
+        default:
+          toast.error('Không thể gửi mã xác thực. Vui lòng thử lại sau')
       }
-      console.error('Send OTP error:', error)
+
+      // Log lỗi chi tiết để debug
+      console.error('Chi tiết lỗi:', {
+        errorCode: firstMessage,
+        fullError: error
+      })
     } finally {
       setLoading(false)
     }
@@ -45,5 +62,5 @@ export function useForgotPassword() {
     await handleSendOTP(data.email)
   }
 
-  return { loading, onSubmit, handleSendOTP }
+  return { loading, onSubmit }
 }

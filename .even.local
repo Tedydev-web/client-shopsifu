@@ -1,6 +1,0 @@
-NEXT_PUBLIC_ENV=develop
-#API URL (prod)
-NEXT_PUBLIC_API_BASE_URL=https://api.shopsifu.live/
-#Auth
-NEXT_PUBLIC_AUTH_COOKIE_KEY=accessToken
-NEXT_PUBLIC_REDUX_ENCRYPTION_KEY=3Z2x!r9qP@1s

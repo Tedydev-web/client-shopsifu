@@ -5,7 +5,9 @@ import {
   RegisterRequest, 
   RegisterResponse,
   SendOTPRequest,
-  SendOTPResponse 
+  SendOTPResponse,
+  VerifyOTPRequest,
+  VerifyOTPResponse 
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -24,6 +26,14 @@ export const authService = {
     const response = await publicAxios.post<SendOTPResponse>(
         API_ENDPOINTS.AUTH.SEND_OTP,
         data
+    )
+    return response.data
+  },
+
+  verifyOTP: async (data: VerifyOTPRequest): Promise<VerifyOTPResponse> => {
+    const response = await publicAxios.post<VerifyOTPResponse>(
+      API_ENDPOINTS.AUTH.VERIFY_OTP,
+      data
     )
     return response.data
   },
