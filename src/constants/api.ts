@@ -4,6 +4,7 @@ const API_BASE = '/api/v1';
 export const API_ENDPOINTS = {
   AUTH: {
     SIGNIN: `${API_BASE}/auth/login`,
+    GOOGLE_SIGNIN: `{API_BASE}/auth/google-link`,
     SIGNUP: `${API_BASE}/auth/register`,
     REFRESH_TOKEN: `${API_BASE}/auth/refresh-token`,
     LOGOUT: `${API_BASE}/auth/logout`,

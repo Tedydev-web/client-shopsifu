@@ -21,7 +21,7 @@ export function useSignin() {
       
       // Lưu token vào Redux store
       dispatch(setCredentials({
-        token: response.accessToken,
+        accessToken: response.accessToken,
         refreshToken: response.refreshToken
       }))
       

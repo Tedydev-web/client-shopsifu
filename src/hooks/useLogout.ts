@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux'; // Thêm useSelector để lấy state từ Redux
 import { useState } from 'react';
-import { removeToken } from '@/lib/auth';
+import { getAccessToken, removeToken } from '@/lib/auth';
 import { showToast } from '@/components/ui/toastify';
 import { ROUTES } from '@/constants/route';
 import { logOut } from '@/store/features/auth/authSlide';
@@ -14,14 +14,14 @@ export function useLogout() {
   const dispatch = useDispatch<AppDispatch>();
 
   // Lấy token từ Redux state
-  const { token, refreshToken } = useSelector((state: any) => state.auth); 
+  const { accessToken, refreshToken } = useSelector((state: any) => state.auth); 
 
   const handleLogout = async () => {
     try {
       setLoading(true);
 
       // Gọi API logout và truyền token vào header và body
-      await authService.logout(token, refreshToken); // Gửi token vào yêu cầu logout
+      await authService.logout(accessToken, refreshToken); // Gửi token vào yêu cầu logout
 
       // Xoá token local
       removeToken();

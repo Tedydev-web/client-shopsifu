@@ -7,7 +7,7 @@ import { getStore } from '@/store/store';
 // ✅ Lấy token từ localStorage
 export const getAccessToken = (): string | null => {
   const { store } = getStore();
-  return store.getState()?.auth?.token || null;
+  return store.getState()?.auth?.accessToken || null;
 };
 
 // ✅ Lấy refreshtoken từ localStorage
@@ -17,9 +17,9 @@ export const getRefreshToken = (): string | null => {
 };
 
 // ✅ Lưu token vào localStorage
-export const setToken = (token: string, refreshToken: string) => {
+export const setToken = (accessToken: string, refreshToken: string) => {
   const { store } = getStore();
-  store.dispatch({ type: 'auth/setCredentials', payload: { refreshToken, token, user: null } });
+  store.dispatch({ type: 'auth/setCredentials', payload: { refreshToken, accessToken, user: null } });
 };
 
 // ✅ Xóa token khi logout
