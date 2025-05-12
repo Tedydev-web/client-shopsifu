@@ -10,7 +10,12 @@ export interface LoginResponse {
 }
 
 export interface oAuthLoginResponse{
-  url: string;
+  data: {
+    success: boolean;
+    data: {
+      url: string;
+    };
+  };
 } 
 
 // REGISTER

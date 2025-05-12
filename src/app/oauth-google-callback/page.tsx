@@ -3,9 +3,12 @@
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
+import { useDispatch } from 'react-redux'
+import { setCredentials } from '@/store/features/auth/authSlide'
 
 export default function OauthCallbackPage() {
   const searchParams = useSearchParams()
+  const dispatch = useDispatch()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -15,9 +18,12 @@ export default function OauthCallbackPage() {
 
     if (accessToken && refreshToken) {
       try {
-        localStorage.setItem('accessToken', accessToken)
-        localStorage.setItem('refreshToken', refreshToken)
-
+        dispatch(
+          setCredentials({
+            accessToken,
+            refreshToken,
+          })
+        )
         toast.success('Đăng nhập thành công!')
 
         setTimeout(() => {

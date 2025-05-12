@@ -16,8 +16,9 @@ export function OAuthForm({ className, type = 'signin' }: OAuthFormProps) {
 
   const handleGoogleAuth = async () => {
     try {
-      const { url } = await authService.getGoogleLoginUrl()
-      window.location.replace(url)
+      const response = await authService.getGoogleLoginUrl();
+      const url = response.data.data.url;
+      window.location.replace(url);
     } catch (error) {
       console.error('Google auth error:', error)
       setError('Có lỗi xảy ra khi đăng nhập bằng Google')
