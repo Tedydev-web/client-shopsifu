@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { useLogout } from '@/hooks/useLogout'
+import { Button } from '@/components/ui/button'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -37,9 +38,9 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         {/* Logo + Hamburger */}
         <div className="flex items-center gap-4">
           {isMobile && (
-            <button onClick={onToggleSidebar} className="text-gray-700">
+            <Button onClick={onToggleSidebar} className="text-gray-700">
               <Menu className="w-6 h-6" />
-            </button>
+            </Button>
           )}
           <Link href="/admin" className="flex items-center">
             <Image 
@@ -66,14 +67,14 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
         {/* Right section */}
         <div className="flex items-center space-x-4">
-          <button className="p-2 rounded-full hover:bg-gray-100 relative">
+          <Button className="p-2 rounded-full hover:bg-gray-100 relative bg-[#fff]">
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
-          </button>
+          </Button>
 
-          <button className="p-2 rounded-full hover:bg-gray-100">
+          <Button className="p-2 rounded-full hover:bg-gray-100 bg-[#fff]">
             <Settings className="h-5 w-5 text-gray-600" />
-          </button>
+          </Button>
 
           {/* Dropdown Profile */}
           <DropdownMenu>

@@ -7,7 +7,8 @@ import {
   BarChart2,
   MessageSquare,
   FileText,
-  HelpCircle
+  HelpCircle,
+  MonitorCog 
 } from 'lucide-react'
 
 export type SidebarItem = {
@@ -66,78 +67,17 @@ export const sidebarConfig: SidebarItem[] = [
         icon: null,
       },
     ],
-  },
-  {
-    title: 'Khách hàng',
-    href: '/admin/customers',
-    icon: <Users className="w-5 h-5" />,
-  },
-  {
-    title: 'Báo cáo',
-    href: '/admin/reports',
-    icon: <BarChart2 className="w-5 h-5" />,
-  },
-  {
-    title: 'Tin nhắn',
-    href: '/admin/messages',
-    icon: <MessageSquare className="w-5 h-5" />,
-  },
-  {
-    title: 'Bài viết',
-    href: '/admin/posts',
-    icon: <FileText className="w-5 h-5" />,
-  },
-  {
-    title: 'Cài đặt',
-    href: '/admin/settings',
-    icon: <Settings className="w-5 h-5" />,
-  },
-  {
-    title: 'Hỗ trợ',
-    href: '/admin/support',
-    icon: <HelpCircle className="w-5 h-5" />,
-  },
+  },  
   {
     title: 'Hệ thống',
     href: '/admin/system',
-    icon: <ShoppingCart className="w-5 h-5" />,
+    icon: <MonitorCog className="w-5 h-5" />,
     subItems: [
       {
-        title: 'Nhật ký hoạt động',
-        href: '/admin/Activity_log',
-        icon: null,
-      },
-      {
-        title: 'Quản lý người dùng',
-        href: '/admin/Users',
-        icon: null,
-      },
-      {
-        title: 'Quản lý người bán hàng',
-        href: '/admin/sellers',
-        icon: null,
-      },
-      {
-        title: 'Phân quyền tính năng',
-        href: '/admin/feature',
-        icon: null,
-      },
-      {
-        title: 'Quản lý role',
-        href: '/admin/orders/processed',
-        icon: null,
-      },
-      {
-        title: 'Quản lý danh mục sidebar',
-        href: '/admin/orders/processed',
-        icon: null,
-      },
-      {
-        title: 'Quản lý danh mục của client',
-        href: '/admin/orders/processed',
+        title: 'Vai Trò Và Phân Quyền',
+        href: '/admin/role',
         icon: null,
       },
     ],
-  }
-  
+  },  
 ]

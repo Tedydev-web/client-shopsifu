@@ -8,6 +8,7 @@ import { sidebarConfig, SidebarItem } from '@/constants/sidebarConfig'
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
+import { Button } from '@/components/ui/button'
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -34,12 +35,27 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
     )
   }
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
+  const isActive = (href: string, item: SidebarItem) => {
+    // Kiểm tra chính xác đường dẫn
+    if (pathname === href) return true
+
+    // Kiểm tra submenu items
+    if (item.subItems) {
+      return item.subItems.some(subItem => pathname === subItem.href || pathname.startsWith(subItem.href + '/'))
+    }
+
+    // Kiểm tra các trường hợp đặc biệt
+    if (href === '/admin/product' && pathname.startsWith('/admin/products')) return true
+    if (href === '/admin/orders' && pathname.startsWith('/admin/orders')) return true
+    if (href === '/admin/system' && pathname.startsWith('/admin/role')) return true
+
+    return false
+  }
 
   const renderItem = (item: SidebarItem, level: number = 0) => {
     const hasSubItems = item.subItems && item.subItems.length > 0
     const isExpanded = expandedItems.includes(item.href)
-    const isItemActive = isActive(item.href)
+    const isItemActive = isActive(item.href, item)
 
     return (
       <div key={item.href} className={cn(level > 0 && "pt-1")}>
@@ -57,7 +73,12 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
           {hasSubItems ? (
             <div className="flex items-center gap-3 flex-1">
               {level === 0 && item.icon}
-              <span className={cn("text-sm font-medium", level > 0 && "text-muted-foreground")}>
+              <span className={cn(
+                "text-sm font-medium", 
+                level > 0 && "text-muted-foreground",
+                isItemActive && level === 0 && 'bg-primary/10 text-primary',
+                isItemActive && level > 0 && 'text-primary'
+              )}>
                 {item.title}
               </span>
             </div>
@@ -116,12 +137,12 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
                 className="mr-2"
               />
             </Link>
-            <button 
+            <Button 
               onClick={() => setOpen(false)}
               className="text-gray-500 hover:text-red-500"
             >
               <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
         )}
         <div className={cn(
