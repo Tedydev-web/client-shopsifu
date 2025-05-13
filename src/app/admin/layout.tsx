@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/admin/Sidebar'
 import { Header } from '@/components/admin/Header'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
+// import { pagination } from '@/components/ui/pagination'
 
 export default function AdminLayout({
   children,
@@ -37,5 +38,7 @@ export default function AdminLayout({
         </main>
       </div>
     </div>
+
+    
   )
 }

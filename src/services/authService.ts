@@ -6,7 +6,6 @@ import {
   RegisterResponse,
   SendOTPRequest,
   SendOTPResponse,
-  oAuthLoginResponse,
   VerifyOTPRequest,
   VerifyOTPResponse,
   ResetPasswordRequest,
@@ -54,31 +53,12 @@ export const authService = {
     return response.data;
   },
 
-  // logout: async (accessToken: string, refreshToken: string): Promise<void> => {
-  //   // Gửi yêu cầu POST với Bearer token trong header và refresh token trong body
-  //   await privateAxios.post(
-  //     API_ENDPOINTS.AUTH.LOGOUT,
-  //     { refreshToken }, // refresh token gửi trong body
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`, // access token gửi trong header
-  //       },
-  //     }
-  //   );
-  // },
-
-  logout: async (refreshToken: string): Promise<void> => {
-    await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
+  logout: async (): Promise<void> => {
+    await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT);
   },
-  
 
   getProfile: async () => {
     const response = await privateAxios.get(API_ENDPOINTS.AUTH.PROFILE);
-    return response.data;
-  },
-
-  getGoogleLoginUrl: async (): Promise<oAuthLoginResponse> => {
-    const response = await publicAxios.get<oAuthLoginResponse>(API_ENDPOINTS.AUTH.GOOGLE_LOGIN);
     return response.data;
   }
 };

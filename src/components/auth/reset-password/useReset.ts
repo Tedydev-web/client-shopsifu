@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
-import { showToast } from '@/components/ui/toastify'
+import { toast } from 'react-hot-toast'
 import { resetPasswordSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { ResetPasswordRequest } from '@/types/auth.interface'
@@ -9,19 +9,19 @@ import { ErrorResponse } from '@/types/base.interface'
 import { ROUTES } from '@/constants/route'
 import { AxiosError } from 'axios'
 
-const RESET_PASSWORD_TOKEN_KEY = 'token_verify_code'
+const RESET_PASSWORD_TOKEN_KEY = 'reset_password_token'
 
 export function useReset() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleResetPassword = async (data: z.infer<typeof resetPasswordSchema>) => {
+  const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
     try {
       // Lấy token từ sessionStorage
-      const token = localStorage.getItem(RESET_PASSWORD_TOKEN_KEY)
+      const token = sessionStorage.getItem(RESET_PASSWORD_TOKEN_KEY)
       
       if (!token) {
-        showToast('Phiên làm việc đã hết hạn', 'info')
+        toast.error('Phiên làm việc đã hết hạn')
         router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
         return
       }
@@ -36,9 +36,9 @@ export function useReset() {
       await authService.resetPassword(resetData)
 
       // Xóa token sau khi đổi mật khẩu thành công
-      localStorage.removeItem(RESET_PASSWORD_TOKEN_KEY)
+      sessionStorage.removeItem(RESET_PASSWORD_TOKEN_KEY)
       
-      showToast('Đổi mật khẩu thành công!', 'success')
+      toast.success('Đổi mật khẩu thành công!')
       router.replace(ROUTES.BUYER.SIGNIN)
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -47,17 +47,17 @@ export function useReset() {
 
         switch (firstMessage) {
           case 'Error.InvalidToken':
-            showToast('Token không hợp lệ hoặc đã hết hạn', 'error')
+            toast.error('Token không hợp lệ hoặc đã hết hạn')
             router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
             break
           case 'Error.InvalidPassword':
-            showToast('Mật khẩu không hợp lệ', 'error')
+            toast.error('Mật khẩu không hợp lệ')
             break
           case 'Error.PasswordMismatch':
-            showToast('Mật khẩu không khớp', 'error')
+            toast.error('Mật khẩu không khớp')
             break
           default:
-            showToast(firstMessage || 'Có lỗi xảy ra. Vui lòng thử lại sau.', 'error')
+            toast.error(firstMessage || 'Có lỗi xảy ra. Vui lòng thử lại sau.')
         }
       }
     } finally {
@@ -65,5 +65,5 @@ export function useReset() {
     }
   }
 
-  return { loading, handleResetPassword }
+  return { loading, onSubmit }
 }

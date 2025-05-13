@@ -49,7 +49,7 @@ export function DataTableSearch<TData>({
       }}
       className={cn("relative flex w-fit", className)}
     >
-      <div className="relative flex h-9 w-full min-w-[200px] max-w-[220px] lg:max-w-[20px] rounded-md border border-input bg-background ring-offset-background">
+      <div className="relative flex h-9 w-full min-w-[200px] max-w-[220px] lg:max-w-[240px] rounded-md border border-input bg-background ring-offset-background">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <input
           type="text"

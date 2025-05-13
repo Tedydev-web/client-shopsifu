@@ -9,10 +9,6 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
-export interface oAuthLoginResponse{
-  url: string;
-} 
-
 // REGISTER
 export interface RegisterRequest {
   name: string;
@@ -20,7 +16,7 @@ export interface RegisterRequest {
   password: string;
   confirmPassword: string;
   phoneNumber: string;
-  token: string;
+  code: string;
 }
 
 export interface RegisterResponse {

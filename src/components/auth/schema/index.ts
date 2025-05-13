@@ -12,7 +12,7 @@ export const RegisterSchema = z.object({
     message: 'Vui lòng nhập họ và tên của bạn'
   }),
   phoneNumber: z.string().min(10, { message: 'Số điện thoại phải có ít nhất 10 số' }),
-  token: z.string(),
+  code: z.string().min(6, { message: 'Mã xác thực phải có 6 chữ số' }),
   password: z
     .string()
     .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
