@@ -2,9 +2,9 @@
 
 import { DataTable, columns } from "@/components/admin/role/datatable"
 import { DataTableToolbar } from "@/components/admin/role/toolbar"
-import { AddNewRole } from "@/components/admin/role/AddNewRole"
 import { useState } from "react"
 import type { Table } from "@tanstack/react-table"
+import AddNewRole from "./add-new/page"
 import {
   Pagination,
   PaginationContent,
@@ -65,61 +65,46 @@ const products: RoleResponse[] = [
   },
 ]
 
-export default function Page() {
+const RolePage = () => {
+  const [isAddNewOpen, setIsAddNewOpen] = useState(false);
   const [tableInstance, setTableInstance] = useState<Table<RoleResponse> | null>(null)
-  const [isAddNewOpen, setIsAddNewOpen] = useState(false)
-
-  const handleAddRole = () => {
-    setIsAddNewOpen(true)
-  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Danh sách Role (vai trò)</h2>
-          <p className="text-muted-foreground">
-            Quản lý tất cả quyền của bạn tại đây
-          </p>
+    <div className="space-y-4 p-8 pt-6">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Quản lý vai trò</h2>
+      </div>
+      <div className="space-y-4">
+        {tableInstance && (
+          <DataTableToolbar 
+            table={tableInstance}
+            onAdd={() => setIsAddNewOpen(true)}
+          />
+        )}
+        <DataTable
+          columns={columns} 
+          data={products} 
+          onTableChange={setTableInstance}
+        />
+        <div className="flex items-center justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
-
-      {tableInstance && (
-        <DataTableToolbar 
-          table={tableInstance}
-          onAdd={handleAddRole}
-        />
-      )}
-
-      <DataTable
-        columns={columns} 
-        data={products} 
-        onTableChange={setTableInstance}
-      />
-
-      <Pagination className="pt-4 justify-end">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#" isActive>1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">2</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">5</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-
       <AddNewRole 
         open={isAddNewOpen}
         onOpenChange={setIsAddNewOpen}
@@ -127,3 +112,5 @@ export default function Page() {
     </div>
   )
 }
+
+export default RolePage

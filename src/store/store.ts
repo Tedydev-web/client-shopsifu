@@ -6,10 +6,13 @@ import { encryptTransform } from 'redux-persist-transform-encrypt';
 import authReducer from './features/auth/authSlide';
 
 // Mã hoá dữ liệu khi lưu Redux persist
-const encryptor = encryptTransform({
-  secretKey: process.env.NEXT_PUBLIC_REDUX_ENCRYPTION_KEY || '',
-  onError: (err) => console.error('Encrypt error:', err),
-});
+const secretKey = process.env.NEXT_PUBLIC_REDUX_ENCRYPTION_KEY;
+const encryptor = secretKey
+  ? encryptTransform({
+      secretKey,
+      onError: (err) => console.error('Encrypt error:', err),
+    })
+  : null;
 
 // // Mã hoá dữ liệu khi lưu Redux persist (chỉ khi có secretKey)
 // const encryptor = secretKey
@@ -30,7 +33,7 @@ const persistConfig = {
   key: 'root',
   storage,
   whitelist: ['auth'], // Chỉ lưu auth
-  transforms: [encryptor],
+  transforms: encryptor ? [encryptor] : [],
 };
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(persistConfig, rootReducer);
