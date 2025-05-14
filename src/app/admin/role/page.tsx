@@ -1,8 +1,10 @@
 "use client"
 
 import { DataTable, columns } from "@/components/admin/role/datatable"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { DataTableToolbar } from "@/components/admin/role/toolbar"
+import { AddNewRole } from "@/components/admin/role/AddNewRole"
+import { useState } from "react"
+import type { Table } from "@tanstack/react-table"
 import {
   Pagination,
   PaginationContent,
@@ -13,62 +15,66 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination"
 
-// Define Product interface inline
-interface Product {
-  id: string;
-  image: string;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: string;
-  createdAt: number;
-  updatedAt: number;
-  actions: string;
-}
+import { RoleResponse } from "@/types/role.interface"
 
-// Define Category interface inline
-interface Category {
-  id: string;
-  name: string;
-}
-
-const products: Product[] = [
+const products: RoleResponse[] = [
   {
     id: "1",
     image: "/images/logo/logofullred.png",
-    name: "Sản phẩm 1",
-    category: "Danh mục 1",
-    price: 100000,
-    stock: 50,
-    status: "Hoạt động",
-    createdAt: 100000,
-    updatedAt: 50,
-    actions: "Sửa",
+    name: "Quản trị viên",
+    fullName: "Nguyễn Văn Admin",
+    role: "admin",
+    description: "Quản lý toàn bộ hệ thống",
+    permissions: [{
+      id: "1",
+      name: "Tất cả quyền",
+      code: "all",
+      description: "Có tất cả các quyền trong hệ thống",
+      groupName: "Hệ thống"
+    }],
+    status: "active",
+    createdAt: Date.now() - 1000000,
+    updatedAt: Date.now() - 500000,
   },
   {
     id: "2",
     image: "/images/logo/logofullred.png",
-    name: "Sản phẩm 2",
-    category: "Danh mục 2",
-    price: 200000,
-    stock: 0,
-    status: "Không hoạt động",
-    createdAt: 200000,
-    updatedAt: 30,
-    actions: "Xóa",
+    name: "Người mua hàng",
+    fullName: "Trần Thị User",
+    role: "customer",
+    description: "Khách hàng của hệ thống",
+    permissions: [
+      {
+        id: "2",
+        name: "Xem sản phẩm",
+        code: "view",
+        description: "Xem thông tin sản phẩm",
+        groupName: "Sản phẩm"
+      },
+      {
+        id: "3",
+        name: "Mua sản phẩm",
+        code: "buy",
+        description: "Mua sản phẩm",
+        groupName: "Sản phẩm"
+      }
+    ],
+    status: "inactive",
+    createdAt: Date.now() - 2000000,
+    updatedAt: Date.now() - 1000000,
   },
 ]
 
-const categories: Category[] = [
-  { id: "1", name: "Danh mục 1" },
-  { id: "2", name: "Danh mục 2" },
-]
-
 export default function Page() {
+  const [tableInstance, setTableInstance] = useState<Table<RoleResponse> | null>(null)
+  const [isAddNewOpen, setIsAddNewOpen] = useState(false)
+
+  const handleAddRole = () => {
+    setIsAddNewOpen(true)
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Danh sách Role (vai trò)</h2>
@@ -76,25 +82,28 @@ export default function Page() {
             Quản lý tất cả quyền của bạn tại đây
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Thêm sản phẩm
-        </Button>
       </div>
 
-      {/* DataTable */}
-      <DataTable columns={columns} data={products} categories={categories} />
+      {tableInstance && (
+        <DataTableToolbar 
+          table={tableInstance}
+          onAdd={handleAddRole}
+        />
+      )}
 
-      {/* Pagination */}
+      <DataTable
+        columns={columns} 
+        data={products} 
+        onTableChange={setTableInstance}
+      />
+
       <Pagination className="pt-4 justify-end">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious href="#" />
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href="#" isActive>
-              1
-            </PaginationLink>
+            <PaginationLink href="#" isActive>1</PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationLink href="#">2</PaginationLink>
@@ -110,6 +119,11 @@ export default function Page() {
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+
+      <AddNewRole 
+        open={isAddNewOpen}
+        onOpenChange={setIsAddNewOpen}
+      />
     </div>
   )
 }

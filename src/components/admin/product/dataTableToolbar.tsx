@@ -23,7 +23,7 @@ export function DataTableToolbar<TData>({ table, categories }: DataTableToolbarP
           date={date}
           onDateChange={(newDate: DateRange | undefined) => {
             setDate(newDate)
-            // Here you can handle the date filter
+            //Ở đây bạn có thể xử lý bộ lọc ngày
           }}
         />
         <DataTableFacetedFilter

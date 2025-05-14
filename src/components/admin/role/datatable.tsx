@@ -7,6 +7,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
+  type Table,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -16,9 +17,44 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { Button } from "@/components/ui/button"
+import { EditRole } from "./EditRole"
+
+interface ActionCellProps {
+  row: {
+    original: RoleResponse
+  }
+}
+
+const ActionCell = ({ row }: ActionCellProps) => {
+  const [open, setOpen] = React.useState(false)
+  
+  return (
+    <>
+      <div className="flex space-x-2">
+        <Button
+          onClick={() => setOpen(true)} 
+          variant="outline"
+          size="sm">
+          Sửa
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm">
+          Xóa
+        </Button>
+      </div>
+      <EditRole 
+        open={open} 
+        onOpenChange={setOpen}
+        data={row.original}
+      />
+    </>
+  )
+}
 
 import {
-  Table,
+  Table as UITable,
   TableBody,
   TableCell,
   TableHead,
@@ -26,29 +62,91 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-// import { Pagination } from "@/components/ui/pagination"
 
-
-interface Product {
-  id: string
-  image: string
-  name: string
-  category: string
-  price: number
-  stock: number
-  status: string
-}
+import { RoleResponse } from "@/types/role.interface"
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[]
   data: TData[]
-  categories: Array<{ id: string; name: string }>
+  onTableChange?: (table: Table<TData>) => void
 }
+
+export const columns: ColumnDef<RoleResponse, unknown>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+        className="translate-y-[2px]"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="translate-y-[2px]"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "image",
+    header: "Hình ảnh",
+    cell: ({ row }) => (
+      <Image 
+        src={row.getValue("image")} 
+        alt={row.getValue("name")} 
+        width={48}
+        height={48}
+        className="object-cover rounded-md"
+      />
+    )
+  },
+  {
+    accessorKey: "fullName",
+    header: "Họ và tên",
+  },
+  {
+    accessorKey: "name",
+    header: "Tên vai trò",
+  },
+  {
+    accessorKey: "status",
+    header: "Trạng thái",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Ngày tạo",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("createdAt"))
+      return date.toLocaleDateString("vi-VN")
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Ngày cập nhật",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("updatedAt"))
+      return date.toLocaleDateString("vi-VN")
+    },
+  },  {
+    accessorKey: "actions",
+    header: "Thao tác",
+    cell: ({ row }) => <ActionCell row={row} />,
+  }
+]
 
 export function DataTable<TData>({
   columns,
   data,
-//   categories,
+  onTableChange,
 }: DataTableProps<TData>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -77,11 +175,17 @@ export function DataTable<TData>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
+  React.useEffect(() => {
+    if (onTableChange) {
+      onTableChange(table)
+    }
+  }, [table, onTableChange])
+
   return (
     <div className="space-y-4">
-      {/* <DataTableToolbar table={table} categories={categories} /> */}
+      {/* <DataTableToolbar table={table} /> */}
       <div className="rounded-md border">
-        <Table>
+        <UITable>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -128,85 +232,9 @@ export function DataTable<TData>({
               </TableRow>
             )}
           </TableBody>
-        </Table>
+        </UITable>
       </div>
       {/* <DataTablePagination table={table} /> */}
     </div>
   )
 }
-
-// Column Definitions
-export const columns: ColumnDef<Product>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "image",
-    header: "Hình ảnh",
-    cell: ({ row }) => (
-      <Image 
-        src={row.getValue("image")} 
-        alt={row.getValue("name")} 
-        width={48}
-        height={48}
-        className="object-cover rounded-md"
-      />
-    )
-  },
-  {
-    accessorKey: "name",
-    header: "Họ và Tên",
-  },
-  {
-    accessorKey: "Status",
-  },
-  {
-    accessorKey: "CreatedAt",
-    header: "Ngày tạo",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("CreatedAt"))
-      return date.toLocaleDateString("vi-VN")
-    },
-  },
-  {
-    accessorKey: "UpdatedAt",
-    header: "Ngày cập nhật",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("UpdatedAt"))
-      return date.toLocaleDateString("vi-VN")
-    },
-  },
-  {
-    accessorKey: "Actions",
-    header: "Thao tác",
-    cell: () => {
-    return (
-        <div className="flex space-x-2">
-        <button className="btn btn-sm btn-primary">Sửa</button>
-        <button className="btn btn-sm btn-danger">Xóa</button>
-        </div>
-    );
-},
-  }
-]

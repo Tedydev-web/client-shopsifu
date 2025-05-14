@@ -12,20 +12,17 @@ export const API_ENDPOINTS = {
     GOOGLE_LOGIN: `${API_BASE}/auth/google-link`,
     VERIFY_OTP: `${API_BASE}/auth/verify-code`,
     RESET_PASSWORD: `${API_BASE}/auth/reset-password`
+  },  ROLE: {
+    GETALL: `${API_BASE}/roles`,
+    GET: `${API_BASE}/roles/:id`,
+    CREATE: `${API_BASE}/roles`,
+    UPDATE: `${API_BASE}/roles/:id`,
+    DELETE: `${API_BASE}/roles/:id`,
   },
-  ROLE:{
-    GETALL: `${API_BASE}/role/create`,
-    GET: `${API_BASE}/role/create`,
-    UPDATE: `${API_BASE}/role/create`,
-    POST: `${API_BASE}/role/create`,
-    DELETE_ALL: `${API_BASE}/role/create`,
-  },
-  PERMISSION:{
-    GETALL: `${API_BASE}/permission/create`,
-    GET: `${API_BASE}/permission/create`,
-    UPDATE: `${API_BASE}/permission/create`,
-    POST: `${API_BASE}/permission/create`,
-    DELETE_ALL: `${API_BASE}/permission/create`,
+  PERMISSION: {
+    GETALL: `${API_BASE}/permissions`,
+    GET_ROLE_PERMISSIONS: `${API_BASE}/roles/:id/permissions`,
+    UPDATE_ROLE_PERMISSIONS: `${API_BASE}/roles/:id/permissions`,
   },
   PRODUCTS: {
     LIST: `${API_BASE}/products`,

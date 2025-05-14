@@ -1,11 +1,30 @@
 
-export interface RoleRequest{
+export interface Permission {
     id: string;
     name: string;
+    code: string;
     description: string;
-    permissions: string[];
+    groupName: string;
 }
 
-export interface RoleResponse{
-    
+export type RoleType = 'admin' | 'seller' | 'customer';
+
+export interface RoleRequest {
+    name: string;
+    description: string;
+    role: RoleType;
+    status: 'active' | 'inactive';
+}
+
+export interface RoleResponse {
+    id: string;
+    fullName: string;
+    image?: string;
+    name: string;
+    description: string;
+    role: RoleType;
+    status: 'active' | 'inactive';
+    permissions: Permission[];
+    createdAt: number;
+    updatedAt: number;
 }
