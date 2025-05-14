@@ -1,3 +1,17 @@
 {
-    "welcome back": "Chào mừng bạn trở lại"
-}
+    "auth": {
+      "welcome back": "Chào mừng bạn quay trở lại ứng dụng",
+      "login": "Đăng nhập",
+      "logout": "Đăng xuất",
+      "register": "Đăng ký",
+      "forgot password": "Quên mật khẩu",
+      "reset password": "Đặt lại mật khẩu",
+      "verify OTP": "Xác minh OTP"
+    },
+    "product": {
+      "product list": "Danh sách sản phẩm",
+      "add product": "Thêm sản phẩm",
+      "edit product": "Chỉnh sửa sản phẩm",
+      "delete product": "Xóa sản phẩm"
+    }
+  }

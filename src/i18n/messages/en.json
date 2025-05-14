@@ -1,4 +1,29 @@
 {
-    "welcome back": "Welcome back to our application"
+  "auth": {
+    "welcome back": "Welcome back to the application",
+
+    "register": "Register",
+    "register title": "Enter your information to complete registration",
+    "full name": "Full name",
+    "email": "Email",
+    "phone number": "Phone number",
+    "password": "Password",
+    "confirm password": "Confirm password",
+
+    "login": "Login",
+
+    "forgot password": "Forgot password",
+
+    "reset password": "Reset password",
+
+    "verify OTP": "Verify OTP",
+
+    "logout": "Logout"
+  },
+  "product": {
+    "product list": "Product list",
+    "add product": "Add product",
+    "edit product": "Edit product",
+    "delete product": "Delete product"
+  }
 }
-  
