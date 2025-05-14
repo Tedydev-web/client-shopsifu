@@ -32,7 +32,6 @@ export default function RootLayout({
         className={`${inter.variable} ${inter.variable} antialiased`}
       >
         <StoreProvider>
-          {/* <LanguageInitializer /> */}
           <Toast/>
           {children}
         </StoreProvider>
