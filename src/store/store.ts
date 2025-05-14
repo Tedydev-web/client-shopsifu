@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 import { encryptTransform } from 'redux-persist-transform-encrypt';
 
 import authReducer from './features/auth/authSlide';
+import langReducer from './features/lang/langSlice';
 
 // Mã hoá dữ liệu khi lưu Redux persist
 const encryptor = encryptTransform({
@@ -23,13 +24,14 @@ const encryptor = encryptTransform({
 // Kết hợp reducer
 const rootReducer = combineReducers({
   auth: authReducer,
+  lang: langReducer,
 });
 
 // Config Redux persist
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth'], // Chỉ lưu auth
+  whitelist: ['auth','lang'], // Chỉ lưu auth
   transforms: [encryptor],
 };
 

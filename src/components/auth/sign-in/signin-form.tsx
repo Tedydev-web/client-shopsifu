@@ -17,9 +17,11 @@ import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
 import { OAuthForm } from '../layout/OAuthForm'
+import { useTranslation } from 'react-i18next'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handleSignin, loading } = useSignin()
+  const { t } = useTranslation()
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -37,7 +39,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
           {/* Tiêu đề */}
           <AnimatedFormItem>
             <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-4xl font-bold">Chào mừng quay trở lại</h1>
+              <h1 className="text-4xl font-bold">{t('welcome back')}</h1>
               <p className="text-balance text-md text-muted-foreground">
                 Nhập email và mật khẩu của bạn phía bên dưới
               </p>

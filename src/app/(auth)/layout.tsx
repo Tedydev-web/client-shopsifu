@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { AuthHeader } from "@/components/auth/layout/authHeader"
+import { AuthHeader } from "@/components/auth/layout/authHeader" 
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

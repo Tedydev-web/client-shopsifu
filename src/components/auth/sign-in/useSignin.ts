@@ -8,7 +8,6 @@ import { ROUTES } from '@/constants/route'
 import { showToast } from '@/components/ui/toastify'
 import { setCredentials } from '@/store/features/auth/authSlide'
 import { AppDispatch } from '@/store/store'
-import { ErrorResponse } from '@/types/base.interface'
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)
