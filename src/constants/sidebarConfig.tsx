@@ -78,6 +78,11 @@ export const sidebarConfig: SidebarItem[] = [
         href: '/admin/role',
         icon: null,
       },
+      {
+        title: 'Quản Lý Người Dùng',
+        href: '/admin/users',
+        icon: null,
+      },
     ],
   },  
 ]

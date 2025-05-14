@@ -11,7 +11,8 @@ import {
   Store,
   Globe,
   LogOut,
-  Menu
+  Menu,
+  Check,
 } from 'lucide-react'
 import { useResponsive } from '@/hooks/useResponsive'
 import {
@@ -20,9 +21,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 import { useLogout } from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
+import { useChangeLang } from '@/hooks/useChangeLang'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -30,7 +35,8 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
-  const { handleLogout, loading } = useLogout() // Sử dụng hook useLogout để lấy handleLogout và loading
+  const { handleLogout, loading: logoutLoading } = useLogout()
+  const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
 
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 z-30">
@@ -108,10 +114,28 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 <Settings className="w-4 h-4 mr-2" />
                 Thiết Lập Shop
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Globe className="w-4 h-4 mr-2" />
-                Tiếng Việt (Vietnamese)
-              </DropdownMenuItem>
+              
+              {/* Language Switcher SubMenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Globe className="w-4 h-4 mr-2" />
+                  <span>Ngôn ngữ: {currentLangName}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => changeLanguage('vi')}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>Tiếng Việt</span>
+                      {currentSelectedLang === 'vi' && <Check className="w-4 h-4 text-green-500" />}
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => changeLanguage('en')}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>English</span>
+                      {currentSelectedLang === 'en' && <Check className="w-4 h-4 text-green-500" />}
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
 
               <DropdownMenuSeparator />
 
@@ -119,10 +143,10 @@ export function Header({ onToggleSidebar }: HeaderProps) {
               <DropdownMenuItem 
                 className="text-red-600" 
                 onClick={handleLogout} 
-                disabled={loading} // Vô hiệu hóa nút khi đang loading
+                disabled={logoutLoading}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                {loading ? 'Đang đăng xuất...' : 'Đăng xuất'} {/* Hiển thị loading */}
+                {logoutLoading ? 'Đang đăng xuất...' : 'Đăng xuất'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
