@@ -6,7 +6,7 @@ import "@/i18n/i18n";
 import { useTranslation } from "react-i18next";
 
 export function AuthHeader() {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
 
   return (
     <header className="w-full py-2 px-6 md:px-40 lg:px-90 flex items-center justify-between bg-white/80 backdrop-blur-sm fixed top-0 z-50 border-b">
@@ -28,7 +28,7 @@ export function AuthHeader() {
           />
         </a>
         <h1 className="text-2xl font-small text-black whitespace-nowrap hidden md:inline">
-          {t("Đăng nhập")}
+          {/* {t("Đăng nhập")} */}
         </h1>
       </motion.div>
 
@@ -39,7 +39,7 @@ export function AuthHeader() {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="flex items-center gap-6 text-sm text-primary cursor-pointer"
       >
-        {t("Bạn cần giúp đỡ?")}
+        {/* {t("Bạn cần giúp đỡ?")} */}
 
         {/* Ngôn ngữ */}
         <LanguageDropdown />
