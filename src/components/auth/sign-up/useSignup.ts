@@ -5,6 +5,7 @@ import { RegisterSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { showToast } from '@/components/ui/toastify'
 import { ErrorResponse } from '@/types/base.interface'
+import { parseApiError } from '@/utils/error'
 
 const TOKEN_KEY = 'token_verify_code'
 
@@ -43,9 +44,7 @@ export function useSignup() {
       showToast('Đăng ký tài khoản thành công', 'success')
       router.push('/buyer/sign-in')
     } catch (error) {
-      const err = error as ErrorResponse
-      const firstMessage = err?.message?.[0]?.message
-      showToast(firstMessage || 'Có lỗi xảy ra khi đăng ký', 'error')
+      showToast(parseApiError(error), 'error')
       console.error('Registration error:', error)
     } finally {
       setLoading(false)

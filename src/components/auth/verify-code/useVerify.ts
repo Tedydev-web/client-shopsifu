@@ -5,9 +5,9 @@ import { showToast } from '@/components/ui/toastify'
 import { otpSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { VerifyOTPRequest } from '@/types/auth.interface'
-import { ErrorResponse } from '@/types/base.interface'
 import { ROUTES } from '@/constants/route'
-import { AxiosError } from 'axios'
+import { parseApiError } from '@/utils/error'
+
 
 const TOKEN_KEY = 'token_verify_code'
 
@@ -37,8 +37,8 @@ export function useVerify() {
 
       const response = await authService.verifyOTP(request)
       
-      if (response.token) {
-        localStorage.setItem(TOKEN_KEY, response.token)
+      if (response.otpToken) {
+        localStorage.setItem(TOKEN_KEY, response.otpToken)
         showToast('Xác thực thành công', 'success')
         
         if (action === 'forgot') {
@@ -50,21 +50,7 @@ export function useVerify() {
         throw new Error('Token không hợp lệ')
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        const err: ErrorResponse = error.response?.data
-        const firstMessage = err?.message?.[0]?.message
-
-        switch (firstMessage) {
-          case 'Error.InvalidOTP':
-            showToast('Mã OTP không chính xác', 'error')
-            break
-          case 'Error.OTPExpired':
-            showToast('Mã OTP đã hết hạn', 'error')
-            break
-          default:
-            showToast(firstMessage || 'Có lỗi xảy ra. Vui lòng thử lại sau.', 'error')
-        }
-      }
+      showToast(parseApiError(error), 'error')
     } finally {
       setLoading(false)
     }
@@ -85,10 +71,7 @@ export function useVerify() {
       })
       showToast('Đã gửi lại mã OTP mới', 'success')
     } catch (error) {
-      const err = error as ErrorResponse
-      const firstMessage = err?.message?.[0]?.message
-      showToast(firstMessage || 'Có lỗi xảy ra khi gửi lại mã OTP', 'error')
-      console.error('Resend OTP error:', error)
+      showToast(parseApiError(error), 'error')
     } finally {
       setLoading(false)
     }

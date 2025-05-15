@@ -9,7 +9,11 @@ import { DataTableRowActions, ActionItem } from '@/components/ui/data-table/data
 import { Edit, Trash2, Eye, UserCog } from 'lucide-react'; // Ví dụ icons
 
 // Hàm tạo danh sách actions cụ thể cho User
-const getUserActions = (rowUser: User): ActionItem<User>[] => [
+const getUserActions = (
+  rowUser: User,
+  onDelete: (user: User) => void,
+  onEdit: (user: User) => void
+): ActionItem<User>[] => [
   {
     type: 'command',
     label: 'Xem chi tiết',
@@ -24,8 +28,7 @@ const getUserActions = (rowUser: User): ActionItem<User>[] => [
     label: 'Sửa thông tin',
     icon: <Edit />,
     onClick: (user) => {
-      console.log('Sửa user:', user.id);
-      // router.push(`/admin/users/${user.id}/edit`)
+      onEdit(user);
     },
   },
   {
@@ -42,12 +45,14 @@ const getUserActions = (rowUser: User): ActionItem<User>[] => [
     type: 'command',
     label: 'Xóa người dùng',
     icon: <Trash2 />,
-
+    onClick: (user) => onDelete(user),
     className: 'text-red-600 hover:!text-red-700',
   },
 ];
 
-export const userColumns: ColumnDef<User>[] = [
+export const userColumns = (
+  { onDelete, onEdit }: { onDelete: (user: User) => void, onEdit: (user: User) => void }
+  ): ColumnDef<User>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -131,6 +136,6 @@ export const userColumns: ColumnDef<User>[] = [
   {
     id: 'actions',
     //header: () => <div className="text-right">Hành động</div>, // Hoặc để trống nếu không muốn title cho cột actions
-    cell: ({ row }) => <DataTableRowActions row={row} actions={getUserActions(row.original)} />,
+    cell: ({ row }) => <DataTableRowActions row={row} actions={getUserActions(row.original, onDelete, onEdit)} />,
   },
 ]

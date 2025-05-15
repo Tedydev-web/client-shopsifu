@@ -10,7 +10,11 @@ import {
   VerifyOTPRequest,
   VerifyOTPResponse,
   ResetPasswordRequest,
-  ResetPasswordResponse 
+  ResetPasswordResponse,
+  Verify2faRequest,
+  Verify2faResponse,
+  Disable2faRequest,
+  Disable2faResponse,
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -54,19 +58,6 @@ export const authService = {
     return response.data;
   },
 
-  // logout: async (accessToken: string, refreshToken: string): Promise<void> => {
-  //   // Gửi yêu cầu POST với Bearer token trong header và refresh token trong body
-  //   await privateAxios.post(
-  //     API_ENDPOINTS.AUTH.LOGOUT,
-  //     { refreshToken }, // refresh token gửi trong body
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`, // access token gửi trong header
-  //       },
-  //     }
-  //   );
-  // },
-
   logout: async (refreshToken: string): Promise<void> => {
     await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
   },
@@ -80,5 +71,25 @@ export const authService = {
   getGoogleLoginUrl: async (): Promise<oAuthLoginResponse> => {
     const response = await publicAxios.get<oAuthLoginResponse>(API_ENDPOINTS.AUTH.GOOGLE_LOGIN);
     return response.data;
-  }
+  },
+
+  verify2fa: async (data: Verify2faRequest): Promise<Verify2faResponse> => {
+    const response = await publicAxios.post<Verify2faResponse>(
+      API_ENDPOINTS.AUTH.VERIFY_2FA,
+      data
+    );
+    return response.data;
+  },
+
+  setup2fa: async (): Promise<void> => {
+    await privateAxios.post(API_ENDPOINTS.AUTH.SETUP_2FA);
+  },
+
+  disable2fa: async (data: Disable2faRequest): Promise<Disable2faResponse> => {
+    const response = await privateAxios.post<Disable2faResponse>(
+      API_ENDPOINTS.AUTH.DISABLE_2FA,
+      data
+    );
+    return response.data;
+  },
 };

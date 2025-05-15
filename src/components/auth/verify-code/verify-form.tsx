@@ -33,6 +33,14 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
     defaultValues: { otp: '' }
   })
 
+  // Khi nhập đủ 6 ký tự OTP thì tự động submit
+  const handleOTPChange = (value: string) => {
+    form.setValue('otp', value, { shouldValidate: true })
+    if (value.length === 6) {
+      form.handleSubmit(handleVerifyCode)()
+    }
+  }
+
   return (
     <Form {...form}>
       <form
@@ -60,7 +68,7 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
                 <FormItem className="flex flex-col items-center">
                   <FormLabel>Nhập mã OTP</FormLabel>
                   <FormControl>
-                    <InputOTP maxLength={6} {...field}>
+                    <InputOTP maxLength={6} {...field} onChange={handleOTPChange}>
                       <InputOTPGroup>
                         {[...Array(6)].map((_, index) => (
                           <InputOTPSlot key={index} index={index} />
@@ -73,16 +81,6 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
               )}
             />
           </AnimatedFormItem>
-
-          {/* Button Submit */}
-          <AnimatedButton
-            size="xl"
-            type="submit"
-            className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={loading}
-          >
-            {loading ? 'Đang xác minh...' : 'Xác minh OTP'}
-          </AnimatedButton>
 
           {/* Link resend */}
           <AnimatedFormItem>

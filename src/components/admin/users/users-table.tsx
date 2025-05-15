@@ -3,45 +3,48 @@
 import { useEffect, useState } from 'react'
 import { DataTable } from '@/components/ui/data-table/data-table'
 import { Pagination } from '@/components/ui/data-table/pagination'
-import { userColumns } from './user-columns'
-import { fetchUsers } from '@/services/userService'
+import { userColumns } from './users-Columns'
 import { User } from '@/types/user.interface'
+import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
+import { useUsers } from './useUsers'
+import UsersModalUpsert from './users-ModalUpsert'
 
-export default function UserTable() {
-  const [data, setData] = useState<User[]>([])
-  const [totalRecords, setTotalRecords] = useState(0)
-  const [loading, setLoading] = useState(true)
-
-  const [limit, setLimit] = useState(10)
-  const [offset, setOffset] = useState(0)
-
-  const currentPage = offset / limit + 1
-  const totalPages = Math.ceil(totalRecords / limit)
-
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const res = await fetchUsers({ limit, offset })
-        setData(res.data)
-        setTotalRecords(res.total)
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-        setData([]);
-        setTotalRecords(0);
-      }
-      setLoading(false);
-    }
-    load()
-  }, [limit, offset])
-
-  if (loading) {
-    return <div>Đang tải dữ liệu người dùng...</div>
-  }
+export default function UserTable({ search }: { search: string }) {
+  const {
+    data,
+    totalRecords,
+    loading,
+    limit,
+    offset,
+    currentPage,
+    totalPages,
+    deleteOpen,
+    userToDelete,
+    deleteLoading,
+    handleOpenDelete,
+    handleConfirmDelete,
+    editOpen,
+    userToEdit,
+    handleOpenEdit,
+    setEditOpen,
+    editUser,
+    handlePageChange,
+    handleLimitChange,
+    handleCloseDeleteModal,
+  } = useUsers();
 
   return (
-    <div className="space-y-4">
-      <DataTable columns={userColumns} data={data} />
+    <div className="space-y-4 relative">
+      {/* Loading overlay chỉ che bảng, không che search input */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
+          <span className="text-gray-500 text-sm">Đang tải dữ liệu...</span>
+        </div>
+      )}
+      <DataTable
+        columns={userColumns({ onDelete: handleOpenDelete, onEdit: handleOpenEdit })}
+        data={data}
+      />
       {totalPages > 0 && (
         <Pagination
           limit={limit}
@@ -49,13 +52,36 @@ export default function UserTable() {
           currentPage={currentPage}
           totalPages={totalPages}
           totalRecords={totalRecords}
-          onPageChange={(newOffset, newPage) => setOffset(newOffset)}
-          onLimitChange={(newLimit) => {
-            setLimit(newLimit)
-            setOffset(0)
-          }}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
         />
       )}
+
+      {/* Popup xác nhận xóa */}
+      <ConfirmDeleteModal
+        open={deleteOpen}
+        onClose={() => { if (!deleteLoading) handleCloseDeleteModal() }}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa người dùng"
+        description={
+          userToDelete
+            ? <>Bạn có chắc chắn muốn xóa người dùng <b>{userToDelete.name}</b> không? Hành động này không thể hoàn tác.</>
+            : ""
+        }
+        confirmText="Xóa"
+        cancelText="Hủy"
+        loading={deleteLoading}
+      />
+
+      <UsersModalUpsert
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        mode="edit"
+        user={userToEdit!}
+        onSubmit={async (user) => {
+          editUser(user as User)
+        }}
+      />
     </div>
   )
 }

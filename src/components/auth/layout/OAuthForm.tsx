@@ -17,7 +17,7 @@ export function OAuthForm({ className, type = 'signin' }: OAuthFormProps) {
   const handleGoogleAuth = async () => {
     try {
       const response = await authService.getGoogleLoginUrl();
-      const url = response.data.data.url;
+      const url = response.url;
       window.location.replace(url);
     } catch (error) {
       console.error('Google auth error:', error)

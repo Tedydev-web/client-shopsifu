@@ -10,12 +10,7 @@ export interface LoginResponse {
 }
 
 export interface oAuthLoginResponse{
-  data: {
-    success: boolean;
-    data: {
-      url: string;
-    };
-  };
+  url: string;
 } 
 
 // REGISTER
@@ -39,7 +34,7 @@ export interface RegisterResponse {
   updatedAt: string;
 }
 
-// VERIFY
+// VERIFY + SEND
 export interface SendOTPRequest {
   email: string;
   type: string;
@@ -58,12 +53,14 @@ export interface VerifyOTPRequest {
 }
 
 export interface VerifyOTPResponse {
+  otpToken: string;
   token: string;
   email: string;
   type: string;
   verified: boolean;
 }
 
+// RESET PASSWORD
 export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
@@ -74,5 +71,22 @@ export interface ResetPasswordResponse {
   message: string;
 }
 
+// 2FA
 
+export interface Verify2faRequest {
+  loginSessionToken: string;
+  type: string;
+  code: string;
+}
 
+export interface Verify2faResponse {
+  message: string;
+}
+
+export interface Disable2faRequest {
+  totpCode: string;
+}
+
+export interface Disable2faResponse {
+  message: string;
+}

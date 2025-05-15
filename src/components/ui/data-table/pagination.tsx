@@ -47,54 +47,24 @@ export function Pagination({
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
-      <div className="flex items-center gap-2 text-gray-400 text-sm">
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 w-8 p-0 bg-[var(--pagination-button-bg)] border-gray-700 text-[var(--pagination-text-color)]"
-          disabled={currentPage === 1}
-          onClick={handlePreviousPage}
-        >
-          <ChevronLeft size={16} />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 w-8 p-0 bg-[var(--pagination-button-bg)] border-blue-500 text-[var(--pagination-text-color)]"
-        >
-          {currentPage}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 w-8 p-0 bg-[var(--pagination-button-bg)] border-blue-500 text-[var(--pagination-text-color)]"
-          disabled={currentPage === totalPages}
-          onClick={handleNextPage}
-        >
-          <ChevronRight size={16} />
-        </Button>
-        <span className="text-gray-400 text-sm">
-          Trang {currentPage} / {totalPages} (Tổng: {totalRecords} )
-        </span>
-      </div>
       <div className="flex items-center gap-2">
-        <span className="text-gray-400 text-sm">Số mục trên mỗi trang:</span>
+        <span className="text-gray-500 text-sm">Số mục/trang:</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-1 bg-[var(--pagination-button-bg)] border-blue-500 text-[var(--pagination-text-color)]"
+              className="flex items-center gap-1 border-gray-300 shadow-sm"
             >
               {limit}
               <ChevronDown size={14} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[var(--dropdown-bg)] border-gray-700">
+          <DropdownMenuContent className="min-w-[80px] border-gray-200 shadow-lg">
             {[10, 25, 50].map((value) => (
               <DropdownMenuItem
                 key={value}
-                className="text-[var(--dropdown-text)] hcursor-pointer hover:bg-gray-700"
+                className={`cursor-pointer ${limit === value ? "bg-gray-100 font-semibold" : ""}`}
                 onClick={() => handleLimitChange(value)}
               >
                 {value}
@@ -102,6 +72,32 @@ export function Pagination({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+      <div className="flex items-center gap-2 text-gray-700 text-sm">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 w-8 p-0 border-gray-300"
+          disabled={currentPage === 1}
+          onClick={handlePreviousPage}
+        >
+          <ChevronLeft size={16} />
+        </Button>
+        <span className="px-2 font-semibold text-base select-none">
+          {currentPage}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 w-8 p-0 border-gray-300"
+          disabled={currentPage === totalPages}
+          onClick={handleNextPage}
+        >
+          <ChevronRight size={16} />
+        </Button>
+        <span className="ml-2 text-gray-400 text-sm">
+          Trang {currentPage} / {totalPages} &nbsp;|&nbsp; Tổng: {totalRecords}
+        </span>
       </div>
     </div>
   );

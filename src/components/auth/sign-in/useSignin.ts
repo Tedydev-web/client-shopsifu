@@ -8,6 +8,7 @@ import { ROUTES } from '@/constants/route'
 import { showToast } from '@/components/ui/toastify'
 import { setCredentials } from '@/store/features/auth/authSlide'
 import { AppDispatch } from '@/store/store'
+import { parseApiError } from '@/utils/error'
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)
@@ -28,19 +29,8 @@ export function useSignin() {
       showToast('Đăng nhập thành công!', 'success')
       router.push(ROUTES.ADMIN.DASHBOARD)
     } catch (error: any) {
-      let firstMessage = 'Đăng nhập thất bại'
       console.error('Login error:', error)
-
-      // Đảm bảo error là object và có field message
-      const errMsg = error?.response?.data?.message || error?.message;
-
-      if (Array.isArray(errMsg)) {
-        firstMessage = errMsg[0]?.message || firstMessage;
-      } else if (typeof errMsg === 'string') {
-        firstMessage = errMsg;
-      }
-
-      showToast(firstMessage, 'error');
+      showToast(parseApiError(error), 'error');
     } finally {
       setLoading(false);
     }
