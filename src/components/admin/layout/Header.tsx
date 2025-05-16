@@ -29,6 +29,7 @@ import { useLogout } from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
 import { useChangeLang } from '@/hooks/useChangeLang'
 import { SearchItem } from './SearchItem'
+import { useTranslation } from 'react-i18next'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -38,6 +39,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
   const { handleLogout, loading: logoutLoading } = useLogout()
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
+  const { t } = useTranslation() // Sử dụng hook useTranslation để lấy hàm t
 
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 z-30">
@@ -102,7 +104,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
               <DropdownMenuItem>
                 <Store className="w-4 h-4 mr-2" />
-                Hồ Sơ Shop
+                {t('admin.profileDropdown.shopProfile')}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="w-4 h-4 mr-2" />
@@ -131,6 +133,10 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
+              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Settings className="w-4 h-4 text-gray-500" />
+                {t('admin.profileDropdown.shopSettings')}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               {/* Đăng xuất */}
@@ -140,7 +146,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 disabled={logoutLoading}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                {logoutLoading ? 'Đang đăng xuất...' : 'Đăng xuất'}
+                {logoutLoading ? t('admin.profileDropdown.logging out') : t('admin.profileDropdown.logout')} {/* Hiển thị loading */}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

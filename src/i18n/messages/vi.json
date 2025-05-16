@@ -1,3 +1,152 @@
 {
-    "welcome back": "Chào mừng bạn trở lại"
+  "common": {
+    "title": "Mua sắm thật dễ dàng",
+    "subtitle": "Giao hàng toàn quốc, thanh toán linh hoạt\nvà hoàn tiền nếu không hài lòng."
+  },
+  "auth": {
+    "common": {
+      "full name": "Họ và tên",
+      "email": "Email",
+      "phone number": "Số điện thoại",
+      "password": "Mật khẩu",
+      "confirm password": "Xác nhận mật khẩu",
+      "logout": "Đăng xuất",
+      "or": "Hoặc tiếp tục với",
+      "signinWithGoogle": "Đăng nhập bằng Google",
+      "signupWithGoogle": "Đăng ký bằng Google"
+    },
+    "register": {
+      "title": "Đăng ký tài khoản",
+      "subtitle": "Nhập thông tin để hoàn tất đăng ký",
+      "register": "Đăng ký",
+      "registering": "Đang đăng ký",
+      "password": "Mật khẩu",
+      "confirm password": "Xác nhận mật khẩu",
+      "Have an account": "Đã có tài khoản?",
+      "login": "Đăng nhập",
+      "start": "Nhập email để bắt đầu đăng ký",
+      "success": "Mã xác minh đã được gửi đến email của bạn",
+      "continue": "Tiếp tục"
+    },
+    "login": {
+      "title": "Chào mừng quay lại ứng dụng",
+      "subtitle": "Vui lòng nhập email và mật khẩu để tiếp tục",
+      "login": "Đăng nhập",
+      "logging in": "Đang đăng nhập",
+      "forgot password": "Quên mật khẩu?",
+      "no account": "Chưa có tài khoản?",
+      "register": "Đăng ký"
+    },
+    "forgotPassword": {
+      "title": "Quên mật khẩu",
+      "subtitle": "Nhập email bên dưới và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.",
+      "Remember password": "Nhớ mật khẩu?",
+      "login": "Đăng nhập",
+      "confirm": "Xác nhận",
+      "Sending": "Đang gửi"
+    },
+    "resetPassword": {
+      "title": "Đặt lại mật khẩu",
+      "subtitle": "Nhập mật khẩu mới bên dưới.",
+      "new password": "Mật khẩu mới",
+      "confirmnewPassword": "Xác nhận mật khẩu mới",
+      "Remember password": "Nhớ mật khẩu?",
+      "login": "Đăng nhập",
+      "Processing": "Đang xử lý",
+      "success": "Liên kết đặt lại mật khẩu đã được gửi đến email của bạn",
+      "send": "Gửi liên kết"
+    },
+    "verifyOtp": {
+      "title": "Nhập mã xác minh",
+      "subtitle": "Chúng tôi đã gửi mã OTP gồm 6 chữ số đến email của bạn. Vui lòng nhập mã bên dưới.",
+      "No code": "Không nhận được mã?",
+      "resend": "Gửi lại",
+      "verify": "Xác minh OTP",
+      "verifying": "Đang xác minh"
+    },
+    "verifyEmail": {
+      "title": "Xác thực email",
+      "subtitle": "Nhập email của bạn để xác minh",
+      "success": "Mã xác minh đã được gửi đến email của bạn",
+      "No code": "Không nhận được mã?",
+      "confirm": "Xác nhận",
+      "resend": "Gửi lại",
+      "verify": "Xác minh",
+      "verifying": "Đang xác minh",
+      "back": "Quay lại",
+      "login": "Đăng nhập",
+      "Processing": "Đang xử lý"
+    }
+  },
+  "admin": {
+    "sidebar": {
+      "overview": "Tổng quan",
+      "orders": "Đơn hàng",
+      "allOrders": "Tất cả đơn hàng",
+      "newOrders": "Đơn hàng mới",
+      "processedOrders": "Đơn đã xử lý",
+      "products": "Sản phẩm",
+      "productList": "Danh sách sản phẩm",
+      "addProduct": "Thêm sản phẩm",
+      "categories": "Danh mục",
+      "system": "Hệ thống",
+      "rolesPermissions": "Vai trò & quyền hạn"
+    },
+    "profileDropdown": {
+      "shopProfile": "Hồ sơ cửa hàng",
+      "shopSettings": "Cài đặt cửa hàng",
+      "language": "Tiếng Việt (Vietnamese)",
+      "logout": "Đăng xuất",
+      "logging out": "Đang đăng xuất"
+    },
+    "dataTable": {
+      "noData": "Không có dữ liệu",
+      "image": "Hình ảnh",
+      "productName": "Tên sản phẩm",
+      "category": "Danh mục",
+      "price": "Giá",
+      "stock": "Tồn kho",
+      "status": "Trạng thái"
+    },
+    "dataTableExport": {
+      "export": "Xuất file",
+      "export CSV": "Xuất CSV",
+      "export Excel": "Xuất Excel"
+    },
+    "dataTablePagination": {
+      "showing": "Đang hiển thị",
+      "line is selected": "dòng đã chọn",
+      "in": "trong",
+      "Number of lines per page": "Số dòng mỗi trang",
+      "page": "Trang"
+    },
+    "dataTableSearch": {
+      "search": "Tìm kiếm",
+      "search by name": "Tìm theo tên",
+      "search by email": "Tìm theo email",
+      "search by phone number": "Tìm theo số điện thoại",
+      "search by address": "Tìm theo địa chỉ",
+      "placeholder": "Nhập từ khóa để tìm kiếm"
+    },
+    "dataTableToolbar": {
+      "categories": "Danh mục",
+      "add": "Thêm",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "delete selected": "Xóa mục đã chọn",
+      "delete all": "Xóa tất cả",
+      "delete all selected": "Xóa tất cả mục đã chọn",
+      "delete all data": "Xóa toàn bộ dữ liệu",
+      "delete all data confirm": "Bạn có chắc chắn muốn xóa toàn bộ dữ liệu không?",
+      "delete selected confirm": "Bạn có chắc chắn muốn xóa các mục đã chọn không?",
+      "delete confirm": "Bạn có chắc chắn muốn xóa mục này không?"
+    },
+    "dataTableViewOptions": {
+      "display": "Hiển thị",
+      "selectColumns": "Chọn cột"
+    },
+    "common": {
+      "pickday": "Chọn ngày"
+    }
+  }
 }

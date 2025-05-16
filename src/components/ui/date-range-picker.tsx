@@ -13,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useTranslation } from "react-i18next"
 
 export type DateRange = {
   from: Date
@@ -25,6 +26,7 @@ interface DateRangePickerProps {
 }
 
 export function DateRangePicker({ date, onDateChange }: DateRangePickerProps) {
+  const { t } = useTranslation("")
   return (
     <div className="grid gap-2">
       <Popover>
@@ -48,7 +50,7 @@ export function DateRangePicker({ date, onDateChange }: DateRangePickerProps) {
                 dateFormat(date.from, "dd/MM/yyyy", { locale: vi })
               )
             ) : (
-              <span>Chọn ngày</span>
+              <span>{t('admin.common.pickday')}</span>
             )}
           </Button>
         </PopoverTrigger>

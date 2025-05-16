@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { DataTable, columns } from "@/components/admin/product/dataTable"
+import { DataTable, getColumns } from "@/components/admin/product/dataTable"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 
 // Interface cho dữ liệu sản phẩm
@@ -18,6 +19,8 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const { t } = useTranslation()
+  const columns = getColumns(t) // Lấy các cột từ hàm getColumns
   // Mock data - sẽ được thay thế bằng dữ liệu thật từ API
   const [products] = useState<Product[]>([
     {
