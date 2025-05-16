@@ -86,7 +86,7 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             {/* Nút gửi */}
             <AnimatedButton
-              size="xl"
+              size="sm"
               type="submit"
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}

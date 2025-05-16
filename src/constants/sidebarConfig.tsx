@@ -8,7 +8,8 @@ import {
   MessageSquare,
   FileText,
   HelpCircle,
-  MonitorCog 
+  MonitorCog,
+  FolderClosed 
 } from 'lucide-react'
 
 export type SidebarItem = {
@@ -85,4 +86,16 @@ export const sidebarConfig: SidebarItem[] = [
       },
     ],
   },  
+  {
+    title: 'Danh mục',
+    href: '/admin/categories',
+    icon: <FolderClosed className="w-5 h-5" />,
+    subItems: [
+      {
+        title: 'Quản lý ngôn ngữ',
+        href: '/admin/languages',
+        icon: null,
+      },
+    ],
+  }
 ]

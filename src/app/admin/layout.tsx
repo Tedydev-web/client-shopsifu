@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Sidebar } from '@/components/admin/Sidebar'
-import { Header } from '@/components/admin/Header'
+import { Sidebar } from '@/components/admin/layout/Sidebar'
+import { Header } from '@/components/admin/layout/Header'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
 

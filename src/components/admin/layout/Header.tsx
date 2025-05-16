@@ -28,6 +28,7 @@ import {
 import { useLogout } from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
 import { useChangeLang } from '@/hooks/useChangeLang'
+import { SearchItem } from './SearchItem'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -61,14 +62,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
         {/* Search bar */}
         {!isMobile && (
-          <div className="flex items-center max-w-md w-full relative">
-            <Search className="absolute left-3 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm..."
-              className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            />
-          </div>
+          <SearchItem />
         )}
 
         {/* Right section */}

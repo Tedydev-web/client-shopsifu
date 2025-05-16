@@ -62,7 +62,8 @@ export interface VerifyOTPResponse {
 
 // RESET PASSWORD
 export interface ResetPasswordRequest {
-  token: string;
+  email: string;
+  otpToken: string;
   newPassword: string;
   confirmNewPassword: string;
 }
@@ -80,7 +81,8 @@ export interface Verify2faRequest {
 }
 
 export interface Verify2faResponse {
-  message: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface Disable2faRequest {

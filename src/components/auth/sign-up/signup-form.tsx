@@ -155,7 +155,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
               </AnimatedFormItem>
 
               <AnimatedButton
-                size="xl"
+                size="sm"
                 type="submit"
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={loading}

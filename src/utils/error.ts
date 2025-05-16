@@ -11,6 +11,7 @@ export const ERROR_MESSAGES: Record<string, string> = {
     'Error.UserExists': 'Người dùng đã tồn tại',
     'Error.UserNotFound': 'Không tìm thấy người dùng',
     'Error.InvalidToken': 'Token không hợp lệ hoặc đã hết hạn',
+    'Error.InvalidPassword': 'Mật khẩu không hợp lệ',
     // ➕ thêm các mã khác tùy theo backend
   }
   

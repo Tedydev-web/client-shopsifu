@@ -4,7 +4,6 @@ import { z } from 'zod'
 import { RegisterSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { showToast } from '@/components/ui/toastify'
-import { ErrorResponse } from '@/types/base.interface'
 import { parseApiError } from '@/utils/error'
 
 const TOKEN_KEY = 'token_verify_code'

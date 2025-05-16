@@ -1,13 +1,11 @@
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { z } from 'zod'
 import { showToast } from '@/components/ui/toastify'
 import { resetPasswordSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { ResetPasswordRequest } from '@/types/auth.interface'
-import { ErrorResponse } from '@/types/base.interface'
 import { ROUTES } from '@/constants/route'
-import { AxiosError } from 'axios'
 import { parseApiError } from '@/utils/error'
 
 const RESET_PASSWORD_TOKEN_KEY = 'token_verify_code'
@@ -15,12 +13,13 @@ const RESET_PASSWORD_TOKEN_KEY = 'token_verify_code'
 export function useReset() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const handleResetPassword = async (data: z.infer<typeof resetPasswordSchema>) => {
     try {
-      // Lấy token từ sessionStorage
+      // Lấy token từ localStorage
       const token = localStorage.getItem(RESET_PASSWORD_TOKEN_KEY)
-      
+      const email = searchParams.get('email')
       if (!token) {
         showToast('Phiên làm việc đã hết hạn', 'info')
         router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
@@ -29,7 +28,8 @@ export function useReset() {
 
       setLoading(true)
       const resetData: ResetPasswordRequest = {
-        token,
+        email: email || '',
+        otpToken: token,
         newPassword: data.password,
         confirmNewPassword: data.confirmPassword
       }

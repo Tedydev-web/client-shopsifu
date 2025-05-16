@@ -24,7 +24,10 @@ export const metadataConfig = {
       title: 'Đăng nhập tài khoản - Mua sắm Online | Shopsifu Việt Nam',
       description: 'Đăng nhập tài khoản để tiếp tục mua sắm cùng Shopsifu.',
     },
-
+    '/buyer/verify-2fa': {
+      title: 'Xác minh mã OTP tài khoản - Mua sắm Online | Shopsifu Việt Nam',
+      description: 'Xác minh tài khoản của bạn bằng mã OTP.',
+    },
     // --------------------------------SELLER------------------------------------ //
     '/seller/sign-up': {
       title: 'Đăng ký tài khoản - Mua sắm Online | Shopsifu Việt Nam',

@@ -69,7 +69,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             </AnimatedFormItem>
 
             <AnimatedButton
-              size="xl"
+              size="sm"
               type="submit"
               className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}

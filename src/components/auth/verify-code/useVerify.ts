@@ -42,7 +42,7 @@ export function useVerify() {
         showToast('Xác thực thành công', 'success')
         
         if (action === 'forgot') {
-          router.replace(ROUTES.BUYER.RESET_PASSWORD)
+          router.replace(`${ROUTES.BUYER.RESET_PASSWORD}?email=${encodeURIComponent(email)}`)
         } else {
           router.replace(`${ROUTES.BUYER.SIGNUP}?email=${encodeURIComponent(email)}`)
         }

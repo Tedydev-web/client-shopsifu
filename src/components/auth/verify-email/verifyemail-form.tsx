@@ -121,9 +121,9 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
               </AnimatedFormItem>
 
               <AnimatedButton
-                size="xl"
+                size="sm"
                 type="submit"
-                className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={loading}
               >
                 {loading ? 'Đang xử lý...' : content.buttonText}
