@@ -1,5 +1,5 @@
 'use client'
-import UserTable from "@/components/admin/users/users-table1";
+import UserTable from "@/components/admin/users/users-Table";
 import { useState } from "react";
 import { SearchInput } from "@/components/ui/data-table/search-input";
 import UsersModalUpsert from "@/components/admin/users/users-ModalUpsert";
