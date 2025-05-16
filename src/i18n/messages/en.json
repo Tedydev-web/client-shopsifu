@@ -1,29 +1,152 @@
 {
-  "auth": {
-    "welcome back": "Welcome back to the application",
-
-    "register": "Register",
-    "register title": "Enter your information to complete registration",
-    "full name": "Full name",
-    "email": "Email",
-    "phone number": "Phone number",
-    "password": "Password",
-    "confirm password": "Confirm password",
-
-    "login": "Login",
-
-    "forgot password": "Forgot password",
-
-    "reset password": "Reset password",
-
-    "verify OTP": "Verify OTP",
-
-    "logout": "Logout"
+  "common": {
+    "title": "Shopping is easy",
+    "subtitle": "Nationwide delivery, flexible payment\nand a money back guarantee if not satisfied."
   },
-  "product": {
-    "product list": "Product list",
-    "add product": "Add product",
-    "edit product": "Edit product",
-    "delete product": "Delete product"
+  "auth": {
+    "common": {
+      "full name": "Full name",
+      "email": "Email",
+      "phone number": "Phone number",
+      "password": "Password",
+      "confirm password": "Confirm password",
+      "logout": "Logout",
+      "or": "Or continue with",
+      "signinWithGoogle": "Sign in with Google",
+      "signupWithGoogle": "Sign up with Google"
+    },
+    "register": {
+      "title": "Register an account",
+      "subtitle": "Enter your information to complete registration",
+      "register": "Register",
+      "registering": "Registering",
+      "password": "Password",
+      "confirm password": "Confirm password",
+      "Have an account": "Have an account?",
+      "login": "Login",
+      "start": "Enter your email to begin registration",
+      "success": "The verification code has been sent to your email",
+      "continue": "Continue"
+    },
+    "login": {
+      "title": "Welcome back to the application",
+      "subtitle": "Please enter your email and password to continue",
+      "login": "Login",
+      "logging in": "Logging in",
+      "forgot password": "Forgot password?",
+      "no account": "Don't have an account?",
+      "register": "Register"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email below and we'll send you a link to reset your password.",
+      "Remember password": "Remember password?",
+      "login": "Login",
+      "confirm": "Confirm",
+      "Sending": "Send"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Enter your new password below.",
+      "new password": "New password",
+      "confirmnewPassword": "Confirm new password",
+      "Remember password": "Remember password?",
+      "login": "Login",
+      "Processing": "Processing",
+      "success": "The password reset link has been sent to your email",
+      "send": "Sen link"
+    },
+    "verifyOtp": {
+      "title": "Enter the verification code",
+      "subtitle": "We have sent the 6-digit OTP code to your email. Please enter the code below.",
+      "No code": "Didn't receive the code?",
+      "resend": "Resend",
+      "verify": "Verify OTP",
+      "verifying": "Verifying"
+    },
+    "verifyEmail": {
+      "title": "Email authentication",
+      "subtitle": "Enter your email to verify",
+      "success": "The verification code has been sent to your email",
+      "No code": "Didn't receive the code?",
+      "confirm": "Confirm",
+      "resend": "Resend",
+      "verify": "Verify",
+      "verifying": "Verifying",
+      "back": "Back",
+      "login": "Login",
+      "Processing": "Processing"
+    }
+  },
+  "admin": {
+    "sidebar": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "allOrders": "All Orders",
+      "newOrders": "New Orders",
+      "processedOrders": "Processed Orders",
+      "products": "Products",
+      "productList": "Product List",
+      "addProduct": "Add Product",
+      "categories": "Categories",
+      "system": "System",
+      "rolesPermissions": "Roles & Permissions"
+    },
+    "profileDropdown": {
+      "shopProfile": "Shop Profile",
+      "shopSettings": "Shop Settings",
+      "language": "Vietnamese (Vietnamese)",
+      "logout": "Log out",
+      "logging out": "Logging out"
+    },
+    "dataTable": {
+      "noData": "No data available",
+      "image": "Image",
+      "productName": "Product name",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "status": "Status"
+    },
+    "dataTableExport": {
+      "export": "Export file",
+      "export CSV": "Export CSV",
+      "export Excel": "Export Excel"
+    },
+    "dataTablePagination": {
+      "showing": "Showing",
+      "line is selected": "line is selected",
+      "in": "in",
+      "Number of lines per page": "Number of lines per page",
+      "page": "Page"
+    },
+    "dataTableSearch": {
+      "search": "Search",
+      "search by name": "Search by name",
+      "search by email": "Search by email",
+      "search by phone number": "Search by phone number",
+      "search by address": "Search by address",
+      "placeholder": "Enter keyword to search"
+    },
+    "dataTableToolbar": {
+      "categories": "Categories",
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "delete selected": "Delete selected",
+      "delete all": "Delete all",
+      "delete all selected": "Delete all selected",
+      "delete all data": "Delete all data",
+      "delete all data confirm": "Are you sure you want to delete all data?",
+      "delete selected confirm": "Are you sure you want to delete the selected items?",
+      "delete confirm": "Are you sure you want to delete this item?"
+    },
+    "dataTableViewOptions": {
+      "display": "Display",
+      "selectColumns": "Select columns"
+    },
+    "common": {
+      "pickday": "Pick a day"
+    }
   }
 }

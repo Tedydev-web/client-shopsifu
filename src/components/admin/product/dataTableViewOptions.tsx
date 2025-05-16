@@ -11,12 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useTranslation } from "react-i18next"
 
 export function DataTableViewOptions<TData>({
   table,
 }: {
   table: TableInstance<TData>
 }) {
+  const { t } = useTranslation()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,11 +29,11 @@ export function DataTableViewOptions<TData>({
           className="ml-auto hidden h-8 lg:flex"
         >
           <Settings2 className="mr-2 h-4 w-4" />
-          Hiển thị
+          {t("admin.dataTableViewOptions.display")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">
-        <DropdownMenuLabel>Chọn cột hiển thị</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("admin.dataTableViewOptions.selectColumns")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()

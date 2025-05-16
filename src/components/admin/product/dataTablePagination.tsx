@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { type Table as TableInstance } from "@tanstack/react-table"
+import { useTranslation } from "react-i18next"
 
 interface DataTablePaginationProps<TData> {
   table: TableInstance<TData>
@@ -17,15 +18,16 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const { t } = useTranslation("")
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} trong {" "}
-        {table.getFilteredRowModel().rows.length} dòng được chọn.
+        {table.getFilteredSelectedRowModel().rows.length} {t("admin.dataTablePagination.in",)} {" "}
+        {table.getFilteredRowModel().rows.length} {t("admin.dataTablePagination.line is selected",)}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Số dòng mỗi trang</p>
+          <p className="text-sm font-medium">{t("admin.dataTablePagination.Number of lines per page",)}</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -45,7 +47,7 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Trang {table.getState().pagination.pageIndex + 1} trong{" "}
+        {t("admin.dataTablePagination.page",)} {" "} {table.getState().pagination.pageIndex + 1} {t("admin.dataTablePagination.in",)} {" "}
           {table.getPageCount()}
         </div>
         <div className="flex items-center space-x-2">

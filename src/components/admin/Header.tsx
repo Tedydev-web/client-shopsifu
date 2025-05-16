@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useLogout } from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
+import LanguageDropdown from '../ui/languagedropdownprofilemenu'
+import { useTranslation } from 'react-i18next'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -31,6 +33,7 @@ interface HeaderProps {
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
   const { handleLogout, loading } = useLogout() // Sử dụng hook useLogout để lấy handleLogout và loading
+  const { t } = useTranslation() // Sử dụng hook useTranslation để lấy hàm t
 
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 z-30">
@@ -100,19 +103,19 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem>
-                <Store className="w-4 h-4 mr-2" />
-                Hồ Sơ Shop
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="w-4 h-4 mr-2" />
-                Thiết Lập Shop
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Globe className="w-4 h-4 mr-2" />
-                Tiếng Việt (Vietnamese)
+              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Store className="w-4 h-4 text-gray-500" />
+                {t('admin.profileDropdown.shopProfile')}
               </DropdownMenuItem>
 
+              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Settings className="w-4 h-4 text-gray-500" />
+                {t('admin.profileDropdown.shopSettings')}
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild className="p-0">
+                <LanguageDropdown />
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               {/* Đăng xuất */}
@@ -122,7 +125,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 disabled={loading} // Vô hiệu hóa nút khi đang loading
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                {loading ? 'Đang đăng xuất...' : 'Đăng xuất'} {/* Hiển thị loading */}
+                {loading ? t('admin.profileDropdown.logging out') : t('admin.profileDropdown.logout')} {/* Hiển thị loading */}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

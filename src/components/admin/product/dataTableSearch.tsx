@@ -4,6 +4,7 @@ import * as React from "react"
 import type { Table } from "@tanstack/react-table"
 import { Search } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
 
 
 interface DataTableSearchProps<TData> {
@@ -13,13 +14,16 @@ interface DataTableSearchProps<TData> {
   className?: string
 }
 
+
 export function DataTableSearch<TData>({
   table,
   searchColumn = "name",
-  placeholder = "Tìm kiếm sản phẩm...",
+  placeholder,
   className
 }: DataTableSearchProps<TData>) {
   const [value, setValue] = React.useState<string>("")
+  const { t } = useTranslation("")
+  const translatedPlaceholder = placeholder ?? t("admin.dataTableSearch.placeholder")
 
   const debouncedSearch = React.useMemo(() => {
     const handler = (value: string) => {
@@ -53,7 +57,7 @@ export function DataTableSearch<TData>({
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder={placeholder}
+          placeholder={translatedPlaceholder}
           value={value}
           onChange={(e) => {
             setValue(e.target.value)
@@ -67,7 +71,7 @@ export function DataTableSearch<TData>({
           className="inline-flex h-full items-center justify-center whitespace-nowrap rounded-r-md border-l bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
         >
           <Search className="h-4 w-4" />
-          <span className="sr-only">Tìm kiếm</span>
+          <span className="sr-only">{t("admin.dataTableSearch.search",)} {" "}</span>
         </button>
       </div>
     </form>

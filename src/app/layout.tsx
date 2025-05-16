@@ -4,9 +4,6 @@ import "./globals.css";
 import StoreProvider from "@/store/StoreProvider"
 import { Toast } from "@/components/ui/toastify"
 import { Inter } from 'next/font/google';
-import { initI18n } from '@/i18n/i18n';
-import LanguageInitializer from "@/components/ui/languageinitializer";
-// import '../i18n/i18n'; // Import i18n để sử dụng trong toàn bộ ứng dụng
 
 
 // Import font Inter từ Google Fonts (subset 'latin' là đủ)

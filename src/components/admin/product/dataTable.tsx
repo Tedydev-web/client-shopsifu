@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
+import { useTranslation } from "react-i18next"
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -77,6 +78,8 @@ export function DataTable<TData>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} categories={categories} />
@@ -85,18 +88,16 @@ export function DataTable<TData>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} colSpan={header.colSpan}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -109,21 +110,15 @@ export function DataTable<TData>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Không có dữ liệu
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  {t("admin.dataTable.noData")}
                 </TableCell>
               </TableRow>
             )}
@@ -135,8 +130,9 @@ export function DataTable<TData>({
   )
 }
 
-// Column Definitions
-export const columns: ColumnDef<Product>[] = [
+// Column Definitions with i18n
+// 💡 Tách phần định nghĩa column thành hàm
+export const getColumns = (t: (key: string) => string): ColumnDef<Product>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -163,28 +159,28 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "image",
-    header: "Hình ảnh",
+    header: () => t("admin.dataTable.image"),
     cell: ({ row }) => (
-      <Image 
-        src={row.getValue("image")} 
-        alt={row.getValue("name")} 
+      <Image
+        src={row.getValue("image")}
+        alt={row.getValue("name")}
         width={48}
         height={48}
         className="object-cover rounded-md"
       />
-    )
+    ),
   },
   {
     accessorKey: "name",
-    header: "Tên sản phẩm",
+    header: () => t("admin.dataTable.productName"),
   },
   {
     accessorKey: "category",
-    header: "Danh mục",
+    header: () => t("admin.dataTable.category"),
   },
   {
     accessorKey: "price",
-    header: "Giá",
+    header: () => t("admin.dataTable.price"),
     cell: ({ row }) => {
       const price = parseFloat(row.getValue("price"))
       const formatted = new Intl.NumberFormat("vi-VN", {
@@ -196,10 +192,11 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "stock",
-    header: "Tồn kho",
+    header: () => t("admin.dataTable.stock"),
   },
   {
     accessorKey: "status",
-    header: "Trạng thái",
-  }
+    header: () => t("admin.dataTable.status"),
+  },
 ]
+
