@@ -75,7 +75,12 @@ export const sidebarConfig: SidebarItem[] = [
     icon: <MonitorCog className="w-5 h-5" />,
     subItems: [
       {
-        title: 'Vai Trò Và Phân Quyền',
+        title: 'Quản lý phân quyền',
+        href: '/admin/permission',
+        icon: null,
+      },
+      {
+        title: 'Quản lý vai trò',
         href: '/admin/role',
         icon: null,
       },
