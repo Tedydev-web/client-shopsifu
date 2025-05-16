@@ -5,11 +5,12 @@ export const ROUTES = {
     SIGNUP: '/buyer/sign-up',
     FORGOT_PASSWORD: '/buyer/forgot-password',
     VERIFY_CODE: '/buyer/verify-code',
-    RESET_PASSWORD: '/buyer/reset-password'
+    RESET_PASSWORD: '/buyer/reset-password',
+    VERIFY_2FA: '/buyer/verify-2fa'
   },
   ADMIN: {
     DASHBOARD: '/admin',
     PRODUCTS: '/admin/products',
     ORDERS: '/admin/orders'
-  }
+  },
 }

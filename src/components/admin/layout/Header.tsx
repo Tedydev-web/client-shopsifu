@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button'
 import { useChangeLang } from '@/hooks/useChangeLang'
 import { SearchItem } from './SearchItem'
 import { useTranslation } from 'react-i18next'
+import { ProfileSetting } from './ProfileSetting'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -39,7 +40,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
   const { handleLogout, loading: logoutLoading } = useLogout()
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
-  const { t } = useTranslation() // Sử dụng hook useTranslation để lấy hàm t
+  const { t } = useTranslation()
 
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 z-30">
@@ -74,9 +75,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
           </Button>
 
-          <Button className="p-2 rounded-full hover:bg-gray-100 bg-[#fff]">
-            <Settings className="h-5 w-5 text-gray-600" />
-          </Button>
+          <ProfileSetting />
 
           {/* Dropdown Profile */}
           <DropdownMenu>
@@ -146,7 +145,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 disabled={logoutLoading}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                {logoutLoading ? t('admin.profileDropdown.logging out') : t('admin.profileDropdown.logout')} {/* Hiển thị loading */}
+                {logoutLoading ? t('admin.profileDropdown.logging out') : t('admin.profileDropdown.logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

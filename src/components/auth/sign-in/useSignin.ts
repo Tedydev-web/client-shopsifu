@@ -20,7 +20,16 @@ export function useSignin() {
       setLoading(true);
       const response = await authService.login(data);
 
-      // Lưu token vào Redux
+      // Kiểm tra nếu có loginSessionToken - đây là tài khoản 2FA
+      if (response.loginSessionToken) {
+        // Lưu loginSessionToken vào sessionStorage
+        sessionStorage.setItem('loginSessionToken', response.loginSessionToken);
+        // Chuyển hướng đến trang verify 2FA
+        router.push(ROUTES.BUYER.VERIFY_2FA);
+        return;
+      }
+
+      // Nếu không phải 2FA, xử lý đăng nhập bình thường
       dispatch(setCredentials({
         accessToken: response.accessToken,
         refreshToken: response.refreshToken

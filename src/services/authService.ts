@@ -15,6 +15,7 @@ import {
   Verify2faResponse,
   Disable2faRequest,
   Disable2faResponse,
+  Setup2faResponse,
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -81,9 +82,15 @@ export const authService = {
     return response.data;
   },
 
-  setup2fa: async (): Promise<void> => {
-    await privateAxios.post(API_ENDPOINTS.AUTH.SETUP_2FA);
+  // setup2fa: async (): Promise<Setup2faResponse> => {
+  //   const response = await privateAxios.post<Setup2faResponse>(API_ENDPOINTS.AUTH.SETUP_2FA);
+  //   return response.data;
+  // },
+  setup2fa: async (): Promise<Setup2faResponse> => {
+    const response = await privateAxios.post<Setup2faResponse>(API_ENDPOINTS.AUTH.SETUP_2FA, {})
+    return response.data
   },
+  
 
   disable2fa: async (data: Disable2faRequest): Promise<Disable2faResponse> => {
     const response = await privateAxios.post<Disable2faResponse>(

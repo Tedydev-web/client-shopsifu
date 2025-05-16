@@ -9,7 +9,7 @@ export const useChangeLang = () => {
   const dispatch = useDispatch();
   const [showLangMenu, setShowLangMenu] = useState(false);
 
-  const languageRedux = useSelector((state: RootState) => state.lang.language);
+  const languageRedux = useSelector((state: RootState) => state.langShopsifu.language);
   const currentLangName = languageRedux === "vi" ? "Tiếng Việt" : "English";
 
   const toggleMenu = () => setShowLangMenu(prev => !prev);
