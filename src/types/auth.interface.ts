@@ -97,3 +97,14 @@ export interface Disable2faRequest {
 export interface Disable2faResponse {
   message: string;
 }
+
+export interface Confirm2faRequest {
+  setupToken: string;
+  totpCode: string;
+}
+
+export interface Confirm2faResponse {
+  message: string;
+}
+
+
