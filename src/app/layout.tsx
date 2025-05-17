@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from 'next/font/google';
 import "./globals.css";
 import StoreProvider from "@/store/StoreProvider"
 import { Toast } from "@/components/ui/toastify"
-import { Inter } from 'next/font/google';
+import ClientLayout from "./client-layout";
 
-
-// Import font Inter từ Google Fonts (subset 'latin' là đủ)
 const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-inter', // dùng biến CSS để gắn Tailwind
+  variable: '--font-inter',
   display: 'swap',
 });
 
@@ -25,12 +23,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body
-        className={`${inter.variable} ${inter.variable} antialiased`}
-      >
+      <body className={`${inter.variable} antialiased`}>
         <StoreProvider>
-          <Toast/>
-          {children}
+          <ClientLayout>
+            <Toast/>
+            {children}
+          </ClientLayout>
         </StoreProvider>
       </body>
     </html>

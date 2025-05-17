@@ -18,6 +18,7 @@ import {
   Setup2faResponse,
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
+import { AxiosError } from "axios";
 
 export const authService = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -59,8 +60,8 @@ export const authService = {
     return response.data;
   },
 
-  logout: async (refreshToken: string): Promise<void> => {
-    await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
+  logout: async (): Promise<void> => {
+    await publicAxios.post(API_ENDPOINTS.AUTH.LOGOUT);
   },
   
 
@@ -82,21 +83,31 @@ export const authService = {
     return response.data;
   },
 
-  // setup2fa: async (): Promise<Setup2faResponse> => {
-  //   const response = await privateAxios.post<Setup2faResponse>(API_ENDPOINTS.AUTH.SETUP_2FA);
-  //   return response.data;
-  // },
   setup2fa: async (): Promise<Setup2faResponse> => {
     const response = await privateAxios.post<Setup2faResponse>(API_ENDPOINTS.AUTH.SETUP_2FA, {})
     return response.data
   },
   
-
   disable2fa: async (data: Disable2faRequest): Promise<Disable2faResponse> => {
     const response = await privateAxios.post<Disable2faResponse>(
       API_ENDPOINTS.AUTH.DISABLE_2FA,
       data
     );
     return response.data;
+  },
+
+  getCsrfToken: async (): Promise<void> => {
+    try {
+      await publicAxios.get(API_ENDPOINTS.AUTH.GET_CSRF_TOKEN);
+      // CSRF token sẽ được tự động lưu vào cookies bởi browser
+      // Không cần xử lý response data
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        // Nếu endpoint không tồn tại, coi như đã có CSRF token
+        console.warn('CSRF token endpoint not found, assuming token exists');
+        return;
+      }
+      throw error;
+    }
   },
 };
