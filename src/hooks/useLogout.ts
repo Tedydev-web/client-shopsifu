@@ -14,7 +14,7 @@ export function useLogout() {
   const dispatch = useDispatch<AppDispatch>();
 
   // Lấy token từ Redux state
-  const { refreshToken } = useSelector((state: any) => state.auth); 
+  const { refreshToken } = useSelector((state: any) => state.authShopsifu); 
 
   const handleLogout = async () => {
     try {

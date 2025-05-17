@@ -147,6 +147,38 @@
     },
     "common": {
       "pickday": "Pick a day"
+    },
+    "profileSettings": {
+      "title": "Profile Settings",
+      "description": "Manage your personal information and account security",
+      "personalInfo": "Personal Information",
+      "contactInfo": "Contact Information",
+      "security": "Security",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email address",
+      "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone number",
+      "address": "Address",
+      "addressPlaceholder": "Enter your address",
+      "twoFactorAuth": "Two-Factor Authentication",
+      "twoFactorAuthDescription": "Protect your account with mobile app authentication",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "enable2FATitle": "Enable Two-Factor Authentication",
+      "enable2FADescription": "Are you sure you want to enable two-factor authentication? You will need to scan a QR code with your authenticator app.",
+      "disable2FATitle": "Disable Two-Factor Authentication",
+      "disable2FADescription": "Are you sure you want to disable two-factor authentication? Your account will be less secure.",
+      "enable": "Enable",
+      "disable": "Disable",
+      "processing": "Processing...",
+      "scanQRCode": "Scan QR Code",
+      "scanQRDescription": "Scan this QR code with your authenticator app",
+      "qrInstructions": "After scanning, enter the 6-digit code from your authenticator app to complete setup.",
+      "2faSetupSuccess": "Two-factor authentication setup successful!",
+      "2faDisabledSuccess": "Two-factor authentication disabled!",
+      "2faError": "An error occurred while processing two-factor authentication"
     }
   }
 }

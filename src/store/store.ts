@@ -23,15 +23,15 @@ const encryptor = encryptTransform({
 
 // Kết hợp reducer
 const rootReducer = combineReducers({
-  auth: authReducer,
-  lang: langReducer,
+  authShopsifu: authReducer,
+  langShopsifu: langReducer,
 });
 
 // Config Redux persist
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth','lang'], // Chỉ lưu auth
+  whitelist: ['authShopsifu','langShopsifu'], // Chỉ lưu auth
   transforms: [encryptor],
 };
 

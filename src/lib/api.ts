@@ -11,7 +11,7 @@ import { getStore } from '@/store/store'; // đã có
 // Định nghĩa URL gốc cho API, lấy từ biến môi trường
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
 const { store } = getStore();
-const refreshToken = store.getState()?.auth?.refreshToken;
+const refreshToken = store.getState()?.authShopsifu?.refreshToken;
 // Biến để theo dõi xem có đang trong quá trình refresh token không
 let isRefreshing = false;
 
@@ -87,7 +87,7 @@ privateAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
       const store = getStore().store;
-      const accessToken = store.getState().auth?.accessToken;
+      const accessToken = store.getState().authShopsifu?.accessToken;
 
       if (accessToken && config.headers) {
         config.headers.Authorization = `Bearer ${accessToken}`;
@@ -119,8 +119,8 @@ refreshAxios.interceptors.request.use(
 //
 const retryRequest = (originalConfig: AxiosRequestConfig): Promise<any> => {
   const store = getStore().store;
-  const newAccessToken = store.getState().auth!.accessToken;
-  const refreshToken = store.getState().auth!.refreshToken; // Lấy token mới từ Redux store
+  const newAccessToken = store.getState().authShopsifu!.accessToken;
+  const refreshToken = store.getState().authShopsifu!.refreshToken; // Lấy token mới từ Redux store
 
   // Nếu không có token mới, redirect về login
   if (!newAccessToken) {

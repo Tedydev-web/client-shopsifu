@@ -7,6 +7,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
+  loginSessionToken: string;
 }
 
 export interface oAuthLoginResponse{
@@ -73,6 +74,9 @@ export interface ResetPasswordResponse {
 }
 
 // 2FA
+export interface Setup2faResponse {
+  uri: string;
+}
 
 export interface Verify2faRequest {
   loginSessionToken: string;
@@ -86,7 +90,8 @@ export interface Verify2faResponse {
 }
 
 export interface Disable2faRequest {
-  totpCode: string;
+  code: string;
+  type: string;
 }
 
 export interface Disable2faResponse {
@@ -103,3 +108,13 @@ export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
 }
+export interface Confirm2faRequest {
+  setupToken: string;
+  totpCode: string;
+}
+
+export interface Confirm2faResponse {
+  message: string;
+}
+
+

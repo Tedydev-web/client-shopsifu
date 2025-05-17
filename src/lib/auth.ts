@@ -7,13 +7,13 @@ import { getStore } from '@/store/store';
 // ✅ Lấy token từ localStorage
 export const getAccessToken = (): string | null => {
   const { store } = getStore();
-  return store.getState()?.auth?.accessToken || null;
+  return store.getState()?.authShopsifu?.accessToken || null;
 };
 
 // ✅ Lấy refreshtoken từ localStorage
 export const getRefreshToken = (): string | null => {
   const { store } = getStore();
-  return store.getState()?.auth?.refreshToken || null;
+  return store.getState()?.authShopsifu?.refreshToken || null;
 };
 
 // ✅ Lưu token vào localStorage

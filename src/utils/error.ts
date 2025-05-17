@@ -2,6 +2,7 @@
 
 export const ERROR_MESSAGES: Record<string, string> = {
     'Error.InvalidOTP': 'Mã OTP không chính xác',
+    'Error.InvalidTOTP': 'Mã TOTP không chính xác',
     'Error.OTPExpired': 'Mã OTP đã hết hạn',
     'Error.InvalidCredentials': 'Email hoặc mật khẩu không đúng',
     'Error.EmailNotFound': 'Email này chưa được đăng ký trong hệ thống',
@@ -12,6 +13,7 @@ export const ERROR_MESSAGES: Record<string, string> = {
     'Error.UserNotFound': 'Không tìm thấy người dùng',
     'Error.InvalidToken': 'Token không hợp lệ hoặc đã hết hạn',
     'Error.InvalidPassword': 'Mật khẩu không hợp lệ',
+    'Error.TOTPAlreadyEnabled': 'Tài khoản của bạn đã được bật xác thực 2 bước',
     // ➕ thêm các mã khác tùy theo backend
   }
   
