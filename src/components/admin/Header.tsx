@@ -103,12 +103,12 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 rounded-lx hover:bg-gray-100">
                 <Store className="w-4 h-4 text-gray-500" />
                 {t('admin.profileDropdown.shopProfile')}
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 rounded-lx hover:bg-gray-100">
                 <Settings className="w-4 h-4 text-gray-500" />
                 {t('admin.profileDropdown.shopSettings')}
               </DropdownMenuItem>
@@ -120,7 +120,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
               {/* Đăng xuất */}
               <DropdownMenuItem 
-                className="text-red-600" 
+                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 rounded-lx hover:bg-gray-100" 
                 onClick={handleLogout} 
                 disabled={loading} // Vô hiệu hóa nút khi đang loading
               >

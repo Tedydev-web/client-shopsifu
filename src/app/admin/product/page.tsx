@@ -54,14 +54,14 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Sản phẩm</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{t('admin.product.product')}</h2>
           <p className="text-muted-foreground">
-            Quản lý tất cả sản phẩm của bạn tại đây
+            {t('admin.product.Manage all your products here')}
           </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Thêm sản phẩm
+          {t('admin.product.addProduct')}
         </Button>
       </div>
       <DataTable columns={columns} data={products} categories={categories} />

@@ -147,6 +147,24 @@
     },
     "common": {
       "pickday": "Chọn ngày"
+    },
+    "product": {
+      "product": "Sản phẩm",
+      "Manage all your products here": "Quản lý tất cả sản phẩm của bạn tại đây",
+      "addProduct": "Thêm sản phẩm"
+    }
+  },
+  "app": {
+    "error": {
+      "title": "Lỗi",
+      "An error has occurred": "Đã xảy ra lỗi",
+      "error": "Đã xảy ra lỗi khi tải trang. Vui lòng thử lại hoặc quay về trang chủ.",
+      "tryAgain": "Vui lòng thử lại",
+      "backToHome": "Quay về trang chủ",
+      "message": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+      "notFound": "Không tìm thấy trang",
+      "unauthorized": "Không có quyền truy cập",
+      "forbidden": "Truy cập bị từ chối"
     }
   }
 }

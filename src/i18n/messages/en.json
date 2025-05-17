@@ -147,6 +147,24 @@
     },
     "common": {
       "pickday": "Pick a day"
+    },
+    "product": {
+      "product": "Product",
+      "Manage all your products here": "Manage all your products here",
+      "addProduct": "Add product"
+    }
+  },
+  "app": {
+    "error": {
+      "title": "Error",
+      "An error has occurred": "An error has occurred",
+      "error": "An error occurred while loading the page. Please try again or return to the home page.",
+      "tryAgain": "Please try again",
+      "backToHome": "Back to home",
+      "message": "An error occurred. Please try again later.",
+      "notFound": "Page not found",
+      "unauthorized": "Unauthorized access",
+      "forbidden": "Forbidden access"
     }
   }
 }

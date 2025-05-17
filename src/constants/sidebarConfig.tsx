@@ -1,17 +1,13 @@
 'use client'
 
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Users, 
-  Package, 
-  Settings,
-  BarChart2,
-  MessageSquare,
-  FileText,
-  HelpCircle,
-  MonitorCog 
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Package,
+  MonitorCog
 } from 'lucide-react'
+
+import { useTranslation } from 'react-i18next'
 
 export type SidebarItem = {
   title: string
@@ -20,66 +16,70 @@ export type SidebarItem = {
   subItems?: SidebarItem[]
 }
 
-export const sidebarConfig: SidebarItem[] = [
-  {
-    title: 'Tổng quan',
-    href: '/admin',
-    icon: <LayoutDashboard className="w-5 h-5" />,
-  },
-  {
-    title: 'Đơn hàng',
-    href: '/admin/orders',
-    icon: <ShoppingCart className="w-5 h-5" />,
-    subItems: [
-      {
-        title: 'Tất cả đơn hàng',
-        href: '/admin/orders',
-        icon: null,
-      },
-      {
-        title: 'Đơn hàng mới',
-        href: '/admin/orders/new',
-        icon: null,
-      },
-      {
-        title: 'Đơn hàng đã xử lý',
-        href: '/admin/orders/processed',
-        icon: null,
-      },
-    ],
-  },
-  {
-    title: 'Sản phẩm',
-    href: '/admin/products',
-    icon: <Package className="w-5 h-5" />,
-    subItems: [
-      {
-        title: 'Danh sách sản phẩm',
-        href: '/admin/product',
-        icon: null,
-      },
-      {
-        title: 'Thêm sản phẩm',
-        href: '/admin/products/add',
-        icon: null,
-      },
-      {
-        title: 'Danh mục',
-        href: '/admin/products/categories',
-        icon: null,
-      },
-    ],
-  },  
-  {
-    title: 'Hệ thống',
-    href: '/admin/system',
-    icon: <MonitorCog className="w-5 h-5" />,
-    subItems: [
-      {
-        title: 'Vai Trò Và Phân Quyền',
-        href: '/admin/role',
-        icon: null,
-      },
-    ],
-  },  
-]
+export const useSidebarConfig = (): SidebarItem[] => {
+  const { t } = useTranslation()
+
+  return [
+    {
+      title: t('admin.sidebar.overview'),
+      href: '/admin',
+      icon: <LayoutDashboard className="w-5 h-5" />,
+    },
+    {
+      title: t('admin.sidebar.orders'),
+      href: '/admin/orders',
+      icon: <ShoppingCart className="w-5 h-5" />,
+      subItems: [
+        {
+          title: t('admin.sidebar.allOrders'),
+          href: '/admin/orders',
+          icon: null,
+        },
+        {
+          title: t('admin.sidebar.newOrders'),
+          href: '/admin/orders/new',
+          icon: null,
+        },
+        {
+          title: t('admin.sidebar.processedOrders'),
+          href: '/admin/orders/processed',
+          icon: null,
+        },
+      ],
+    },
+    {
+      title: t('admin.sidebar.products'),
+      href: '/admin/products',
+      icon: <Package className="w-5 h-5" />,
+      subItems: [
+        {
+          title: t('admin.sidebar.productList'),
+          href: '/admin/product',
+          icon: null,
+        },
+        {
+          title: t('admin.sidebar.addProduct'),
+          href: '/admin/products/add',
+          icon: null,
+        },
+        {
+          title: t('admin.sidebar.categories'),
+          href: '/admin/products/categories',
+          icon: null,
+        },
+      ],
+    },
+    {
+      title: t('admin.sidebar.system'),
+      href: '/admin/system',
+      icon: <MonitorCog className="w-5 h-5" />,
+      subItems: [
+        {
+          title: t('admin.sidebar.rolesPermissions'),
+          href: '/admin/role',
+          icon: null,
+        },
+      ],
+    },
+  ]
+}

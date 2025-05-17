@@ -4,15 +4,15 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { sidebarConfig, SidebarItem } from '@/constants/sidebarConfig'
+import { useSidebarConfig, SidebarItem } from '@/constants/sidebarConfig'
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
 import { Button } from '@/components/ui/button'
 
 interface SidebarProps {
-  isOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  isOpen?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
@@ -20,6 +20,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [internalOpen, setInternalOpen] = useState(false)
   const { isMobile } = useResponsive()
+  const sidebarItems = useSidebarConfig()
 
   const open = externalOpen ?? internalOpen
   const setOpen = (value: boolean) => {
@@ -36,15 +37,14 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
   }
 
   const isActive = (href: string, item: SidebarItem) => {
-    // Kiểm tra chính xác đường dẫn
     if (pathname === href) return true
 
-    // Kiểm tra submenu items
     if (item.subItems) {
-      return item.subItems.some(subItem => pathname === subItem.href || pathname.startsWith(subItem.href + '/'))
+      return item.subItems.some(
+        subItem => pathname === subItem.href || pathname.startsWith(subItem.href + '/')
+      )
     }
 
-    // Kiểm tra các trường hợp đặc biệt
     if (href === '/admin/product' && pathname.startsWith('/admin/products')) return true
     if (href === '/admin/orders' && pathname.startsWith('/admin/orders')) return true
     if (href === '/admin/system' && pathname.startsWith('/admin/role')) return true
@@ -58,7 +58,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
     const isItemActive = isActive(item.href, item)
 
     return (
-      <div key={item.href} className={cn(level > 0 && "pt-1")}>
+      <div key={item.href} className={cn(level > 0 && 'pt-1')}>
         <div
           className={cn(
             'flex items-center justify-between px-4 py-2 rounded-md',
@@ -68,24 +68,26 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
             isItemActive && level === 0 && 'bg-primary/10 text-primary',
             level > 0 && 'pl-10'
           )}
-          onClick={() => hasSubItems ? toggleItem(item.href) : undefined}
+          onClick={() => (hasSubItems ? toggleItem(item.href) : undefined)}
         >
           {hasSubItems ? (
             <div className="flex items-center gap-3 flex-1">
               {level === 0 && item.icon}
-              <span className={cn(
-                "text-sm font-medium", 
-                level > 0 && "text-muted-foreground",
-                isItemActive && level === 0 && 'bg-primary/10 text-primary',
-                isItemActive && level > 0 && 'text-primary'
-              )}>
+              <span
+                className={cn(
+                  'text-sm font-medium',
+                  level > 0 && 'text-muted-foreground',
+                  isItemActive && level === 0 && 'bg-primary/10 text-primary',
+                  isItemActive && level > 0 && 'text-primary'
+                )}
+              >
                 {item.title}
               </span>
             </div>
           ) : (
             <Link href={item.href} className="flex items-center gap-3 flex-1">
               {level === 0 && item.icon}
-              <span className={cn("text-sm font-medium", level > 0 && "text-muted-foreground")}>
+              <span className={cn('text-sm font-medium', level > 0 && 'text-muted-foreground')}>
                 {item.title}
               </span>
             </Link>
@@ -93,7 +95,10 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
 
           {hasSubItems && (
             <ChevronDown
-              className={cn('w-4 h-4 transition-transform duration-200 text-muted-foreground', isExpanded && 'rotate-180')}
+              className={cn(
+                'w-4 h-4 transition-transform duration-200 text-muted-foreground',
+                isExpanded && 'rotate-180'
+              )}
             />
           )}
         </div>
@@ -109,48 +114,35 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
 
   return (
     <>
-      {/* Overlay when mobile menu is open */}
       {isMobile && open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40"
-          onClick={() => setOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setOpen(false)} />
       )}
 
-      {/* Sidebar */}
-      <aside className={cn(
-        'w-64 bg-white border-r h-[calc(100vh-4rem)] fixed top-16',
-        {
-          // Mobile styles
+      <aside
+        className={cn('w-64 bg-white border-r h-[calc(100vh-4rem)] fixed top-16', {
           'inset-y-0 left-0 z-50 h-screen transition-transform duration-300': isMobile,
           '-translate-x-full': isMobile && !open,
-        }
-      )}>
+        })}
+      >
         {isMobile && (
           <div className="flex items-center justify-between h-16 px-4 border-b">
             <Link href="/admin" className="flex items-center">
-              <Image 
-                src="/images/logo/logofullred.png" 
-                alt="Shopsifu Logo" 
-                width={116} 
-                height={66} 
+              <Image
+                src="/images/logo/logofullred.png"
+                alt="Shopsifu Logo"
+                width={116}
+                height={66}
                 className="mr-2"
               />
             </Link>
-            <Button 
-              onClick={() => setOpen(false)}
-              className="text-gray-500 hover:text-red-500"
-            >
+            <Button onClick={() => setOpen(false)} className="text-gray-500 hover:text-red-500">
               <X className="w-5 h-5" />
             </Button>
           </div>
         )}
-        <div className={cn(
-          "h-full overflow-y-auto",
-          isMobile && "h-[calc(100vh-4rem)]"
-        )}>
+        <div className={cn('h-full overflow-y-auto', isMobile && 'h-[calc(100vh-4rem)]')}>
           <nav className="p-4 space-y-2">
-            {sidebarConfig.map(item => renderItem(item))}
+            {sidebarItems.map(item => renderItem(item))}
           </nav>
         </div>
       </aside>
