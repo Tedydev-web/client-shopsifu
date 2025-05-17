@@ -62,7 +62,7 @@ publicAxios.interceptors.response.use(
 //
 const refreshAxios = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+  // withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -98,6 +98,21 @@ privateAxios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+
+refreshAxios.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    if (typeof window !== 'undefined') {
+      const store = getStore().store;
+      const accessToken = store.getState().auth?.accessToken;
+
+      if (accessToken && config.headers) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 //
 // === Hàm retry request sau khi đã refresh token thành công ===
@@ -151,7 +166,7 @@ privateAxios.interceptors.response.use(
           await refreshPromise;
           return retryRequest(originalConfig); // Sau khi refresh xong thì retry
         } catch (e) {
-          window.location.href = '/buyer/sign-in'; // Nếu refresh thất bại
+          // window.location.href = '/buyer/sign-in'; // Nếu refresh thất bại
           return new Promise(() => { });
         }
       }
@@ -175,7 +190,7 @@ privateAxios.interceptors.response.use(
       } catch (refreshErr) {
         console.warn('Refresh token failed', refreshErr);
         removeToken(); // Xoá token cũ từ Redux store
-        window.location.href = '/buyer/sign-in'; // Chuyển về trang đăng nhập
+        // window.location.href = '/buyer/sign-in'; // Chuyển về trang đăng nhập
         return new Promise(() => { });
       } finally {
         // Reset trạng thái refresh

@@ -30,6 +30,13 @@ export const API_ENDPOINTS = {
     POST: `${API_BASE}/permission/create`,
     DELETE_ALL: `${API_BASE}/permission/create`,
   },
+  LANGUAGES:{
+    GETALL: `${API_BASE}/languages`,
+    GETBYID: `${API_BASE}/languages/:id`,
+    UPDATE: `${API_BASE}/languages/:id`,
+    POST: `${API_BASE}/languages`,
+    DELETE_BY_ID: `${API_BASE}/languages/:id`,
+  },
   PRODUCTS: {
     LIST: `${API_BASE}/products`,
     DETAIL: `${API_BASE}/products/:id`,
