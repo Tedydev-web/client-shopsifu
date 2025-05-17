@@ -87,22 +87,6 @@ export const LanguagesColumns = (
     enableHiding: true,
   },
   {
-    accessorKey: "isActive",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const isActive = row.getValue("isActive") as boolean
-      return (
-        <Badge className={`capitalize ${isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }`}>
-          {isActive ? "Hoạt động" : "Không hoạt động"}
-        </Badge>
-      )
-    },
-    enableSorting: true,
-    enableHiding: true,
-  },
-  {
     accessorKey: "createdAt",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Ngày tạo" />

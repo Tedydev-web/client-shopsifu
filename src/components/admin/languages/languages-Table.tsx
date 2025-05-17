@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { LanguagesColumns, Language } from "./languages-Columns"
-import { languagesMockData } from "./languages-MockData"
 import SearchInput from "@/components/ui/data-table/search-input"
 import LanguagesModalUpsert from "./languages-ModalUpsert"
 import { PlusIcon } from "lucide-react"
@@ -10,11 +9,24 @@ import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { Pagination } from "@/components/ui/data-table/pagination"
 import { Button } from "@/components/ui/button"
+import { useLanguages } from "./useLanguages"
 
 export function LanguagesTable() {
+  const {
+    languages,
+    totalItems,
+    loading,
+    isModalOpen,
+    selectedLanguage,
+    getAllLanguages,
+    deleteLanguage,
+    createLanguage,
+    updateLanguage,
+    handleOpenModal,
+    handleCloseModal
+  } = useLanguages()
+
   const [searchValue, setSearchValue] = useState("")
-  const [openModal, setOpenModal] = useState(false)
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [languageToDelete, setLanguageToDelete] = useState<Language | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -23,12 +35,14 @@ export function LanguagesTable() {
   const [limit, setLimit] = useState(10)
   const [offset, setOffset] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
-  const totalRecords = languagesMockData.length
-  const totalPages = Math.ceil(totalRecords / limit)
+  const totalPages = Math.ceil(totalItems / limit)
+
+  useEffect(() => {
+    getAllLanguages()
+  }, [])
 
   const handleEdit = (language: Language) => {
-    setSelectedLanguage(language)
-    setOpenModal(true)
+    handleOpenModal(language)
   }
 
   const handleOpenDelete = (language: Language) => {
@@ -45,9 +59,11 @@ export function LanguagesTable() {
     if (!languageToDelete) return
     setDeleteLoading(true)
     try {
-      // TODO: Implement delete logic
-      console.log('Delete language:', languageToDelete)
-      handleCloseDeleteModal()
+      const success = await deleteLanguage(languageToDelete.code)
+      if (success) {
+        handleCloseDeleteModal()
+        getAllLanguages() // Refresh data
+      }
     } catch (error) {
       console.error('Error deleting language:', error)
     } finally {
@@ -56,10 +72,25 @@ export function LanguagesTable() {
   }
 
   const handleSubmit = async (values: { code: string; name: string; isActive: boolean }) => {
-    // TODO: Implement submit logic
-    console.log(values)
-    setOpenModal(false)
-    setSelectedLanguage(null)
+    try {
+      if (selectedLanguage) {
+        // Update
+        const response = await updateLanguage(selectedLanguage.code, { name: values.name })
+        if (response) {
+          handleCloseModal()
+          getAllLanguages() // Refresh data
+        }
+      } else {
+        // Create
+        const response = await createLanguage({ id: values.code, name: values.name })
+        if (response) {
+          handleCloseModal()
+          getAllLanguages() // Refresh data
+        }
+      }
+    } catch (error) {
+      console.error('Error saving language:', error)
+    }
   }
 
   const handleSearch = (value: string) => {
@@ -77,6 +108,14 @@ export function LanguagesTable() {
     setCurrentPage(1)
   }
 
+  // Filter data based on search
+  const filteredData = searchValue
+    ? languages.filter(lang =>
+        lang.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        lang.code.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    : languages
+
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2">
@@ -87,10 +126,7 @@ export function LanguagesTable() {
           className="max-w-sm"
         />
         <Button 
-          onClick={() => {
-            setSelectedLanguage(null)
-            setOpenModal(true)
-          }}
+          onClick={() => handleOpenModal()}
           className="ml-auto"
         >
           <PlusIcon className="w-4 h-4 mr-2" />Thêm mới ngôn ngữ
@@ -99,14 +135,7 @@ export function LanguagesTable() {
 
       <DataTable
         columns={LanguagesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
-        data={
-          searchValue
-            ? languagesMockData.filter(lang =>
-                lang.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-                lang.code.toLowerCase().includes(searchValue.toLowerCase())
-              )
-            : languagesMockData
-        }
+        data={filteredData}
       />
 
       {totalPages > 0 && (
@@ -115,18 +144,15 @@ export function LanguagesTable() {
           offset={offset}
           currentPage={currentPage}
           totalPages={totalPages}
-          totalRecords={totalRecords}
+          totalRecords={totalItems}
           onPageChange={handlePageChange}
           onLimitChange={handleLimitChange}
         />
       )}
 
       <LanguagesModalUpsert 
-        open={openModal}
-        onClose={() => {
-          setOpenModal(false)
-          setSelectedLanguage(null)
-        }}
+        open={isModalOpen}
+        onClose={handleCloseModal}
         mode={selectedLanguage ? "edit" : "add"}
         language={selectedLanguage}
         onSubmit={handleSubmit}

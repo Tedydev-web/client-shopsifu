@@ -166,7 +166,7 @@ privateAxios.interceptors.response.use(
           await refreshPromise;
           return retryRequest(originalConfig); // Sau khi refresh xong thì retry
         } catch (e) {
-          window.location.href = '/buyer/sign-in'; // Nếu refresh thất bại
+          // window.location.href = '/buyer/sign-in'; // Nếu refresh thất bại
           return new Promise(() => { });
         }
       }
@@ -190,7 +190,7 @@ privateAxios.interceptors.response.use(
       } catch (refreshErr) {
         console.warn('Refresh token failed', refreshErr);
         removeToken(); // Xoá token cũ từ Redux store
-        window.location.href = '/buyer/sign-in'; // Chuyển về trang đăng nhập
+        // window.location.href = '/buyer/sign-in'; // Chuyển về trang đăng nhập
         return new Promise(() => { });
       } finally {
         // Reset trạng thái refresh
