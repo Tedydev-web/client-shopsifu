@@ -92,3 +92,14 @@ export interface Disable2faRequest {
 export interface Disable2faResponse {
   message: string;
 }
+
+
+// REFRESH TOKEN
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
