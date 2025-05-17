@@ -34,7 +34,7 @@ export function useSignup() {
         password: data.password,
         confirmPassword: data.confirmPassword,
         phoneNumber: data.phoneNumber,
-        token: token
+        otpToken: token
       })
       
       // Clear token after successful registration

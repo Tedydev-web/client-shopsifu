@@ -21,7 +21,7 @@ export interface RegisterRequest {
   password: string;
   confirmPassword: string;
   phoneNumber: string;
-  token: string;
+  otpToken: string;
 }
 
 export interface RegisterResponse {

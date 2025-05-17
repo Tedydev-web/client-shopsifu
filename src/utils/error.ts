@@ -14,6 +14,12 @@ export const ERROR_MESSAGES: Record<string, string> = {
     'Error.InvalidToken': 'Token không hợp lệ hoặc đã hết hạn',
     'Error.InvalidPassword': 'Mật khẩu không hợp lệ',
     'Error.TOTPAlreadyEnabled': 'Tài khoản của bạn đã được bật xác thực 2 bước',
+    'Error.EmailAlreadyExists': 'Email đã tồn tại',
+    'Error.LanguageNotFound': 'Ngôn ngữ không tồn tại',
+    'Error.LanguageCodeExists': 'Mã ngôn ngữ đã tồn tại',
+    'Error.LanguageCodeInvalid': 'Mã ngôn ngữ không hợp lệ',
+    'Error.LanguageNameExists': 'Tên ngôn ngữ đã tồn tại',
+    'Error.LanguageNameInvalid': 'Tên ngôn ngữ không hợp lệ',
     // ➕ thêm các mã khác tùy theo backend
   }
   
