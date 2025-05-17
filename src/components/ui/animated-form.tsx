@@ -1,6 +1,12 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { Button, ButtonProps } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import type { VariantProps } from "class-variance-authority";
+import type { ButtonHTMLAttributes } from "react";
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonVariants> & {
+  asChild?: boolean
+};
 
 interface AnimatedFormProps {
   children: React.ReactNode
