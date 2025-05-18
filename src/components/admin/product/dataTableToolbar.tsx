@@ -6,7 +6,7 @@ import { DataTableViewOptions } from "./dataTableViewOptions"
 import { DataTableFacetedFilter } from "./dataTableFacetedFilter"
 import { DataTableExport } from "./dataTableExport"
 import { DataTableSearch } from "./dataTableSearch"
-import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker"
+// import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker"
 import { useTranslation } from "react-i18next"
 
 interface DataTableToolbarProps<TData> {
@@ -21,13 +21,13 @@ export function DataTableToolbar<TData>({ table, categories }: DataTableToolbarP
   return (
     <div className="flex items-center justify-between">      <div className="flex flex-1 items-center space-x-2">
         <DataTableSearch table={table} />
-        <DateRangePicker
+        {/* <DateRangePicker
           date={date}
           onDateChange={(newDate: DateRange | undefined) => {
             setDate(newDate)
             // Here you can handle the date filter
           }}
-        />
+        /> */}
         <DataTableFacetedFilter
           column={table.getColumn("category")}
           title={t("admin.dataTableToolbar.categories")}

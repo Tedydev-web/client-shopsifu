@@ -7,6 +7,7 @@ import axios, {
 import { getAccessToken, setToken, removeToken, getRefreshToken } from './auth';
 import { ErrorResponse } from '@/types/base.interface'
 import { getStore } from '@/store/store'; // đã có
+import Cookies from 'js-cookie'
 
 // Định nghĩa URL gốc cho API, lấy từ biến môi trường
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
@@ -28,33 +29,47 @@ interface ExtendedInternalAxiosRequestConfig extends InternalAxiosRequestConfig 
 
 export const publicAxios = axios.create({
   baseURL: BASE_URL,
-  withCredentials: false // Giữ nếu cần cookie, hoặc false nếu không cần
+  withCredentials: true
 })
 
 // ✅ Interceptors: handle SUCCESS + ERROR
-publicAxios.interceptors.response.use(
-  (response: AxiosResponse) => {
-    // 🟢 Handle thành công
-    console.log('✅ API success:', response)
-    return response
-  },
-  (error) => {
-    // 🔴 Handle lỗi
-    if (axios.isAxiosError(error)) {
-      const errorResponse = error.response?.data as ErrorResponse
+// publicAxios.interceptors.response.use(
+//   (response: AxiosResponse) => {
+//     // 🟢 Handle thành công
+//     console.log('✅ API success:', response)
+//     return response
+//   },
+//   (error) => {
+//     // 🔴 Handle lỗi
+//     if (axios.isAxiosError(error)) {
+//       const errorResponse = error.response?.data as ErrorResponse
 
-      console.error('❌ API error:', errorResponse)
+//       console.error('❌ API error:', errorResponse)
 
-      // NÉM RA lỗi chuẩn
-      return Promise.reject(errorResponse)
+//       // NÉM RA lỗi chuẩn
+//       return Promise.reject(errorResponse)
+//     }
+
+//     // Trường hợp không phải lỗi Axios (ví dụ mạng bị mất)
+//     return Promise.reject(error)
+//   }
+// )
+
+publicAxios.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined') {
+      const csrfToken = Cookies.get('xsrf-token')
+
+      if (csrfToken && config.headers) {
+        config.headers['x-csrf-token'] = csrfToken
+      }
     }
 
-    // Trường hợp không phải lỗi Axios (ví dụ mạng bị mất)
-    return Promise.reject(error)
-  }
+    config.withCredentials = true // ✅ gửi cookie trong mọi request
+    return config
+  },
+  (error) => Promise.reject(error)
 )
-
-
 
 //
 // ==================== REFRESH AXIOS (Dùng riêng để refresh token) ====================
@@ -62,7 +77,7 @@ publicAxios.interceptors.response.use(
 //
 const refreshAxios = axios.create({
   baseURL: BASE_URL,
-  // withCredentials: true,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -74,7 +89,7 @@ const refreshAxios = axios.create({
 //
 export const privateAxios = axios.create({
   baseURL: BASE_URL,
-  // withCredentials: true,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -83,27 +98,52 @@ export const privateAxios = axios.create({
 //
 // === Interceptor request: tự động gắn Bearer token vào header ===
 //
+// privateAxios.interceptors.request.use(
+//   (config: InternalAxiosRequestConfig) => {
+//     if (typeof window !== 'undefined') {
+//       const store = getStore().store;
+//       const accessToken = store.getState().authShopsifu?.accessToken;
+
+//       if (accessToken && config.headers) {
+//         config.headers.Authorization = `Bearer ${accessToken}`;
+//       }
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
+
+
 privateAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
       const store = getStore().store;
       const accessToken = store.getState().authShopsifu?.accessToken;
 
+      // ✅ Đọc xsrf-token từ cookie
+      const csrfToken = Cookies.get('xsrf-token');
+
       if (accessToken && config.headers) {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
+
+      if (csrfToken && config.headers) {
+        config.headers['x-csrf-token'] = csrfToken; // ✅ Thêm CSRF token vào header
+      }
     }
+
+    config.withCredentials = true; // ✅ Luôn đính kèm cookies trong request
     return config;
   },
   (error) => Promise.reject(error)
-);
+)
 
 
 refreshAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
       const store = getStore().store;
-      const accessToken = store.getState().auth?.accessToken;
+      const accessToken = store.getState().authShopsifu?.accessToken;
 
       if (accessToken && config.headers) {
         config.headers.Authorization = `Bearer ${accessToken}`;
