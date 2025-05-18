@@ -15,7 +15,7 @@ interface DataTableToolbarProps<TData> {
 }
 
 export function DataTableToolbar<TData>({ table, categories }: DataTableToolbarProps<TData>) {
-  const [date, setDate] = React.useState<DateRange>()
+  // const [date, setDate] = React.useState<DateRange>()
   const { t } = useTranslation()
 
   return (
