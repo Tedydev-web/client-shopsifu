@@ -21,7 +21,7 @@ export function useLogout() {
       setLoading(true);
 
       // Gọi API logout và truyền token vào header và body
-      await authService.logout(refreshToken); // Gửi token vào yêu cầu logout
+      await authService.logout(); // Gửi token vào yêu cầu logout
 
       // Xoá token local
       removeToken();
