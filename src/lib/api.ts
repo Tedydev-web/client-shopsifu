@@ -59,7 +59,7 @@ publicAxios.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
       const csrfToken = Cookies.get('xsrf-token')
-
+      console.log('x-csrfToken', csrfToken)
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken
       }
