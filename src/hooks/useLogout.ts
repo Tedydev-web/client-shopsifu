@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux'; // Thêm useSelector để lấy state từ Redux
+import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { removeToken } from '@/lib/auth';
 import { showToast } from '@/components/ui/toastify';
@@ -13,15 +13,14 @@ export function useLogout() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  // Lấy token từ Redux state
-  const { refreshToken } = useSelector((state: any) => state.authShopsifu); 
-
   const handleLogout = async () => {
     try {
       setLoading(true);
 
-      // Gọi API logout và truyền token vào header và body
-      await authService.logout(refreshToken); // Gửi token vào yêu cầu logout
+      // Gọi API logout với refreshToken mặc định
+      await authService.logout({
+        refreshToken: 'default-refresh-token' // Truyền giá trị mặc định
+      });
 
       // Xoá token local
       removeToken();

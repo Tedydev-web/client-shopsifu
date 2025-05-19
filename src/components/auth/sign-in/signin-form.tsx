@@ -13,6 +13,7 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
@@ -25,7 +26,11 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: { email: '', password: '' }
+    defaultValues: { 
+      email: '', 
+      password: '',
+      rememberMe: false
+    }
   })
 
   return (
@@ -83,6 +88,28 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                       <Input {...field} type="password" placeholder="******" />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </AnimatedFormItem>
+
+            <AnimatedFormItem>
+              <FormField
+                control={form.control}
+                name="rememberMe"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-normal">
+                        {t('auth.login.remember me')}
+                      </FormLabel>
+                    </div>
                   </FormItem>
                 )}
               />
