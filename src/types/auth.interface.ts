@@ -2,6 +2,7 @@
 export interface LoginRequest {
   email: string;
   password: string;
+  rememberMe: boolean;
 }
 
 export interface LoginResponse {
@@ -13,7 +14,10 @@ export interface LoginResponse {
 export interface oAuthLoginResponse{
   url: string;
 } 
-
+//LOGOUT
+export interface LogoutRequest {
+  refreshToken?: string;
+}
 // REGISTER
 export interface RegisterRequest {
   name: string;

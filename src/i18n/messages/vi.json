@@ -35,7 +35,8 @@
       "logging in": "Đang đăng nhập",
       "forgot password": "Quên mật khẩu?",
       "no account": "Chưa có tài khoản?",
-      "register": "Đăng ký"
+      "register": "Đăng ký",
+      "remember me": "Ghi nhớ tôi"
     },
     "forgotPassword": {
       "title": "Quên mật khẩu",

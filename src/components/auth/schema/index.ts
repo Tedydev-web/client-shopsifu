@@ -35,6 +35,7 @@ export const LoginSchema = z.object({
     .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
     .regex(/[A-Z]/, { message: 'Mật khẩu phải chứa ít nhất một chữ cái viết hoa' })
     .regex(/\d/, { message: 'Mật khẩu phải chứa ít nhất một số' }),
+    rememberMe: z.boolean()
 });
 
 export const ForgotPasswordSchema = z.object({
