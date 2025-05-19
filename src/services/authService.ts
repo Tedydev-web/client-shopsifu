@@ -1,4 +1,4 @@
-import { privateAxios, publicAxios } from '@/lib/api';
+import { publicAxios } from '@/lib/api';
 import { 
   LoginRequest, 
   LoginResponse, 
