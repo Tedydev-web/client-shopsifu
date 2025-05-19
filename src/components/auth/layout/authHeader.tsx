@@ -1,8 +1,13 @@
-'use client'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
+"use client";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import LanguageDropdown from "@/components/ui/languagedropdown"; // Đảm bảo đúng đường dẫn
+import "@/i18n/i18n";
+import { useTranslation } from "react-i18next";
 
 export function AuthHeader() {
+  // const { t } = useTranslation();
+
   return (
     <header className="w-full py-2 px-6 md:px-40 lg:px-90 flex items-center justify-between bg-white/80 backdrop-blur-sm fixed top-0 z-50 border-b">
       {/* Logo + Đăng nhập bên trái */}
@@ -22,9 +27,8 @@ export function AuthHeader() {
             priority
           />
         </a>
-        {/* Ẩn chữ đăng nhập trên mobile */}
         <h1 className="text-2xl font-small text-black whitespace-nowrap hidden md:inline">
-          Đăng nhập
+          {/* {t("Đăng nhập")} */}
         </h1>
       </motion.div>
 
@@ -33,10 +37,13 @@ export function AuthHeader() {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-sm text-primary cursor-pointer"
+        className="flex items-center gap-6 text-sm text-primary cursor-pointer"
       >
-        Bạn cần giúp đỡ?
+        {/* {t("Bạn cần giúp đỡ?")} */}
+
+        {/* Ngôn ngữ */}
+        <LanguageDropdown />
       </motion.div>
     </header>
-  )
+  );
 }

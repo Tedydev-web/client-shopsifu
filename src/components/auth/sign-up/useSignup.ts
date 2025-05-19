@@ -1,21 +1,54 @@
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { z } from 'zod'
 import { RegisterSchema } from '../schema/index'
+import { authService } from '@/services/authService'
+import { showToast } from '@/components/ui/toastify'
+import { parseApiError } from '@/utils/error'
+
+const TOKEN_KEY = 'token_verify_code'
 
 export function useSignup() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email')
 
-  const onSubmit = async (data: z.infer<typeof RegisterSchema>) => {
-    setLoading(true)
-    console.log(data)
-    // Simulate successful registration
-    setTimeout(() => {
+  const handleSignup = async (data: z.infer<typeof RegisterSchema>) => {
+    if (!email) {
+      showToast('Không tìm thấy email, vui lòng thử lại', 'error')
+      return
+    }
+
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (!token) {
+      showToast('Phiên xác thực đã hết hạn, vui lòng thử lại', 'error')
+      return
+    }
+
+    try {
+      setLoading(true)
+      await authService.register({
+        name: data.name,
+        email: email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        phoneNumber: data.phoneNumber,
+        otpToken: token
+      })
+      
+      // Clear token after successful registration
+      localStorage.removeItem(TOKEN_KEY)
+      
+      showToast('Đăng ký tài khoản thành công', 'success')
+      router.push('/buyer/sign-in')
+    } catch (error) {
+      showToast(parseApiError(error), 'error')
+      console.error('Registration error:', error)
+    } finally {
       setLoading(false)
-      router.push('/dashboard') // Redirect after registration
-    }, 2000)
+    }
   }
 
-  return { loading, onSubmit }
+  return { loading, handleSignup }
 }

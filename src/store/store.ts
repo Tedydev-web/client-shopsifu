@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 import { encryptTransform } from 'redux-persist-transform-encrypt';
 
 import authReducer from './features/auth/authSlide';
+import langReducer from './features/lang/langSlice';
 
 // Mã hoá dữ liệu khi lưu Redux persist
 const encryptor = encryptTransform({
@@ -11,20 +12,30 @@ const encryptor = encryptTransform({
   onError: (err) => console.error('Encrypt error:', err),
 });
 
+// // Mã hoá dữ liệu khi lưu Redux persist (chỉ khi có secretKey)
+// const encryptor = secretKey
+//   ? encryptTransform({
+//       secretKey,
+//       onError: (err) => console.error('Encrypt error:', err),
+//     })
+//   : undefined;
+
+
 // Kết hợp reducer
 const rootReducer = combineReducers({
-  auth: authReducer,
+  authShopsifu: authReducer,
+  langShopsifu: langReducer,
 });
 
 // Config Redux persist
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth'], // Chỉ lưu auth
+  whitelist: ['authShopsifu','langShopsifu'], // Chỉ lưu auth
   transforms: [encryptor],
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(persistConfig, rootReducer);
 
 export const makeStore = () => {
   const store = configureStore({

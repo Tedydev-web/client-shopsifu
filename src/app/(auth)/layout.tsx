@@ -1,7 +1,9 @@
 import Image from "next/image"
-import { AuthHeader } from "@/components/auth/layout/authHeader"
+import { AuthHeader } from "@/components/auth/layout/authHeader" 
+// import { useTranslation } from "react-i18next"
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+// const { t } = useTranslation('')
   return (
     <>
       <AuthHeader />
@@ -33,8 +35,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 <div className="text-center mb-6 w-full px-6 max-w-[380px] mx-auto">
                   <h2 className="text-4xl font-bold text-primary">Mua sắm dễ dàng</h2>
                   <p className="text-muted-foreground text-md mt-1">
-                    Giao hàng toàn quốc, thanh toán linh hoạt 
-                    và cam kết hoàn tiền nếu không hài lòng.
+                  Giao hàng toàn quốc,
+                  thanh toán linh hoạt và cam kết hoàn tiền nếu không hài lòng.
                   </p>
                 </div>
                 {/* Image */}

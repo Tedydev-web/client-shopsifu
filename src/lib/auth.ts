@@ -5,15 +5,21 @@ const USER_KEY = 'user';
 import { getStore } from '@/store/store';
 
 // ✅ Lấy token từ localStorage
-export const getToken = (): string | null => {
+export const getAccessToken = (): string | null => {
   const { store } = getStore();
-  return store.getState()?.auth?.token || null;
+  return store.getState()?.authShopsifu?.accessToken || null;
+};
+
+// ✅ Lấy refreshtoken từ localStorage
+export const getRefreshToken = (): string | null => {
+  const { store } = getStore();
+  return store.getState()?.authShopsifu?.refreshToken || null;
 };
 
 // ✅ Lưu token vào localStorage
-export const setToken = (token: string) => {
+export const setToken = (accessToken: string, refreshToken: string) => {
   const { store } = getStore();
-  store.dispatch({ type: 'auth/setCredentials', payload: { token, user: null } });
+  store.dispatch({ type: 'authShopsifu/setCredentials', payload: { accessToken, refreshToken, user: null } });
 };
 
 // ✅ Xóa token khi logout
@@ -43,7 +49,7 @@ export const removeUser = () => {
 
 // ✅ Check đã đăng nhập hay chưa
 export const isAuthenticated = (): boolean => {
-  return !!getToken();
+  return !!getAccessToken();
 };
 
 // ✅ Xoá toàn bộ auth
@@ -51,6 +57,3 @@ export const clearAuth = () => {
   removeToken();
   removeUser();
 };
-
-
-
