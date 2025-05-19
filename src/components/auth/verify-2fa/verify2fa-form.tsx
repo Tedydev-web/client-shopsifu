@@ -31,7 +31,7 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
   const searchParams = useSearchParams()
   const router = useRouter()
   const [type, setType] = useState<'TOTP' | 'OTP'>(searchParams.get('type') as 'TOTP' | 'OTP' || 'TOTP')
-  const { loading, handleVerifyCode, resendOTP } = useVerify2FA()
+  const { loading, handleVerifyCode, sendOTP } = useVerify2FA()
 
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
@@ -47,12 +47,24 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
   }
 
   // Khi chuyển đổi phương thức xác minh, cập nhật URL và reset form
-  const switchMethod = () => {
+  const switchMethod = async () => {
     const newType = type === 'TOTP' ? 'OTP' : 'TOTP'
     setType(newType)
     router.replace(`?type=${newType}`)
     form.reset()
+
+    // Nếu chuyển sang OTP thì gửi OTP ngay lập tức
+    if (newType === 'OTP') {
+      await sendOTP()
+    }
   }
+
+  // Gửi OTP khi component mount nếu type là OTP
+  useEffect(() => {
+    if (type === 'OTP') {
+      sendOTP()
+    }
+  }, [])
 
   return (
     <Form {...form}>
@@ -120,7 +132,7 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
                 Không nhận được mã?{' '}
                 <button
                   type="button"
-                  onClick={resendOTP}
+                  onClick={sendOTP}
                   disabled={loading}
                   className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
                 >

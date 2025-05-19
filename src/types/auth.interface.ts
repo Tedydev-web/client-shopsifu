@@ -1,3 +1,4 @@
+import { Confirm2faRequest } from './auth.interface';
 // LOGIN
 export interface LoginRequest {
   email: string;
@@ -80,8 +81,17 @@ export interface ResetPasswordResponse {
 // 2FA
 export interface Setup2faResponse {
   uri: string;
+  setupToken: string;
 }
 
+export interface Confirm2faRequest{
+  setupToken: string;
+  totpCode: string;
+}
+
+export interface Confirm2faResponse {
+  message: string;
+}
 export interface Verify2faRequest {
   loginSessionToken: string;
   type: string;
@@ -112,13 +122,6 @@ export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
 }
-export interface Confirm2faRequest {
-  setupToken: string;
-  totpCode: string;
-}
 
-export interface Confirm2faResponse {
-  message: string;
-}
 
 

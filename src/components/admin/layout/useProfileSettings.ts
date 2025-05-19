@@ -25,6 +25,8 @@ export function useProfileSettings() {
   const [showQRDialog, setShowQRDialog] = useState(false)
   const [qrUri, setQrUri] = useState('')
   const [loading, setLoading] = useState(false)
+  const [totpCode, setTotpCode] = useState('')
+  const [setupToken, setSetupToken] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -45,12 +47,12 @@ export function useProfileSettings() {
         // Setup 2FA
         const response = await authService.setup2fa()
         setQrUri(response.uri)
+        setSetupToken(response.setupToken)
         setShowQRDialog(true)
-        setIs2FAEnabled(true)
-        showToast(t('admin.profileSettings.2faSetupSuccess'), 'success')
+        showToast(t('admin.profileSettings.scanQRFirst'), 'info')
       } else {
         // Disable 2FA
-        await authService.disable2fa({ type: 'totp', code: '' }) // TODO: Add code input
+        await authService.disable2fa({ type: 'totp', code: totpCode })
         setIs2FAEnabled(false)
         showToast(t('admin.profileSettings.2faDisabledSuccess'), 'success')
       }
@@ -60,6 +62,24 @@ export function useProfileSettings() {
     } finally {
       setLoading(false)
       setShow2FADialog(false)
+    }
+  }
+
+  const handleConfirmSetup = async () => {
+    try {
+      setLoading(true)
+      await authService.confirm2fa({
+        setupToken,
+        totpCode: totpCode
+      })
+      setIs2FAEnabled(true)
+      setShowQRDialog(false)
+      showToast(t('admin.profileSettings.2faSetupSuccess'), 'success')
+    } catch (error: any) {
+      console.error('Error confirming 2FA:', error)
+      showToast(parseApiError(error), 'error')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -86,9 +106,12 @@ export function useProfileSettings() {
     setShowQRDialog,
     qrUri,
     loading,
+    totpCode,
+    setTotpCode,
     handleInputChange,
     handle2FAToggle,
     handleConfirm2FA,
+    handleConfirmSetup,
     handleSubmit
   }
 }

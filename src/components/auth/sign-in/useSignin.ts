@@ -24,6 +24,7 @@ export function useSignin() {
       if (response.loginSessionToken) {
         // Lưu loginSessionToken vào sessionStorage
         sessionStorage.setItem('loginSessionToken', response.loginSessionToken);
+        sessionStorage.setItem('userEmail', data.email); // Lưu email
         // Chuyển hướng đến trang verify 2FA
         router.push(ROUTES.BUYER.VERIFY_2FA);
         return;

@@ -17,6 +17,8 @@ import {
   Disable2faResponse,
   Setup2faResponse,
   LogoutRequest,
+  Confirm2faRequest,
+  Confirm2faResponse,
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
@@ -97,6 +99,13 @@ export const authService = {
     return response.data;
   },
 
+  confirm2fa: async (data: Confirm2faRequest): Promise<Confirm2faResponse> => {
+    const response = await publicAxios.post<Confirm2faResponse>(
+      API_ENDPOINTS.AUTH.CONFIRM_2FA,
+      data
+    );
+    return response.data;
+  },
   getCsrfToken: async (): Promise<void> => {
     try {
       await publicAxios.get(API_ENDPOINTS.AUTH.GET_CSRF_TOKEN);

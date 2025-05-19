@@ -6,18 +6,15 @@ import { otpSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
-import { AppDispatch } from '@/store/store'
-import { setCredentials } from '@/store/features/auth/authSlide'
-import { useDispatch } from 'react-redux'
 
 const SESSION_TOKEN_KEY = 'loginSessionToken'
+const USER_EMAIL_KEY = 'userEmail'
 
 export function useVerify2FA() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type') as 'TOTP' | 'OTP' || 'TOTP'
-  const dispatch = useDispatch<AppDispatch>()
   
   const verify2FA = async (code: string) => {
     const loginSessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
@@ -29,22 +26,17 @@ export function useVerify2FA() {
 
     try {
       setLoading(true)
-      const response = await authService.verify2fa({
+      await authService.verify2fa({
         loginSessionToken,
         type,
         code
       })
-      if (response.accessToken && response.refreshToken) {
-        dispatch(setCredentials({
-          accessToken: response.accessToken,
-          refreshToken: response.refreshToken
-        }))
-
-        showToast('Xác minh 2FA thành công', 'success')
-        router.replace(ROUTES.ADMIN.DASHBOARD)
-      } else {
-        throw new Error('Token không hợp lệ')
-      }
+      
+      sessionStorage.removeItem(SESSION_TOKEN_KEY)
+      sessionStorage.removeItem(USER_EMAIL_KEY)
+      
+      showToast('Xác minh 2FA thành công', 'success')
+      router.replace(ROUTES.ADMIN.DASHBOARD)
     } catch (error) {
       showToast(parseApiError(error), 'error')
     } finally {
@@ -52,9 +44,11 @@ export function useVerify2FA() {
     }
   }
 
-  const resendOTP = async () => {
+  const sendOTP = async () => {
     const loginSessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
-    if (!loginSessionToken) {
+    const userEmail = sessionStorage.getItem(USER_EMAIL_KEY)
+    
+    if (!loginSessionToken || !userEmail) {
       showToast('Không tìm thấy phiên đăng nhập, vui lòng thử lại', 'error')
       router.replace(ROUTES.BUYER.SIGNIN)
       return
@@ -63,10 +57,10 @@ export function useVerify2FA() {
     try {
       setLoading(true)
       await authService.sendOTP({
-        email: loginSessionToken, // Giả sử loginSessionToken chứa email
-        type: '2FA'
+        email: userEmail,
+        type: 'LOGIN'
       })
-      showToast('Đã gửi lại mã OTP mới', 'success')
+      showToast('Đã gửi mã OTP đến email của bạn', 'success')
     } catch (error) {
       showToast(parseApiError(error), 'error')
     } finally {
@@ -78,5 +72,5 @@ export function useVerify2FA() {
     await verify2FA(data.otp)
   }
 
-  return { loading, handleVerifyCode, resendOTP }
+  return { loading, handleVerifyCode, sendOTP }
 }

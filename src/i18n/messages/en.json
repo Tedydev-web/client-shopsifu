@@ -179,7 +179,12 @@
       "qrInstructions": "After scanning, enter the 6-digit code from your authenticator app to complete setup.",
       "2faSetupSuccess": "Two-factor authentication setup successful!",
       "2faDisabledSuccess": "Two-factor authentication disabled!",
-      "2faError": "An error occurred while processing two-factor authentication"
+      "2faError": "An error occurred while processing two-factor authentication",
+      "scanQRFirst": "Please scan the QR code with your authenticator app first",
+      "enterTOTP": "Enter TOTP",
+      "totpPlaceholder": "Enter 6-digit code from authenticator app",
+      "verifying": "Verifying...",
+      "activate2FA": "Activate 2FA"
     }
   }
 }

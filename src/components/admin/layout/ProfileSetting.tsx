@@ -53,7 +53,10 @@ export function ProfileSetting() {
     handleInputChange,
     handle2FAToggle,
     handleConfirm2FA,
-    handleSubmit
+    handleSubmit,
+    totpCode,
+    setTotpCode,
+    handleConfirmSetup
   } = useProfileSettings()
 
   return (
@@ -234,6 +237,29 @@ export function ProfileSetting() {
             <p className="text-sm text-gray-500 text-center">
               {t('admin.profileSettings.qrInstructions')}
             </p>
+            
+            {/* TOTP Input Section */}
+            <div className="w-full space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="totp">{t('admin.profileSettings.enterTOTP')}</Label>
+                <Input
+                  id="totp"
+                  value={totpCode}
+                  onChange={(e) => setTotpCode(e.target.value)}
+                  placeholder={t('admin.profileSettings.totpPlaceholder')}
+                  maxLength={6}
+                />
+              </div>
+              <Button 
+                onClick={handleConfirmSetup}
+                disabled={loading || totpCode.length !== 6}
+                className="w-full"
+              >
+                {loading 
+                  ? t('admin.profileSettings.verifying')
+                  : t('admin.profileSettings.activate2FA')}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

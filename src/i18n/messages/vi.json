@@ -179,7 +179,12 @@
       "qrInstructions": "Sau khi quét, nhập mã xác thực 6 chữ số từ ứng dụng để hoàn tất thiết lập.",
       "2faSetupSuccess": "Thiết lập xác thực hai yếu tố thành công!",
       "2faDisabledSuccess": "Đã tắt xác thực hai yếu tố!",
-      "2faError": "Có lỗi xảy ra khi xử lý xác thực hai yếu tố"
+      "2faError": "Có lỗi xảy ra khi xử lý xác thực hai yếu tố",
+      "scanQRFirst": "Vui lòng quét mã QR bằng ứng dụng xác thực của bạn trước",
+      "enterTOTP": "Nhập mã xác thực",
+      "totpPlaceholder": "Nhập 6 chữ số từ ứng dụng xác thực",
+      "verifying": "Đang xác thực...",
+      "activate2FA": "Kích hoạt xác thực 2 yếu tố"
     }
   }
 }
