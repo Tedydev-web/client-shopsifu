@@ -24,14 +24,16 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
   const { handleSignin, loading } = useSignin()
   const { t } = useTranslation()
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: { 
-      email: '', 
-      password: '',
-      rememberMe: false
-    }
-  })
+  type LoginFormData = z.infer<typeof LoginSchema>;
+
+const form = useForm<LoginFormData>({
+  resolver: zodResolver(LoginSchema),
+  defaultValues: { 
+    email: '', 
+    password: '',
+    rememberMe: false
+  }
+});
 
   return (
     <Form {...form}>
