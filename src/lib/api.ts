@@ -28,7 +28,7 @@ interface ExtendedInternalAxiosRequestConfig extends InternalAxiosRequestConfig 
 
 export const publicAxios = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true, // 🔒 Rất quan trọng để cookie đi theo request
+  withCredentials: false, // 🔒 Rất quan trọng để cookie đi theo request
 })
 
 // Request Interceptor → Gắn x-csrf-token
