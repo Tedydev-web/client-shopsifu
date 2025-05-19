@@ -1,4 +1,4 @@
-import { privateAxios, publicAxios } from '@/lib/api';
+import { publicAxios } from '@/lib/api';
 import { 
   LoginRequest, 
   LoginResponse, 
@@ -16,6 +16,7 @@ import {
   Disable2faRequest,
   Disable2faResponse,
   Setup2faResponse,
+  LogoutRequest,
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
@@ -60,13 +61,13 @@ export const authService = {
     return response.data;
   },
 
-  logout: async (): Promise<void> => {
-    await publicAxios.post(API_ENDPOINTS.AUTH.LOGOUT);
+  logout: async (data?: LogoutRequest): Promise<void> => {
+    await publicAxios.post(API_ENDPOINTS.AUTH.LOGOUT, data || {});
   },
   
 
   getProfile: async () => {
-    const response = await privateAxios.get(API_ENDPOINTS.AUTH.PROFILE);
+    const response = await publicAxios.get(API_ENDPOINTS.AUTH.PROFILE);
     return response.data;
   },
 
@@ -84,12 +85,12 @@ export const authService = {
   },
 
   setup2fa: async (): Promise<Setup2faResponse> => {
-    const response = await privateAxios.post<Setup2faResponse>(API_ENDPOINTS.AUTH.SETUP_2FA, {})
+    const response = await publicAxios.post<Setup2faResponse>(API_ENDPOINTS.AUTH.SETUP_2FA, {})
     return response.data
   },
   
   disable2fa: async (data: Disable2faRequest): Promise<Disable2faResponse> => {
-    const response = await privateAxios.post<Disable2faResponse>(
+    const response = await publicAxios.post<Disable2faResponse>(
       API_ENDPOINTS.AUTH.DISABLE_2FA,
       data
     );

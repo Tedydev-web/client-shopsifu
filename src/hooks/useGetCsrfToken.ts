@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { authService } from '@/services/authService';
 
 export const useGetCsrfToken = () => {
@@ -17,11 +17,6 @@ export const useGetCsrfToken = () => {
       setIsLoading(false);
     }
   }, []);
-
-  // Tự động lấy CSRF token khi component mount
-  useEffect(() => {
-    getCsrfToken();
-  }, [getCsrfToken]);
 
   return {
     getCsrfToken,

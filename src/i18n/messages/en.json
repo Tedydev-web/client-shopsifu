@@ -35,7 +35,8 @@
       "logging in": "Logging in",
       "forgot password": "Forgot password?",
       "no account": "Don't have an account?",
-      "register": "Register"
+      "register": "Register",
+      "remember me": "Remember me"
     },
     "forgotPassword": {
       "title": "Forgot password",
