@@ -29,8 +29,24 @@ interface ExtendedInternalAxiosRequestConfig extends InternalAxiosRequestConfig 
 
 export const publicAxios = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true
+  withCredentials: false
 })
+
+publicAxios.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined') {
+      const csrfToken = Cookies.get('xsrf-token')
+      console.log('x-csrfToken', csrfToken)
+      if (csrfToken && config.headers) {
+        config.headers['x-csrf-token'] = csrfToken
+      }
+    }
+
+    config.withCredentials = false // ✅ gửi cookie trong mọi request
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 
 // ✅ Interceptors: handle SUCCESS + ERROR
 // publicAxios.interceptors.response.use(
@@ -55,21 +71,7 @@ export const publicAxios = axios.create({
 //   }
 // )
 
-publicAxios.interceptors.request.use(
-  (config) => {
-    if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token')
 
-      if (csrfToken && config.headers) {
-        config.headers['x-csrf-token'] = csrfToken
-      }
-    }
-
-    config.withCredentials = true // ✅ gửi cookie trong mọi request
-    return config
-  },
-  (error) => Promise.reject(error)
-)
 
 //
 // ==================== REFRESH AXIOS (Dùng riêng để refresh token) ====================
