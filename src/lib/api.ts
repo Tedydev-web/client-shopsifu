@@ -26,52 +26,38 @@ interface ExtendedInternalAxiosRequestConfig extends InternalAxiosRequestConfig 
 
 // ==================== PUBLIC AXIOS (Không cần token) ====================
 
-
 export const publicAxios = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: false
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  withCredentials: true, // 🔒 Rất quan trọng để cookie đi theo request
 })
 
+// Request Interceptor → Gắn x-csrf-token
 publicAxios.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token')
-      console.log('x-csrfToken', csrfToken)
+      const csrfToken = Cookies.get('xsrf-token') // 🔍 Đọc cookie
+
       if (csrfToken && config.headers) {
-        config.headers['x-csrf-token'] = csrfToken
+        config.headers['x-csrf-token'] = csrfToken // ✅ Gắn header
+        console.log('➡️ CSRF Token attached:', csrfToken)
       }
     }
 
-    config.withCredentials = false // ✅ gửi cookie trong mọi request
     return config
   },
   (error) => Promise.reject(error)
 )
 
-// ✅ Interceptors: handle SUCCESS + ERROR
-// publicAxios.interceptors.response.use(
-//   (response: AxiosResponse) => {
-//     // 🟢 Handle thành công
-//     console.log('✅ API success:', response)
-//     return response
-//   },
-//   (error) => {
-//     // 🔴 Handle lỗi
-//     if (axios.isAxiosError(error)) {
-//       const errorResponse = error.response?.data as ErrorResponse
-
-//       console.error('❌ API error:', errorResponse)
-
-//       // NÉM RA lỗi chuẩn
-//       return Promise.reject(errorResponse)
-//     }
-
-//     // Trường hợp không phải lỗi Axios (ví dụ mạng bị mất)
-//     return Promise.reject(error)
-//   }
-// )
-
-
+// Response Interceptor (optional)
+publicAxios.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response
+  },
+  (error) => {
+    console.error('❌ publicAxios error:', error)
+    return Promise.reject(error)
+  }
+)
 
 //
 // ==================== REFRESH AXIOS (Dùng riêng để refresh token) ====================
