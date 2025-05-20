@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "@/store/features/auth/authSlide";
 import Cookies from 'js-cookie';
+import { showToast } from "@/components/ui/toastify";
 
 export default function OauthCallbackPage() {
   const dispatch = useDispatch();
@@ -22,7 +23,8 @@ export default function OauthCallbackPage() {
     }
     
     // Luôn chuyển hướng về trang chủ, không cần check lỗi
-    window.location.replace("/buyer/sign-in");
+    showToast("Đăng nhập thành công", "success")
+    window.location.replace("/admin");
   }, []);
 
   return (

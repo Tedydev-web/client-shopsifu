@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       manual_rollback:
-        description: 'Commit SHA hoặc tag để rollback (để trống để deploy bình thường)'
+        description: "Commit SHA hoặc tag để rollback (để trống để deploy bình thường)"
         required: false
 
 jobs:
@@ -169,7 +169,7 @@ jobs:
             --arg color "$COLOR" \
             '{
               embeds: [{
-                title: "🚀 Thông báo triển khai",
+                title: "🚀 CLIENT - Thông báo triển khai",
                 color: ($color | tonumber),
                 fields: [
                   { name: "Trạng thái", value: "\($icon) \($status)", inline: true },
