@@ -92,7 +92,6 @@ export default function LanguagesModalUpsert({
               onChange={e => setCode(e.target.value)} 
               required 
               placeholder="Nhập mã ngôn ngữ..." 
-              disabled={mode === 'edit'}
             />
           </div>
           <div>

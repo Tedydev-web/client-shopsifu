@@ -20,6 +20,10 @@ export const ERROR_MESSAGES: Record<string, string> = {
     'Error.LanguageCodeInvalid': 'Mã ngôn ngữ không hợp lệ',
     'Error.LanguageNameExists': 'Tên ngôn ngữ đã tồn tại',
     'Error.LanguageNameInvalid': 'Tên ngôn ngữ không hợp lệ',
+    'Error.LanguageCodeTooShort': 'Mã ngôn ngữ phải có ít nhất 2 ký tự',
+    'Error.LanguageCreateFailed': 'Tạo ngôn ngữ thất bại',
+    'Error.LanguageUpdateFailed': 'Cập nhật ngôn ngữ thất bại',
+    'Error.LanguageDeleteFailed': 'Xóa ngôn ngữ thất bại',
     'Error.Auth.Email.NotFound': 'Email này chưa được đăng ký trong hệ thống',
     // ➕ thêm các mã khác tùy theo backend
   }
