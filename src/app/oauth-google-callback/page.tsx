@@ -22,7 +22,7 @@ export default function OauthCallbackPage() {
     }
     
     // Luôn chuyển hướng về trang chủ, không cần check lỗi
-    window.location.replace("/");
+    window.location.replace("/buyer/sign-in");
   }, []);
 
   return (
