@@ -17,9 +17,9 @@ export function useLogout() {
     try {
       setLoading(true);
 
-      // Gọi API logout với refreshToken mặc định
+      // Gọi API logout
       await authService.logout({
-        refreshToken: 'default-refresh-token' // Truyền giá trị mặc định
+        refreshToken: 'default-refresh-token'
       });
 
       // Xoá token local
@@ -27,6 +27,9 @@ export function useLogout() {
 
       // Cập nhật Redux
       dispatch(logOut());
+
+      // Lấy CSRF token mới
+      await authService.getCsrfToken();
 
       // Hiển thị thông báo
       showToast('Đăng xuất thành công!', 'success');
