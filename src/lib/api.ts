@@ -1,17 +1,11 @@
-import axios, {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from 'axios';// đã có
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios' // đã có
 import Cookies from 'js-cookie'
-
 
 // ==================== PUBLIC AXIOS (Truyền csrf-token vào header) ====================
 
 export const publicAxios = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  withCredentials: true, // 🔒 Rất quan trọng để cookie đi theo request
+  baseURL: '', // Sử dụng URL tương đối - sẽ gửi yêu cầu đến server đang chạy
+  withCredentials: true // 🔒 Rất quan trọng để cookie đi theo request
 })
 
 // Request Interceptor → Gắn x-csrf-token

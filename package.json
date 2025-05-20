@@ -4,9 +4,11 @@
   "private": true,
   "proxy": "https://api.shopsifu.live/",
   "scripts": {
-    "dev": "next dev --turbopack -p 8000",
+    "dev": "node server.js",
+    "dev:next": "next dev --turbopack -p 8000",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
+    "start:next": "next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -33,6 +35,7 @@
     "date-fns": "^4.1.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.11.0",
+    "http-proxy-middleware": "^3.0.5",
     "i18next": "^25.1.2",
     "input-otp": "^1.4.2",
     "js-cookie": "^3.0.5",
@@ -67,6 +70,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "https": "^1.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.6",
     "tw-animate-css": "^1.2.9",
