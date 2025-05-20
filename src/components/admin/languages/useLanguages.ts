@@ -59,7 +59,7 @@ export function useLanguages() {
     try {
       setLoading(true)
       const response = await languagesService.create(data)
-      showToast('Language created successfully', 'success')
+      showToast("Tạo thành công ngôn ngữ", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -75,7 +75,7 @@ export function useLanguages() {
     try {
       setLoading(true)
       const response = await languagesService.update(id, data)
-      showToast('Language updated successfully', 'success')
+      showToast("Cập nhật thành công ngôn ngữ", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -91,7 +91,7 @@ export function useLanguages() {
     try {
       setLoading(true)
       const response = await languagesService.deleteById(id)
-      showToast('Language deleted successfully', 'success')
+      showToast("Xóa thành công ngôn ngữ", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), 'error')

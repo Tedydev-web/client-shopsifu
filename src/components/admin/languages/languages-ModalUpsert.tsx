@@ -15,13 +15,15 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { showToast } from "@/components/ui/toastify"
 import { Language } from "./languages-Columns"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import ISO6391 from 'iso-639-1'
 
 interface LanguagesModalUpsertProps {
   open: boolean
   onClose: () => void
   mode: 'add' | 'edit'
   language?: Language | null
-  onSubmit: (values: { code: string; name: string; isActive: boolean }) => Promise<void>
+  onSubmit: (values: { code: string; name: string }) => Promise<void>
 }
 
 export default function LanguagesModalUpsert({
@@ -35,6 +37,7 @@ export default function LanguagesModalUpsert({
   const [name, setName] = useState("")
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
     if (mode === 'edit' && language) {
@@ -50,8 +53,8 @@ export default function LanguagesModalUpsert({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (code.length < 2) {
-      showToast("Mã ngôn ngữ phải có ít nhất 2 ký tự", "error")
+    if (!code) {
+      showToast("Vui lòng chọn mã ngôn ngữ", "error")
       return
     }
     if (name.length < 2) {
@@ -61,8 +64,7 @@ export default function LanguagesModalUpsert({
 
     setLoading(true)
     try {
-      await onSubmit({ code, name, isActive })
-      showToast("Lưu ngôn ngữ thành công", "success")
+      await onSubmit({ code, name })
       onClose()
     } catch (error) {
       showToast("Có lỗi xảy ra", "error")
@@ -70,6 +72,20 @@ export default function LanguagesModalUpsert({
       setLoading(false)
     }
   }
+
+  // Lấy danh sách code ngôn ngữ từ iso-639-1
+  const languageOptions = ISO6391.getAllCodes().map(code => ({
+    code,
+    name: ISO6391.getNativeName(code) || ISO6391.getName(code)
+  }))
+
+  // Lọc theo search
+  const filteredOptions = search
+    ? languageOptions.filter(opt =>
+        opt.code.toLowerCase().includes(search.toLowerCase()) ||
+        (opt.name && opt.name.toLowerCase().includes(search.toLowerCase()))
+      )
+    : languageOptions
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -87,12 +103,34 @@ export default function LanguagesModalUpsert({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Mã ngôn ngữ</label>
-            <Input 
-              value={code} 
-              onChange={e => setCode(e.target.value)} 
-              required 
-              placeholder="Nhập mã ngôn ngữ..." 
-            />
+            <Select value={code} onValueChange={setCode} disabled={mode === 'edit'}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Chọn mã ngôn ngữ" />
+              </SelectTrigger>
+              <SelectContent className="w-full">
+                <div className="p-2">
+                  <input
+                    className="w-full px-2 py-1 border rounded text-sm"
+                    placeholder="Tìm kiếm mã hoặc tên..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    onMouseDown={e => e.stopPropagation()}
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-60 overflow-y-auto">
+                  {filteredOptions.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground">Không tìm thấy ngôn ngữ phù hợp</div>
+                  ) : (
+                    filteredOptions.map(opt => (
+                      <SelectItem key={opt.code} value={opt.code} className="w-full">
+                        {opt.code} - {opt.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </div>
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Tên ngôn ngữ</label>
@@ -101,18 +139,6 @@ export default function LanguagesModalUpsert({
               onChange={e => setName(e.target.value)} 
               required 
               placeholder="Nhập tên ngôn ngữ..." 
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <label className="text-base font-medium">Trạng thái hoạt động</label>
-              <div className="text-sm text-muted-foreground">
-                Đặt trạng thái hoạt động của ngôn ngữ
-              </div>
-            </div>
-            <Switch
-              checked={isActive}
-              onCheckedChange={setIsActive}
             />
           </div>
           <DialogFooter>

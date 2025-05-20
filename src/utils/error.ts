@@ -25,6 +25,7 @@ export const ERROR_MESSAGES: Record<string, string> = {
     'Error.LanguageUpdateFailed': 'Cập nhật ngôn ngữ thất bại',
     'Error.LanguageDeleteFailed': 'Xóa ngôn ngữ thất bại',
     'Error.Auth.Email.NotFound': 'Email này chưa được đăng ký trong hệ thống',
+    'Error.Language.AlreadyExists': 'Mã ngôn ngữ đã tồn tại',
     // ➕ thêm các mã khác tùy theo backend
   }
   

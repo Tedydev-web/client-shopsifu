@@ -71,7 +71,7 @@ export function LanguagesTable() {
     }
   }
 
-  const handleSubmit = async (values: { code: string; name: string; isActive: boolean }) => {
+  const handleSubmit = async (values: { code: string; name: string }) => {
     try {
       if (selectedLanguage) {
         // Update

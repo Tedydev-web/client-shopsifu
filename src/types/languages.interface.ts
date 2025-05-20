@@ -13,6 +13,11 @@ export interface LangCreateResponse {
     updatedAt: string;
 }
 
+export interface LangGetAllRequest {
+    page: number;
+    limit: number;
+    search: string;
+}
 
 export interface LangGetAllResponse {
     data: Array<{
