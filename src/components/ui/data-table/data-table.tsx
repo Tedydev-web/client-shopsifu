@@ -28,12 +28,14 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onRowClick?: (row: any) => void
   // Thêm các props cho toolbar, pagination nếu cần quản lý từ bên ngoài DataTable
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -92,6 +94,8 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={onRowClick ? 'cursor-pointer hover:bg-muted/60' : ''}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

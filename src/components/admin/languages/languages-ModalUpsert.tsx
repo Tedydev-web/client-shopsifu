@@ -17,6 +17,7 @@ import { showToast } from "@/components/ui/toastify"
 import { Language } from "./languages-Columns"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ISO6391 from 'iso-639-1'
+import { useTranslation } from "react-i18next"
 
 interface LanguagesModalUpsertProps {
   open: boolean
@@ -38,7 +39,7 @@ export default function LanguagesModalUpsert({
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
-
+  const { t } = useTranslation()
   useEffect(() => {
     if (mode === 'edit' && language) {
       setCode(language.code || "")
@@ -92,26 +93,26 @@ export default function LanguagesModalUpsert({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {mode === 'add' ? 'Thêm ngôn ngữ mới' : 'Chỉnh sửa ngôn ngữ'}
+            {mode === 'add' ? t("admin.languages.modal.title") : t("admin.languages.modalEdit.title")}
           </DialogTitle>
           <DialogDescription>
             {mode === 'add' 
-              ? 'Nhập thông tin ngôn ngữ để thêm mới vào hệ thống.' 
-              : 'Cập nhật thông tin ngôn ngữ.'}
+              ? t("admin.languages.modal.subtitle") 
+              : t("admin.languages.modalEdit.subtitle")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Mã ngôn ngữ</label>
+            <label className="block text-sm font-medium mb-1">{t("admin.languages.modal.code")}</label>
             <Select value={code} onValueChange={setCode} disabled={mode === 'edit'}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Chọn mã ngôn ngữ" />
+                <SelectValue placeholder={t("admin.languages.modal.codePlaceholder")} />
               </SelectTrigger>
               <SelectContent className="w-full">
                 <div className="p-2">
                   <input
                     className="w-full px-2 py-1 border rounded text-sm"
-                    placeholder="Tìm kiếm mã hoặc tên..."
+                    placeholder={t("admin.languages.modal.searchPlaceholder")}
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     onMouseDown={e => e.stopPropagation()}
@@ -133,24 +134,24 @@ export default function LanguagesModalUpsert({
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Tên ngôn ngữ</label>
+            <label className="block text-sm font-medium mb-1">{t("admin.languages.modal.name")}</label>
             <Input 
               value={name} 
               onChange={e => setName(e.target.value)} 
               required 
-              placeholder="Nhập tên ngôn ngữ..." 
+              placeholder={t("admin.languages.modal.namePlaceholder")} 
             />
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline" disabled={loading} onClick={onClose}>
-                Hủy
+                {t("admin.languages.modal.cancel")}
               </Button>
             </DialogClose>
             <Button type="submit" disabled={loading}>
               {loading 
-                ? (mode === 'add' ? 'Đang thêm...' : 'Đang cập nhật...') 
-                : (mode === 'add' ? 'Thêm mới' : 'Cập nhật')}
+                ? (mode === 'add' ? t("admin.languages.modal.processing") : t("admin.languages.modal.processing")) 
+                : (mode === 'add' ? t("admin.languages.modal.save") : t("admin.languages.modal.save"))}
             </Button>
           </DialogFooter>
         </form>

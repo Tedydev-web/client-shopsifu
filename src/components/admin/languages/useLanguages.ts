@@ -6,8 +6,9 @@ import { parseApiError } from "@/utils/error"
 import { 
   LangCreateRequest, 
   LangUpdateRequest,
-  LangGetAllRequest
+  LangGetAllResponse
 } from "@/types/languages.interface"
+import { PaginationRequest } from "@/types/base.interface"
 
 export function useLanguages() {
   const [languages, setLanguages] = useState<Language[]>([])
@@ -15,11 +16,11 @@ export function useLanguages() {
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
   const [loading, setLoading] = useState(false)
   const [totalItems, setTotalItems] = useState(0)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [page, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
   // Get all languages
-  const getAllLanguages = async (params?: LangGetAllRequest) => {
+  const getAllLanguages = async (params?: PaginationRequest) => {
     try {
       setLoading(true)
       const response = await languagesService.getAll(params)
@@ -34,7 +35,7 @@ export function useLanguages() {
       }))
       setLanguages(mappedLanguages)
       setTotalItems(response.totalItems)
-      setCurrentPage(response.currentPage)
+      setCurrentPage(response.page)
       setTotalPages(response.totalPages)
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -124,7 +125,7 @@ export function useLanguages() {
   return {
     languages,
     totalItems,
-    currentPage,
+    page,
     totalPages,
     isModalOpen,
     selectedLanguage,

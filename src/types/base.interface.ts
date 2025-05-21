@@ -6,3 +6,12 @@ export interface ErrorResponse {
     error: string;
     statusCode: number;
   }
+
+
+export interface PaginationRequest {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+}

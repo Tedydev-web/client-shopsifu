@@ -3,18 +3,17 @@ import { API_ENDPOINTS } from '@/constants/api';
 import { 
     LangCreateRequest,
     LangCreateResponse,
-    LangGetAllRequest,
     LangGetAllResponse,
     LangUpdateRequest,
     LangUpdateResponse,
-    LangDeleteRequest,
     LangDeleteResponse,
     LangGetByIdResponse,
  } from '@/types/languages.interface';
+import { PaginationRequest } from '@/types/base.interface';
 
 class LanguagesService {
     // Lấy danh sách tất cả ngôn ngữ
-    async getAll(params?: LangGetAllRequest): Promise<LangGetAllResponse> {
+    async getAll(params?: PaginationRequest): Promise<LangGetAllResponse> {
         const response = await privateAxios.get(API_ENDPOINTS.LANGUAGES.GETALL, {
             params: params
         });

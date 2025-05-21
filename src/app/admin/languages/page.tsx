@@ -1,12 +1,15 @@
+'use client'
 import { LanguagesTable } from "@/components/admin/languages/languages-Table";
+import { useTranslation } from "react-i18next";
 
 export default function LanguagesPage() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Quản lý ngôn ngữ</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t("admin.languages.title")}</h2>
         <p className="text-muted-foreground">
-          Quản lý tất cả ngôn ngữ của bạn tại đây
+          {t("admin.languages.subtitle")}
         </p>
       </div>
       <LanguagesTable />

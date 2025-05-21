@@ -100,6 +100,16 @@
       "logout": "Đăng xuất",
       "logging out": "Đang đăng xuất"
     },
+    "pagination": {
+      "previous": "Trang trước",
+      "next": "Trang tiếp",
+      "first": "Trang đầu",
+      "last": "Trang cuối",
+      "page": "Trang",
+      "of": "trong",
+      "results": "Số mục/trang",
+      "total": "Tổng"
+    },
     "dataTable": {
       "noData": "Không có dữ liệu",
       "image": "Hình ảnh",
@@ -190,7 +200,44 @@
       "title": "Nhật ký hệ thống",
       "subtitle": "Quản lý tất cả nhật ký hệ thống của bạn tại đây",
       "search": "Tìm kiếm",
-      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+      "searchPlaceholder": "Tìm kiếm theo Log",
+      "stats": {
+        "total": "Tổng log",
+        "success": "Thành công",
+        "failure": "Thất bại",
+        "entities": "Tổng entity"
+      },
+      "modal": {
+        "detailTitle": "Chi tiết Log - ID: {{id}}",
+        "detailDesc": "Xem chi tiết thông tin log hệ thống",
+        "userEmail": "Email người dùng",
+        "timestamp": "Thời gian",
+        "action": "Hành động",
+        "entity": "Đối tượng",
+        "ipAddress": "Địa chỉ IP",
+        "status": "Trạng thái",
+        "statusCode": "Mã trạng thái",
+        "elapsedTime": "Thời gian xử lý",
+        "userAgent": "User Agent",
+        "requestHeaders": "Request Headers",
+        "notes": "Ghi chú",
+        "more": "Thông tin mở rộng",
+        "close": "Đóng"
+      },
+      "column": {
+        "userEmail": "Email người dùng",
+        "timestamp": "Thời gian",
+        "action": "Hành động",
+        "entity": "Đối tượng",
+        "entityId": "ID đối tượng",
+        "ipAddress": "Địa chỉ IP",
+        "userAgent": "User Agent",
+        "statusCode": "Mã trạng thái",
+        "status": "Trạng thái",
+        "elapsedTime": "Thời gian xử lý",
+        "notes": "Ghi chú"
+      }
+
     },
     "roles": {
       "title": "Vai trò",
@@ -213,9 +260,61 @@
     "languages": {
       "title": "Ngôn ngữ",
       "subtitle": "Quản lý tất cả ngôn ngữ của bạn tại đây",
+      "add": "Thêm mới ngôn ngữ",
+      "edit": "Chỉnh sửa ngôn ngữ",
+      "delete": "Xóa ngôn ngữ",
+      "confirmDeleteTitle": "Xác nhận xóa ngôn ngữ",
+      "confirmDeleteDesc": "Bạn có chắc chắn muốn xóa ngôn ngữ {{name}} không? Hành động này không thể hoàn tác.",
+      "confirm": "Xác nhận",
+      "cancel": "Hủy",
       "search": "Tìm kiếm",
-      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+      "searchPlaceholder": "Tìm kiếm ngôn ngữ...",
+      "code": "Mã ngôn ngữ",
+      "name": "Tên ngôn ngữ",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Ngày cập nhật",
+      "actions": "Thao tác",
+      "noData": "Không có dữ liệu.",
+      "addTitle": "Thêm ngôn ngữ",
+      "editTitle": "Chỉnh sửa ngôn ngữ",
+      "form": {
+        "code": "Mã ngôn ngữ",
+        "name": "Tên ngôn ngữ",
+        "codePlaceholder": "Nhập mã ngôn ngữ",
+        "namePlaceholder": "Nhập tên ngôn ngữ"
+      },
+      "toast": {
+        "addSuccess": "Tạo thành công ngôn ngữ",
+        "editSuccess": "Cập nhật thành công ngôn ngữ",
+        "deleteSuccess": "Xóa thành công ngôn ngữ"
+      },
+      "editAction": "Sửa thông tin",
+      "deleteAction": "Xóa ngôn ngữ",
+      "addAction": "Thêm ngôn ngữ",
+      "modal":{
+        "title": "Thêm ngôn ngữ mới",
+        "subtitle": "Nhập thông tin ngôn ngữ để thêm mới vào hệ thống",
+        "code": "Mã ngôn ngữ",
+        "name": "Tên ngôn ngữ",
+        "codePlaceholder": "Nhập mã ngôn ngữ",
+        "namePlaceholder": "Nhập tên ngôn ngữ",
+        "searchPlaceholder": "Tìm kiếm mã hoặc tên...",
+        "save": "Lưu thông tin",
+        "cancel": "Hủy bỏ",
+        "processing": "Đang xử lý...",
+        "success": "Thêm ngôn ngữ thành công",
+        "error": "Có lỗi xảy ra"
+      },
+      "modalEdit":{
+        "title": "Chỉnh sửa ngôn ngữ",
+        "subtitle": "Nhập thông tin ngôn ngữ để chỉnh sửa",
+        "save": "Lưu thông tin",
+        "cancel": "Hủy bỏ",
+        "processing": "Đang xử lý...",
+        "success": "Cập nhật ngôn ngữ thành công",
+        "error": "Có lỗi xảy ra",
+        "edit": "Chỉnh sửa ngôn ngữ"
+      }
     }
-
   }
 }

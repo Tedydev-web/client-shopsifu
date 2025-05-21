@@ -12,12 +12,13 @@ import { Button } from "@/components/ui/button"
 import { useLanguages } from "./useLanguages"
 import { useDebounce } from "@/hooks/useDebounce"
 import { Loader2 } from "lucide-react"
-
+import { useTranslation } from "react-i18next"
 export function LanguagesTable() {
+  const { t } = useTranslation()
   const {
     languages,
     totalItems,
-    currentPage,
+    page,
     totalPages,
     loading,
     isModalOpen,
@@ -79,7 +80,7 @@ export function LanguagesTable() {
       const success = await deleteLanguage(languageToDelete.code)
       if (success) {
         handleCloseDeleteModal()
-        getAllLanguages({ page: currentPage, limit })
+        getAllLanguages({ page: page, limit })
       }
     } catch (error) {
       console.error('Error deleting language:', error)
@@ -95,14 +96,14 @@ export function LanguagesTable() {
         const response = await updateLanguage(selectedLanguage.code, { name: values.name })
         if (response) {
           handleCloseModal()
-          getAllLanguages({ page: currentPage, limit })
+          getAllLanguages({ page: page, limit })
         }
       } else {
         // Create
         const response = await createLanguage({ id: values.code, name: values.name })
         if (response) {
           handleCloseModal()
-          getAllLanguages({ page: currentPage, limit })
+          getAllLanguages({ page: page, limit })
         }
       }
     } catch (error) {
@@ -114,7 +115,7 @@ export function LanguagesTable() {
     setSearchValue(value)
   }
 
-  const handlePageChange = (newOffset: number, newPage: number) => {
+  const handlePageChange = (newPage: number) => {
     getAllLanguages({ page: newPage, limit })
   }
 
@@ -129,14 +130,14 @@ export function LanguagesTable() {
         <SearchInput
           value={searchValue}
           onValueChange={handleSearch}
-          placeholder="Tìm kiếm ngôn ngữ..."
+          placeholder={t("admin.languages.searchPlaceholder")}
           className="max-w-sm"
         />
         <Button 
           onClick={() => handleOpenModal()}
           className="ml-auto"
         >
-          <PlusIcon className="w-4 h-4 mr-2" />Thêm mới ngôn ngữ
+          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
         </Button>
       </div>
 
@@ -155,8 +156,7 @@ export function LanguagesTable() {
       {totalPages > 0 && (
         <Pagination
           limit={limit}
-          offset={offset}
-          currentPage={currentPage}
+          page={page}
           totalPages={totalPages}
           totalRecords={totalItems}
           onPageChange={handlePageChange}

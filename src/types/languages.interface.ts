@@ -13,12 +13,6 @@ export interface LangCreateResponse {
     updatedAt: string;
 }
 
-export interface LangGetAllRequest {
-    page?: number;
-    limit?: number;
-    search?: string;
-}
-
 export interface LangGetAllResponse {
     data: Array<{
         id: string;
@@ -30,9 +24,16 @@ export interface LangGetAllResponse {
         updatedAt: string;
     }>;
     totalItems: number;
-    currentPage: number;
+    page: number;
     totalPages: number;
 }
+
+export interface LangListResponse {
+    data: LangGetAllResponse[];
+    totalItems: number;
+    page: number;
+    totalPages: number;
+  }
 
 export interface LangUpdateRequest {
     name: string;

@@ -100,6 +100,16 @@
       "logout": "Log out",
       "logging out": "Logging out"
     },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "first": "First",
+      "last": "Last",
+      "page": "Page",
+      "of": "of",
+      "results": "Items per page",
+      "total": "Total"
+    },
     "dataTable": {
       "noData": "No data available",
       "image": "Image",
@@ -190,7 +200,47 @@
       "title": "Audit Logs",
       "subtitle": "Manage all your audit logs",
       "search": "Search",
-      "searchPlaceholder": "Search by user, action, or date"
+      "searchPlaceholder": "Search by Log",
+      "totalLogs": "Total Logs",
+      "totalSuccessLogs": "Total Success Logs",
+      "totalFailureLogs": "Total Failure Logs",
+      "totalEntities": "Total Entities",
+      "stats": {
+        "total": "Total Logs",
+        "success": "Total Success Logs",
+        "failure": "Total Failure Logs",
+        "entities": "Total Entities"
+      },
+      "modal": {
+        "detailTitle": "Detail Log - ID: {{id}}",
+        "detailDesc": "View detailed system log information",
+        "userEmail": "User Email",
+        "timestamp": "Timestamp",
+        "action": "Action",
+        "entity": "Entity",
+        "ipAddress": "IP Address",
+        "status": "Status",
+        "statusCode": "Status Code",
+        "elapsedTime": "Elapsed Time",
+        "userAgent": "User Agent",
+        "requestHeaders": "Request Headers",
+        "notes": "Notes",
+        "more": "More",
+        "close": "Close"
+      },
+      "column": {
+        "userEmail": "User Email",
+        "timestamp": "Timestamp",
+        "action": "Action",
+        "entity": "Entity",
+        "entityId": "Entity ID",
+        "ipAddress": "IP Address",
+        "userAgent": "User Agent",
+        "statusCode": "Status Code",
+        "status": "Status",
+        "elapsedTime": "Elapsed Time",
+        "notes": "Notes"
+      }
     },
     "roles": {
       "title": "Roles",
@@ -210,11 +260,64 @@
       "search": "Search",
       "searchPlaceholder": "Search by user, action, or date"
     },
-    "languages": {
+      "languages": {
       "title": "Languages",
-      "subtitle": "Manage all your languages",
+      "subtitle": "Manage all your languages here",
+      "add": "Add New Language",
+      "edit": "Edit Language",
+      "delete": "Delete Language",
+      "confirmDeleteTitle": "Confirm Language Deletion",
+      "confirmDeleteDesc": "Are you sure you want to delete the language {{name}}? This action cannot be undone.",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
       "search": "Search",
-      "searchPlaceholder": "Search by user, action, or date"
+      "searchPlaceholder": "Search for languages...",
+      "code": "Language Code",
+      "name": "Language Name",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions",
+      "noData": "No data available.",
+      "addTitle": "Add Language",
+      "editTitle": "Edit Language",
+      "form": {
+        "code": "Language Code",
+        "name": "Language Name",
+        "codePlaceholder": "Enter language code",
+        "namePlaceholder": "Enter language name"
+      },
+      "toast": {
+        "addSuccess": "Language created successfully",
+        "editSuccess": "Language updated successfully",
+        "deleteSuccess": "Language deleted successfully"
+      },
+      "editAction": "Edit Information",
+      "deleteAction": "Delete Language",
+      "addAction": "Add Language",
+      "modal": {
+        "title": "Add New Language",
+        "subtitle": "Enter language details to add to the system",
+        "code": "Language Code",
+        "name": "Language Name",
+        "codePlaceholder": "Enter language code",
+        "namePlaceholder": "Enter language name",
+        "searchPlaceholder": "Search by code or name...",
+        "save": "Save Information",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "success": "Language added successfully",
+        "error": "An error occurred"
+      },
+      "modalEdit": {
+        "title": "Edit Language",
+        "subtitle": "Enter language details to edit",
+        "save": "Save Information",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "success": "Language updated successfully",
+        "error": "An error occurred",
+        "edit": "Edit Language"
+      }
     }
   }
 }

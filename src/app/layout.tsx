@@ -4,6 +4,8 @@ import "./globals.css";
 import StoreProvider from "@/store/StoreProvider"
 import { Toast } from "@/components/ui/toastify"
 import ClientLayout from "./client-layout";
+import { I18nextProvider } from "react-i18next";
+import i18nextInstance from "@/i18n/i18n";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -24,12 +26,12 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={`${inter.variable} antialiased`}>
-        <StoreProvider>
-          <ClientLayout>
-            <Toast/>
+          <StoreProvider>
+            <ClientLayout>
+              <Toast/>
             {children}
           </ClientLayout>
-        </StoreProvider>
+          </StoreProvider>
       </body>
     </html>
   );

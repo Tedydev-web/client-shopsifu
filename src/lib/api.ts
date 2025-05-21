@@ -73,7 +73,7 @@ privateAxios.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       showToast('Vui lòng đăng nhập tài khoản', 'info')
-      window.location.href = '/buyer/sign-in'
+      window.location.href = '/buyer/sign-in' 
       // Vấn đề Lỗi 401 dành cho hợp Unauthorized
     }
     return Promise.reject(error)
