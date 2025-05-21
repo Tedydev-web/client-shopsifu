@@ -48,8 +48,7 @@ export default function UserTable({ search }: { search: string }) {
       {totalPages > 0 && (
         <Pagination
           limit={limit}
-          offset={offset}
-          currentPage={currentPage}
+          page={currentPage}
           totalPages={totalPages}
           totalRecords={totalRecords}
           onPageChange={handlePageChange}
