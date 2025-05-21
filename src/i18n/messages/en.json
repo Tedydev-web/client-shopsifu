@@ -185,6 +185,36 @@
       "totpPlaceholder": "Enter 6-digit code from authenticator app",
       "verifying": "Verifying...",
       "activate2FA": "Activate 2FA"
+    },
+    "auditLogs": {
+      "title": "Audit Logs",
+      "subtitle": "Manage all your audit logs",
+      "search": "Search",
+      "searchPlaceholder": "Search by user, action, or date"
+    },
+    "roles": {
+      "title": "Roles",
+      "subtitle": "Manage all your roles",
+      "search": "Search",
+      "searchPlaceholder": "Search by user, action, or date"
+    },
+    "permissions": {
+      "title": "Permissions",
+      "subtitle": "Manage all your permissions",
+      "search": "Search",
+      "searchPlaceholder": "Search by user, action, or date"
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Manage all your users",
+      "search": "Search",
+      "searchPlaceholder": "Search by user, action, or date"
+    },
+    "languages": {
+      "title": "Languages",
+      "subtitle": "Manage all your languages",
+      "search": "Search",
+      "searchPlaceholder": "Search by user, action, or date"
     }
   }
 }

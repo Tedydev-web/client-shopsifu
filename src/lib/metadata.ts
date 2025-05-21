@@ -50,6 +50,26 @@ export const metadataConfig = {
     '/admin':{
       title:'Shopsifu - Kênh người bán',
       description:'Shopsifu - Tổng quan bán hàng'
+    },
+    '/admin/audit-logs':{
+      title:'Shopsifu - Nhật ký hệ thống',
+      description:'Shopsifu - Nhật ký hệ thống'
+    },
+    '/admin/languages':{
+      title:'Shopsifu - Quản lý ngôn ngữ',
+      description:'Shopsifu - Quản lý ngôn ngữ'
+    },
+    '/admin/roles':{
+      title:'Shopsifu - Quản lý vai trò',
+      description:'Shopsifu - Quản lý vai trò'
+    },
+    '/admin/permissions':{
+      title:'Shopsifu - Quản lý quyền hạn',
+      description:'Shopsifu - Quản lý quyền hạn'
+    },
+    '/admin/users':{
+      title:'Shopsifu - Quản lý người dùng',
+      description:'Shopsifu - Quản lý người dùng'
     }
   } satisfies Record<string, { title: string; description: string }>
   

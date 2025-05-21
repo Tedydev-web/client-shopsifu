@@ -14,9 +14,9 @@ export interface LangCreateResponse {
 }
 
 export interface LangGetAllRequest {
-    page: number;
-    limit: number;
-    search: string;
+    page?: number;
+    limit?: number;
+    search?: string;
 }
 
 export interface LangGetAllResponse {
@@ -30,6 +30,8 @@ export interface LangGetAllResponse {
         updatedAt: string;
     }>;
     totalItems: number;
+    currentPage: number;
+    totalPages: number;
 }
 
 export interface LangUpdateRequest {

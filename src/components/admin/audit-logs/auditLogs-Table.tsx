@@ -1,38 +1,38 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { LanguagesColumns, Language } from "./languages-Columns"
+import { AuditLogsColumns, AuditLog } from "./auditLogs-Columns"
 import SearchInput from "@/components/ui/data-table/search-input"
-import LanguagesModalUpsert from "./languages-ModalUpsert"
+import AuditLogsModalUpsert from "./auditLogs-ModalUpsert"
 import { PlusIcon } from "lucide-react"
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { Pagination } from "@/components/ui/data-table/pagination"
 import { Button } from "@/components/ui/button"
-import { useLanguages } from "./useLanguages"
+import { useAuditLogs } from "./useAuditLogs"
 import { useDebounce } from "@/hooks/useDebounce"
 import { Loader2 } from "lucide-react"
 
-export function LanguagesTable() {
+export function AuditLogsTable() {
   const {
-    languages,
+    auditLogs,
     totalItems,
     currentPage,
     totalPages,
     loading,
     isModalOpen,
-    selectedLanguage,
-    getAllLanguages,
-    deleteLanguage,
-    createLanguage,
-    updateLanguage,
+    selectedAuditLog,
+    getAllAuditLogs,
+    deleteAuditLog,
+    createAuditLog,
+    updateAuditLog,
     handleOpenModal,
     handleCloseModal
-  } = useLanguages()
+  } = useAuditLogs()
 
   const [searchValue, setSearchValue] = useState("")
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [languageToDelete, setLanguageToDelete] = useState<Language | null>(null)
+  const [auditLogToDelete, setAuditLogToDelete] = useState<AuditLog | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
 
@@ -44,45 +44,45 @@ export function LanguagesTable() {
   const debouncedSearchValue = useDebounce(searchValue, 1000)
 
   useEffect(() => {
-    getAllLanguages()
+    getAllAuditLogs()
   }, [])
 
   // Effect to handle debounced search
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setIsSearching(true)
-      getAllLanguages({ page: 1, limit, search: debouncedSearchValue })
+      getAllAuditLogs({ page: 1, limit, search: debouncedSearchValue })
         .finally(() => {
           setIsSearching(false)
         })
     }
   }, [debouncedSearchValue, limit])
 
-  const handleEdit = (language: Language) => {
-    handleOpenModal(language)
+  const handleEdit = (auditLog: AuditLog) => {
+    handleOpenModal(auditLog)
   }
 
-  const handleOpenDelete = (language: Language) => {
-    setLanguageToDelete(language)
+  const handleOpenDelete = (auditLog: AuditLog) => {
+    setAuditLogToDelete(auditLog)
     setDeleteOpen(true)
   }
 
   const handleCloseDeleteModal = () => {
     setDeleteOpen(false)
-    setLanguageToDelete(null)
+    setAuditLogToDelete(null)
   }
 
   const handleConfirmDelete = async () => {
-    if (!languageToDelete) return
+    if (!auditLogToDelete) return
     setDeleteLoading(true)
     try {
-      const success = await deleteLanguage(languageToDelete.code)
+      const success = await deleteAuditLog(auditLogToDelete.id)
       if (success) {
         handleCloseDeleteModal()
-        getAllLanguages({ page: currentPage, limit })
+        getAllAuditLogs({ page: currentPage, limit })
       }
     } catch (error) {
-      console.error('Error deleting language:', error)
+      console.error('Error deleting audit log:', error)
     } finally {
       setDeleteLoading(false)
     }
@@ -90,23 +90,23 @@ export function LanguagesTable() {
 
   const handleSubmit = async (values: { code: string; name: string }) => {
     try {
-      if (selectedLanguage) {
+      if (selectedAuditLog) {
         // Update
-        const response = await updateLanguage(selectedLanguage.code, { name: values.name })
+        const response = await updateAuditLog(selectedAuditLog.id, { name: values.name })
         if (response) {
           handleCloseModal()
-          getAllLanguages({ page: currentPage, limit })
+          getAllAuditLogs({ page: currentPage, limit })
         }
       } else {
         // Create
-        const response = await createLanguage({ id: values.code, name: values.name })
+        const response = await createAuditLog({ id: values.code, name: values.name })
         if (response) {
           handleCloseModal()
-          getAllLanguages({ page: currentPage, limit })
+          getAllAuditLogs({ page: currentPage, limit })
         }
       }
     } catch (error) {
-      console.error('Error saving language:', error)
+      console.error('Error saving audit log:', error)
     }
   }
 
@@ -115,12 +115,12 @@ export function LanguagesTable() {
   }
 
   const handlePageChange = (newOffset: number, newPage: number) => {
-    getAllLanguages({ page: newPage, limit })
+    getAllAuditLogs({ page: newPage, limit })
   }
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
-    getAllLanguages({ page: 1, limit: newLimit })
+    getAllAuditLogs({ page: 1, limit: newLimit })
   }
 
   return (
@@ -129,14 +129,14 @@ export function LanguagesTable() {
         <SearchInput
           value={searchValue}
           onValueChange={handleSearch}
-          placeholder="Tìm kiếm ngôn ngữ..."
+          placeholder="Tìm kiếm log..."
           className="max-w-sm"
         />
         <Button 
           onClick={() => handleOpenModal()}
           className="ml-auto"
         >
-          <PlusIcon className="w-4 h-4 mr-2" />Thêm mới ngôn ngữ
+          <PlusIcon className="w-4 h-4 mr-2" />Thêm mới log
         </Button>
       </div>
 
@@ -147,8 +147,8 @@ export function LanguagesTable() {
           </div>
         )}
         <DataTable
-          columns={LanguagesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
-          data={languages}
+          columns={AuditLogsColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
+          data={auditLogs}
         />
       </div>
 
@@ -164,11 +164,11 @@ export function LanguagesTable() {
         />
       )}
 
-      <LanguagesModalUpsert 
+      <AuditLogsModalUpsert 
         open={isModalOpen}
         onClose={handleCloseModal}
-        mode={selectedLanguage ? "edit" : "add"}
-        language={selectedLanguage}
+        mode={selectedAuditLog ? "edit" : "add"}
+        auditLog={selectedAuditLog}
         onSubmit={handleSubmit}
       />
 
@@ -178,8 +178,8 @@ export function LanguagesTable() {
         onConfirm={handleConfirmDelete}
         title="Xác nhận xóa ngôn ngữ"
         description={
-          languageToDelete
-            ? <>Bạn có chắc chắn muốn xóa ngôn ngữ <b>{languageToDelete.name}</b> không? Hành động này không thể hoàn tác.</>
+          auditLogToDelete
+            ? <>Bạn có chắc chắn muốn xóa log <b>{auditLogToDelete.id}</b> không? Hành động này không thể hoàn tác.</>
             : ""
         }
         confirmText="Xóa"

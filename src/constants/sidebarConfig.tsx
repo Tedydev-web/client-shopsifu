@@ -91,6 +91,11 @@ export const sidebarConfig: SidebarItem[] = [
         href: '/admin/users',
         icon: null,
       },
+      {
+        title: 'Nhật ký hệ thống',
+        href: '/admin/audit-logs',
+        icon: null,
+      },
     ],
   },  
   {

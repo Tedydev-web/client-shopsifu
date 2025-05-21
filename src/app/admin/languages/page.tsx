@@ -1,4 +1,3 @@
-'use client'
 import { LanguagesTable } from "@/components/admin/languages/languages-Table";
 
 export default function LanguagesPage() {

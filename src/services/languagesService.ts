@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from '@/constants/api';
 import { 
     LangCreateRequest,
     LangCreateResponse,
+    LangGetAllRequest,
     LangGetAllResponse,
     LangUpdateRequest,
     LangUpdateResponse,
@@ -13,8 +14,10 @@ import {
 
 class LanguagesService {
     // Lấy danh sách tất cả ngôn ngữ
-    async getAll(): Promise<LangGetAllResponse> {
-        const response = await privateAxios.get(API_ENDPOINTS.LANGUAGES.GETALL, {});
+    async getAll(params?: LangGetAllRequest): Promise<LangGetAllResponse> {
+        const response = await privateAxios.get(API_ENDPOINTS.LANGUAGES.GETALL, {
+            params: params
+        });
         return response.data;
     }
 

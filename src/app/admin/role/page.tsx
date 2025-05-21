@@ -1,5 +1,7 @@
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
 
-
+export const metadata: Metadata = metadataConfig['/admin/roles']
 export default function RolePage() {
     return(
         <div className="space-y-6">

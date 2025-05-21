@@ -185,6 +185,37 @@
       "totpPlaceholder": "Nhập 6 chữ số từ ứng dụng xác thực",
       "verifying": "Đang xác thực...",
       "activate2FA": "Kích hoạt xác thực 2 yếu tố"
+    },
+    "auditLogs": {
+      "title": "Nhật ký hệ thống",
+      "subtitle": "Quản lý tất cả nhật ký hệ thống của bạn tại đây",
+      "search": "Tìm kiếm",
+      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+    },
+    "roles": {
+      "title": "Vai trò",
+      "subtitle": "Quản lý tất cả vai trò của bạn tại đây",
+      "search": "Tìm kiếm",
+      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+    },
+    "permissions": {
+      "title": "Quyền hạn",
+      "subtitle": "Quản lý tất cả quyền hạn của bạn tại đây",
+      "search": "Tìm kiếm",
+      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+    },
+    "users": {
+      "title": "Người dùng",
+      "subtitle": "Quản lý tất cả người dùng của bạn tại đây",
+      "search": "Tìm kiếm",
+      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+    },
+    "languages": {
+      "title": "Ngôn ngữ",
+      "subtitle": "Quản lý tất cả ngôn ngữ của bạn tại đây",
+      "search": "Tìm kiếm",
+      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
     }
+
   }
 }

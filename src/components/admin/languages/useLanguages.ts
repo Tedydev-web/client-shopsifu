@@ -5,7 +5,8 @@ import { showToast } from "@/components/ui/toastify"
 import { parseApiError } from "@/utils/error"
 import { 
   LangCreateRequest, 
-  LangUpdateRequest 
+  LangUpdateRequest,
+  LangGetAllRequest
 } from "@/types/languages.interface"
 
 export function useLanguages() {
@@ -14,12 +15,14 @@ export function useLanguages() {
   const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
   const [loading, setLoading] = useState(false)
   const [totalItems, setTotalItems] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   // Get all languages
-  const getAllLanguages = async () => {
+  const getAllLanguages = async (params?: LangGetAllRequest) => {
     try {
       setLoading(true)
-      const response = await languagesService.getAll()
+      const response = await languagesService.getAll(params)
       // Map API response to Language type
       const mappedLanguages: Language[] = response.data.map(lang => ({
         id: parseInt(lang.id),
@@ -31,6 +34,8 @@ export function useLanguages() {
       }))
       setLanguages(mappedLanguages)
       setTotalItems(response.totalItems)
+      setCurrentPage(response.currentPage)
+      setTotalPages(response.totalPages)
     } catch (error) {
       showToast(parseApiError(error), 'error')
       console.error('Error fetching languages:', error)
@@ -119,6 +124,8 @@ export function useLanguages() {
   return {
     languages,
     totalItems,
+    currentPage,
+    totalPages,
     isModalOpen,
     selectedLanguage,
     loading,
