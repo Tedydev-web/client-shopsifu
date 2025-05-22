@@ -9,20 +9,24 @@ import {
     PerCreateResponse,
     PerDeleteResponse
 } from '@/types/permission.interface';
+import { PaginationRequest } from '@/types/base.interface';
 
 export const permissionService = {
     // Lấy tất cả permissions
-    getAllPermissions: async (): Promise<PerGetAllResponse> => {
+    getAll: async (params?: PaginationRequest): Promise<PerGetAllResponse> => {
         try {
-            const response = await privateAxios.get(API_ENDPOINTS.PERMISSION.GETALL);
-            return response.data;
+          const response = await privateAxios.get(API_ENDPOINTS.PERMISSION.GETALL, {
+            params: params
+          })
+          return response.data
         } catch (error) {
-            throw error;
+          throw error
         }
     },
+      
 
     // Lấy chi tiết permission theo ID
-    getPermissionById: async (id: string): Promise<PerGetByIdResponse> => {
+    getById: async (id: string): Promise<PerGetByIdResponse> => {
         try {
             const url = API_ENDPOINTS.PERMISSION.GETBYID.replace(':id', id);
             const response = await privateAxios.get(url);
@@ -33,7 +37,7 @@ export const permissionService = {
     },
 
     // Tạo permission mới
-    createPermission: async (data: PerCreateRequest): Promise<PerCreateResponse> => {
+    create: async (data: PerCreateRequest): Promise<PerCreateResponse> => {
         try {
             const response = await privateAxios.post(API_ENDPOINTS.PERMISSION.POST, data);
             return response.data;
@@ -43,7 +47,7 @@ export const permissionService = {
     },
 
     // Cập nhật permission theo ID
-    updatePermission: async (id: string, data: PerUpdateRequest): Promise<PerUpdateResponse> => {
+    update: async (id: string, data: PerUpdateRequest): Promise<PerUpdateResponse> => {
         try {
             const url = API_ENDPOINTS.PERMISSION.UPDATE.replace(':id', id);
             const response = await privateAxios.put(url, data);
@@ -54,7 +58,7 @@ export const permissionService = {
     },
 
     // Xoá permission theo ID
-    deletePermission: async (id: string): Promise<PerDeleteResponse> => {
+    delete: async (id: string): Promise<PerDeleteResponse> => {
         try {
             const url = API_ENDPOINTS.PERMISSION.DELETE_BY_ID.replace(':id', id);
             const response = await privateAxios.delete(url);

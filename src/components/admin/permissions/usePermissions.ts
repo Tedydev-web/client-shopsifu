@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Permission } from "./permissions-Columns"
 import { permissionService } from "@/services/permissionService"
 import { showToast } from "@/components/ui/toastify"
 import { parseApiError } from "@/utils/error"
@@ -9,15 +10,6 @@ import {
 } from "@/types/permission.interface"
 import { PaginationRequest } from "@/types/base.interface"
 
-export interface Permission {
-  id: number
-  code: string
-  name: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
-
 export function usePermissions() {
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -27,17 +19,16 @@ export function usePermissions() {
   const [page, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  // Get all permissions
+  // Get all permissions with pagination
   const getAllPermissions = async (params?: PaginationRequest) => {
     try {
       setLoading(true)
-      const response: PerGetAllResponse = await permissionService.getAll()
+      const response = await permissionService.getAll(params)
       const mappedPermissions: Permission[] = response.data.map(per => ({
         id: parseInt(per.id),
         name: per.name,
-        path: per.path,
-        code: per.id, // Using id as code
-        isActive: true, // or per.isActive if available
+        code: per.id, // dùng per.code nếu có
+        isActive: true, // fallback true nếu không có
         createdAt: per.createdAt,
         updatedAt: per.updatedAt
       }))
@@ -53,7 +44,6 @@ export function usePermissions() {
     }
   }
 
-  // Get permission by ID
   const getPermissionById = async (id: string) => {
     try {
       setLoading(true)
@@ -68,7 +58,6 @@ export function usePermissions() {
     }
   }
 
-  // Create permission
   const createPermission = async (data: PerCreateRequest) => {
     try {
       setLoading(true)
@@ -84,7 +73,6 @@ export function usePermissions() {
     }
   }
 
-  // Update permission
   const updatePermission = async (id: string, data: PerUpdateRequest) => {
     try {
       setLoading(true)
@@ -100,11 +88,10 @@ export function usePermissions() {
     }
   }
 
-  // Delete permission
   const deletePermission = async (id: string) => {
     try {
       setLoading(true)
-      const response = await permissionService.deletePermission(id)
+      const response = await permissionService.delete(id)
       showToast("Xóa quyền thành công", "success")
       return response
     } catch (error) {
@@ -147,5 +134,6 @@ export function usePermissions() {
     // UI handlers
     handleOpenModal,
     handleCloseModal,
+    setCurrentPage, // để gọi từ component khi chuyển trang
   }
 }

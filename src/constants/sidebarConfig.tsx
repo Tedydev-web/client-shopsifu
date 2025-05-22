@@ -78,7 +78,7 @@ export const sidebarConfig: SidebarItem[] = [
     subItems: [
       {
         title: 'Quản lý phân quyền',
-        href: '/admin/permission',
+        href: '/admin/permissions',
         icon: null,
       },
       {

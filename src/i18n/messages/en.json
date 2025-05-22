@@ -251,8 +251,60 @@
     "permissions": {
       "title": "Permissions",
       "subtitle": "Manage all your permissions",
+      "add": "Add New Permission",
+      "edit": "Edit Permission",
+      "delete": "Delete Permission",
+      "confirmDeleteTitle": "Confirm Permission Deletion",
+      "confirmDeleteDesc": "Are you sure you want to delete the permission {{name}}? This action cannot be undone.",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
       "search": "Search",
-      "searchPlaceholder": "Search by user, action, or date"
+      "searchPlaceholder": "Search by user, action, or date",
+      "name": "Permission Name",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions",
+      "noData": "No data available.",
+      "addTitle": "Add Permission",
+      "editTitle": "Edit Permission",
+      "form": {
+        "name": "Permission Name",
+        "subtitle": "Manage all your permissions",
+        "description": "Permission Description",
+        "path": "Permission Path",
+        "method": "Permission Method",
+        "namePlaceholder": "Enter permission name"
+      },
+      "toast": {
+        "addSuccess": "Permission created successfully",
+        "editSuccess": "Permission updated successfully",
+        "deleteSuccess": "Permission deleted successfully"
+      },
+      "editAction": "Edit Information",
+      "deleteAction": "Delete Permission",
+      "addAction": "Add Permission",
+      "modal": {
+        "title": "Add New Permission",
+        "subtitle": "Enter permission details to add to the system",
+        "name": "Permission Name",
+        "namePlaceholder": "Enter permission name",
+        "searchPlaceholder": "Search by code or name...",
+        "save": "Save Information",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "success": "Permission added successfully",
+        "error": "An error occurred"
+      },
+      "modalEdit": {
+        "title": "Edit Permission",
+        "subtitle": "Enter permission details to edit",
+        "save": "Save Information",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "success": "Permission updated successfully",
+        "error": "An error occurred",
+        "edit": "Edit Permission"
+      }
     },
     "users": {
       "title": "Users",
