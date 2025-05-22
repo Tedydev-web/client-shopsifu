@@ -13,18 +13,27 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
 import { OAuthForm } from '../layout/OAuthForm'
+import { useTranslation } from 'react-i18next'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handleSignin, loading } = useSignin()
+  const { t } = useTranslation()
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: { email: '', password: '' }
-  })
+  type LoginFormData = z.infer<typeof LoginSchema>;
+
+const form = useForm<LoginFormData>({
+  resolver: zodResolver(LoginSchema),
+  defaultValues: { 
+    email: '', 
+    password: '',
+    rememberMe: false
+  }
+});
 
   return (
     <Form {...form}>
@@ -37,9 +46,9 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
           {/* Tiêu đề */}
           <AnimatedFormItem>
             <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-4xl font-bold">Chào mừng quay trở lại</h1>
+              <h1 className="text-4xl font-bold">{t('auth.login.title')}</h1>
               <p className="text-balance text-md text-muted-foreground">
-                Nhập email và mật khẩu của bạn phía bên dưới
+                {t('auth.login.subtitle')}
               </p>
             </div>
           </AnimatedFormItem>
@@ -69,12 +78,12 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel>Mật khẩu</FormLabel>
+                      <FormLabel>{t('auth.common.password')}</FormLabel>
                       <Link
                         href="/buyer/verify-email?action=forgot"
                         className="text-sm text-primary hover:underline underline-offset-4"
                       >
-                        Quên mật khẩu?
+                        {t('auth.login.forgot password')}
                       </Link>
                     </div>
                     <FormControl>
@@ -86,13 +95,35 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
               />
             </AnimatedFormItem>
 
+            <AnimatedFormItem>
+              <FormField
+                control={form.control}
+                name="rememberMe"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-normal">
+                        {t('auth.login.remember me')}
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </AnimatedFormItem>
+
             <AnimatedButton
-              size="xl"
+              size="sm"
               type="submit"
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {loading ? t('auth.login.logging in...') : t('auth.login.login')}
             </AnimatedButton>
 
             {/* OAuth Form */}
@@ -101,12 +132,12 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
             {/* Link đến đăng ký */}
             <AnimatedFormItem>
               <div className="text-center text-sm">
-                Chưa có tài khoản?{' '}
+                {t('auth.login.no account')}{' '}
                 <Link
                   href="/buyer/verify-email?action=signup"
                   className="underline underline-offset-4 text-primary hover:text-primary/90"
                 >
-                  Đăng ký tại đây
+                  {t('auth.login.register')}
                 </Link>
               </div>
             </AnimatedFormItem>

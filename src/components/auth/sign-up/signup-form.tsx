@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/animated-form'
 import { useEffect } from 'react'
 import { OAuthForm } from '../layout/OAuthForm'
+import { useTranslation } from 'react-i18next'
 
 interface SignupFormProps {
   email: string
@@ -32,6 +33,7 @@ interface SignupFormProps {
 
 export function SignupForm({ email, className }: SignupFormProps) {
   const { loading, handleSignup } = useSignup()
+  const { t } = useTranslation('')
 
   const registerForm = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -59,9 +61,9 @@ export function SignupForm({ email, className }: SignupFormProps) {
           <AnimatedForm>
             <AnimatedFormItem>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-4xl font-bold">Đăng ký tài khoản</h1>
+                <h1 className="text-4xl font-bold">{t('auth.register.title')}</h1>
                 <p className="text-balance text-md text-muted-foreground">
-                  Nhập thông tin của bạn để hoàn tất đăng ký
+                  {t('auth.register.subtitle')}
                 </p>
               </div>
             </AnimatedFormItem>
@@ -73,7 +75,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Họ và tên</FormLabel>
+                      <FormLabel>{t('auth.common.full name')}</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
@@ -112,7 +114,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Số điện thoại</FormLabel>
+                      <FormLabel>{t('auth.common.phone number')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="0123456789" />
                       </FormControl>
@@ -128,7 +130,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mật khẩu</FormLabel>
+                      <FormLabel>{t('auth.register.password')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="password" placeholder="******" />
                       </FormControl>
@@ -144,7 +146,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Xác nhận mật khẩu</FormLabel>
+                      <FormLabel>{t('auth.register.confirm password')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="password" placeholder="******" />
                       </FormControl>
@@ -155,12 +157,12 @@ export function SignupForm({ email, className }: SignupFormProps) {
               </AnimatedFormItem>
 
               <AnimatedButton
-                size="xl"
+                size="sm"
                 type="submit"
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={loading}
               >
-                {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+                {loading ? t('auth.register.registering...') : t('auth.register.register')}
               </AnimatedButton>
 
               {/* OAuth Form */}
@@ -174,12 +176,12 @@ export function SignupForm({ email, className }: SignupFormProps) {
       <div className="mt-8 space-y-6">
         <AnimatedFormItem>
           <div className="text-center text-sm">
-            Đã có tài khoản?{' '}
+            {t('auth.register.Have an account')}{' '}
             <Link
               href="/buyer/sign-in"
               className="underline underline-offset-4 text-primary hover:text-primary/90"
             >
-              Đăng nhập
+              {t('auth.register.login')}
             </Link>
           </div>
         </AnimatedFormItem>

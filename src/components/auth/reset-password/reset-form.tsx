@@ -21,13 +21,14 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
+import { useTranslation } from 'react-i18next'
 
 export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const form = useForm<z.infer<typeof resetPasswordSchema>>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { password: '', confirmPassword: '' }
   })
-
+  const { t } = useTranslation('')
   const { loading, handleResetPassword } = useReset()
 
   return (
@@ -41,9 +42,9 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
           {/* Tiêu đề */}
           <AnimatedFormItem>
             <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-4xl font-bold">Đặt lại mật khẩu</h1>
+              <h1 className="text-4xl font-bold">{t('auth.resetPassword.title')}</h1>
               <p className="text-balance text-md text-muted-foreground">
-                Nhập mật khẩu mới của bạn bên dưới.
+                {t('auth.resetPassword.subtitle')}
               </p>
             </div>
           </AnimatedFormItem>
@@ -57,7 +58,7 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mật khẩu mới</FormLabel>
+                    <FormLabel>{t('auth.resetPassword.new password')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="password" placeholder="******" />
                     </FormControl>
@@ -74,7 +75,7 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Xác nhận mật khẩu mới</FormLabel>
+                    <FormLabel>{t('auth.resetPassword.confirmnewPassword')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="password" placeholder="******" />
                     </FormControl>
@@ -86,24 +87,24 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             {/* Nút gửi */}
             <AnimatedButton
-              size="xl"
+              size="sm"
               type="submit"
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
-              {loading ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
+              {loading ? t('auth.resetPassword.Processing...') : t('auth.resetPassword.title')}
             </AnimatedButton>
           </div>
 
           {/* Link trở lại đăng nhập */}
           <AnimatedFormItem>
             <div className="text-center text-sm">
-              Nhớ mật khẩu?{' '}
+              {t('auth.resetPassword.Remember password')}{' '}
               <Link
                 href="/buyer/sign-in"
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
-                Đăng nhập
+                {t('auth.resetPassword.login')}
               </Link>
             </div>
           </AnimatedFormItem>

@@ -9,6 +9,7 @@ import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
 import { Button } from '@/components/ui/button'
+import React from 'react'
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -72,20 +73,35 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
         >
           {hasSubItems ? (
             <div className="flex items-center gap-3 flex-1">
-              {level === 0 && item.icon}
+              {level === 0 && item.icon &&
+                React.isValidElement(item.icon) && item.icon.type
+                  ? React.createElement(item.icon.type, {
+                      className: cn("w-5 h-5", isItemActive ? "text-primary" : "text-[#52525B]")
+                    })
+                  : null
+              }
               <span className={cn(
-                "text-sm font-medium", 
-                level > 0 && "text-muted-foreground",
-                isItemActive && level === 0 && 'bg-primary/10 text-primary',
-                isItemActive && level > 0 && 'text-primary'
+                "text-sm font-medium text-[#52525B]",
+                level > 0 && "text-muted-foreground capitalize",
+                isItemActive && 'text-primary'
               )}>
                 {item.title}
               </span>
             </div>
           ) : (
             <Link href={item.href} className="flex items-center gap-3 flex-1">
-              {level === 0 && item.icon}
-              <span className={cn("text-sm font-medium", level > 0 && "text-muted-foreground")}>
+              {level === 0 && item.icon &&
+                React.isValidElement(item.icon) && item.icon.type
+                  ? React.createElement(item.icon.type, {
+                      className: cn("w-5 h-5", isItemActive ? "text-primary" : "text-[#52525B]")
+                    })
+                  : null
+              }
+              <span className={cn(
+                "text-sm font-medium text-[#52525B]",
+                level > 0 && "text-muted-foreground capitalize",
+                isItemActive && 'text-primary'
+              )}>
                 {item.title}
               </span>
             </Link>

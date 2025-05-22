@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
 import { authService } from '@/services/authService'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 
 interface OAuthFormProps {
   className?: string
@@ -13,11 +14,13 @@ interface OAuthFormProps {
 
 export function OAuthForm({ className, type = 'signin' }: OAuthFormProps) {
   const [error, setError] = useState<string | null>(null)
+  const { t } = useTranslation('')
 
   const handleGoogleAuth = async () => {
     try {
-      const { url } = await authService.getGoogleLoginUrl()
-      window.location.replace(url)
+      const response = await authService.getGoogleLoginUrl();
+      const url = response.url;
+      window.location.replace(url);
     } catch (error) {
       console.error('Google auth error:', error)
       setError('Có lỗi xảy ra khi đăng nhập bằng Google')
@@ -31,7 +34,7 @@ export function OAuthForm({ className, type = 'signin' }: OAuthFormProps) {
 
       <AnimatedFormItem>
         <div className='relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border'>
-          <span className='relative z-10 bg-background px-2 text-muted-foreground'>Hoặc tiếp tục với</span>
+          <span className='relative z-10 bg-background px-2 text-muted-foreground'>{t('auth.common.or')}</span>
         </div>
       </AnimatedFormItem>
 
@@ -41,7 +44,7 @@ export function OAuthForm({ className, type = 'signin' }: OAuthFormProps) {
         onClick={handleGoogleAuth}
       >
         <Image src='/iconSvg/google.svg' alt='Google' width={20} height={20} />
-        {type === 'signin' ? 'Đăng nhập bằng Google' : 'Đăng ký bằng Google'}
+        {type === 'signin' ? t('auth.common.signinWithGoogle') : t('auth.common.signupWithGoogle')}
       </AnimatedButton>
     </div>
   )

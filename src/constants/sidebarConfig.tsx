@@ -1,3 +1,5 @@
+'use client'
+
 import { 
   LayoutDashboard, 
   ShoppingCart, 
@@ -8,7 +10,8 @@ import {
   MessageSquare,
   FileText,
   HelpCircle,
-  MonitorCog 
+  MonitorCog,
+  FolderClosed 
 } from 'lucide-react'
 
 export type SidebarItem = {
@@ -74,10 +77,37 @@ export const sidebarConfig: SidebarItem[] = [
     icon: <MonitorCog className="w-5 h-5" />,
     subItems: [
       {
-        title: 'Vai Trò Và Phân Quyền',
+        title: 'Quản lý phân quyền',
+        href: '/admin/permission',
+        icon: null,
+      },
+      {
+        title: 'Quản lý vai trò',
         href: '/admin/role',
+        icon: null,
+      },
+      {
+        title: 'Quản Lý Người Dùng',
+        href: '/admin/users',
+        icon: null,
+      },
+      {
+        title: 'Nhật ký hệ thống',
+        href: '/admin/audit-logs',
         icon: null,
       },
     ],
   },  
+  {
+    title: 'Danh mục',
+    href: '/admin/categories',
+    icon: <FolderClosed className="w-5 h-5" />,
+    subItems: [
+      {
+        title: 'Quản lý ngôn ngữ',
+        href: '/admin/languages',
+        icon: null,
+      },
+    ],
+  }
 ]

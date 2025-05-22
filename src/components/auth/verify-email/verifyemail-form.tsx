@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/animated-form'
 import { useVerifyEmail } from './useVerifyEmail'
 import { OAuthForm } from '../layout/OAuthForm'
+import { useTranslation } from 'react-i18next'
 
 interface VerifyEmailFormProps {
   className?: string
@@ -34,6 +35,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
   const searchParams = useSearchParams()
   const action = (searchParams.get('action') as ActionType) || 'signup'
   const { loading, handleSendOTP } = useVerifyEmail()
+  const { t } = useTranslation('')
 
   const form = useForm<z.infer<typeof EmailSchema>>({
     resolver: zodResolver(EmailSchema),
@@ -51,33 +53,33 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
     switch (action) {
       case 'signup':
         return {
-          title: 'Đăng ký tài khoản',
-          subtitle: 'Nhập email của bạn để bắt đầu đăng ký',
-          successMessage: 'Mã xác thực đã được gửi đến email của bạn',
-          buttonText: 'Tiếp tục',
-          linkText: 'Đã có tài khoản?',
+          title: t('auth.register.title'),
+          subtitle: t('auth.register.start'),
+          successMessage: t('auth.register.success'),
+          buttonText: t('auth.register.continue'),
+          linkText: t('auth.register.Have an account?'),
           linkHref: '/buyer/sign-in',
-          linkLabel: 'Đăng nhập'
+          linkLabel: t('auth.register.login')
         }
       case 'forgot':
         return {
-          title: 'Quên mật khẩu?',
-          subtitle: 'Nhập email của bạn để đặt lại mật khẩu',
-          successMessage: 'Link đặt lại mật khẩu đã được gửi đến email của bạn',
-          buttonText: 'Gửi link',
-          linkText: 'Đã nhớ mật khẩu?',
+          title: t('auth.forgotPassword.title'),
+          subtitle: t('auth.forgotPassword.subtitle'),
+          successMessage: t('auth.forgotPassword.success'),
+          buttonText: t('auth.forgotPassword.Sending'),
+          linkText: t('auth.forgotPassword.Remember password'),
           linkHref: '/buyer/sign-in',
-          linkLabel: 'Đăng nhập'
+          linkLabel: t('auth.forgotPassword.login')
         }
       default:
         return {
-          title: 'Xác thực email',
-          subtitle: 'Nhập email của bạn để xác thực',
-          successMessage: 'Mã xác thực đã được gửi đến email của bạn',
-          buttonText: 'Xác nhận',
-          linkText: 'Quay lại',
+          title: t('auth.verifyEmail.title'),
+          subtitle: t('auth.verifyEmail.subtitle'),
+          successMessage: t('auth.verifyEmail.success'),
+          buttonText: t('auth.verifyEmail.confirm'),
+          linkText: t('auth.verifyEmail.back'),
           linkHref: '/buyer/sign-in',
-          linkLabel: 'Đăng nhập'
+          linkLabel: t('auth.verifyEmail.login')
         }
     }
   }
@@ -121,12 +123,12 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
               </AnimatedFormItem>
 
               <AnimatedButton
-                size="xl"
+                size="sm"
                 type="submit"
-                className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={loading}
               >
-                {loading ? 'Đang xử lý...' : content.buttonText}
+                {loading ? t('auth.verifyEmail.Processing...') : content.buttonText}
               </AnimatedButton>
             </div>
             {/* OAuth Form */}

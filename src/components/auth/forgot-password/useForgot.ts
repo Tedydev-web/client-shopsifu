@@ -5,6 +5,7 @@ import * as z from 'zod'
 import { ForgotPasswordSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { SendOTPRequest } from '@/types/auth.interface'
+import { parseApiError } from '@/utils/error'
 
 interface ErrorResponse {
   message?: Array<{ message: string }>
@@ -25,15 +26,8 @@ export function useForgotPassword() {
       showToast('Mã xác thực đã được gửi đến email của bạn', 'success')
       router.replace(`/buyer/verify-code?email=${encodeURIComponent(email)}`)
     } catch (error) {
-      const err = error as ErrorResponse
-      const firstMessage = err?.message?.[0]?.message
-
-      showToast(firstMessage || 'Không thể gửi mã xác thực. Vui lòng thử lại sau', 'error')
-
-      console.error('Chi tiết lỗi:', {
-        errorCode: firstMessage,
-        fullError: error
-      })
+      showToast(parseApiError(error), 'error')
+      console.error('Chi tiết lỗi:', error)
     } finally {
       setLoading(false)
     }

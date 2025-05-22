@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from 'next/font/google';
 import "./globals.css";
 import StoreProvider from "@/store/StoreProvider"
 import { Toast } from "@/components/ui/toastify"
-import { Inter } from 'next/font/google';
+import ClientLayout from "./client-layout";
+import { I18nextProvider } from "react-i18next";
+import i18nextInstance from "@/i18n/i18n";
 
-
-// Import font Inter từ Google Fonts (subset 'latin' là đủ)
 const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-inter', // dùng biến CSS để gắn Tailwind
+  variable: '--font-inter',
   display: 'swap',
 });
 
@@ -24,14 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${inter.variable} antialiased`}
-      >
-        <StoreProvider>
-          <Toast/>
-          {children}
-        </StoreProvider>
+    <html lang="vi">
+      <body className={`${inter.variable} antialiased`}>
+          <StoreProvider>
+            <ClientLayout>
+              <Toast/>
+            {children}
+          </ClientLayout>
+          </StoreProvider>
       </body>
     </html>
   );

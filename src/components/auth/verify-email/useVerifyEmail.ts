@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { authService } from '@/services/authService'
 import { showToast } from '@/components/ui/toastify'
 import { ErrorResponse } from '@/types/base.interface'
+import { parseApiError } from '@/utils/error'
 
 type ActionType = 'signup' | 'forgot'
 
@@ -30,9 +31,7 @@ export function useVerifyEmail() {
       router.push(`/buyer/verify-code?email=${encodeURIComponent(email)}&action=${action}`)
       return true
     } catch (error) {
-      const err = error as ErrorResponse
-      const firstMessage = err?.message?.[0]?.message
-      showToast(firstMessage || 'Có lỗi xảy ra khi gửi mã xác thực', 'error')
+      showToast(parseApiError(error), 'error')
       console.error('Send OTP error:', error)
       return false
     } finally {

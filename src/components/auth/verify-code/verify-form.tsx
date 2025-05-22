@@ -24,14 +24,24 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
+import { useTranslation } from 'react-i18next'
 
 export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { loading, handleVerifyCode, resendOTP } = useVerify()
+  const { t } = useTranslation('')
 
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
     defaultValues: { otp: '' }
   })
+
+  // Khi nhập đủ 6 ký tự OTP thì tự động submit
+  const handleOTPChange = (value: string) => {
+    form.setValue('otp', value, { shouldValidate: true })
+    if (value.length === 6) {
+      form.handleSubmit(handleVerifyCode)()
+    }
+  }
 
   return (
     <Form {...form}>
@@ -44,9 +54,9 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
           {/* Tiêu đề */}
           <AnimatedFormItem>
             <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-4xl font-bold">Nhập mã xác minh</h1>
+              <h1 className="text-4xl font-bold">{t('auth.verifyOtp.title')}</h1>
               <p className="text-balance text-md text-muted-foreground">
-                Chúng tôi đã gửi mã OTP gồm 6 chữ số đến email của bạn. Vui lòng nhập mã bên dưới.
+              {t('auth.verifyOtp.subtitle')}
               </p>
             </div>
           </AnimatedFormItem>
@@ -58,9 +68,9 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
               name="otp"
               render={({ field }) => (
                 <FormItem className="flex flex-col items-center">
-                  <FormLabel>Nhập mã OTP</FormLabel>
+                  <FormLabel>{t('auth.verifyOtp.title')}</FormLabel>
                   <FormControl>
-                    <InputOTP maxLength={6} {...field}>
+                    <InputOTP maxLength={6} {...field} onChange={handleOTPChange}>
                       <InputOTPGroup>
                         {[...Array(6)].map((_, index) => (
                           <InputOTPSlot key={index} index={index} />
@@ -74,27 +84,17 @@ export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutR
             />
           </AnimatedFormItem>
 
-          {/* Button Submit */}
-          <AnimatedButton
-            size="xl"
-            type="submit"
-            className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={loading}
-          >
-            {loading ? 'Đang xác minh...' : 'Xác minh OTP'}
-          </AnimatedButton>
-
           {/* Link resend */}
           <AnimatedFormItem>
             <div className="text-center text-sm">
-              Không nhận được mã?{' '}
+              {t('auth.verifyOtp.No code')}{' '}
               <button
                 type="button"
                 onClick={resendOTP}
                 disabled={loading}
                 className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
               >
-                Gửi lại OTP
+                {t('auth.verifyOtp.resend')}
               </button>
             </div>
           </AnimatedFormItem>

@@ -1,4 +1,4 @@
-import { privateAxios, publicAxios } from '@/lib/api';
+import { publicAxios, privateAxios } from '@/lib/api';
 import { 
   LoginRequest, 
   LoginResponse, 
@@ -10,23 +10,32 @@ import {
   VerifyOTPRequest,
   VerifyOTPResponse,
   ResetPasswordRequest,
-  ResetPasswordResponse 
+  ResetPasswordResponse,
+  Verify2faRequest,
+  Verify2faResponse,
+  Disable2faRequest,
+  Disable2faResponse,
+  Setup2faResponse,
+  LogoutRequest,
+  Confirm2faRequest,
+  Confirm2faResponse,
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
+import { AxiosError } from "axios";
 
 export const authService = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    const response = await publicAxios.post<LoginResponse>(API_ENDPOINTS.AUTH.SIGNIN, data);
+    const response = await privateAxios.post<LoginResponse>(API_ENDPOINTS.AUTH.SIGNIN, data);
     return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
-    const response = await publicAxios.post<RegisterResponse>(API_ENDPOINTS.AUTH.SIGNUP, data);
+    const response = await privateAxios.post<RegisterResponse>(API_ENDPOINTS.AUTH.SIGNUP, data);
     return response.data;
   },
 
   sendOTP: async (data: SendOTPRequest): Promise<SendOTPResponse> => {
-    const response = await publicAxios.post<SendOTPResponse>(
+    const response = await privateAxios.post<SendOTPResponse>(
         API_ENDPOINTS.AUTH.SEND_OTP,
         data
     )
@@ -34,7 +43,7 @@ export const authService = {
   },
 
   verifyOTP: async (data: VerifyOTPRequest): Promise<VerifyOTPResponse> => {
-    const response = await publicAxios.post<VerifyOTPResponse>(
+    const response = await privateAxios.post<VerifyOTPResponse>(
       API_ENDPOINTS.AUTH.VERIFY_OTP,
       data
     )
@@ -42,7 +51,7 @@ export const authService = {
   },
 
   resetPassword: async (data: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
-    const response = await publicAxios.post<ResetPasswordResponse>(
+    const response = await privateAxios.post<ResetPasswordResponse>(
       API_ENDPOINTS.AUTH.RESET_PASSWORD,
       data
     )
@@ -50,25 +59,12 @@ export const authService = {
   },
 
   refreshToken: async (): Promise<{ token: string }> => {
-    const response = await publicAxios.post<{ token: string }>(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+    const response = await privateAxios.post<{ token: string }>(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
     return response.data;
   },
 
-  // logout: async (accessToken: string, refreshToken: string): Promise<void> => {
-  //   // Gửi yêu cầu POST với Bearer token trong header và refresh token trong body
-  //   await privateAxios.post(
-  //     API_ENDPOINTS.AUTH.LOGOUT,
-  //     { refreshToken }, // refresh token gửi trong body
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`, // access token gửi trong header
-  //       },
-  //     }
-  //   );
-  // },
-
-  logout: async (refreshToken: string): Promise<void> => {
-    await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
+  logout: async (data?: LogoutRequest): Promise<void> => {
+    await privateAxios.post(API_ENDPOINTS.AUTH.LOGOUT, data || {});
   },
   
 
@@ -78,7 +74,50 @@ export const authService = {
   },
 
   getGoogleLoginUrl: async (): Promise<oAuthLoginResponse> => {
-    const response = await publicAxios.get<oAuthLoginResponse>(API_ENDPOINTS.AUTH.GOOGLE_LOGIN);
+    const response = await privateAxios.get<oAuthLoginResponse>(API_ENDPOINTS.AUTH.GOOGLE_LOGIN);
     return response.data;
-  }
+  },
+
+  verify2fa: async (data: Verify2faRequest): Promise<Verify2faResponse> => {
+    const response = await privateAxios.post<Verify2faResponse>(
+      API_ENDPOINTS.AUTH.VERIFY_2FA,
+      data
+    );
+    return response.data;
+  },
+
+  setup2fa: async (): Promise<Setup2faResponse> => {
+    const response = await privateAxios.post<Setup2faResponse>(API_ENDPOINTS.AUTH.SETUP_2FA, {})
+    return response.data
+  },
+  
+  disable2fa: async (data: Disable2faRequest): Promise<Disable2faResponse> => {
+    const response = await privateAxios.post<Disable2faResponse>(
+      API_ENDPOINTS.AUTH.DISABLE_2FA,
+      data
+    );
+    return response.data;
+  },
+
+  confirm2fa: async (data: Confirm2faRequest): Promise<Confirm2faResponse> => {
+    const response = await privateAxios.post<Confirm2faResponse>(
+      API_ENDPOINTS.AUTH.CONFIRM_2FA,
+      data
+    );
+    return response.data;
+  },
+  getCsrfToken: async (): Promise<void> => {
+    try {
+      await privateAxios.get(API_ENDPOINTS.AUTH.GET_CSRF_TOKEN);
+      // CSRF token sẽ được tự động lưu vào cookies bởi browser
+      // Không cần xử lý response data
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        // Nếu endpoint không tồn tại, coi như đã có CSRF token
+        console.warn('CSRF token endpoint not found, assuming token exists');
+        return;
+      }
+      throw error;
+    }
+  },
 };

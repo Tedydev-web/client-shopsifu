@@ -22,10 +22,12 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
+import { useTranslation } from 'react-i18next'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { loading, handleForgotPassword } = useForgotPassword()
   // const router = useRouter()
+  const { t } = useTranslation('')
 
   const form = useForm<z.infer<typeof ForgotPasswordSchema>>({
     resolver: zodResolver(ForgotPasswordSchema),
@@ -43,9 +45,9 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           {/* Tiêu đề */}
           <AnimatedFormItem>
             <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-4xl font-bold">Quên mật khẩu?</h1>
+              <h1 className="text-4xl font-bold">{t('auth.forgotPassword.title')}</h1>
               <p className="text-balance text-md text-muted-foreground">
-                Nhập email của bạn bên dưới và chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.
+                {t('auth.forgotPassword.subtitle')}
               </p>
             </div>
           </AnimatedFormItem>
@@ -69,24 +71,24 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             </AnimatedFormItem>
 
             <AnimatedButton
-              size="xl"
+              size="sm"
               type="submit"
-              className="w-full h-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
-              {loading ? 'Đang gửi...' : 'Xác nhận'}
+              {loading ? ('auth.forgotPassword.Sending...') : t('auth.forgotPassword.confirm')}
             </AnimatedButton>
           </div>
 
           {/* Link về đăng nhập */}
           <AnimatedFormItem>
             <div className="text-center text-sm">
-              Đã nhớ mật khẩu?{' '}
+              {t('auth.forgotPassword.Remember password')}{' '}
               <Link 
                 href="/buyer/sign-in"
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
-                Đăng nhập
+                {t('auth.forgotPassword.login')}
               </Link>
             </div>
           </AnimatedFormItem>

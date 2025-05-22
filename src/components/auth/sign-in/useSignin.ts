@@ -8,7 +8,7 @@ import { ROUTES } from '@/constants/route'
 import { showToast } from '@/components/ui/toastify'
 import { setCredentials } from '@/store/features/auth/authSlide'
 import { AppDispatch } from '@/store/store'
-import { ErrorResponse } from '@/types/base.interface'
+import { parseApiError } from '@/utils/error'
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)
@@ -20,7 +20,17 @@ export function useSignin() {
       setLoading(true);
       const response = await authService.login(data);
 
-      // Lưu token vào Redux
+      // Kiểm tra nếu có loginSessionToken - đây là tài khoản 2FA
+      if (response.loginSessionToken) {
+        // Lưu loginSessionToken vào sessionStorage
+        sessionStorage.setItem('loginSessionToken', response.loginSessionToken);
+        sessionStorage.setItem('userEmail', data.email); // Lưu email
+        // Chuyển hướng đến trang verify 2FA
+        router.push(ROUTES.BUYER.VERIFY_2FA);
+        return;
+      }
+
+      // Nếu không phải 2FA, xử lý đăng nhập bình thường
       dispatch(setCredentials({
         accessToken: response.accessToken,
         refreshToken: response.refreshToken
@@ -29,19 +39,8 @@ export function useSignin() {
       showToast('Đăng nhập thành công!', 'success')
       router.push(ROUTES.ADMIN.DASHBOARD)
     } catch (error: any) {
-      let firstMessage = 'Đăng nhập thất bại'
       console.error('Login error:', error)
-
-      // Đảm bảo error là object và có field message
-      const errMsg = error?.response?.data?.message || error?.message;
-
-      if (Array.isArray(errMsg)) {
-        firstMessage = errMsg[0]?.message || firstMessage;
-      } else if (typeof errMsg === 'string') {
-        firstMessage = errMsg;
-      }
-
-      showToast(firstMessage, 'error');
+      showToast(parseApiError(error), 'error');
     } finally {
       setLoading(false);
     }

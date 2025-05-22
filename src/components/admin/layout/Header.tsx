@@ -11,7 +11,8 @@ import {
   Store,
   Globe,
   LogOut,
-  Menu
+  Menu,
+  Check,
 } from 'lucide-react'
 import { useResponsive } from '@/hooks/useResponsive'
 import {
@@ -20,9 +21,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 import { useLogout } from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
+import { useChangeLang } from '@/hooks/useChangeLang'
+import { SearchItem } from './SearchItem'
+import { useTranslation } from 'react-i18next'
+import { ProfileSetting } from './ProfileSetting'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -30,7 +38,9 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
-  const { handleLogout, loading } = useLogout() // Sử dụng hook useLogout để lấy handleLogout và loading
+  const { handleLogout, loading: logoutLoading } = useLogout()
+  const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
+  const { t } = useTranslation()
 
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 z-30">
@@ -55,14 +65,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
         {/* Search bar */}
         {!isMobile && (
-          <div className="flex items-center max-w-md w-full relative">
-            <Search className="absolute left-3 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm..."
-              className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            />
-          </div>
+          <SearchItem />
         )}
 
         {/* Right section */}
@@ -72,9 +75,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
           </Button>
 
-          <Button className="p-2 rounded-full hover:bg-gray-100 bg-[#fff]">
-            <Settings className="h-5 w-5 text-gray-600" />
-          </Button>
+          <ProfileSetting />
 
           {/* Dropdown Profile */}
           <DropdownMenu>
@@ -102,27 +103,49 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
               <DropdownMenuItem>
                 <Store className="w-4 h-4 mr-2" />
-                Hồ Sơ Shop
+                {t('admin.profileDropdown.shopProfile')}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="w-4 h-4 mr-2" />
                 Thiết Lập Shop
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Globe className="w-4 h-4 mr-2" />
-                Tiếng Việt (Vietnamese)
-              </DropdownMenuItem>
+              
+              {/* Language Switcher SubMenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Globe className="w-4 h-4 mr-2" />
+                  <span>Ngôn ngữ: {currentLangName}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => changeLanguage('vi')}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>Tiếng Việt</span>
+                      {currentSelectedLang === 'vi' && <Check className="w-4 h-4 text-green-500" />}
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => changeLanguage('en')}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>English</span>
+                      {currentSelectedLang === 'en' && <Check className="w-4 h-4 text-green-500" />}
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
 
+              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Settings className="w-4 h-4 text-gray-500" />
+                {t('admin.profileDropdown.shopSettings')}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               {/* Đăng xuất */}
               <DropdownMenuItem 
                 className="text-red-600" 
                 onClick={handleLogout} 
-                disabled={loading} // Vô hiệu hóa nút khi đang loading
+                disabled={logoutLoading}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                {loading ? 'Đang đăng xuất...' : 'Đăng xuất'} {/* Hiển thị loading */}
+                {logoutLoading ? t('admin.profileDropdown.logging out') : t('admin.profileDropdown.logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
