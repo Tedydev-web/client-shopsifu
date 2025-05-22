@@ -28,6 +28,7 @@ export interface AuditLogListResponse {
   totalItems: number;
   page: number;
   totalPages: number;
+  limit: number;
 }
 
 export interface AduitGetStatsResponse {

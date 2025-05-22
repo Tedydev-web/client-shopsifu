@@ -33,6 +33,7 @@ export interface LangListResponse {
     totalItems: number;
     page: number;
     totalPages: number;
+    limit: number;
   }
 
 export interface LangUpdateRequest {
