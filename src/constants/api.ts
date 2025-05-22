@@ -26,11 +26,11 @@ export const API_ENDPOINTS = {
     DELETE_ALL: `${API_BASE}/role/create`,
   },
   PERMISSION:{
-    GETALL: `${API_BASE}/permission/create`,
-    GET: `${API_BASE}/permission/create`,
-    UPDATE: `${API_BASE}/permission/create`,
-    POST: `${API_BASE}/permission/create`,
-    DELETE_ALL: `${API_BASE}/permission/create`,
+    GETALL: `${API_BASE}/permissions`,
+    GETBYID: `${API_BASE}/permissions/:id`,
+    UPDATE: `${API_BASE}/permissions/:id`,
+    POST: `${API_BASE}/permissions`,
+    DELETE_BY_ID: `${API_BASE}/permissions/:id`,
   },
   LANGUAGES:{
     GETALL: `${API_BASE}/languages`,
