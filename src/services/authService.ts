@@ -1,4 +1,4 @@
-import { publicAxios, privateAxios } from '@/lib/api';
+import { publicAxios, privateAxios, refreshAxios } from '@/lib/api';
 import { 
   LoginRequest, 
   LoginResponse, 
@@ -19,6 +19,7 @@ import {
   LogoutRequest,
   Confirm2faRequest,
   Confirm2faResponse,
+  RefreshTokenResponse,
 } from '@/types/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
@@ -58,8 +59,8 @@ export const authService = {
     return response.data
   },
 
-  refreshToken: async (): Promise<{ token: string }> => {
-    const response = await privateAxios.post<{ token: string }>(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+  refreshToken: async (): Promise<RefreshTokenResponse> => {
+    const response = await refreshAxios.post<RefreshTokenResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
     return response.data;
   },
 
@@ -108,7 +109,7 @@ export const authService = {
   },
   getCsrfToken: async (): Promise<void> => {
     try {
-      await privateAxios.get(API_ENDPOINTS.AUTH.GET_CSRF_TOKEN);
+      await publicAxios.get(API_ENDPOINTS.AUTH.GET_CSRF_TOKEN);
       // CSRF token sẽ được tự động lưu vào cookies bởi browser
       // Không cần xử lý response data
     } catch (error) {
