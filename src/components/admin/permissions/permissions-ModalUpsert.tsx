@@ -14,18 +14,14 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { showToast } from "@/components/ui/toastify"
 import { useTranslation } from "react-i18next"
-
-interface Permission {
-  name: string
-  description: string
-}
+import { Permission } from "./permissions-Columns"
 
 interface PermissionsModalUpsertProps {
   open: boolean
   onClose: () => void
   mode: 'add' | 'edit'
   permission?: Permission | null
-  onSubmit: (values: Permission) => Promise<void>
+  onSubmit: (values: { name: string, description: string, path: string, method: string }) => Promise<void>
 }
 
 export default function PermissionsModalUpsert({
@@ -59,7 +55,7 @@ export default function PermissionsModalUpsert({
 
     setLoading(true)
     try {
-      await onSubmit({ name, description })
+      await onSubmit({ name, description, path: "", method: "" })
       onClose()
     } catch (error) {
       showToast("Có lỗi xảy ra", "error")

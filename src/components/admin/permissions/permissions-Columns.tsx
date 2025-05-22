@@ -10,10 +10,11 @@ import { useTranslation } from "react-i18next";
 
 // Interface mới theo PerGetByIdResponse
 export type Permission = {
-  id: number;
+  id: number
   name: string;
   description: string;
   path: string;
+  isActive: boolean;
   method: string;
   createdAt: string;
   updatedAt: string;

@@ -1,5 +1,5 @@
 'use client'
-import { PermissionsTable } from "@/components/admin/permissions/permissions-table";
+import { PermissionsTable } from "@/components/admin/permissions/permissions-Table";
 import { useTranslation } from "react-i18next";
 
 export default function PermissionsPage() {

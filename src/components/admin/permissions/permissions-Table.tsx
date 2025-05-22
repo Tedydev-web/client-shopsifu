@@ -49,7 +49,8 @@ export function PermissionsTable() {
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setIsSearching(true)
-      getAllPermissions({ page: 1, limit, search: debouncedSearchValue }).finally(() => {
+      getAllPermissions({ page: 1, limit, search: debouncedSearchValue })
+      .finally(() => {
         setIsSearching(false)
       })
     }
@@ -70,40 +71,52 @@ export function PermissionsTable() {
   }
 
   const handleConfirmDelete = async () => {
-    if (!permissionToDelete) return
-    setDeleteLoading(true)
+    if (!permissionToDelete) return;
+    setDeleteLoading(true);
     try {
-      const success = await deletePermission(permissionToDelete.id)
+      const success = await deletePermission(permissionToDelete.id.toString()); // Chuyển id thành string
       if (success) {
-        handleCloseDeleteModal()
-        getAllPermissions({ page, limit })
+        handleCloseDeleteModal();
+        getAllPermissions({ page: page.toString(), limit: limit.toString() }); // Chuyển page và limit thành string
       }
     } catch (error) {
-      console.error('Error deleting permission:', error)
+      console.error('Lỗi khi xóa quyền:', error);
     } finally {
-      setDeleteLoading(false)
+      setDeleteLoading(false);
     }
-  }
+  };
 
-  const handleSubmit = async (values: { id: string; name: string }) => {
+  const handleSubmit = async (values: { name: string, description: string, path: string, method: string }) => {
     try {
       if (selectedPermission) {
-        const response = await updatePermission(selectedPermission.id, { name: values.name })
+        // Cập nhật quyền dựa trên name gốc
+        const response = await updatePermission(selectedPermission.name, { 
+          name: values.name,
+          description: values.description,
+          path: values.path,
+          method: values.method,
+         })
         if (response) {
           handleCloseModal()
           getAllPermissions({ page, limit })
         }
       } else {
-        const response = await createPermission({ id: values.id, name: values.name })
+        // Tạo mới quyền
+        const response = await createPermission({ 
+          name: values.name,
+          description: values.description,
+          path: values.path,
+          method: values.method,
+         })
         if (response) {
           handleCloseModal()
           getAllPermissions({ page, limit })
         }
       }
     } catch (error) {
-      console.error('Error saving permission:', error)
+      console.error("Error saving permission:", error)
     }
-  }
+  }  
 
   const handleSearch = (value: string) => {
     setSearchValue(value)

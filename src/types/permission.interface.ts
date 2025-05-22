@@ -20,6 +20,7 @@ export interface PerGetAllResponse {
         id: string;
         name: string;
         path: string;
+        description: string;
         type: string;
         method: string;
         createdById: string;

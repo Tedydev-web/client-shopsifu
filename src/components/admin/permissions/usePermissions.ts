@@ -1,121 +1,123 @@
-import { useState } from "react"
-import { Permission } from "./permissions-Columns"
-import { permissionService } from "@/services/permissionService"
-import { showToast } from "@/components/ui/toastify"
-import { parseApiError } from "@/utils/error"
+import { useState } from "react";
+import { Permission } from "./permissions-Columns";
+import { permissionService } from "@/services/permissionService";
+import { showToast } from "@/components/ui/toastify";
+import { parseApiError } from "@/utils/error";
 import {
   PerCreateRequest,
   PerUpdateRequest,
-  PerGetAllResponse
-} from "@/types/permission.interface"
-import { PaginationRequest } from "@/types/base.interface"
+  PerGetAllResponse,
+} from "@/types/permission.interface";
+import { PaginationRequest } from "@/types/base.interface";
 
 export function usePermissions() {
-  const [permissions, setPermissions] = useState<Permission[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [totalItems, setTotalItems] = useState(0)
-  const [page, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [page, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Get all permissions with pagination
   const getAllPermissions = async (params?: PaginationRequest) => {
     try {
-      setLoading(true)
-      const response = await permissionService.getAll(params)
+      setLoading(true);
+      const response = await permissionService.getAll(params);
       const mappedPermissions: Permission[] = response.data.map(per => ({
         id: parseInt(per.id),
         name: per.name,
-        code: per.id, // dùng per.code nếu có
-        isActive: true, // fallback true nếu không có
+        description: per.description || "", // Giá trị mặc định
+        path: per.path || "", // Giá trị mặc định
+        method: per.method || "GET", // Giá trị mặc định
+        isActive: per.isActive ?? true,
         createdAt: per.createdAt,
-        updatedAt: per.updatedAt
-      }))
-      setPermissions(mappedPermissions)
-      setTotalItems(response.totalItems)
-      setCurrentPage(response.page)
-      setTotalPages(response.totalPages)
+        updatedAt: per.updatedAt,
+      }));
+      setPermissions(mappedPermissions);
+      setTotalItems(response.totalItems);
+      setCurrentPage(response.page);
+      setTotalPages(response.totalPages);
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error fetching permissions:', error)
+      showToast(parseApiError(error), 'error');
+      console.error('Error fetching permissions:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getPermissionById = async (id: string) => {
     try {
-      setLoading(true)
-      const response = await permissionService.getById(id)
-      return response
+      setLoading(true);
+      const response = await permissionService.getById(id);
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error fetching permission:', error)
-      return null
+      showToast(parseApiError(error), 'error');
+      console.error('Error fetching permission:', error);
+      return null;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const createPermission = async (data: PerCreateRequest) => {
     try {
-      setLoading(true)
-      const response = await permissionService.create(data)
-      showToast("Tạo quyền thành công", "success")
-      return response
+      setLoading(true);
+      const response = await permissionService.create(data);
+      showToast("Tạo quyền thành công", "success");
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error creating permission:', error)
-      return null
+      showToast(parseApiError(error), 'error');
+      console.error('Error creating permission:', error);
+      return null;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const updatePermission = async (id: string, data: PerUpdateRequest) => {
     try {
-      setLoading(true)
-      const response = await permissionService.update(id, data)
-      showToast("Cập nhật quyền thành công", "success")
-      return response
+      setLoading(true);
+      const response = await permissionService.update(id, data);
+      showToast("Cập nhật quyền thành công", "success");
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error updating permission:', error)
-      return null
+      showToast(parseApiError(error), 'error');
+      console.error('Error updating permission:', error);
+      return null;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const deletePermission = async (id: string) => {
     try {
-      setLoading(true)
-      const response = await permissionService.delete(id)
-      showToast("Xóa quyền thành công", "success")
-      return response
+      setLoading(true);
+      const response = await permissionService.delete(id);
+      showToast("Xóa quyền thành công", "success");
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error deleting permission:', error)
-      return null
+      showToast(parseApiError(error), 'error');
+      console.error('Error deleting permission:', error);
+      return null;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleOpenModal = (permission?: Permission) => {
     if (permission) {
-      setSelectedPermission(permission)
+      setSelectedPermission(permission);
     } else {
-      setSelectedPermission(null)
+      setSelectedPermission(null);
     }
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedPermission(null)
-  }
+    setIsModalOpen(false);
+    setSelectedPermission(null);
+  };
 
   return {
     permissions,
@@ -134,6 +136,6 @@ export function usePermissions() {
     // UI handlers
     handleOpenModal,
     handleCloseModal,
-    setCurrentPage, // để gọi từ component khi chuyển trang
-  }
+    setCurrentPage,
+  };
 }
