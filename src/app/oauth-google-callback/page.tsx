@@ -21,7 +21,7 @@ export default function OauthCallbackPage() {
         })
       );
     }
-    
+
     // Luôn chuyển hướng về trang chủ, không cần check lỗi
     showToast("Đăng nhập thành công", "success")
     window.location.replace("/admin");
