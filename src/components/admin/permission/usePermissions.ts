@@ -31,7 +31,7 @@ export function usePermissions() {
   const getAllPermissions = async (params?: PaginationRequest) => {
     try {
       setLoading(true)
-      const response: PerGetAllResponse = await permissionService.getAll()
+      const response: PerGetAllResponse = await permissionService.getAllPermissions()
       const mappedPermissions: Permission[] = response.data.map(per => ({
         id: parseInt(per.id),
         name: per.name,
@@ -57,7 +57,7 @@ export function usePermissions() {
   const getPermissionById = async (id: string) => {
     try {
       setLoading(true)
-      const response = await permissionService.getById(id)
+      const response = await permissionService.getPermissionById(id)
       return response
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -72,7 +72,7 @@ export function usePermissions() {
   const createPermission = async (data: PerCreateRequest) => {
     try {
       setLoading(true)
-      const response = await permissionService.create(data)
+      const response = await permissionService.createPermission(data)
       showToast("Tạo quyền thành công", "success")
       return response
     } catch (error) {
@@ -88,7 +88,7 @@ export function usePermissions() {
   const updatePermission = async (id: string, data: PerUpdateRequest) => {
     try {
       setLoading(true)
-      const response = await permissionService.update(id, data)
+      const response = await permissionService.updatePermission(id, data)
       showToast("Cập nhật quyền thành công", "success")
       return response
     } catch (error) {
