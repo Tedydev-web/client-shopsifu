@@ -19,7 +19,6 @@ export function useLogout() {
 
       // Gọi API logout
       await authService.logout({
-        refreshToken: 'default-refresh-token'
       });
 
       // Xoá token local
