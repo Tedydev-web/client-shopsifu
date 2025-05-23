@@ -9,6 +9,7 @@ export interface LoginResponse {
   accessToken: string
   refreshToken: string
   loginSessionToken: string
+  twoFactorMethod: string
 }
 
 export interface oAuthLoginResponse {
@@ -100,6 +101,11 @@ export interface Verify2faRequest {
 export interface Verify2faResponse {
   accessToken: string
   refreshToken: string
+  userId: string
+  email: string
+  name: string
+  role: string
+  askToTrustDevice: string
 }
 
 export interface Disable2faRequest {

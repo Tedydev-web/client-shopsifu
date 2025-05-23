@@ -2,19 +2,23 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { z } from 'zod'
 import { showToast } from '@/components/ui/toastify'
-import { otpSchema } from '../schema/index'
+import { otpSchema, recoveryCodeSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
+import { Verify2faResponse } from '@/types/auth.interface'
 
 const SESSION_TOKEN_KEY = 'loginSessionToken'
 const USER_EMAIL_KEY = 'userEmail'
+const TRUST_DEVICE_KEY = 'askToTrustDevice'
+
+type TwoFactorType = 'TOTP' | 'OTP' | 'RECOVERY'
 
 export function useVerify2FA() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const type = searchParams.get('type') as 'TOTP' | 'OTP' || 'TOTP'
+  const type = (searchParams.get('type') as TwoFactorType) || 'TOTP'
   
   const verify2FA = async (code: string) => {
     const loginSessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
@@ -26,17 +30,21 @@ export function useVerify2FA() {
 
     try {
       setLoading(true)
-      await authService.verify2fa({
+      const response = await authService.verify2fa({
         loginSessionToken,
         type,
         code
-      })
+      }) as Verify2faResponse
+      
+      if (response.askToTrustDevice) {
+        sessionStorage.setItem(TRUST_DEVICE_KEY, response.askToTrustDevice)
+      }
       
       sessionStorage.removeItem(SESSION_TOKEN_KEY)
       sessionStorage.removeItem(USER_EMAIL_KEY)
       
       showToast('Xác minh 2FA thành công', 'success')
-      router.replace(ROUTES.ADMIN.DASHBOARD)
+      window.location.href = ROUTES.ADMIN.DASHBOARD
     } catch (error) {
       showToast(parseApiError(error), 'error')
     } finally {
@@ -68,9 +76,39 @@ export function useVerify2FA() {
     }
   }
 
-  const handleVerifyCode = async (data: z.infer<typeof otpSchema>) => {
-    await verify2FA(data.otp)
+  const handleVerifyCode = async (data: { otp: string }) => {
+
+    try {
+      // Validate based on type
+      if (type === 'RECOVERY') {
+        const result = recoveryCodeSchema.safeParse(data);
+        if (!result.success) {
+          throw result.error;
+        }
+      } else {
+        otpSchema.parse(data);
+      }
+      await verify2FA(data.otp);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.log('Zod error:', error.errors);
+        showToast(error.errors[0].message, 'error');
+      } else {
+        showToast(parseApiError(error), 'error');
+      }
+    }
   }
 
-  return { loading, handleVerifyCode, sendOTP }
+  const switchToRecovery = () => {
+    router.replace(`?type=RECOVERY`)
+  }
+
+  return { 
+    loading, 
+    handleVerifyCode, 
+    sendOTP, 
+    type, 
+    switchToRecovery,
+    schema: type === 'RECOVERY' ? recoveryCodeSchema : otpSchema 
+  }
 }

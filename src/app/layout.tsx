@@ -6,6 +6,7 @@ import { Toast } from "@/components/ui/toastify"
 import ClientLayout from "./client-layout";
 import { I18nextProvider } from "react-i18next";
 import i18nextInstance from "@/i18n/i18n";
+import { TrustDeviceModal } from "@/components/auth/layout/trustDevice-Modal";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,8 +30,9 @@ export default function RootLayout({
           <StoreProvider>
             <ClientLayout>
               <Toast/>
-            {children}
-          </ClientLayout>
+              <TrustDeviceModal />
+              {children}
+            </ClientLayout>
           </StoreProvider>
       </body>
     </html>

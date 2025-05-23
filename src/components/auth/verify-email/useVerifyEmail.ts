@@ -18,7 +18,7 @@ export function useVerifyEmail() {
       setLoading(true)
       
       // Xác định type dựa vào action
-      const type = action === 'signup' ? 'REGISTER' : 'FORGOT_PASSWORD'
+      const type = action === 'signup' ? 'REGISTER' : 'RESET_PASSWORD'
       
       await authService.sendOTP({
         email,
