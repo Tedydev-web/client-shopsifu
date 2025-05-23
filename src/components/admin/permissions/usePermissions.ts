@@ -27,10 +27,10 @@ export function usePermissions() {
       const mappedPermissions: Permission[] = response.data.map(per => ({
         id: parseInt(per.id),
         name: per.name,
-        description: per.description || "", // Giá trị mặc định
+        description: per.description , // Giá trị mặc định
         path: per.path || "", // Giá trị mặc định
-        method: per.method || "GET", // Giá trị mặc định
-        isActive: per.isActive ?? true,
+        method: per.method, // Giá trị mặc định
+        isActive: true,
         createdAt: per.createdAt,
         updatedAt: per.updatedAt,
       }));

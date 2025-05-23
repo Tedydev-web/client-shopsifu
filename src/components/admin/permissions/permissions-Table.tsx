@@ -77,7 +77,7 @@ export function PermissionsTable() {
       const success = await deletePermission(permissionToDelete.id.toString()); // Chuyển id thành string
       if (success) {
         handleCloseDeleteModal();
-        getAllPermissions({ page: page.toString(), limit: limit.toString() }); // Chuyển page và limit thành string
+        getAllPermissions({ page: page, limit}); // Chuyển page và limit thành string
       }
     } catch (error) {
       console.error('Lỗi khi xóa quyền:', error);
@@ -98,7 +98,7 @@ export function PermissionsTable() {
          })
         if (response) {
           handleCloseModal()
-          getAllPermissions({ page, limit })
+          getAllPermissions({ page: page, limit })
         }
       } else {
         // Tạo mới quyền
@@ -110,7 +110,7 @@ export function PermissionsTable() {
          })
         if (response) {
           handleCloseModal()
-          getAllPermissions({ page, limit })
+          getAllPermissions({ page: page, limit })
         }
       }
     } catch (error) {

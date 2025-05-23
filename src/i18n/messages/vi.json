@@ -283,9 +283,13 @@
       "modal": {
         "title": "Thêm quyền mới",
         "subtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "description": "Mô tả quyền",
         "name": "Tên quyền",
         "namePlaceholder": "Nhập tên quyền",
         "searchPlaceholder": "Tìm theo mã hoặc tên...",
+        "descriptionPlaceholder": "Nhập mô tả quyền",
+        "pathPlaceholder": "Nhập đường dẫn quyền",
+        "methodPlaceholder": "Nhập phương thức quyền",
         "save": "Lưu thông tin",
         "cancel": "Hủy",
         "processing": "Đang xử lý...",

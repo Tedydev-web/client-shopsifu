@@ -106,8 +106,8 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 {t('admin.profileDropdown.shopProfile')}
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Settings className="w-4 h-4 mr-2" />
-                Thiết Lập Shop
+                <Settings className="w-4 h-4 mr-2 text-gray-500" />
+                {t('admin.profileDropdown.shopSettings')}
               </DropdownMenuItem>
               
               {/* Language Switcher SubMenu */}

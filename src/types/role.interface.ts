@@ -28,3 +28,31 @@ export interface RoleResponse {
     createdAt: number;
     updatedAt: number;
 }
+
+export interface RoleCreateRequest {
+    id: string;
+    name: string;
+    description: string;
+    role: RoleType;
+    status: 'active' | 'inactive';
+    permissions: string[];
+}
+
+export interface RoleCreateResponse {
+    id: string;
+    name: string;
+    description: string;
+    role: RoleType;
+    status: 'active' | 'inactive';
+    permissions: Permission[];
+    createdAt: number;
+}
+
+export interface RoleUpdateRequest {
+    id: string;
+    name: string;
+    description: string;
+    role: RoleType;
+    status: 'active' | 'inactive';
+    permissions: string[];
+}

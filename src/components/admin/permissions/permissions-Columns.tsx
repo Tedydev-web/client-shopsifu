@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 // Interface mới theo PerGetByIdResponse
 export type Permission = {
-  id: number
+  id: number;
   name: string;
   description: string;
   path: string;
@@ -81,7 +81,7 @@ export const PermissionsColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("admin.permissions.form.name")} />
       ),
-      cell: ({ row }) => <div className="w-[180px]">{row.getValue("name")}</div>,
+      cell: ({ row }) => <div className="w-[200px] truncate">{row.getValue("name")}</div>,
       enableSorting: true,
       enableHiding: true,
     },
@@ -90,7 +90,7 @@ export const PermissionsColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("admin.permissions.form.description")} />
       ),
-      cell: ({ row }) => <div className="w-[220px]">{row.getValue("description")}</div>,
+      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("description")}</div>,
       enableSorting: true,
       enableHiding: true,
     },
@@ -99,7 +99,7 @@ export const PermissionsColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("admin.permissions.form.path")} />
       ),
-      cell: ({ row }) => <div className="w-[220px]">{row.getValue("path")}</div>,
+      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("path")}</div>,
       enableSorting: true,
       enableHiding: true,
     },
@@ -108,7 +108,7 @@ export const PermissionsColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("admin.permissions.form.method")} />
       ),
-      cell: ({ row }) => <div className="w-[120px] uppercase">{row.getValue("method")}</div>,
+      cell: ({ row }) => <div className="w-[120px] uppercase truncate">{row.getValue("method")}</div>,
       enableSorting: true,
       enableHiding: true,
     },
@@ -118,7 +118,7 @@ export const PermissionsColumns = ({
         <DataTableColumnHeader column={column} title={t("admin.permissions.createdAt")} />
       ),
       cell: ({ row }) => (
-        <div className="w-[160px]">
+        <div className="w-[160px] truncate">
           {format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm")}
         </div>
       ),
@@ -131,7 +131,7 @@ export const PermissionsColumns = ({
         <DataTableColumnHeader column={column} title={t("admin.permissions.updatedAt")} />
       ),
       cell: ({ row }) => (
-        <div className="w-[160px]">
+        <div className="w-[160px] truncate">
           {format(new Date(row.getValue("updatedAt")), "dd/MM/yyyy HH:mm")}
         </div>
       ),

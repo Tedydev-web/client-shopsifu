@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { showToast } from "@/components/ui/toastify"
 import { useTranslation } from "react-i18next"
 import { Permission } from "./permissions-Columns"
@@ -33,6 +40,8 @@ export default function PermissionsModalUpsert({
 }: PermissionsModalUpsertProps) {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [path, setPath] = useState("")
+  const [method, setMethod] = useState("")
   const [loading, setLoading] = useState(false)
   const { t } = useTranslation()
 
@@ -40,22 +49,30 @@ export default function PermissionsModalUpsert({
     if (mode === 'edit' && permission) {
       setName(permission.name || "")
       setDescription(permission.description || "")
+      setPath(permission.path || "")
+      setMethod(permission.method || "")
     } else if (mode === 'add') {
       setName("")
       setDescription("")
+      setPath("")
+      setMethod("")
     }
   }, [mode, permission, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (name.length < 2) {
-      showToast("Tên quyền phải có ít nhất 2 ký tự", "error")
+      showToast(t("admin.permissions.modal.nameValidation"), "error")
+      return
+    }
+    if (!path || !method) {
+      showToast(t("admin.permissions.modal.pathMethodValidation"), "error")
       return
     }
 
     setLoading(true)
     try {
-      await onSubmit({ name, description, path: "", method: "" })
+      await onSubmit({ name, description, path, method })
       onClose()
     } catch (error) {
       showToast("Có lỗi xảy ra", "error")
@@ -69,7 +86,9 @@ export default function PermissionsModalUpsert({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {mode === 'add' ? t("admin.permissions.modal.title") : t("admin.permissions.modalEdit.title")}
+            {mode === 'add'
+              ? t("admin.permissions.modal.title")
+              : t("admin.permissions.modalEdit.title")}
           </DialogTitle>
           <DialogDescription>
             {mode === 'add'
@@ -87,6 +106,7 @@ export default function PermissionsModalUpsert({
               placeholder={t("admin.permissions.modal.namePlaceholder")}
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.description")}</label>
             <Input
@@ -95,7 +115,34 @@ export default function PermissionsModalUpsert({
               placeholder={t("admin.permissions.modal.descriptionPlaceholder")}
             />
           </div>
-          <DialogFooter>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.path")}</label>
+            <Input
+              value={path}
+              onChange={e => setPath(e.target.value)}
+              required
+              placeholder={t("admin.permissions.modal.pathPlaceholder")}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.method")}</label>
+            <Select value={method} onValueChange={setMethod} required>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("admin.permissions.modal.methodPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {["GET", "POST", "PUT", "PATCH", "DELETE"].map(m => (
+                  <SelectItem key={m} value={m}>
+                    {t(`admin.permissions.methods.${m}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button type="button" variant="outline" disabled={loading} onClick={onClose}>
                 {t("admin.permissions.modal.cancel")}
