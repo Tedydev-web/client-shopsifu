@@ -100,7 +100,12 @@ export function Header({ onToggleSidebar }: HeaderProps) {
               </div>
 
               <DropdownMenuSeparator />
-
+              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <Settings className="w-4 h-4 text-gray-500" />
+                {t('admin.profileDropdown.shopSettings')}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              
               <DropdownMenuItem>
                 <Store className="w-4 h-4 mr-2" />
                 {t('admin.profileDropdown.shopProfile')}
@@ -132,11 +137,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
-              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <Settings className="w-4 h-4 text-gray-500" />
-                {t('admin.profileDropdown.shopSettings')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              
 
               {/* Đăng xuất */}
               <DropdownMenuItem 
