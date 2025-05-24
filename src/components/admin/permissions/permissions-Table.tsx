@@ -86,37 +86,47 @@ export function PermissionsTable() {
     }
   };
 
-  const handleSubmit = async (values: { name: string, description: string, path: string, method: string }) => {
+  const handleSubmit = async (values: {
+    code?: string;
+    name: string;
+    description: string;
+    path: string;
+    method: string;
+  }) => {
     try {
       if (selectedPermission) {
-        // Cập nhật quyền dựa trên name gốc
-        const response = await updatePermission(selectedPermission.name, { 
+        // Gán code cho id vì giá trị code chính là id
+        const id = selectedPermission.code;
+  
+        const response = await updatePermission(id, {
           name: values.name,
           description: values.description,
           path: values.path,
           method: values.method,
-         })
+        });
+  
         if (response) {
-          handleCloseModal()
-          getAllPermissions({ page: page, limit })
+          handleCloseModal();
+          getAllPermissions({ page, limit });
         }
       } else {
-        // Tạo mới quyền
-        const response = await createPermission({ 
+        // Tạo mới
+        const response = await createPermission({
           name: values.name,
           description: values.description,
           path: values.path,
           method: values.method,
-         })
+        });
+  
         if (response) {
-          handleCloseModal()
-          getAllPermissions({ page: page, limit })
+          handleCloseModal();
+          getAllPermissions({ page, limit });
         }
       }
     } catch (error) {
-      console.error("Error saving permission:", error)
+      console.error("Error saving permission:", error);
     }
-  }  
+  };
 
   const handleSearch = (value: string) => {
     setSearchValue(value)

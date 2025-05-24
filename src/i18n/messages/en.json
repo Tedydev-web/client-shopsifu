@@ -310,6 +310,13 @@
         "success": "Permission updated successfully",
         "error": "An error occurred",
         "edit": "Edit Permission"
+      },
+      "methods": {
+        "GET": "GET",
+        "POST": "POST",
+        "PUT": "PUT",
+        "DELETE": "DELETE",
+        "PATCH": "PATCH"
       }
     },
     "users": {

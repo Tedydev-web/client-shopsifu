@@ -9,6 +9,7 @@ import {
   PerGetAllResponse,
 } from "@/types/permission.interface";
 import { PaginationRequest } from "@/types/base.interface";
+import { Code } from "lucide-react";
 
 export function usePermissions() {
   const [permissions, setPermissions] = useState<Permission[]>([]);
@@ -26,6 +27,7 @@ export function usePermissions() {
       const response = await permissionService.getAll(params);
       const mappedPermissions: Permission[] = response.data.map(per => ({
         id: parseInt(per.id),
+        code: per.id,
         name: per.name,
         description: per.description , // Giá trị mặc định
         path: per.path || "", // Giá trị mặc định
@@ -75,10 +77,16 @@ export function usePermissions() {
     }
   };
 
-  const updatePermission = async (id: string, data: PerUpdateRequest) => {
+  const updatePermission = async (code: string, data: PerUpdateRequest) => {
     try {
       setLoading(true);
-      const response = await permissionService.update(id, data);
+      // Tìm permission theo code để lấy id
+      const permission = permissions.find(p => p.code === code);
+      if (!permission) {
+        showToast("Không tìm thấy quyền để cập nhật", "error");
+        return null;
+      }
+      const response = await permissionService.update(code, data);
       showToast("Cập nhật quyền thành công", "success");
       return response;
     } catch (error) {

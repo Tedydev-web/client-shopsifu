@@ -61,10 +61,11 @@ export default function PermissionsModalUpsert({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (name.length < 2) {
-      showToast(t("admin.permissions.modal.nameValidation"), "error")
-      return
-    }
+    // if (name.length < 2) {
+    //   showToast(t("admin.permissions.modal.nameValidation"), "error")
+    //   return
+    // }
+
     if (!path || !method) {
       showToast(t("admin.permissions.modal.pathMethodValidation"), "error")
       return

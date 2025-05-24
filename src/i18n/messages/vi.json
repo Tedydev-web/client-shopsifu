@@ -285,6 +285,8 @@
         "subtitle": "Nhập thông tin quyền để thêm vào hệ thống",
         "description": "Mô tả quyền",
         "name": "Tên quyền",
+        "path": "Đường dẫn quyền",
+        "method": "Phương thức quyền",
         "namePlaceholder": "Nhập tên quyền",
         "searchPlaceholder": "Tìm theo mã hoặc tên...",
         "descriptionPlaceholder": "Nhập mô tả quyền",
@@ -305,6 +307,13 @@
         "success": "Cập nhật quyền thành công",
         "error": "Đã xảy ra lỗi",
         "edit": "Chỉnh sửa quyền"
+      },
+      "methods": {
+        "GET": "GET",
+        "POST": "POST",
+        "PUT": "PUT",
+        "DELETE": "DELETE",
+        "PATCH": "PATCH"
       }
     },
     "users": {
