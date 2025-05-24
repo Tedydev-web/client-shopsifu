@@ -23,7 +23,7 @@ export function useVerify() {
   const verifyOTP = async (otp: string) => {
     if (!email) {
       showToast('Không tìm thấy email, vui lòng thử lại', 'error')
-      router.replace(action === 'signup' ? ROUTES.BUYER.SIGNUP : ROUTES.BUYER.FORGOT_PASSWORD)
+      router.replace(action === 'signup' ? ROUTES.BUYER.SIGNUP : ROUTES.BUYER.RESET_PASSWORD)
       return
     }
 
@@ -32,7 +32,7 @@ export function useVerify() {
       const request: VerifyOTPRequest = {
         email,
         code: otp,
-        type: action === 'signup' ? 'REGISTER' : 'FORGOT_PASSWORD'
+        type: action === 'signup' ? 'REGISTER' : 'RESET_PASSWORD'
       }
 
       const response = await authService.verifyOTP(request)
@@ -59,7 +59,7 @@ export function useVerify() {
   const resendOTP = async () => {
     if (!email) {
       showToast('Không tìm thấy email, vui lòng thử lại', 'error')
-      router.replace(action === 'signup' ? ROUTES.BUYER.SIGNUP : ROUTES.BUYER.FORGOT_PASSWORD)
+      router.replace(action === 'signup' ? ROUTES.BUYER.SIGNUP : ROUTES.BUYER.RESET_PASSWORD)
       return
     }
 
@@ -67,7 +67,7 @@ export function useVerify() {
       setLoading(true)
       await authService.sendOTP({
         email,
-        type: action === 'signup' ? 'REGISTER' : 'FORGOT_PASSWORD'
+        type: action === 'signup' ? 'REGISTER' : 'RESET_PASSWORD'
       })
       showToast('Đã gửi lại mã OTP mới', 'success')
     } catch (error) {

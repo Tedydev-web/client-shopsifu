@@ -49,6 +49,14 @@ export const otpSchema = z.object({
     otp: z.string().length(6, { message: 'OTP phải gồm 6 chữ số' }).regex(/^\d+$/, { message: 'Chỉ được nhập số' })
 })
 
+export const recoveryCodeSchema = z.object({
+  otp: z.string()
+      .length(11, { message: 'Mã khôi phục phải gồm 10 ký tự và 1 dấu gạch ngang' })
+      .regex(/^[A-Z0-9]{5}-[A-Z0-9]{5}$/, { 
+          message: 'Mã khôi phục phải có dạng 5 ký tự (chữ hoa hoặc số) - 5 ký tự (chữ hoa hoặc số)' 
+      })
+      .transform(val => val.toUpperCase())
+})
 // Schema validation với Zod
 export const resetPasswordSchema = z.object({
   password: z.string()

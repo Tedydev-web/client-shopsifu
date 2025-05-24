@@ -121,4 +121,9 @@ export const authService = {
       throw error;
     }
   },
+
+  trustDevice: async (): Promise<void> =>{
+    const response = await privateAxios.post(API_ENDPOINTS.AUTH.TRUST_DEVICE, {})
+    return response.data
+  }
 };

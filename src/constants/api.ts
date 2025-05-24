@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     DISABLE_2FA: `${API_BASE}/auth/2fa/disable`,
     GET_CSRF_TOKEN: `${API_BASE}/get-cookies`,
     CONFIRM_2FA: `${API_BASE}/auth/2fa/confirm-setup`,
+    TRUST_DEVICE: `${API_BASE}/auth/trust-device`,
   },
   ROLE:{
     GETALL: `${API_BASE}/role/create`,

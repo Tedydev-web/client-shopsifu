@@ -22,7 +22,7 @@ export function useReset() {
       const email = searchParams.get('email')
       if (!token) {
         showToast('Phiên làm việc đã hết hạn', 'info')
-        router.replace(ROUTES.BUYER.FORGOT_PASSWORD)
+        router.replace(ROUTES.BUYER.RESET_PASSWORD)
         return
       }
 
