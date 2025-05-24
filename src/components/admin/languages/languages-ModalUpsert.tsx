@@ -88,6 +88,12 @@ export default function LanguagesModalUpsert({
       )
     : languageOptions
 
+  const handleCodeChange = (selectedCode: string) => {
+    setCode(selectedCode)
+    const found = languageOptions.find(opt => opt.code === selectedCode)
+    if (found) setName(found.name)
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
@@ -104,7 +110,7 @@ export default function LanguagesModalUpsert({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">{t("admin.languages.modal.code")}</label>
-            <Select value={code} onValueChange={setCode} disabled={mode === 'edit'}>
+            <Select value={code} onValueChange={handleCodeChange} disabled={mode === 'edit'}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("admin.languages.modal.codePlaceholder")} />
               </SelectTrigger>

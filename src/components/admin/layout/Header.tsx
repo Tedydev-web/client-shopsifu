@@ -31,6 +31,8 @@ import { useChangeLang } from '@/hooks/useChangeLang'
 import { SearchItem } from './SearchItem'
 import { useTranslation } from 'react-i18next'
 import { ProfileSetting } from './ProfileSetting'
+import { NotificationSheet } from './Notification-Sheet'
+import { useState } from 'react'
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -41,6 +43,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const { handleLogout, loading: logoutLoading } = useLogout()
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
   const { t } = useTranslation()
+  const [notificationOpen, setNotificationOpen] = useState(false)
 
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 z-30">
@@ -48,11 +51,11 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         {/* Logo + Hamburger */}
         <div className="flex items-center gap-4">
           {isMobile && (
-            <Button onClick={onToggleSidebar} className="text-gray-700">
+            <Button onClick={onToggleSidebar} className="text-gray-700 bg-white">
               <Menu className="w-6 h-6" />
             </Button>
           )}
-          <Link href="/admin" className="flex items-center">
+          <Link href="/admin" className="items-center hidden lg:flex">
             <Image 
               src="/images/logo/logofullred.png" 
               alt="Shopsifu Logo" 
@@ -70,7 +73,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
         {/* Right section */}
         <div className="flex items-center space-x-4">
-          <Button className="p-2 rounded-full hover:bg-gray-100 relative bg-[#fff]">
+          <Button className="p-2 rounded-full hover:bg-gray-100 relative bg-[#fff]" onClick={() => setNotificationOpen(true)} aria-label={t('admin.notifications.title')}>
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
           </Button>
@@ -78,6 +81,8 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           <ProfileSetting />
 
           {/* Dropdown Profile */}
+          {/* {
+            isMobile && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center cursor-pointer space-x-2 px-2 py-1 hover:bg-gray-100 rounded-md">
@@ -98,13 +103,6 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 </div>
                 <p className="text-sm font-medium">tung63soi</p>
               </div>
-
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <Settings className="w-4 h-4 text-gray-500" />
-                {t('admin.profileDropdown.shopSettings')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               
               <DropdownMenuItem>
                 <Store className="w-4 h-4 mr-2" />
@@ -115,7 +113,6 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 Thiết Lập Shop
               </DropdownMenuItem>
               
-              {/* Language Switcher SubMenu */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Globe className="w-4 h-4 mr-2" />
@@ -139,7 +136,6 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
               
 
-              {/* Đăng xuất */}
               <DropdownMenuItem 
                 className="text-red-600" 
                 onClick={handleLogout} 
@@ -150,6 +146,9 @@ export function Header({ onToggleSidebar }: HeaderProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+            )
+          } */}
+          <NotificationSheet open={notificationOpen} onOpenChange={setNotificationOpen} />
         </div>
       </div>
     </header>

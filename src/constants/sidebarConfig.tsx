@@ -11,14 +11,16 @@ import {
   FileText,
   HelpCircle,
   MonitorCog,
-  FolderClosed 
+  FolderClosed,
+  Undo 
 } from 'lucide-react'
 
 export type SidebarItem = {
   title: string
   href: string
-  icon: React.ReactNode
+  icon?: React.ReactNode
   subItems?: SidebarItem[]
+  isTitle?: boolean
 }
 
 export const sidebarConfig: SidebarItem[] = [
@@ -110,4 +112,32 @@ export const sidebarConfig: SidebarItem[] = [
       },
     ],
   }
+]
+
+export const settingsSidebarConfig: SidebarItem[] = [
+  {
+    title: 'Cài đặt hệ thống',
+    href: '/admin',
+    icon: <Undo className="w-5 h-5" />,
+    isTitle: true
+  },
+  {
+    title: 'Quản lý tài khoản',
+    href: '/admin/settings',
+    subItems:[
+      {
+        title: 'Hồ sơ',
+        href: '/admin/settings/profile',
+      },
+    ]
+  },
+  {
+    title: 'Cửa hàng',
+    href: '/admin/settings/store',
+  },
+  {
+    title: 'Bảo mật',
+    href: '/admin/settings/security',
+  },
+  // Add more settings items as needed
 ]

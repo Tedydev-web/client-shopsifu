@@ -237,7 +237,6 @@
         "elapsedTime": "Thời gian xử lý",
         "notes": "Ghi chú"
       }
-
     },
     "roles": {
       "title": "Vai trò",
@@ -315,6 +314,13 @@
         "error": "Có lỗi xảy ra",
         "edit": "Chỉnh sửa ngôn ngữ"
       }
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "emptyTitle": "Chưa có thông báo",
+      "emptyDesc": "Bạn chưa có thông báo nào vào lúc này, nhưng khi có chúng sẽ xuất hiện ở đây.",
+      "esc": "esc",
+      "close": "Đóng"
     }
   }
 }

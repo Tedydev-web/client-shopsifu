@@ -260,7 +260,7 @@
       "search": "Search",
       "searchPlaceholder": "Search by user, action, or date"
     },
-      "languages": {
+    "languages": {
       "title": "Languages",
       "subtitle": "Manage all your languages here",
       "add": "Add New Language",
@@ -318,6 +318,13 @@
         "error": "An error occurred",
         "edit": "Edit Language"
       }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "emptyTitle": "No notifications",
+      "emptyDesc": "You don't have any notifications at the moment, but once you do they will live here.",
+      "esc": "esc",
+      "close": "Close"
     }
   }
 }
