@@ -31,6 +31,10 @@ export interface RoleResponse {
     permissions: Permission[];
     createdAt: number;
     updatedAt: number;
+    totalItems: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 
 export interface RoleGetAllResponse {
@@ -39,14 +43,14 @@ export interface RoleGetAllResponse {
     name: string;
     description: string;
     isActive: boolean;
-    permissions: any[]; // Nếu biết rõ kiểu thì thay `any` bằng kiểu cụ thể
+    permissions: Permission[]; // Nếu biết rõ kiểu thì thay `any` bằng kiểu cụ thể
     createdById: string;
     updatedById: string;
     deletedById: string;
     deletedAt: string;
     createdAt: string;
     updatedAt: string;
-  }[]>;
+  }>;
   totalItems: number;
   page: number;
   limit: number;

@@ -13,6 +13,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
+import { usePermissions } from "@/components/admin/permissions/usePermissions"
 import { showToast } from "@/components/ui/toastify"
 import { useTranslation } from "react-i18next"
 
@@ -35,7 +37,6 @@ interface RolesModalUpsertProps {
     isActive: boolean
     permissionIds: string[]
   }) => Promise<void>
-  defaultValues?: Role | null;
 }
 
 export default function RolesModalUpsert({
@@ -45,23 +46,40 @@ export default function RolesModalUpsert({
   role,
   onSubmit,
 }: RolesModalUpsertProps) {
+  const { t } = useTranslation()
+  const { permissions, getAllPermissions } = usePermissions()
+
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [isActive, setIsActive] = useState(true)
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  const { t } = useTranslation()
+
+  useEffect(() => {
+    if (permissions.length === 0) {
+      getAllPermissions()
+    }
+  }, [])
 
   useEffect(() => {
     if (mode === "edit" && role) {
       setName(role.name || "")
       setDescription(role.description || "")
       setIsActive(role.isActive ?? true)
+      setSelectedPermissionIds(role.permissionIds || [])
     } else if (mode === "add") {
       setName("")
       setDescription("")
       setIsActive(true)
+      setSelectedPermissionIds([])
     }
   }, [mode, role, open])
+
+  const handleTogglePermission = (id: string) => {
+    setSelectedPermissionIds(prev =>
+      prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,7 +95,7 @@ export default function RolesModalUpsert({
         name,
         description,
         isActive,
-        permissionIds: role?.permissionIds ?? [],
+        permissionIds: selectedPermissionIds,
       })
       onClose()
     } catch (error) {
@@ -89,7 +107,7 @@ export default function RolesModalUpsert({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {mode === 'add'
@@ -126,6 +144,21 @@ export default function RolesModalUpsert({
           <div className="flex items-center justify-between pt-2">
             <label className="text-sm font-medium">{t("admin.roles.modal.isActive")}</label>
             <Switch checked={isActive} onCheckedChange={setIsActive} />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">{t("admin.roles.modal.permissions")}</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto border rounded-md p-2">
+              {permissions.map((permission) => (
+                <label key={permission.id} className="flex items-center gap-2">
+                  <Checkbox
+                    checked={selectedPermissionIds.includes(permission.id.toString())}
+                    onCheckedChange={() => handleTogglePermission(permission.id.toString())}
+                  />
+                  <span className="text-sm">{permission.name}</span>
+                </label>
+              ))}
+            </div>
           </div>
 
           <DialogFooter className="pt-4">

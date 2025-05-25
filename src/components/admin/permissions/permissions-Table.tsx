@@ -190,14 +190,14 @@ export function PermissionsTable() {
         open={deleteOpen}
         onClose={() => { if (!deleteLoading) handleCloseDeleteModal() }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa quyền"
+        title={t("admin.permissions.confirmDeleteTitle")}
         description={
           permissionToDelete
-            ? <>Bạn có chắc chắn muốn xóa quyền <b>{permissionToDelete.name}</b> không? Hành động này không thể hoàn tác.</>
+            ? t("admin.permissions.confirmDeleteDesc", { name: permissionToDelete.name })
             : ""
         }
-        confirmText="Xóa"
-        cancelText="Hủy"
+        confirmText={t("admin.permissions.modal.delete")}
+        cancelText={t("admin.permissions.modal.cancel")}
         loading={deleteLoading}
       />
     </div>

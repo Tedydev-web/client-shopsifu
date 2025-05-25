@@ -243,7 +243,10 @@
       "title": "Vai trò",
       "subtitle": "Quản lý tất cả vai trò của bạn tại đây",
       "search": "Tìm kiếm",
-      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày",
+      "editAction": "Chỉnh sửa thông tin",
+      "deleteAction": "Xóa quyền",
+      "addAction": "Thêm quyền"
     },
     "permissions": {
       "title": "Quyền",
@@ -269,7 +272,7 @@
         "subtitle": "Quản lý tất cả các quyền của bạn",
         "description": "Mô tả quyền",
         "path": "Đường dẫn quyền",
-        "method": "Phương thức quyền",
+        "method": "Phương thức",
         "namePlaceholder": "Nhập tên quyền"
       },
       "toast": {
@@ -294,9 +297,12 @@
         "methodPlaceholder": "Nhập phương thức quyền",
         "save": "Lưu thông tin",
         "cancel": "Hủy",
+        "delete": "Xóa",
         "processing": "Đang xử lý...",
         "success": "Thêm quyền thành công",
-        "error": "Đã xảy ra lỗi"
+        "error": "Đã xảy ra lỗi",
+        "isActive": "Hoạt động?",
+        "permissions": "Quyền"
       },
       "modalEdit": {
         "title": "Chỉnh sửa quyền",

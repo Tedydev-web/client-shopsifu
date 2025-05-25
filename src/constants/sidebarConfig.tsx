@@ -83,7 +83,7 @@ export const sidebarConfig: SidebarItem[] = [
       },
       {
         title: 'Quản lý vai trò',
-        href: '/admin/role',
+        href: '/admin/roles',
         icon: null,
       },
       {

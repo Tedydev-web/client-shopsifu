@@ -13,7 +13,9 @@
       "logout": "Logout",
       "or": "Or continue with",
       "signinWithGoogle": "Sign in with Google",
-      "signupWithGoogle": "Sign up with Google"
+      "signupWithGoogle": "Sign up with Google",
+      "cancel":"Cancel",
+      "delete":"Delete?"
     },
     "register": {
       "title": "Register an account",
@@ -291,9 +293,12 @@
         "methodPlaceholder": "Enter role method",
         "save": "Save Information",
         "cancel": "Cancel",
+        "delete":"Delete",
         "processing": "Processing...",
         "success": "Role added successfully",
-        "error": "An error occurred"
+        "error": "An error occurred",
+        "isActive": "Active?",
+        "permissions": "Permissions"
       },
       "modalEdit": {
         "title": "Edit Role",
@@ -355,6 +360,7 @@
         "methodPlaceholder": "Enter permission method",
         "save": "Save Information",
         "cancel": "Cancel",
+        "delete": "Delete",
         "processing": "Processing...",
         "success": "Permission added successfully",
         "error": "An error occurred"

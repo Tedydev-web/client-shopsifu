@@ -4,9 +4,6 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PlusIcon, Loader2 } from 'lucide-react'
 
-import { roleService } from '@/services/roleService'
-import { RoleCreateRequest, RoleGetAllResponse } from '@/types/role.interface'
-
 import { Button } from '@/components/ui/button'
 import SearchInput from '@/components/ui/data-table/search-input'
 import { DataTable } from '@/components/ui/data-table/data-table'
@@ -17,134 +14,136 @@ import { RolesColumns, Role } from './roles-Columns'
 import RolesModalUpsert from './roles-ModalUpsert'
 import { useDebounce } from '@/hooks/useDebounce'
 import { showToast } from '@/components/ui/toastify'
+import { useRoles } from './useRoles'
 
 export default function RolesTable() {
   const { t } = useTranslation()
-  const [roles, setRoles] = useState<Role[]>([])
-  const [loading, setLoading] = useState(false)
-  const [isSearching, setIsSearching] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null)
-  const [roleToEdit, setRoleToEdit] = useState<Role | null>(null)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
+  const {
+    roles,
+    totalItems,
+    page,
+    totalPages,
+    loading,
+    isModalOpen,
+    selectedRole,
+    getAllRoles,
+    handleOpenModal,
+    handleCloseModal,
+    setCurrentPage,
+    deleteRole,
+    createRole,
+    updateRole,
+  } = useRoles()
 
-  const [searchValue, setSearchValue] = useState("")
-  const [page, setPage] = useState(1)
+  const [searchValue, setSearchValue] = useState("");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] =
+    useState<Role | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
   const [limit, setLimit] = useState(10)
-  const [totalPages, setTotalPages] = useState(0)
-  const [totalItems, setTotalItems] = useState(0)
+  const [offset, setOffset] = useState(0)
 
-  const debouncedSearch = useDebounce(searchValue, 1000)
-
-  const fetchRoles = async () => {
-    setLoading(true)
-    try {
-      const res: RoleGetAllResponse = await roleService.getAll({ page, limit, search: debouncedSearch })
-      const flattened = res.data.flat()
-      setRoles(flattened)
-      setTotalItems(res.totalItems)
-      setTotalPages(res.totalPages)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const debouncedSearchValue = useDebounce(searchValue, 1000)
 
   useEffect(() => {
-    fetchRoles()
+    getAllRoles({ page, limit })
   }, [page, limit])
 
   useEffect(() => {
-    if (debouncedSearch !== undefined) {
-      setIsSearching(true)
-      setPage(1)
-      roleService.getAll({ page: 1, limit, search: debouncedSearch })
-        .then(res => {
-          const flattened = res.data.flat()
-          setRoles(flattened)
-          setTotalItems(res.totalItems)
-          setTotalPages(res.totalPages)
-        })
-        .finally(() => setIsSearching(false))
+    if (debouncedSearchValue !== undefined) {
+      setCurrentPage(1)
+      getAllRoles({ page: 1, limit, search: debouncedSearchValue })
     }
-  }, [debouncedSearch])
-
-  const handleDelete = (role: Role) => {
-    setRoleToDelete(role)
-    setDeleteOpen(true)
-  }
-
-  const confirmDelete = async () => {
-    if (!roleToDelete) return
-    setDeleteLoading(true)
-    try {
-      await roleService.delete(roleToDelete.id.toString())
-      setDeleteOpen(false)
-      fetchRoles()
-      showToast(t("admin.roles.deletedSuccess"), "success")
-    } catch (err) {
-      showToast(t("admin.roles.deleteError"), "error")
-    } finally {
-      setDeleteLoading(false)
-    }
-  }
-
-  const handleAddRole = () => {
-    setRoleToEdit(null)
-    setIsModalOpen(true)
-  }
+  }, [debouncedSearchValue, limit])
 
   const handleEdit = (role: Role) => {
-    setRoleToEdit(role)
-    setIsModalOpen(true)
+    handleOpenModal(role)
   }
 
+  const handleOpenDelete = (role: Role) => {
+    setRoleToDelete(role);
+    setDeleteOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteOpen(false)
+    setRoleToDelete(null)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!roleToDelete) return;
+    setDeleteLoading(true);
+    try {
+      const success = await deleteRole(roleToDelete.id); // Chuyển id thành string
+      if (success) {
+        handleCloseDeleteModal();
+        getAllRoles({ page: page, limit}); // Chuyển page và limit thành string
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa quyền:', error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleSubmit = async (values: {
-    name: string;
-    description: string;
-    isActive: boolean;
+    name: string
+    description: string
+    isActive: boolean
     permissionIds: string[]
   }) => {
-    const payload: RoleCreateRequest = {
+    const payload = {
       name: values.name,
       description: values.description,
       isActive: values.isActive,
-      permissionIds: [], // sẽ thay đổi sau khi gán quyền
-    };
+      permissionIds: [], // Permission assignment done later?
+    }
 
     try {
-      if (roleToEdit) {
-        await roleService.update(roleToEdit.id.toString(), payload);
-        showToast(t("admin.roles.updatedSuccess"), "success");
+      if (selectedRole) {
+        await updateRole(selectedRole.id, payload)
+        showToast(t('admin.roles.updatedSuccess'), 'success')
       } else {
-        await roleService.create(payload);
-        showToast(t("admin.roles.createdSuccess"), "success");
+        await createRole(payload)
+        showToast(t('admin.roles.createdSuccess'), 'success')
       }
-      setIsModalOpen(false);
-      setRoleToEdit(null);
-      fetchRoles();
+      handleCloseModal()
+      getAllRoles({ page, limit, search: debouncedSearchValue })
     } catch (err) {
       showToast(
-        roleToEdit
-          ? t("admin.roles.updateError")
-          : t("admin.roles.createError"),
-        "error"
-      );
+        selectedRole
+          ? t('admin.roles.updateError')
+          : t('admin.roles.createError'),
+        'error'
+      )
     }
-  };
+  }
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    getAllRoles({ page: newPage, limit })
+  }
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit)
+    getAllRoles({ page: 1, limit: newLimit })
+  }
 
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2">
         <SearchInput
           value={searchValue}
-          onValueChange={setSearchValue}
+          onValueChange={handleSearch}
           placeholder={t("admin.roles.searchPlaceholder")}
           className="max-w-sm"
         />
-        <Button onClick={handleAddRole} className="ml-auto">
+        <Button onClick={() => handleOpenModal()} className="ml-auto">
           <PlusIcon className="w-4 h-4 mr-2" />
           {t("admin.roles.addAction")}
         </Button>
@@ -157,7 +156,10 @@ export default function RolesTable() {
           </div>
         )}
         <DataTable
-          columns={RolesColumns({ onDelete: handleDelete, onEdit: handleEdit })}
+          columns={RolesColumns({
+            onDelete: handleOpenDelete,
+            onEdit: handleEdit,
+          })}
           data={roles}
         />
       </div>
@@ -168,7 +170,7 @@ export default function RolesTable() {
           page={page}
           totalPages={totalPages}
           totalRecords={totalItems}
-          onPageChange={setPage}
+          onPageChange={setCurrentPage}
           onLimitChange={setLimit}
         />
       )}
@@ -176,23 +178,23 @@ export default function RolesTable() {
       <RolesModalUpsert
         open={isModalOpen}
         onClose={handleCloseModal}
-        mode="edit"
-        defaultValues={roleToEdit}
+        mode={selectedRole ? "edit" : "add"}
+        role={selectedRole}
         onSubmit={handleSubmit}
       />
 
       <ConfirmDeleteModal
         open={deleteOpen}
         onClose={() => !deleteLoading && setDeleteOpen(false)}
-        onConfirm={confirmDelete}
+        onConfirm={handleConfirmDelete}
         title={t("admin.roles.confirmDeleteTitle")}
         description={
           roleToDelete
             ? t("admin.roles.confirmDeleteDesc", { name: roleToDelete.name })
             : ""
         }
-        confirmText={t("common.delete")}
-        cancelText={t("common.cancel")}
+        confirmText={t("admin.roles.modal.delete")}
+        cancelText={t("admin.roles.modal.cancel")}
         loading={deleteLoading}
       />
     </div>

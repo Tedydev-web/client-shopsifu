@@ -22,6 +22,15 @@ export interface Role {
   updatedAt: string;
 }
 
+export interface RoleGetAllResponse {
+  data: Role[]; // ✅ một mảng Role, không phải mảng các mảng
+  totalItems: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+
 const getRoleActions = (
   role: Role,
   onDelete: (role: Role) => void,

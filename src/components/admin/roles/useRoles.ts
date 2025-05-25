@@ -3,16 +3,18 @@ import { roleService } from "@/services/roleService"
 import { showToast } from "@/components/ui/toastify"
 import { parseApiError } from "@/utils/error"
 import {
-  RoleResponse,
+  RoleGetAllResponse,
   RoleCreateRequest,
   RoleUpdateRequest,
 } from "@/types/role.interface"
 import { PaginationRequest } from "@/types/base.interface"
+import { Role } from "./roles-Columns"
+import { string } from "zod"
 
 export function useRoles() {
-  const [roles, setRoles] = useState<RoleResponse[]>([])
+  const [roles, setRoles] = useState<Role[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<RoleResponse | null>(null)
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null)
   const [loading, setLoading] = useState(false)
   const [totalItems, setTotalItems] = useState(0)
   const [page, setCurrentPage] = useState(1)
@@ -22,17 +24,20 @@ export function useRoles() {
   const getAllRoles = async (params?: PaginationRequest) => {
     try {
       setLoading(true)
-      const response = await roleService.getAll(params)
+      const response: RoleGetAllResponse = await roleService.getAll();
+      setRoles(response.data)
       // response.data là mảng RoleResponse hoặc kiểu tương tự
-      const mappedRoles: RoleResponse[] = response.data.map((role: any) => ({
-        id: String(role.id),
+      const mappedRoles: Role[] = response.data.map(role => ({
+        id: Number(role.id),
         name: role.name,
         description: role.description || "",
         isActive: role.isActive ?? true,
-        permissions: role.permissions || [],
-        role: role.role || "", // nếu API có trường này, không thì để chuỗi rỗng
-        createdAt: typeof role.createdAt === "string" ? Number(new Date(role.createdAt)) : Number(role.createdAt),
-        updatedAt: typeof role.updatedAt === "string" ? Number(new Date(role.updatedAt)) : Number(role.updatedAt),
+        createdById: role.createdById,
+        updatedById: role.updatedById,
+        deletedById: role.deletedById,
+        deletedAt: role.deletedAt,
+        createdAt: role.createdAt,
+        updatedAt: role.updatedAt,
       }))
       setRoles(mappedRoles)
       setTotalItems(response.totalItems)
@@ -109,7 +114,7 @@ export function useRoles() {
   }
 
   // Mở modal tạo hoặc sửa role
-  const handleOpenModal = (role?: RoleResponse) => {
+  const handleOpenModal = (role?: Role) => {
     if (role) {
       setSelectedRole(role)
     } else {
