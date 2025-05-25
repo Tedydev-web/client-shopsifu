@@ -245,8 +245,66 @@
     "roles": {
       "title": "Roles",
       "subtitle": "Manage all your roles",
+      "add": "Add New Role",
+      "edit": "Edit Role",
+      "delete": "Delete Role",
+      "confirmDeleteTitle": "Confirm Role Deletion",
+      "confirmDeleteDesc": "Are you sure you want to delete the role {{name}}? This action cannot be undone.",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
       "search": "Search",
-      "searchPlaceholder": "Search by user, action, or date"
+      "searchPlaceholder": "Search by role name or description",
+      "name": "Role Name",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions",
+      "noData": "No data available.",
+      "addTitle": "Add Role",
+      "editTitle": "Edit Role",
+      "form": {
+        "name": "Role Name",
+        "subtitle": "Manage all your roles",
+        "description": "Role Description",
+        "path": "Role Path",
+        "method": "Role Method",
+        "namePlaceholder": "Enter role name"
+      },
+      "toast": {
+        "addSuccess": "Role created successfully",
+        "editSuccess": "Role updated successfully",
+        "deleteSuccess": "Role deleted successfully"
+      },
+      "editAction": "Edit Information",
+      "deleteAction": "Delete Role",
+      "addAction": "Add Role",
+      "modal": {
+        "title": "Add New Role",
+        "subtitle": "Enter role details to add to the system",
+        "description": "Role Description",
+        "name": "Role Name",
+        "path": "Role Path",
+        "method": "Role Method",
+        "namePlaceholder": "Enter role name",
+        "searchPlaceholder": "Search by code or name...",
+        "descriptionPlaceholder": "Enter role description",
+        "pathPlaceholder": "Enter role path",
+        "methodPlaceholder": "Enter role method",
+        "save": "Save Information",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "success": "Role added successfully",
+        "error": "An error occurred"
+      },
+      "modalEdit": {
+        "title": "Edit Role",
+        "subtitle": "Enter role details to edit",
+        "save": "Save Information",
+        "cancel": "Cancel",
+        "processing": "Processing...",
+        "success": "Role updated successfully",
+        "error": "An error occurred",
+        "edit": "Edit Role"
+      }
     },
     "permissions": {
       "title": "Permissions",
