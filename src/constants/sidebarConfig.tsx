@@ -98,6 +98,11 @@ export const sidebarConfig: SidebarItem[] = [
         href: '/admin/audit-logs',
         icon: null,
       },
+      {
+        title: 'Quản lý thiết bị',
+        href: '/admin/device',
+        icon: null,
+      },
     ],
   },  
   {
@@ -111,7 +116,12 @@ export const sidebarConfig: SidebarItem[] = [
         icon: null,
       },
     ],
-  }
+  },
+  {
+    title: 'Cài đặt',
+    href: '/admin/settings',
+    icon: <Undo className="w-5 h-5" />,
+  },
 ]
 
 export const settingsSidebarConfig: SidebarItem[] = [
@@ -130,14 +140,6 @@ export const settingsSidebarConfig: SidebarItem[] = [
         href: '/admin/settings/profile',
       },
     ]
-  },
-  {
-    title: 'Cửa hàng',
-    href: '/admin/settings/store',
-  },
-  {
-    title: 'Bảo mật',
-    href: '/admin/settings/security',
-  },
+  }
   // Add more settings items as needed
 ]

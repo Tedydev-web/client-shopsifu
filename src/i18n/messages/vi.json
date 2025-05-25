@@ -315,6 +315,12 @@
         "edit": "Chỉnh sửa ngôn ngữ"
       }
     },
+    "settings": {
+      "profile": {
+        "title": "Cài đặt hồ sơ",
+        "subtitle": "Quản lý thông tin cá nhân và bảo mật tài khoản của bạn"
+      }
+    },
     "notifications": {
       "title": "Thông báo",
       "emptyTitle": "Chưa có thông báo",

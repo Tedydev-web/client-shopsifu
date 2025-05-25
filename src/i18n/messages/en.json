@@ -319,6 +319,12 @@
         "edit": "Edit Language"
       }
     },
+    "settings": {
+      "profile": {
+        "title": "Profile Settings",
+        "subtitle": "Manage your personal information and account security"
+      }
+    },
     "notifications": {
       "title": "Notifications",
       "emptyTitle": "No notifications",

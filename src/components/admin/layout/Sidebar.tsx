@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { sidebarConfig, SidebarItem, settingsSidebarConfig } from '@/constants/sidebarConfig'
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDown, X, Undo, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
 import { Button } from '@/components/ui/button'
@@ -15,12 +15,14 @@ import { ProfileDropdownSidebar } from './ProfileDropdown-Sidebar'
 interface SidebarProps {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onCollapse?: (collapsed: boolean) => void;
 }
 
-export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
+export function Sidebar({ isOpen: externalOpen, onOpenChange, onCollapse }: SidebarProps) {
   const pathname = usePathname()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [internalOpen, setInternalOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const { isMobile } = useResponsive()
 
   const open = externalOpen ?? internalOpen
@@ -35,6 +37,14 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
         ? prev.filter(item => item !== href)
         : [...prev, href]
     )
+  }
+
+  const toggleCollapse = () => {
+    setIsCollapsed(prev => {
+      const newState = !prev;
+      onCollapse?.(newState);
+      return newState;
+    });
   }
 
   const isActive = (href: string, item: SidebarItem) => {
@@ -72,14 +82,14 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
       {settingsSidebarConfig.map((item, idx) => {
         if (item.isTitle) {
           return (
-            <div key={item.href} className="px-2 py-2 mb-2">
-              <Link
-                href={item.href}
-                className="flex items-center gap-2 py-2 rounded-lg transition-colors duration-150 text-gray-700 hover:text-primary font-semibold text-base"
-              >
-                {item.icon && <span className="mr-1">{item.icon}</span>}
-                <span>{item.title}</span>
-              </Link>
+            <div key={item.href} className="mb-2">
+             <Link
+              href={item.href}
+              className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-[#52525B] hover:bg-gray-100 font-semibold text-sm"
+            >
+              {item.icon && <span className="mr-1 text-[#52525B]">{item.icon}</span>}
+              <span>{item.title}</span>
+            </Link>
             </div>
           )
         }
@@ -88,7 +98,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
         return (
           <div key={item.href} className="mb-2">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 mt-2">
+              <div className="text-xs font-semibold text-[#52525B] uppercase tracking-wide mb-1 mt-2">
                 {item.title}
               </div>
             </div>
@@ -96,16 +106,16 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
               <div className="flex flex-col gap-0.5">
                 {item.subItems!.map(sub => (
                   <Link key={sub.href} href={sub.href} className={cn(
-                    "px-3 py-2 rounded text-[15px] font-normal",
-                    pathname === sub.href && "border border-gray-200 bg-white font-semibold shadow-sm"
+                    "px-3 py-2 rounded-md text-sm font-normal text-[#52525B] hover:bg-primary/10 hover:text-primary transition-colors duration-200",
+                    pathname === sub.href && "bg-primary/10 text-primary font-medium"
                   )}>{sub.title}</Link>
                 ))}
               </div>
             )}
             {!hasSub && (
               <Link href={item.href} className={cn(
-                "px-3 py-2 rounded text-[15px] font-normal block",
-                pathname === item.href && "border border-gray-200 bg-white font-semibold shadow-sm"
+                "px-3 py-2 rounded-md text-sm font-medium block text-gray-500 hover:bg-primary/10 hover:text-primary transition-colors duration-200",
+                pathname === item.href && "bg-primary/10 text-primary font-medium"
               )}>{item.title}</Link>
             )}
             {idx < settingsSidebarConfig.length - 1 && (
@@ -199,11 +209,14 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
 
       {/* Sidebar */}
       <aside className={cn(
-        'w-64 bg-white border-r h-[calc(100vh-4rem)] fixed top-16 flex flex-col',
+        'bg-white border-r h-[calc(100vh-4rem)] fixed top-16 flex flex-col transition-all duration-300',
         {
           // Mobile styles
           'inset-y-0 left-0 z-50 h-screen transition-transform duration-300': isMobile,
           '-translate-x-full': isMobile && !open,
+          // Desktop collapse styles
+          'w-64': !isCollapsed && !isMobile,
+          'w-0': isCollapsed && !isMobile,
         }
       )}>
         {isMobile && (
@@ -227,16 +240,40 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange }: SidebarProps) {
         )}
         <div className={cn(
           "h-full overflow-y-auto flex-1",
-          isMobile && "h-[calc(100vh-4rem)]"
+          isMobile && "h-[calc(100vh-4rem)]",
+          isCollapsed && !isMobile && "hidden"
         )}>
           <nav className="p-4 space-y-2">
-            {isSettingsPage ? renderSettingsSidebar() : currentSidebarConfig.map(item => renderItem(item))}
+            {isSettingsPage ? renderSettingsSidebar() : currentSidebarConfig.filter(item => item.title !== 'Cài đặt').map(item => renderItem(item))}
           </nav>
         </div>
+        {/* Settings item rendered separately, just above ProfileDropdownSidebar */}
+        {!isSettingsPage && !isCollapsed && (
+          <div className="px-4 py-2">
+            <Link
+              href="/admin/settings"
+              className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-[#52525B] hover:bg-primary/10 font-semibold text-sm"
+            >
+              <Settings className="w-5 h-5 text-[#52525B]" />
+              <span>Cài đặt</span>
+            </Link>
+          </div>
+        )}
         {/* Profile dropdown at the bottom */}
-        <div className="p-4 border-t">
-          <ProfileDropdownSidebar />
-        </div>
+        {!isCollapsed && (
+          <div className="p-4 border-t">
+            <ProfileDropdownSidebar />
+          </div>
+        )}
+        {/* Collapse/Expand button for desktop */}
+        {!isMobile && (
+          <button
+            onClick={toggleCollapse}
+            className="absolute -right-4 top-1/2 transform -translate-y-1/2 bg-white border border-gray-200 rounded-full p-1 shadow-sm hover:bg-gray-50"
+          >
+            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
+        )}
       </aside>
     </>
   )
