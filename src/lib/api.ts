@@ -11,6 +11,7 @@ import { addHours, differenceInMinutes } from 'date-fns';
 import { authService } from '@/services/authService';
 import { useLogout } from '@/hooks/useLogout';
 import { ROUTES } from '@/constants/route';
+import { getStore } from '@/store/store';
 
 // Constants
 const TOKEN_CHECK_INTERVAL = 300000; // 5 minutes
@@ -78,15 +79,18 @@ export const publicAxios = axios.create({
 publicAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token') // 🔍 Đọc cookie
-
+      const csrfToken = Cookies.get('xsrf-token');
       if (csrfToken && config.headers) {
-        config.headers['x-csrf-token'] = csrfToken // ✅ Gắn header
-        console.log('➡️ CSRF Token attached:', csrfToken)
+        config.headers['x-csrf-token'] = csrfToken;
+      }
+      // Inject Accept-Language from Redux
+      const store = getStore();
+      const lang = store.store.getState().langShopsifu?.language || 'vi';
+      if (config.headers) {
+        config.headers['Accept-Language'] = lang;
       }
     }
-
-    return config
+    return config;
   },
   (error) => Promise.reject(error)
 )
@@ -114,14 +118,18 @@ export const refreshAxios = axios.create({
 refreshAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token')
-
+      const csrfToken = Cookies.get('xsrf-token');
       if (csrfToken && config.headers) {
-        config.headers['x-csrf-token'] = csrfToken
+        config.headers['x-csrf-token'] = csrfToken;
+      }
+      // Inject Accept-Language from Redux
+      const store = getStore();
+      const lang = store.store.getState().langShopsifu?.language || 'vi';
+      if (config.headers) {
+        config.headers['Accept-Language'] = lang;
       }
     }
-
-    return config
+    return config;
   },
   (error) => Promise.reject(error)
 )
@@ -202,12 +210,16 @@ privateAxios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
       const csrfToken = Cookies.get('xsrf-token');
-
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
       }
+      // Inject Accept-Language from Redux
+      const store = getStore();
+      const lang = store.store.getState().langShopsifu?.language || 'vi';
+      if (config.headers) {
+        config.headers['Accept-Language'] = lang;
+      }
     }
-
     return config;
   },
   (error) => Promise.reject(error)

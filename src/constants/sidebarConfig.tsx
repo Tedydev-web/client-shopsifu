@@ -120,7 +120,7 @@ export const sidebarConfig: SidebarItem[] = [
   {
     title: 'Cài đặt',
     href: '/admin/settings',
-    icon: <Undo className="w-5 h-5" />,
+    icon: <Settings className="w-5 h-5" />,
   },
 ]
 
