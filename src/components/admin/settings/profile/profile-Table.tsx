@@ -13,14 +13,31 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import { ProfileUpdateSheet } from './profile-Update'
+import { Profile2FAModal } from './profile-2faModal'
+import { useProfile } from './useProfile'
 
 export function ProfileSettingsTable() {
   // Dữ liệu mẫu, có thể lấy từ props hoặc context
   const profile = profileMockData
-  // State mẫu cho 2FA
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false)
   // State for update sheet
   const [openUpdate, setOpenUpdate] = useState(false)
+
+  // 2FA logic from useProfile
+  const {
+    is2FAEnabled,
+    show2FADialog,
+    setShow2FADialog,
+    showQRDialog,
+    setShowQRDialog,
+    qrUri,
+    loading,
+    totpCode,
+    setTotpCode,
+    handle2FAToggle,
+    handleConfirm2FA,
+    handleConfirmSetup,
+    t,
+  } = useProfile()
 
   const columns: SettingTableColumn[] = [
     { label: 'Tên', value: profile.name },
@@ -55,8 +72,9 @@ export function ProfileSettingsTable() {
           <div className="flex-1 flex">
             <Switch
               checked={is2FAEnabled}
-              onCheckedChange={setIs2FAEnabled}
+              onCheckedChange={handle2FAToggle}
               id="2fa"
+              disabled={loading}
             />
           </div>
         </div>
@@ -65,6 +83,20 @@ export function ProfileSettingsTable() {
         open={openUpdate}
         onOpenChange={setOpenUpdate}
         initialData={profile}
+      />
+      <Profile2FAModal
+        show2FADialog={show2FADialog}
+        setShow2FADialog={setShow2FADialog}
+        showQRDialog={showQRDialog}
+        setShowQRDialog={setShowQRDialog}
+        is2FAEnabled={is2FAEnabled}
+        loading={loading}
+        qrUri={qrUri}
+        totpCode={totpCode}
+        setTotpCode={setTotpCode}
+        onConfirm2FA={handleConfirm2FA}
+        onConfirmSetup={handleConfirmSetup}
+        t={t}
       />
     </>
   )
