@@ -2,8 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
-import { DataTableRowActions, ActionItem } from "@/components/ui/data-table/data-table-row-actions";
+import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
+import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
 import { Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 

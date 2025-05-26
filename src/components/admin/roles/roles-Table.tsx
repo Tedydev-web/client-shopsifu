@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 import { PlusIcon, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import SearchInput from '@/components/ui/data-table/search-input'
-import { DataTable } from '@/components/ui/data-table/data-table'
-import { Pagination } from '@/components/ui/data-table/pagination'
+import SearchInput from '@/components/ui/data-table-component/search-input'
+import { DataTable } from '@/components/ui/data-table-component/data-table'
+import { Pagination } from '@/components/ui/data-table-component/pagination'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
 
 import { RolesColumns, Role } from './roles-Columns'
