@@ -53,6 +53,13 @@ export const API_ENDPOINTS = {
     GET_BY_ID: `${API_BASE}/audit-logs/:id`,
     GET_ACTIONS: `${API_BASE}/audit-logs/actions`,
     GET_ENTITIES: `${API_BASE}/audit-logs/entities`,
-  }
+  },
+  DEVICES: {
+    GETALL: `${API_BASE}/devices`,
+    GETBYID: `${API_BASE}/devices/:id`,
+    UPDATE: `${API_BASE}/devices/:id`,
+    POST: `${API_BASE}/devices`,
+    DELETE_BY_ID: `${API_BASE}/devices/:id`,
+  },
   // ... các endpoints khác
 }
