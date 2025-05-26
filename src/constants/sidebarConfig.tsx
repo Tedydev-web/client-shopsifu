@@ -80,12 +80,12 @@ export const sidebarConfig: SidebarItem[] = [
     subItems: [
       {
         title: 'Quản lý phân quyền',
-        href: '/admin/permission',
+        href: '/admin/permissions',
         icon: null,
       },
       {
         title: 'Quản lý vai trò',
-        href: '/admin/role',
+        href: '/admin/roles',
         icon: null,
       },
       {

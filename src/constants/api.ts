@@ -19,12 +19,13 @@ export const API_ENDPOINTS = {
     CONFIRM_2FA: `${API_BASE}/auth/2fa/confirm-setup`,
     TRUST_DEVICE: `${API_BASE}/auth/trust-device`,
   },
-  ROLE:{
-    GETALL: `${API_BASE}/role/create`,
-    GET: `${API_BASE}/role/create`,
-    UPDATE: `${API_BASE}/role/create`,
-    POST: `${API_BASE}/role/create`,
-    DELETE_ALL: `${API_BASE}/role/create`,
+  ROLES:{
+    GETALL: `${API_BASE}/roles`,
+    GETBYID: `${API_BASE}/roles/:id`,
+    UPDATE: `${API_BASE}/roles/:id`,
+    POST: `${API_BASE}/roles`,
+    POST_ROLE_PERMISSIONS: `${API_BASE}/roles/:id/assign-permissions`,
+    DELETE_BY_ID: `${API_BASE}/roles/:id`,
   },
   PERMISSION:{
     GETALL: `${API_BASE}/permissions`,

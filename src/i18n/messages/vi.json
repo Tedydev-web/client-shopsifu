@@ -242,13 +242,84 @@
       "title": "Vai trò",
       "subtitle": "Quản lý tất cả vai trò của bạn tại đây",
       "search": "Tìm kiếm",
-      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày",
+      "editAction": "Chỉnh sửa thông tin",
+      "deleteAction": "Xóa quyền",
+      "addAction": "Thêm quyền"
     },
     "permissions": {
-      "title": "Quyền hạn",
-      "subtitle": "Quản lý tất cả quyền hạn của bạn tại đây",
+      "title": "Quyền",
+      "subtitle": "Quản lý tất cả các quyền của bạn",
+      "add": "Thêm quyền mới",
+      "edit": "Chỉnh sửa quyền",
+      "delete": "Xóa quyền",
+      "confirmDeleteTitle": "Xác nhận xóa quyền",
+      "confirmDeleteDesc": "Bạn có chắc chắn muốn xóa quyền {{name}} không? Hành động này không thể hoàn tác.",
+      "confirm": "Xác nhận",
+      "cancel": "Hủy",
       "search": "Tìm kiếm",
-      "searchPlaceholder": "Tìm kiếm theo người dùng, hành động hoặc ngày"
+      "searchPlaceholder": "Tìm theo người dùng, hành động hoặc ngày",
+      "name": "Tên quyền",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Ngày cập nhật",
+      "actions": "Hành động",
+      "noData": "Không có dữ liệu.",
+      "addTitle": "Thêm quyền",
+      "editTitle": "Chỉnh sửa quyền",
+      "form": {
+        "name": "Tên quyền",
+        "subtitle": "Quản lý tất cả các quyền của bạn",
+        "description": "Mô tả quyền",
+        "path": "Đường dẫn quyền",
+        "method": "Phương thức",
+        "namePlaceholder": "Nhập tên quyền"
+      },
+      "toast": {
+        "addSuccess": "Tạo quyền thành công",
+        "editSuccess": "Cập nhật quyền thành công",
+        "deleteSuccess": "Xóa quyền thành công"
+      },
+      "editAction": "Chỉnh sửa thông tin",
+      "deleteAction": "Xóa quyền",
+      "addAction": "Thêm quyền",
+      "modal": {
+        "title": "Thêm quyền mới",
+        "subtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "description": "Mô tả quyền",
+        "name": "Tên quyền",
+        "path": "Đường dẫn quyền",
+        "method": "Phương thức quyền",
+        "namePlaceholder": "Nhập tên quyền",
+        "searchPlaceholder": "Tìm theo mã hoặc tên...",
+        "descriptionPlaceholder": "Nhập mô tả quyền",
+        "pathPlaceholder": "Nhập đường dẫn quyền",
+        "methodPlaceholder": "Nhập phương thức quyền",
+        "save": "Lưu thông tin",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "processing": "Đang xử lý...",
+        "success": "Thêm quyền thành công",
+        "error": "Đã xảy ra lỗi",
+        "isActive": "Hoạt động?",
+        "permissions": "Quyền"
+      },
+      "modalEdit": {
+        "title": "Chỉnh sửa quyền",
+        "subtitle": "Nhập thông tin quyền để chỉnh sửa",
+        "save": "Lưu thông tin",
+        "cancel": "Hủy",
+        "processing": "Đang xử lý...",
+        "success": "Cập nhật quyền thành công",
+        "error": "Đã xảy ra lỗi",
+        "edit": "Chỉnh sửa quyền"
+      },
+      "methods": {
+        "GET": "GET",
+        "POST": "POST",
+        "PUT": "PUT",
+        "DELETE": "DELETE",
+        "PATCH": "PATCH"
+      }
     },
     "users": {
       "title": "Người dùng",

@@ -115,7 +115,7 @@ export default function LanguagesModalUpsert({
                 <SelectValue placeholder={t("admin.languages.modal.codePlaceholder")} />
               </SelectTrigger>
               <SelectContent className="w-full">
-                <div className="p-2">
+                <div>
                   <input
                     className="w-full px-2 py-1 border rounded text-sm"
                     placeholder={t("admin.languages.modal.searchPlaceholder")}
