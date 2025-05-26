@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
+import { cn } from "@/lib/utils";
 
 export type SettingTableColumn = {
   label: string;
@@ -13,11 +14,12 @@ interface SettingTableProps {
   subtitle?: string;
   rightAction?: React.ReactNode;
   children?: React.ReactNode; // for extra rows (e.g. 2FA toggle)
+  className?: string;
 }
 
-export function SettingTable({ columns = [], title, subtitle, rightAction, children }: SettingTableProps) {
+export function SettingTable({ columns = [], title, subtitle, rightAction, children, className }: SettingTableProps) {
   return (
-    <Card className="w-full max-w-none rounded-xl shadow-sm border border-gray-300">
+    <Card className={cn("w-full max-w-none rounded-xl shadow-sm border border-gray-300", className)}>
       {(title || subtitle || rightAction) && (
         <CardHeader className="flex flex-row items-center justify-between px-6 py-5 border-b border-gray-200">
           <div>

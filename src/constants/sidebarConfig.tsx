@@ -141,7 +141,7 @@ export const settingsSidebarConfig: SidebarItem[] = [
       },
       {
         title: 'Mật khẩu và bảo mật',
-        href: '/admin/settings/security',
+        href: '/admin/settings/password-and-security',
       },
     ]
   }
