@@ -4,8 +4,8 @@ import { ColumnDef } from '@tanstack/react-table'
 import { User } from '@/types/user.interface' // Import User type
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header' // Assuming you will create this for sorting
-import { DataTableRowActions, ActionItem } from '@/components/ui/data-table/data-table-row-actions' // Import ActionItem
+import { DataTableColumnHeader } from '@/components/ui/data-table-component/data-table-column-header' // Assuming you will create this for sorting
+import { DataTableRowActions, ActionItem } from '@/components/ui/data-table-component/data-table-row-actions' // Import ActionItem
 import { Edit, Trash2, Eye, UserCog } from 'lucide-react'; // Ví dụ icons
 
 // Hàm tạo danh sách actions cụ thể cho User

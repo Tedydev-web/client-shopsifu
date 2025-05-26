@@ -98,12 +98,12 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange, onCollapse }: Side
         return (
           <div key={item.href} className="mb-2">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-[#52525B] uppercase tracking-wide mb-1 mt-2">
+              <div className="text-sm font-semibold text-[#52525B] tracking-wide mb-1 mt-2">
                 {item.title}
               </div>
             </div>
             {hasSub && (
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-2">
                 {item.subItems!.map(sub => (
                   <Link key={sub.href} href={sub.href} className={cn(
                     "px-3 py-2 rounded-md text-sm font-normal text-[#52525B] hover:bg-primary/10 hover:text-primary transition-colors duration-200",

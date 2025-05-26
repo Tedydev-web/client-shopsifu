@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { DataTable } from '@/components/ui/data-table/data-table'
-import { Pagination } from '@/components/ui/data-table/pagination'
+import { DataTable } from '@/components/ui/data-table-component/data-table'
+import { Pagination } from '@/components/ui/data-table-component/pagination'
 import { userColumns } from './users-Columns'
 import { User } from '@/types/user.interface'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'

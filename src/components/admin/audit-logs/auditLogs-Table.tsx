@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { AuditLogsColumns, AuditLog } from "./auditLogs-Columns";
-import SearchInput from "@/components/ui/data-table/search-input";
-import { DataTable } from "@/components/ui/data-table/data-table";
-import { Pagination } from "@/components/ui/data-table/pagination";
+import SearchInput from "@/components/ui/data-table-component/search-input";
+import { DataTable } from "@/components/ui/data-table-component/data-table";
+import { Pagination } from "@/components/ui/data-table-component/pagination";
 import { useAuditLogs } from "./useAuditLogs";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Loader2 } from "lucide-react";

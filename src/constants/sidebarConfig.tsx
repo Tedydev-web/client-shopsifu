@@ -132,12 +132,16 @@ export const settingsSidebarConfig: SidebarItem[] = [
     isTitle: true
   },
   {
-    title: 'Quản lý tài khoản',
+    title: 'Cài đặt tài khoản',
     href: '/admin/settings',
     subItems:[
       {
-        title: 'Hồ sơ',
+        title: 'Hồ sơ cá nhân',
         href: '/admin/settings/profile',
+      },
+      {
+        title: 'Mật khẩu và bảo mật',
+        href: '/admin/settings/security',
       },
     ]
   }
