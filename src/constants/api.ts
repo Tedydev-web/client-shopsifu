@@ -12,7 +12,7 @@ export const API_ENDPOINTS = {
     GOOGLE_LOGIN: `${API_BASE}/auth/google-link`,
     VERIFY_OTP: `${API_BASE}/auth/verify-code`,
     RESET_PASSWORD: `${API_BASE}/auth/reset-password`,
-    VERIFY_2FA: `${API_BASE}/auth/2fa/verify`,
+    VERIFY_2FA: `${API_BASE}/auth/login/verify`,
     SETUP_2FA: `${API_BASE}/auth/2fa/setup`,
     DISABLE_2FA: `${API_BASE}/auth/2fa/disable`,
     GET_CSRF_TOKEN: `${API_BASE}/get-cookies`,

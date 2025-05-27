@@ -210,8 +210,11 @@ privateAxios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
       const csrfToken = Cookies.get('xsrf-token');
+      const sltToken = Cookies.get('slt_token');
+      console.log("sessionToken: ", sltToken)
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
+        // config.headers['slt_token'] = sltToken;
       }
       // Inject Accept-Language from Redux
       const store = getStore();

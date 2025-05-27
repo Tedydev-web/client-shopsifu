@@ -29,7 +29,7 @@ import { useEffect } from 'react'
 
 export function Verify2FAForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const router = useRouter()
-  const { loading, handleVerifyCode, sendOTP, type, switchToRecovery, schema } = useVerify2FA()
+  const { loading, handleVerifyCode,type, switchToRecovery, schema } = useVerify2FA()
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),

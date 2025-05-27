@@ -2,7 +2,6 @@
 
 import { MoreHorizontal, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
 import { useState } from 'react'
 import { SettingTable, SettingTableColumn } from '@/components/ui/settings-component/settings-table'
 import { profileMockData } from './profile-MockData'
@@ -13,7 +12,6 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import { ProfileUpdateSheet } from './profile-Update'
-import { Profile2FAModal } from './profile-2faModal'
 import { useProfile } from './useProfile'
 
 export function ProfileSettingsTable() {
@@ -22,20 +20,10 @@ export function ProfileSettingsTable() {
   // State for update sheet
   const [openUpdate, setOpenUpdate] = useState(false)
 
-  // 2FA logic from useProfile
+  // Profile logic from useProfile
   const {
-    is2FAEnabled,
-    show2FADialog,
-    setShow2FADialog,
-    showQRDialog,
-    setShowQRDialog,
-    qrUri,
     loading,
-    totpCode,
-    setTotpCode,
-    handle2FAToggle,
-    handleConfirm2FA,
-    handleConfirmSetup,
+    handleUpdateProfile,
     t,
   } = useProfile()
 
@@ -67,36 +55,11 @@ export function ProfileSettingsTable() {
           </DropdownMenu>
         }
       >
-        <div className="grid grid-cols-1 sm:grid-cols-[580px_1fr] px-6 py-4 gap-y-1 gap-x-6 items-start">
-          <div className="w-40 text-gray-600 text-sm">Xác thực hai yếu tố</div>
-          <div className="flex-1 flex">
-            <Switch
-              checked={is2FAEnabled}
-              onCheckedChange={handle2FAToggle}
-              id="2fa"
-              disabled={loading}
-            />
-          </div>
-        </div>
       </SettingTable>
       <ProfileUpdateSheet
         open={openUpdate}
         onOpenChange={setOpenUpdate}
         initialData={profile}
-      />
-      <Profile2FAModal
-        show2FADialog={show2FADialog}
-        setShow2FADialog={setShow2FADialog}
-        showQRDialog={showQRDialog}
-        setShowQRDialog={setShowQRDialog}
-        is2FAEnabled={is2FAEnabled}
-        loading={loading}
-        qrUri={qrUri}
-        totpCode={totpCode}
-        setTotpCode={setTotpCode}
-        onConfirm2FA={handleConfirm2FA}
-        onConfirmSetup={handleConfirmSetup}
-        t={t}
       />
     </>
   )

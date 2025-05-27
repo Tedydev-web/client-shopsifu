@@ -8,6 +8,7 @@ export type SettingTableColumn = {
   value: string | React.ReactNode;
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
+  onClick?: () => void;
 };
 
 interface SettingTableProps {
@@ -36,15 +37,23 @@ export function SettingTable({ columns = [], title, subtitle, rightAction, child
           {columns.map((column, index) => (
             <div
               key={index}
-              className="grid grid-cols-1 sm:grid-cols-[580px_1fr] px-6 py-4 gap-y-1 gap-x-6 items-start hover:bg-gray-50 first:hover:rounded-t-xl last:hover:rounded-b-xl transition-all"
+              onClick={column.onClick}
+              className={cn(
+                "grid grid-cols-1 sm:grid-cols-[580px_1fr] px-6 py-4 gap-y-1 gap-x-6 items-start hover:bg-gray-50 first:hover:rounded-t-xl last:hover:rounded-b-xl transition-all",
+                column.onClick && "cursor-pointer"
+              )}
             >
               <div className="text-gray-600 text-sm font-medium flex-shrink-0 flex items-center gap-2">
-                {column.startIcon}
+                <div className="w-4 h-4 text-gray-400 flex items-center justify-center">
+                  {column.startIcon}
+                </div>
                 {column.label}
               </div>
               <div className="break-words text-gray-900 text-sm flex items-center justify-between">
                 <div>{column.value}</div>
-                {column.endIcon}
+                <div className="w-4 h-4 text-gray-700 flex items-center justify-center">
+                  {column.endIcon}
+                </div>
               </div>
             </div>
           ))}

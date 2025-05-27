@@ -24,8 +24,7 @@ export function useVerify2FA() {
     try {
       setLoading(true)
       const response = await authService.verify2fa({
-        type,
-        code
+        code,
       }) as Verify2faResponse
       
       if (response.isDeviceTrustedInSession) {
@@ -41,23 +40,23 @@ export function useVerify2FA() {
     }
   }
 
-  const sendOTP = async () => {
-    const userEmail = sessionStorage.getItem(USER_EMAIL_KEY)
+  // const sendOTP = async () => {
+  //   const userEmail = sessionStorage.getItem(USER_EMAIL_KEY)
   
 
-    try {
-      setLoading(true)
-      await authService.sendOTP({
-        email: userEmail,
-        type: 'LOGIN'
-      })
-      showToast('Đã gửi mã OTP đến email của bạn', 'success')
-    } catch (error) {
-      showToast(parseApiError(error), 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
+  //   try {
+  //     setLoading(true)
+  //     await authService.sendOTP({
+  //       email: userEmail,
+  //       type: 'LOGIN'
+  //     })
+  //     showToast('Đã gửi mã OTP đến email của bạn', 'success')
+  //   } catch (error) {
+  //     showToast(parseApiError(error), 'error')
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const handleVerifyCode = async (data: { otp: string }) => {
 
@@ -89,7 +88,7 @@ export function useVerify2FA() {
   return { 
     loading, 
     handleVerifyCode, 
-    sendOTP, 
+    // sendOTP, 
     type, 
     switchToRecovery,
     schema: type === 'RECOVERY' ? recoveryCodeSchema : otpSchema 

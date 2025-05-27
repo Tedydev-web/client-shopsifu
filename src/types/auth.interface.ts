@@ -43,8 +43,9 @@ export interface RegisterResponse {
 
 // VERIFY + SEND
 export interface SendOTPRequest {
-  email
-  type: string
+  code?: string
+  email?: string
+  type?: string
 }
 export interface SendOTPResponse {
   email: string
@@ -92,10 +93,11 @@ export interface Confirm2faRequest {
 
 export interface Confirm2faResponse {
   message: string
+  recoveryCodes:[]
 }
 export interface Verify2faRequest {
   loginSessionToken?: string
-  type: string
+  type?: string
   code: string
 }
 
