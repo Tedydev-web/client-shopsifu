@@ -66,11 +66,11 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
   }
 
   // Gửi OTP khi component mount nếu type là OTP
-  useEffect(() => {
-    if (type === 'OTP') {
-      sendOTP()
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (type === 'OTP') {
+  //     sendOTP()
+  //   }
+  // }, [])
 
   const renderTitle = () => {
     switch (type) {
@@ -191,7 +191,7 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
                 Không nhận được mã?{' '}
                 <button
                   type="button"
-                  onClick={sendOTP}
+                  // onClick={sendOTP}
                   disabled={loading}
                   className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
                 >

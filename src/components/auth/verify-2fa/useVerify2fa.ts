@@ -21,27 +21,16 @@ export function useVerify2FA() {
   const type = (searchParams.get('type') as TwoFactorType) || 'TOTP'
   
   const verify2FA = async (code: string) => {
-    const loginSessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
-    if (!loginSessionToken) {
-      showToast('Không tìm thấy phiên đăng nhập, vui lòng thử lại', 'error')
-      router.replace(ROUTES.BUYER.SIGNIN)
-      return
-    }
-
     try {
       setLoading(true)
       const response = await authService.verify2fa({
-        loginSessionToken,
         type,
         code
       }) as Verify2faResponse
       
-      if (response.askToTrustDevice) {
-        sessionStorage.setItem(TRUST_DEVICE_KEY, response.askToTrustDevice)
+      if (response.isDeviceTrustedInSession) {
+        sessionStorage.setItem(TRUST_DEVICE_KEY, response.isDeviceTrustedInSession)
       }
-      
-      sessionStorage.removeItem(SESSION_TOKEN_KEY)
-      sessionStorage.removeItem(USER_EMAIL_KEY)
       
       showToast('Xác minh 2FA thành công', 'success')
       window.location.href = ROUTES.ADMIN.DASHBOARD
@@ -53,14 +42,8 @@ export function useVerify2FA() {
   }
 
   const sendOTP = async () => {
-    const loginSessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
     const userEmail = sessionStorage.getItem(USER_EMAIL_KEY)
-    
-    if (!loginSessionToken || !userEmail) {
-      showToast('Không tìm thấy phiên đăng nhập, vui lòng thử lại', 'error')
-      router.replace(ROUTES.BUYER.SIGNIN)
-      return
-    }
+  
 
     try {
       setLoading(true)

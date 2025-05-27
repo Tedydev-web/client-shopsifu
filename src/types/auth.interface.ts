@@ -10,6 +10,7 @@ export interface LoginResponse {
   refreshToken: string
   loginSessionToken: string
   twoFactorMethod: string
+  message: string
 }
 
 export interface oAuthLoginResponse {
@@ -42,7 +43,7 @@ export interface RegisterResponse {
 
 // VERIFY + SEND
 export interface SendOTPRequest {
-  email: string
+  email
   type: string
 }
 export interface SendOTPResponse {
@@ -93,7 +94,7 @@ export interface Confirm2faResponse {
   message: string
 }
 export interface Verify2faRequest {
-  loginSessionToken: string
+  loginSessionToken?: string
   type: string
   code: string
 }
@@ -105,7 +106,7 @@ export interface Verify2faResponse {
   email: string
   name: string
   role: string
-  askToTrustDevice: string
+  isDeviceTrustedInSession: string
 }
 
 export interface Disable2faRequest {
