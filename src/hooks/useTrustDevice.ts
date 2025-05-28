@@ -11,7 +11,7 @@ export function useTrustDevice() {
 
   const checkTrustDevice = () => {
     const shouldTrust = sessionStorage.getItem(TRUST_DEVICE_KEY)
-    if (shouldTrust === 'true') {
+    if (shouldTrust === 'false') {
       setIsOpen(true)
     }
   }

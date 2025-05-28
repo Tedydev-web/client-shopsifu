@@ -4,10 +4,8 @@ import "./globals.css";
 import StoreProvider from "@/store/StoreProvider"
 import { Toast } from "@/components/ui/toastify"
 import ClientLayout from "./client-layout";
-import { I18nextProvider } from "react-i18next";
-import i18nextInstance from "@/i18n/i18n";
 import { TrustDeviceModal } from "@/components/auth/layout/trustDevice-Modal";
-
+import { Toaster } from '@/components/ui/sonner';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -33,6 +31,7 @@ export default function RootLayout({
               <TrustDeviceModal />
               {children}
             </ClientLayout>
+            <Toaster position="bottom-right" />
           </StoreProvider>
       </body>
     </html>

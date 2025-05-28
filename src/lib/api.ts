@@ -214,7 +214,6 @@ privateAxios.interceptors.request.use(
       console.log("sessionToken: ", sltToken)
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
-        // config.headers['slt_token'] = sltToken;
       }
       // Inject Accept-Language from Redux
       const store = getStore();

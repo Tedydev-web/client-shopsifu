@@ -1,12 +1,17 @@
-import { SettingTable } from '@/components/ui/settings-component/settings-table'
+'use client'
+
+import { SettingTable, SettingTableColumn } from '@/components/ui/settings-component/settings-table'
 import { ChevronRight, Lock, Shield, Clock, KeyRound } from 'lucide-react'
 import { useState } from 'react'
 import { ChangePasswordModal } from './passwordSecurity-ChangePassword'
 import { Profile2FAModal } from './passwordSecurity-2faModal'
 import { usePasswordSecurity } from './usePasswordSecurity'
+import { PasswordSecuritySession } from './passwordSecurity-Session'
 
 export function PasswordSecurityTable() {
   const [showChangePassword, setShowChangePassword] = useState(false)
+  const [currentView, setCurrentView] = useState('table') // 'table' or 'sessions'
+
   const {
     is2FAEnabled,
     show2FADialog,
@@ -30,7 +35,7 @@ export function PasswordSecurityTable() {
     email: "nguyenvana@example.com"
   }
 
-  const columns = [
+  const columns: SettingTableColumn[] = [
     {
       label: "Mật khẩu",
       value: "Đã thay đổi cách đây 3 tháng",
@@ -47,9 +52,10 @@ export function PasswordSecurityTable() {
     },
     {
       label: "Thiết bị đăng nhập",
-      value: "2 thiết bị đang hoạt động",
+      value: "2 thiết bị đang hoạt động", // You might want to update this with actual count
       startIcon: <Clock />,
-      endIcon: <ChevronRight />
+      endIcon: <ChevronRight />,
+      onClick: () => setCurrentView('sessions')
     },
     {
       label: "Mã khôi phục",
@@ -58,6 +64,11 @@ export function PasswordSecurityTable() {
       endIcon: <ChevronRight />
     }
   ]
+
+  // Render based on currentView state
+  if (currentView === 'sessions') {
+    return <PasswordSecuritySession onBack={() => setCurrentView('table')} />;
+  }
 
   return (
     <>

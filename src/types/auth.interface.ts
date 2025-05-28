@@ -96,19 +96,16 @@ export interface Confirm2faResponse {
   recoveryCodes:[]
 }
 export interface Verify2faRequest {
-  loginSessionToken?: string
-  type?: string
   code: string
 }
 
 export interface Verify2faResponse {
-  accessToken: string
-  refreshToken: string
   userId: string
   email: string
   name: string
   role: string
-  isDeviceTrustedInSession: string
+  isDeviceTrustedInSession: boolean
+  currentDeviceId: string
 }
 
 export interface Disable2faRequest {

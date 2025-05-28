@@ -22,23 +22,30 @@ export function useVerify2FA() {
   
   const verify2FA = async (code: string) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await authService.verify2fa({
         code,
-      }) as Verify2faResponse
-      
-      if (response.isDeviceTrustedInSession) {
-        sessionStorage.setItem(TRUST_DEVICE_KEY, response.isDeviceTrustedInSession)
+      }) as Verify2faResponse;
+  
+      // Đảm bảo lưu giá trị vào sessionStorage trước khi reload
+      const isDeviceTrusted = response.isDeviceTrustedInSession;
+      if (isDeviceTrusted !== undefined) {
+        sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
+      } else {
+        throw new Error('Không thể lấy giá trị isDeviceTrustedInSession từ phản hồi API');
       }
-      
-      showToast('Xác minh 2FA thành công', 'success')
-      window.location.href = ROUTES.ADMIN.DASHBOARD
+  
+      // Hiển thị thông báo thành công
+      showToast('Xác minh 2FA thành công', 'success');
+  
+      // Reload trang sau khi đã lưu giá trị
+      window.location.href = ROUTES.ADMIN.DASHBOARD;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
+      showToast(parseApiError(error), 'error');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // const sendOTP = async () => {
   //   const userEmail = sessionStorage.getItem(USER_EMAIL_KEY)
@@ -59,7 +66,6 @@ export function useVerify2FA() {
   // }
 
   const handleVerifyCode = async (data: { otp: string }) => {
-
     try {
       // Validate based on type
       if (type === 'RECOVERY') {
