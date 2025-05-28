@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
     GET_CSRF_TOKEN: `${API_BASE}/get-cookies`,
     CONFIRM_2FA: `${API_BASE}/auth/2fa/confirm-setup`,
     TRUST_DEVICE: `${API_BASE}/auth/sessions/current/trust-device`,
+    UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`
   },
   ROLES:{
     GETALL: `${API_BASE}/roles`,
@@ -55,12 +56,9 @@ export const API_ENDPOINTS = {
     GET_ACTIONS: `${API_BASE}/audit-logs/actions`,
     GET_ENTITIES: `${API_BASE}/audit-logs/entities`,
   },
-  DEVICES: {
-    GETALL: `${API_BASE}/devices`,
-    GETBYID: `${API_BASE}/devices/:id`,
-    UPDATE: `${API_BASE}/devices/:id`,
-    POST: `${API_BASE}/devices`,
-    DELETE_BY_ID: `${API_BASE}/devices/:id`,
+  SESSIONS: {
+    GETALL: `${API_BASE}/auth/sessions`,
+    REVOKE: `${API_BASE}/auth/sessions`,
   },
   // ... các endpoints khác
 }

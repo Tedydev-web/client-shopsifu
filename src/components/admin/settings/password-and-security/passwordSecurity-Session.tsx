@@ -1,15 +1,14 @@
 'use client'
 
 import { SettingTable } from '@/components/ui/settings-component/settings-table'
-import { ChevronLeft, Monitor, MoreHorizontal, CheckCircle, ChevronDown, ChevronRight } from 'lucide-react'
-import { sessionMockData } from './passwordSecurity-Session-MockData'
+import { ChevronLeft, Monitor, MoreHorizontal, CheckCircle } from 'lucide-react'
+import { sessionMockData } from './passwordSecurity-Mockdata'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
 import {
   Accordion,
@@ -33,7 +32,7 @@ export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps
           <span>Thiết bị đăng nhập</span>
         </Button>
       }
-      subtitle={`Tổng số ${devices.reduce((total, device) => total + device.sessions.length, 0)} phiên hoạt động trên (${devices.length}) máy tính ${devices[0]?.os || ''}`}
+      subtitle={`Tổng số ${devices.reduce((total, device) => total + device.sessions.length, 0)} phiên hoạt động trên ${devices.length} thiết bị`}
     >
       <Accordion type="single" collapsible className="w-full">
         {devices.map((device, deviceIndex) => (
@@ -42,8 +41,8 @@ export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps
               <div className="flex items-center gap-4">
                 <Monitor className="w-6 h-6 text-gray-600 flex-shrink-0" />
                 <div className="flex-1 text-left">
-                  <div className="text-base font-semibold text-gray-900">{device.os}</div>
-                  <div className="text-sm text-gray-500">{device.location}</div>
+                  <div className="text-base font-semibold text-gray-900">{device.deviceName}</div>
+                  <div className="text-sm text-gray-500">{device.sessions.length} phiên đăng nhập</div>
                 </div>
               </div>
             </AccordionTrigger>
@@ -53,10 +52,14 @@ export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps
                 {device.sessions.map((session, sessionIndex) => (
                   <div key={session.sessionId || sessionIndex} className="flex items-center justify-between py-3">
                     <div className="flex-1">
-                      <div className="text-sm font-medium text-gray-800">{session.browser}</div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1">
-                        {session.isCurrent && <CheckCircle className="w-3 h-3 text-blue-500" />}
-                        {session.lastActive}
+                      <div className="text-sm font-medium text-gray-800">{session.deviceName}</div>
+                      <div className="text-xs text-gray-500 space-y-1">
+                        <div className="flex items-center gap-1">
+                          {session.isCurrent && <CheckCircle className="w-3 h-3 text-blue-500" />}
+                          <span>{session.browser}</span>
+                        </div>
+                        <div>{session.location}</div>
+                        <div>{session.lastActive}</div>
                       </div>
                     </div>
                     {!session.isCurrent && (
