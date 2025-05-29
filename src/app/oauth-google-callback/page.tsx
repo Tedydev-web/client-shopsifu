@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "@/store/features/auth/authSlide";
 import Cookies from 'js-cookie';
 import { showToast } from "@/components/ui/toastify";
+import {t} from "i18next"
 
 export default function OauthCallbackPage() {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ export default function OauthCallbackPage() {
     }
     
     // Luôn chuyển hướng về trang chủ, không cần check lỗi
-    showToast("Đăng nhập thành công", "success")
+    showToast(t('admin.showToast.auth.loginSuccessful'), "success")
     window.location.replace("/admin");
   }, []);
 
@@ -31,7 +32,7 @@ export default function OauthCallbackPage() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="flex flex-col items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-muted-foreground">Đang xử lý đăng nhập...</p>
+        <p className="text-muted-foreground">{t('admin.login.logging in')}</p>
       </div>
     </div>
   );

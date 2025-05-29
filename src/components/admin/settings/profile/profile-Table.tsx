@@ -40,17 +40,17 @@ export function ProfileSettingsTable() {
   } = useProfile()
 
   const columns: SettingTableColumn[] = [
-    { label: 'Tên', value: profile.name },
+    { label: t('admin.profileSettings.name'), value: profile.name },
     { label: 'Email', value: profile.email },
-    { label: 'Ngôn ngữ', value: profile.language },
+    { label: t('admin.profileSettings.lang'), value: profile.language },
   ]
 
   return (
     <>
       <SettingTable
         columns={columns}
-        title="Thông tin tài khoản"
-        subtitle="Quản lý thông tin tài khoản của bạn"
+        title={t('admin.profileSettings.accountInfo')}
+        subtitle={t('admin.profileSettings.manageAccount')}
         rightAction={
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -61,14 +61,14 @@ export function ProfileSettingsTable() {
             <DropdownMenuContent align="center" className="p-0 px-2">
               <DropdownMenuItem onClick={() => setOpenUpdate(true)}>
                 <Pencil className="w-4 h-4" />
-                Chỉnh sửa
+                {t('admin.profileSettings.edit')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         }
       >
         <div className="grid grid-cols-1 sm:grid-cols-[580px_1fr] px-6 py-4 gap-y-1 gap-x-6 items-start">
-          <div className="w-40 text-gray-600 text-sm">Xác thực hai yếu tố</div>
+          <div className="w-40 text-gray-600 text-sm">{t('admin.profileSettings.2faVerify')}</div>
           <div className="flex-1 flex">
             <Switch
               checked={is2FAEnabled}

@@ -3,6 +3,45 @@
     "title": "Shopping is easy",
     "subtitle": "Nationwide delivery, flexible payment\nand a money back guarantee if not satisfied."
   },
+  "errorPage": {
+    "title": "Page not found",
+    "subtitle": "The page you are looking for does not exist or has been moved.",
+    "backToHome": "Back to Home"
+  },
+  "language": {
+    "en": "English",
+    "vi": "Vietnamese",
+    "fr": "French",
+    "es": "Spanish",
+    "de": "German",
+    "zh": "Chinese"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "phone": "Please enter a valid phone number",
+    "minLengthPhone": "Phone number must be at least 10 characters long",
+    "fullName": "Please enter your full name",
+    "invalid email": "Invalid email format",
+    "invalid phone": "Invalid phone number format",
+    "password": {
+      "minLength": "Password must be at least 6 characters long",
+      "maxLength": "Password must not exceed 20 characters",
+      "uppercase": "Password must contain at least one uppercase letter",
+      "lowercase": "Password must contain at least one lowercase letter",
+      "number": "Password must contain at least one number",
+      "specialCharacter": "Password must contain at least one special character",
+      "match": "Passwords do not match"
+    },
+    "otp": {
+      "length": "OTP must be 6 digits long",
+      "numeric": "OTP must contain only numbers"
+    },
+    "recovery": {
+      "codeLength": "Recovery code must be 6 digits long and a (-) must be included",
+      "codeFormat": "The recovery code must be 5 characters (uppercase letters or numbers) - 5 characters (uppercase letters or numbers)"
+    }
+  },
   "auth": {
     "common": {
       "full name": "Full name",
@@ -14,14 +53,14 @@
       "or": "Or continue with",
       "signinWithGoogle": "Sign in with Google",
       "signupWithGoogle": "Sign up with Google",
-      "cancel":"Cancel",
-      "delete":"Delete?"
+      "cancel": "Cancel",
+      "delete": "Delete?"
     },
     "register": {
       "title": "Register an account",
       "subtitle": "Enter your information to complete registration",
       "register": "Register",
-      "registering": "Registering",
+      "registering": "Registering...",
       "password": "Password",
       "confirm password": "Confirm password",
       "Have an account": "Have an account?",
@@ -34,7 +73,7 @@
       "title": "Welcome back to the application",
       "subtitle": "Please enter your email and password to continue",
       "login": "Login",
-      "logging in": "Logging in",
+      "logging in": "Logging in...",
       "forgot password": "Forgot password?",
       "no account": "Don't have an account?",
       "register": "Register",
@@ -79,28 +118,86 @@
       "back": "Back",
       "login": "Login",
       "Processing": "Processing"
+    },
+    "trustDevices": {
+      "title": "Trust this device?",
+      "subtitle": "Do you want to trust this device?\nIf you trust, you won't need 2FA authentication for the next 30 days.",
+      "trust": "Trust",
+      "trusting": "Trusting...",
+      "cancel": "Cancel",
+      "success": "This device has been trusted successfully",
+      "no": "No",
+      "processing": "Processing...",
+      "trustDevices": "Trust this device"
+    },
+    "2faVerify": {
+      "enterOTPCode": "Enter OTP verification code",
+      "enterRecoveryCode": "Enter recovery code",
+      "enterVerrifyCodeAuthen": "Enter the verification code from your Authenticator app",
+      "sent6DigitCodeEmail": "We've sent a 6-digit OTP code to your email. Please enter the code below.",
+      "plsEnterRecoveryCode": "Please enter your recovery code (e.g., 45UXR-RU50C)",
+      "sent6DigitCodeAuthenticator": "Please enter the 6-digit code from your Authenticator app",
+      "enterVerrifyCode": "Enter verification code",
+      "useRecoveryCode": "Use recovery code",
+      "useAuthenticator": "Use Authenticator",
+      "didnotReceiveCode": "Didn't receive a code?",
+      "resendOtp": "Resend OTP"
     }
   },
   "admin": {
     "sidebar": {
-      "overview": "Overview",
-      "orders": "Orders",
-      "allOrders": "All Orders",
-      "newOrders": "New Orders",
-      "processedOrders": "Processed Orders",
-      "products": "Products",
-      "productList": "Product List",
-      "addProduct": "Add Product",
-      "categories": "Categories",
-      "system": "System",
-      "rolesPermissions": "Roles & Permissions"
+      "dashboard": "Dashboard",
+
+      "orders": {
+        "orders": "Orders",
+        "allOrders": "All Orders",
+        "newOrders": "New Orders",
+        "processedOrders": "Processed Orders"
+      },
+
+      "products": {
+        "products": "Products",
+        "productsList": "Products List",
+        "addProducts": "Add Product"
+      },
+
+      "categories": {
+        "categories": "Categories"
+      },
+
+      "system": {
+        "system": "System",
+        "permissionManager": "Permission Management",
+        "roleManager": "Role Management",
+        "userManager": "User Management",
+        "systemLog": "System Logs",
+        "deviceManager": "Device Management"
+      },
+
+      "language": {
+        "languageManager": "Language Management"
+      },
+
+      "settings": {
+        "settings": "Settings",
+        "systemSettings": "System Settings",
+        "accountSettings": "Account Settings",
+        "profile": "Profile",
+        "passwordAndSecurity": "Password & Security"
+      }
     },
+
     "profileDropdown": {
       "shopProfile": "Shop Profile",
       "shopSettings": "Shop Settings",
-      "language": "Vietnamese (Vietnamese)",
       "logout": "Log out",
-      "logging out": "Logging out"
+      "logging out": "Logging out",
+      "profileManage": "Profile management",
+      "language": "Language: ",
+      "lang": {
+        "vi": "Vietnamese",
+        "en": "English"
+      }
     },
     "pagination": {
       "previous": "Previous",
@@ -161,6 +258,62 @@
     "common": {
       "pickday": "Pick a day"
     },
+    "dashboard": {
+      "title": "Overview",
+      "subtitle": "Welcome back! Here is an overview of your store.",
+      "recentActivity": {
+        "title": "Recent Activity",
+        "empty": "No recent activity"
+      },
+      "page": {
+        "totalEarn": "Total revenue",
+        "newOrders": "New Orders",
+        "bestSeller": "Best selling product",
+        "newCustomer": "New customers"
+      },
+      "salesStats": {
+        "title": "Sales Statistics",
+        "empty": "No statistical data"
+      },
+      "searchPlaceholder": "Search...",
+      "searchMenu": "Search menu"
+    },
+    "showToast": {
+      "language": {
+        "createSuccessful": "Language created successfully.",
+        "updateSuccessful": "Language updated successfully.",
+        "deleteSuccessful": "Language deleted successfully",
+        "errorFetching": "Error fetching language",
+        "errorFetchings": "Error fetching languages"
+      },
+      "role": {
+        "createSuccessful": "Role created successfully.",
+        "updateSuccessful": "Role updated successfully.",
+        "deleteSuccessful": "Role deleted successfully"
+      },
+      "auth": {
+        "registerSuccessful": "Account registered successfully.",
+        "loginSuccessful": "Login successful!",
+        "sessionExpired": "Your session has expired.",
+        "changePasswordSuccessful": "Your password has been changed successfully!",
+        "2faVerify": "2FA verification successful.",
+        "authSuccessful": "Authentication successful.",
+        "sentOtp": "OTP code has been sent to your email.",
+        "sentNewOtp": "A new OTP code has been resent.",
+        "sentCode": "Verification code has been sent to your email.",
+
+        "emailNotFound": "Email not found. Please try again.",
+        "sessionExpireds": "Authentication session has expired. Please try again.",
+        "loginSessionNotFound": "Login session not found. Please try again.",
+        "invalidToken": "Invalid token."
+      }
+    },
+    "error": {
+      "title": "An error has occurred",
+      "subtitle": "An error occurred while loading the page. Please try again or return to the home page.",
+      "tryAgain": "Try again",
+      "backToHome": "Back to Home"
+    },
     "profileSettings": {
       "title": "Profile Settings",
       "description": "Manage your personal information and account security",
@@ -192,12 +345,44 @@
       "2faSetupSuccess": "Two-factor authentication setup successful!",
       "2faDisabledSuccess": "Two-factor authentication disabled!",
       "2faError": "An error occurred while processing two-factor authentication",
+      "2faCodeManually": "2FA Code (Enter Manually)",
+      "recoveryCode": "Eecovery Codes",
+      "recoveryCodes": "Save these codes to restore your account if you lose 2FA access.",
       "scanQRFirst": "Please scan the QR code with your authenticator app first",
       "enterTOTP": "Enter TOTP",
       "totpPlaceholder": "Enter 6-digit code from authenticator app",
       "verifying": "Verifying...",
-      "activate2FA": "Activate 2FA"
+      "activate2FA": "Activate 2FA",
+      "enableAuthen": "Enable authentication app",
+      "increaseSecurityin3steps": "Increase account security in 3 simple steps:",
+      "dowloadAuthenApp": "Download the authentication app",
+      "openApp": "Open the authenticator app and scan the image from right to left using your phone's camera.",
+      "loginWithCode": "Login With Your Code",
+      "enterVerrifyCode": "Enter the generated 6-digit verification code.",
+      "dowloadAndInstall": "Download and install",
+      "or": "or",
+      "googleAuth": "Google Authenticator",
+      "device": "for phone or tablet.",
+
+      "name": "Name",
+      "lang": "Language",
+      "accountInfo": "Account information",
+      "manageAccount": "Manage your account information",
+
+      "edit": "Edit",
+
+      "2faVerify": "Two-factor authentication"
     },
+
+    "profileUpdate": {
+      "title": "Edit account information",
+      "subtitle": "Update the information fields below and click save to complete.",
+      "name": "name",
+      "lang": "language",
+      "confirm": "Save changes",
+      "cancel": "Cancel"
+    },
+
     "auditLogs": {
       "title": "Audit Logs",
       "subtitle": "Manage all your audit logs",
@@ -293,7 +478,7 @@
         "methodPlaceholder": "Enter role method",
         "save": "Save Information",
         "cancel": "Cancel",
-        "delete":"Delete",
+        "delete": "Delete",
         "processing": "Processing...",
         "success": "Role added successfully",
         "error": "An error occurred",
@@ -384,10 +569,63 @@
       }
     },
     "users": {
-      "title": "Users",
-      "subtitle": "Manage all your users",
+      "title": "User Management",
+      "subtitle": "Manage all users here",
       "search": "Search",
-      "searchPlaceholder": "Search by user, action, or date"
+      "searchPlaceholder": "Search by name, action, or date",
+      "add": "Add new user",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "pending": "Pending"
+      },
+      "role": {
+        "user": "User",
+        "admin": "Administrator",
+        "editor": "Editor"
+      },
+      "actions": {
+        "view": "View details",
+        "edit": "Edit information",
+        "assignPermissions": "Assign permissions",
+        "delete": "Delete user"
+      },
+      "modal": {
+        "addTitle": "Add new user",
+        "addDescription": "Enter user information to add to the system.",
+        "editTitle": "Edit user",
+        "editDescription": "Update user information.",
+        "name": "User name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "cancel": "Cancel",
+        "confirmAdd": "Add",
+        "confirmEdit": "Update",
+        "loadingAdd": "Adding...",
+        "loadingEdit": "Updating..."
+      },
+      "deleteConfirm": {
+        "title": "Confirm user deletion",
+        "description": "Are you sure you want to delete user {{name}}? This action cannot be undone.",
+        "confirmText": "Delete",
+        "cancelText": "Cancel"
+      },
+      "loading": "Loading data..."
+    },
+    "passwordAndSecurity": {
+      "title": "Security & Passwords",
+      "subtitle": "Manage account security and password-related settings.",
+      "changePassword": "Change password",
+      "whereYouLogIn": "Where you log in"
     },
     "languages": {
       "title": "Languages",

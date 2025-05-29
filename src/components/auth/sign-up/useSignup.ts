@@ -5,6 +5,7 @@ import { RegisterSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
+import { useTranslation } from 'react-i18next'
 
 const TOKEN_KEY = 'token_verify_code'
 
@@ -14,15 +15,18 @@ export function useSignup() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email')
 
-  const handleSignup = async (data: z.infer<typeof RegisterSchema>) => {
+  const {t} = useTranslation()
+  const Schema = RegisterSchema(t)
+
+  const handleSignup = async (data: z.infer<typeof Schema>) => {
     if (!email) {
-      showToast('Không tìm thấy email, vui lòng thử lại', 'error')
+      showToast(t('admin.showToast.auth.emailNotFound'), 'error')
       return
     }
 
     const token = localStorage.getItem(TOKEN_KEY)
     if (!token) {
-      showToast('Phiên xác thực đã hết hạn, vui lòng thử lại', 'error')
+      showToast(t('admin.showToast.auth.sessionExpireds'), 'error')
       return
     }
 
@@ -40,7 +44,7 @@ export function useSignup() {
       // Clear token after successful registration
       localStorage.removeItem(TOKEN_KEY)
       
-      showToast('Đăng ký tài khoản thành công', 'success')
+      showToast(t('admin.showToast.auth.registerSuccessful'), 'success')
       router.push('/buyer/sign-in')
     } catch (error) {
       showToast(parseApiError(error), 'error')

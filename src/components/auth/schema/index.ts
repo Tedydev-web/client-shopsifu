@@ -1,71 +1,83 @@
-import * as z from 'zod';
+import * as z from 'zod'
+import { TFunction } from 'i18next'
 
-export const EmailSchema = z.object({
-  email: z.string().email({ message: 'Email không hợp lệ' })
+export const EmailSchema = (t: TFunction) => z.object({
+  email: z.string().email({ message: t('validation.email') })
 })
 
-export const RegisterSchema = z.object({
-  email: z.string().email({
-    message: 'Vui lòng nhập một địa chỉ email hợp lệ'
-  }),
-  name: z.string().min(1, {
-    message: 'Vui lòng nhập họ và tên của bạn'
-  }),
-  phoneNumber: z.string().min(10, { message: 'Số điện thoại phải có ít nhất 10 số' }),
-  token: z.string(),
-  password: z
-    .string()
-    .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
-    .regex(/[A-Z]/, { message: 'Mật khẩu phải chứa ít nhất một chữ cái viết hoa' })
-    .regex(/\d/, { message: 'Mật khẩu phải chứa ít nhất một số' }),
-  confirmPassword: z.string().min(6, {
-    message: 'Mật khẩu phải có ít nhất 6 ký tự'
-  })
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Mật khẩu không khớp',
-  path: ['confirmPassword']
-})
-
-export const LoginSchema = z.object({
+export const RegisterSchema = (t: TFunction) =>
+  z.object({
     email: z.string().email({
-        message: "Vui lòng nhập một địa chỉ email hợp lệ"
+      message: t('validation.email')
     }),
-    password:
-    z.string()
-    .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
-    .regex(/[A-Z]/, { message: 'Mật khẩu phải chứa ít nhất một chữ cái viết hoa' })
-    .regex(/\d/, { message: 'Mật khẩu phải chứa ít nhất một số' }),
-    rememberMe: z.boolean()
-});
+    name: z.string().min(1, {
+      message: t('validation.fullName')
+    }),
+    phoneNumber: z.string().min(10, {
+      message: t('validation.minLengthPhone')
+    }),
+    token: z.string(),
+    password: z
+      .string()
+      .min(6, { message: t('validation.password.minLength') })
+      .regex(/[A-Z]/, { message: t('validation.password.uppercase') })
+      .regex(/\d/, { message: t('validation.password.number') }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: t('validation.password.minLength') })
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('validation.password.match'),
+    path: ['confirmPassword']
+  })
 
-export const ForgotPasswordSchema = z.object({
+export const LoginSchema = (t: TFunction) =>
+  z.object({
     email: z.string().email({
-        message: "Vui lòng nhập một địa chỉ email hợp lệ"
+      message: t('validation.email')
+    }),
+    password: z
+      .string()
+      .min(6, { message: t('validation.password.minLength') })
+      .regex(/[A-Z]/, { message: t('validation.password.uppercase') })
+      .regex(/\d/, { message: t('validation.password.number') }),
+    rememberMe: z.boolean()
+  })
+
+export const ForgotPasswordSchema = (t: TFunction) =>
+  z.object({
+    email: z.string().email({
+      message: t('validation.email')
     })
-});
+  })
 
-// Schema validation với Zod (OTP chỉ gồm 6 số)
-export const otpSchema = z.object({
-    otp: z.string().length(6, { message: 'OTP phải gồm 6 chữ số' }).regex(/^\d+$/, { message: 'Chỉ được nhập số' })
-})
+export const otpSchema = (t: TFunction) =>
+  z.object({
+    otp: z.string()
+      .length(6, { message: t('validation.otp.length') })
+      .regex(/^\d+$/, { message: t('validation.otp.numeric') })
+  })
 
-export const recoveryCodeSchema = z.object({
-  otp: z.string()
-      .length(11, { message: 'Mã khôi phục phải gồm 10 ký tự và 1 dấu gạch ngang' })
-      .regex(/^[A-Z0-9]{5}-[A-Z0-9]{5}$/, { 
-          message: 'Mã khôi phục phải có dạng 5 ký tự (chữ hoa hoặc số) - 5 ký tự (chữ hoa hoặc số)' 
+export const recoveryCodeSchema = (t: TFunction) =>
+  z.object({
+    otp: z.string()
+      .length(11, { message: t('validation.recovery.codeLength') })
+      .regex(/^[A-Z0-9]{5}-[A-Z0-9]{5}$/, {
+        message: t('validation.recovery.codeFormat')
       })
       .transform(val => val.toUpperCase())
-})
-// Schema validation với Zod
-export const resetPasswordSchema = z.object({
-  password: z.string()
-    .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
-    .regex(/[A-Z]/, { message: 'Mật khẩu phải chứa ít nhất một chữ cái viết hoa' })
-    .regex(/\d/, { message: 'Mật khẩu phải chứa ít nhất một số' }),
-  confirmPassword: z.string()
-    .min(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' })
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Mật khẩu không khớp',
-  path: ['confirmPassword']
-});
+  })
+
+export const resetPasswordSchema = (t: TFunction) =>
+  z.object({
+    password: z
+      .string()
+      .min(6, { message: t('validation.password.minLength') })
+      .regex(/[A-Z]/, { message: t('validation.password.uppercase') })
+      .regex(/\d/, { message: t('validation.password.number') }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: t('validation.password.minLength') })
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('validation.password.match'),
+    path: ['confirmPassword']
+  })

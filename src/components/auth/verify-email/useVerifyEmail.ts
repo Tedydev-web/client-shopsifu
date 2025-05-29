@@ -4,6 +4,7 @@ import { authService } from '@/services/authService'
 import { showToast } from '@/components/ui/toastify'
 import { ErrorResponse } from '@/types/base.interface'
 import { parseApiError } from '@/utils/error'
+import {t} from "i18next"
 
 type ActionType = 'signup' | 'forgot'
 
@@ -25,7 +26,7 @@ export function useVerifyEmail() {
         type
       })
 
-      showToast('Mã xác thực đã được gửi đến email của bạn', 'success')
+      showToast(t('admin.showToast.auth.sentCode'), 'success')
       
       // Chuyển hướng đến trang nhập mã xác thực với email và action
       router.push(`/buyer/verify-code?email=${encodeURIComponent(email)}&action=${action}`)

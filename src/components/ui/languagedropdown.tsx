@@ -1,9 +1,11 @@
 "use client";
 import { Globe, ChevronDown } from "lucide-react";
 import { useChangeLang } from "@/hooks/useChangeLang";
+import { useTranslation } from "react-i18next";
 
 const LanguageDropdown = () => {
   const { showLangMenu, toggleMenu, changeLanguage, currentLangName } = useChangeLang();
+  const { t } = useTranslation();
 
   return (
     <div className="relative flex items-center">
@@ -22,13 +24,13 @@ const LanguageDropdown = () => {
             className="w-full text-left px-4 py-2 hover:bg-gray-100"
             onClick={() => changeLanguage("vi")}
           >
-            Tiếng Việt
+            {t('language.vi')}
           </button>
           <button
             className="w-full text-left px-4 py-2 hover:bg-gray-100"
             onClick={() => changeLanguage("en")}
           >
-            English
+            {t('language.en')}
           </button>
         </div>
       )}

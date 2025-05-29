@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/animated-form'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import {t} from "i18next"
 
 export function Verify2FAForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const router = useRouter()
@@ -75,22 +76,22 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
   const renderTitle = () => {
     switch (type) {
       case 'OTP':
-        return 'Nhập mã xác minh OTP'
+        return t('auth.2faVerify.enterOTPCode')
       case 'RECOVERY':
-        return 'Nhập mã khôi phục'
+        return t('auth.2faVerify.enterRecoveryCode')
       default:
-        return 'Nhập mã xác minh từ ứng dụng Authenticator'
+        return t('auth.2faVerify.enterVerrifyCodeAuthen')
     }
   }
 
   const renderDescription = () => {
     switch (type) {
       case 'OTP':
-        return 'Chúng tôi đã gửi mã OTP gồm 6 chữ số đến email của bạn. Vui lòng nhập mã bên dưới.'
+        return t('auth.2faVerify.sent6DigitCodeEmail')
       case 'RECOVERY':
-        return 'Vui lòng nhập mã khôi phục của bạn (ví dụ: 45UXR-RU50C)'
+        return t('auth.2faVerify.plsEnterRecoveryCode')
       default:
-        return 'Vui lòng nhập mã 6 chữ số từ ứng dụng Authenticator của bạn.'
+        return t('auth.2faVerify.sent6DigitCodeAuthenticator')
     }
   }
 
@@ -108,7 +109,7 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
             disabled={loading}
             className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
           >
-            {type === 'TOTP' ? 'Sử dụng mã khôi phục' : 'Sử dụng Authenticator'}
+            {type === 'TOTP' ? t('auth.2faVerify.useRecoveryCode') : t('auth.2faVerify.useAuthenticator')}
           </button>
         </div>
       </AnimatedFormItem>
@@ -142,7 +143,7 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
               name="otp"
               render={({ field }) => (
                 <FormItem className="flex flex-col items-center">
-                  <FormLabel>Nhập mã xác minh</FormLabel>
+                  <FormLabel>{t('auth.2faVerify.enterVerrifyCode')}</FormLabel>
                   <FormControl>
                     <InputOTP 
                       maxLength={type === 'RECOVERY' ? 10 : 6}
@@ -188,14 +189,14 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
           {type === 'OTP' && (
             <AnimatedFormItem>
               <div className="text-center text-sm">
-                Không nhận được mã?{' '}
+                {t('auth.2faVerify.didnotReceiveCode')}{' '}
                 <button
                   type="button"
                   onClick={sendOTP}
                   disabled={loading}
                   className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
                 >
-                  Gửi lại OTP
+                  {t('auth.2faVerify.resendOtp')}
                 </button>
               </div>
             </AnimatedFormItem>

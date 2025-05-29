@@ -1,3 +1,5 @@
+'use client';
+
 export default function NotFound() {
   return (
     <div className="w-full min-h-screen flex flex-col lg:flex-row items-center justify-center bg-white px-6 py-16 space-y-16 lg:space-y-0 lg:space-x-16">

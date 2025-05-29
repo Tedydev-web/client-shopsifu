@@ -1,3 +1,4 @@
+'use client'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,9 +93,9 @@ export function Profile2FAModal({
       <Dialog open={showQRDialog} onOpenChange={setShowQRDialog}>
         <DialogContent className="max-w-lg bg-[#23272f] text-white rounded-xl p-0 overflow-hidden">
           <div className="px-8 pt-8 pb-2">
-            <DialogTitle className="text-2xl font-bold mb-1">Bật Ứng Dụng Xác Thực</DialogTitle>
+            <DialogTitle className="text-2xl font-bold mb-1">{t('admin.profileSettings.enableAuthen')}</DialogTitle>
             <DialogDescription className="text-gray-300 mb-4">
-              Tăng độ bảo mật cho tài khoản trong 3 bước đơn giản:
+              {t('admin.profileSettings.increaseSecurityin3steps')}
             </DialogDescription>
           </div>
           <div className="px-8 pb-2">
@@ -102,25 +103,25 @@ export function Profile2FAModal({
             <div className="flex items-center gap-4 mb-6">
               <Smartphone className="w-10 h-10 text-gray-400" />
               <div>
-                <div className="font-semibold text-white">Tải Ứng Dụng Xác Thực</div>
+                <div className="font-semibold text-white">{t('admin.profileSettings.dowloadAuthenApp')}</div>
                 <div className="text-gray-300 text-sm">
-                  Tải và cài đặt <Link href="https://authy.com/" target="_blank" className="underline text-blue-400">Authy</Link> hoặc <Link href="https://support.google.com/accounts/answer/1066447?hl=vi" target="_blank" className="underline text-blue-400">Trình Xác Thực Google</Link> cho điện thoại hoặc máy tính bảng.
+                  {t('admin.profileSettings.dowloadAndInstall')} <Link href="https://authy.com/" target="_blank" className="underline text-blue-400">Authy</Link> {t('admin.profileSettings.or')} <Link href="https://support.google.com/accounts/answer/1066447?hl=vi" target="_blank" className="underline text-blue-400">{t('admin.profileSettings.googleAuth')}</Link> {t('admin.profileSettings.device')}
                 </div>
               </div>
             </div>
             {/* Bước 2: QR */}
             <div className="mb-6">
-              <div className="font-semibold mb-2">Quét Mã QR</div>
+              <div className="font-semibold mb-2">{t('admin.profileSettings.scanQRCode')}</div>
               <div className="flex flex-col items-center">
                 <QRCodeSVG value={qrUri} size={160} />
               </div>
               <div className="text-gray-300 text-sm mt-2">
-                Mở ứng dụng xác thực và quét hình ảnh từ phải sang trái bằng máy ảnh trên điện thoại.
+                {t('admin.profileSettings.openApp')}
               </div>
             </div>
             {/* Bước 3: Secret code */}
             <div className="mb-6">
-              <div className="font-semibold mb-2">Mã Số 2FA (Nhập Thủ Công)</div>
+              <div className="font-semibold mb-2">{t('admin.profileSettings.2faCodeManually')}</div>
               <div className="bg-[#181a20] rounded-md px-4 py-3 font-mono text-lg tracking-widest text-blue-300 select-all break-all">
                 {secret}
               </div>
@@ -128,7 +129,7 @@ export function Profile2FAModal({
             {/* Recovery codes */}
             {recoveryCodes.length > 0 && (
               <div className="mb-6">
-                <div className="font-semibold mb-2">Mã Khôi Phục (Recovery Codes)</div>
+                <div className="font-semibold mb-2">{t('admin.profileSettings.recoveryCode')}</div>
                 <div className="grid grid-cols-2 gap-2">
                   {recoveryCodes.map((code, idx) => (
                     <div key={idx} className="bg-[#181a20] rounded px-3 py-2 font-mono text-base text-yellow-300 select-all">
@@ -136,13 +137,13 @@ export function Profile2FAModal({
                     </div>
                   ))}
                 </div>
-                <div className="text-gray-400 text-xs mt-1">Lưu lại các mã này để khôi phục tài khoản nếu mất quyền truy cập 2FA.</div>
+                <div className="text-gray-400 text-xs mt-1">{t('admin.profileSettings.recoveryCodes')}</div>
               </div>
             )}
             {/* Nhập mã xác minh */}
             <div className="mb-2">
-              <div className="font-semibold mb-2">Đăng Nhập Bằng Mã Của Bạn</div>
-              <div className="text-gray-300 text-sm mb-2">Nhập mã xác minh gồm 6 chữ số đã được tạo.</div>
+              <div className="font-semibold mb-2">{t('admin.profileSettings.loginWithCode')}</div>
+              <div className="text-gray-300 text-sm mb-2">{t('admin.profileSettings.enterVerrifyCode')}</div>
               <div className="flex gap-2">
                 <Input
                   className="bg-[#181a20] border border-gray-600 text-white font-mono text-lg w-40"
@@ -156,7 +157,7 @@ export function Profile2FAModal({
                   disabled={loading || totpCode.length !== 6}
                   onClick={onConfirmSetup}
                 >
-                  {loading ? "Đang xác minh..." : "Kích hoạt"}
+                  {loading ? t('admin.profileSettings.verifying') : t('admin.profileSettings.activate2FA')}
                 </Button>
               </div>
             </div>

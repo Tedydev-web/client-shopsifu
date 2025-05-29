@@ -1,15 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DataTable } from '@/components/ui/data-table-component/data-table'
 import { Pagination } from '@/components/ui/data-table-component/pagination'
 import { userColumns } from './users-Columns'
-import { User } from '@/types/user.interface'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
-import { useUsers } from './useUsers'
 import UsersModalUpsert from './users-ModalUpsert'
+import { useUsers } from './useUsers'
+import { User } from '@/types/user.interface'
 
 export default function UserTable({ search }: { search: string }) {
+  const { t } = useTranslation();
+  
   const {
     data,
     totalRecords,
@@ -38,13 +40,17 @@ export default function UserTable({ search }: { search: string }) {
       {/* Loading overlay chỉ che bảng, không che search input */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
-          <span className="text-gray-500 text-sm">Đang tải dữ liệu...</span>
+          <span className="text-gray-500 text-sm">
+            {t('admin.users.loading')}
+          </span>
         </div>
       )}
+
       <DataTable
         columns={userColumns({ onDelete: handleOpenDelete, onEdit: handleOpenEdit })}
         data={data}
       />
+
       {totalPages > 0 && (
         <Pagination
           limit={limit}
@@ -56,22 +62,23 @@ export default function UserTable({ search }: { search: string }) {
         />
       )}
 
-      {/* Popup xác nhận xóa */}
+      {/* Xác nhận xóa */}
       <ConfirmDeleteModal
         open={deleteOpen}
         onClose={() => { if (!deleteLoading) handleCloseDeleteModal() }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa người dùng"
+        title={t('admin.users.deleteConfirm.title')}
         description={
           userToDelete
-            ? <>Bạn có chắc chắn muốn xóa người dùng <b>{userToDelete.name}</b> không? Hành động này không thể hoàn tác.</>
-            : ""
+            ? t('admin.users.deleteConfirm.description', { name: userToDelete.name })
+            : ''
         }
-        confirmText="Xóa"
-        cancelText="Hủy"
+        confirmText={t('admin.users.deleteConfirm.confirmText')}
+        cancelText={t('admin.users.deleteConfirm.cancelText')}
         loading={deleteLoading}
       />
 
+      {/* Modal cập nhật người dùng */}
       <UsersModalUpsert
         open={editOpen}
         onClose={() => setEditOpen(false)}

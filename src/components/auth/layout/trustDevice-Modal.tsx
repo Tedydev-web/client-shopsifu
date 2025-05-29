@@ -11,9 +11,11 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useTrustDevice } from '@/hooks/useTrustDevice'
+import { useTranslation } from 'react-i18next'
 
 export function TrustDeviceModal() {
   const { isOpen, loading, checkTrustDevice, handleTrustDevice, handleClose } = useTrustDevice()
+  const {t} = useTranslation('')
 
   useEffect(() => {
     checkTrustDevice()
@@ -23,9 +25,9 @@ export function TrustDeviceModal() {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Tin tưởng thiết bị này?</DialogTitle>
+          <DialogTitle>{t('auth.trustDevices.title')}</DialogTitle>
           <DialogDescription>
-            Bạn có muốn tin tưởng thiết bị này không? Nếu tin tưởng, bạn sẽ không cần xác minh 2FA trong 30 ngày tới.
+            {t('auth.trustDevices.subtitle')}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex gap-6 sm:gap-0">
@@ -35,13 +37,13 @@ export function TrustDeviceModal() {
             disabled={loading}
             className="mr-2"
           >
-            Không
+            {t('auth.trustDevices.no')}
           </Button>
           <Button
             onClick={handleTrustDevice}
             disabled={loading}
           >
-            {loading ? 'Đang xử lý...' : 'Tin tưởng thiết bị'}
+            {loading ? t('auth.trustDevices.processing') : t('auth.trustDevices.trustDevices')}
           </Button>
         </DialogFooter>
       </DialogContent>

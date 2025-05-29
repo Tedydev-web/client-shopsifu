@@ -36,13 +36,15 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
   const action = (searchParams.get('action') as ActionType) || 'signup'
   const { loading, handleSendOTP } = useVerifyEmail()
   const { t } = useTranslation('')
+  const Schema = EmailSchema(t)
+  // Khởi tạo form với zod và react-hook-form
 
-  const form = useForm<z.infer<typeof EmailSchema>>({
-    resolver: zodResolver(EmailSchema),
+  const form = useForm<z.infer<typeof Schema>>({
+    resolver: zodResolver(Schema),
     defaultValues: { email: '' }
   })
 
-  const onSubmit = async (data: z.infer<typeof EmailSchema>) => {
+  const onSubmit = async (data: z.infer<typeof Schema>) => {
     const success = await handleSendOTP(data.email)
     if (success) {
       onSuccess?.(data.email)

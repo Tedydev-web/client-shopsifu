@@ -5,12 +5,15 @@ import { cn } from '@/lib/utils';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { sidebarConfig, SidebarItem } from '@/constants/sidebarConfig';
+import { useTranslation } from 'react-i18next';
 
 export function SearchItem() {
   const [open, setOpen] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
   const [expanded, setExpanded] = React.useState<string[]>([]);
+
+  const {t} = useTranslation('')
 
   // Focus input when modal opens
   React.useEffect(() => {
@@ -90,11 +93,11 @@ export function SearchItem() {
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-2xl w-full p-0 bg-white rounded-xl shadow-2xl border-0">
-        <DialogTitle className="sr-only">Tìm kiếm menu</DialogTitle>
+        <DialogTitle className="sr-only">{t('admin.dashboard.searchMenu')}</DialogTitle>
         <div className="p-4 border-b border-gray-300 dark:border-gray-700">
           <Input
             ref={inputRef}
-            placeholder="Tìm kiếm..."
+            placeholder={t('admin.dashboard.searchPlaceholder')}
             className="h-8 text-sm px-4 bg-gray-50 border-none border-b border-gray-400 focus:border-gray-600 focus-visible:ring-0 focus-visible:border-gray-600"
             autoFocus
           />

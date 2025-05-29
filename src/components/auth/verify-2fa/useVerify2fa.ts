@@ -7,6 +7,7 @@ import { authService } from '@/services/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
 import { Verify2faResponse } from '@/types/auth.interface'
+import { useTranslation } from 'react-i18next'
 
 const SESSION_TOKEN_KEY = 'loginSessionToken'
 const USER_EMAIL_KEY = 'userEmail'
@@ -19,11 +20,15 @@ export function useVerify2FA() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = (searchParams.get('type') as TwoFactorType) || 'TOTP'
+
+  const {t} = useTranslation()
+  const recovery = recoveryCodeSchema(t)
+  const otp = otpSchema(t)
   
   const verify2FA = async (code: string) => {
     const loginSessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
     if (!loginSessionToken) {
-      showToast('Không tìm thấy phiên đăng nhập, vui lòng thử lại', 'error')
+      showToast(t('admin.showToast.auth.loginSessionNotFound'), 'error')
       router.replace(ROUTES.BUYER.SIGNIN)
       return
     }
@@ -43,7 +48,7 @@ export function useVerify2FA() {
       sessionStorage.removeItem(SESSION_TOKEN_KEY)
       sessionStorage.removeItem(USER_EMAIL_KEY)
       
-      showToast('Xác minh 2FA thành công', 'success')
+      showToast(t('admin.showToast.auth.2faVerify'), 'success')
       window.location.href = ROUTES.ADMIN.DASHBOARD
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -57,7 +62,7 @@ export function useVerify2FA() {
     const userEmail = sessionStorage.getItem(USER_EMAIL_KEY)
     
     if (!loginSessionToken || !userEmail) {
-      showToast('Không tìm thấy phiên đăng nhập, vui lòng thử lại', 'error')
+      showToast(t('admin.showToast.auth.loginSessionNotFound'), 'error')
       router.replace(ROUTES.BUYER.SIGNIN)
       return
     }
@@ -68,7 +73,7 @@ export function useVerify2FA() {
         email: userEmail,
         type: 'LOGIN'
       })
-      showToast('Đã gửi mã OTP đến email của bạn', 'success')
+      showToast(t('admin.showToast.auth.sentOtp'), 'success')
     } catch (error) {
       showToast(parseApiError(error), 'error')
     } finally {
@@ -81,12 +86,12 @@ export function useVerify2FA() {
     try {
       // Validate based on type
       if (type === 'RECOVERY') {
-        const result = recoveryCodeSchema.safeParse(data);
+        const result = recovery.safeParse(data);
         if (!result.success) {
           throw result.error;
         }
       } else {
-        otpSchema.parse(data);
+        otp.parse(data);
       }
       await verify2FA(data.otp);
     } catch (error) {
@@ -109,6 +114,6 @@ export function useVerify2FA() {
     sendOTP, 
     type, 
     switchToRecovery,
-    schema: type === 'RECOVERY' ? recoveryCodeSchema : otpSchema 
+    schema: type === 'RECOVERY' ? recovery : otp 
   }
 }

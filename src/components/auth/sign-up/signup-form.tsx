@@ -34,9 +34,10 @@ interface SignupFormProps {
 export function SignupForm({ email, className }: SignupFormProps) {
   const { loading, handleSignup } = useSignup()
   const { t } = useTranslation('')
+  const Schema = RegisterSchema(t)
 
-  const registerForm = useForm<z.infer<typeof RegisterSchema>>({
-    resolver: zodResolver(RegisterSchema),
+  const registerForm = useForm<z.infer<typeof Schema>>({
+    resolver: zodResolver(Schema),
     defaultValues: { 
       name: '', 
       email: '', 

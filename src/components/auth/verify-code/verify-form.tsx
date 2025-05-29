@@ -29,9 +29,10 @@ import { useTranslation } from 'react-i18next'
 export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { loading, handleVerifyCode, resendOTP } = useVerify()
   const { t } = useTranslation('')
+  const otp = otpSchema(t)
 
-  const form = useForm<z.infer<typeof otpSchema>>({
-    resolver: zodResolver(otpSchema),
+  const form = useForm<z.infer<typeof otp>>({
+    resolver: zodResolver(otp),
     defaultValues: { otp: '' }
   })
 
