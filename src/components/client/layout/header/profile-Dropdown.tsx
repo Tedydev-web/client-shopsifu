@@ -16,10 +16,10 @@ export function ProfileDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-auto px-2 py-1 flex items-center gap-1 text-white opacity-80 g-none hover:bg-none hover:underline transition-opacity text-[11px]">
-           <User className="h-3.5 w-3.5" />
+        <Button size="sm" className="bg- h-auto px-2 py-1 flex items-center gap-1 text-black  hover:bg- hover:opacity-80 transition-opacity text-[13px]">
+           <User className="h-4 w-4" />
            <span>{name}</span>
-           <ChevronDown className="h-3.5 w-3.5" />
+           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-0 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-700 text-[11px] [&>button]:hover:bg-none [&>button]:hover:underline">
@@ -28,7 +28,7 @@ export function ProfileDropdown() {
               {name[0]}
           </div>
           <div className="flex flex-col max-w-[120px]">
-              <div className="font-medium text-[11px] text-gray-900 truncate">{name}</div>
+              <div className="font-medium text-[13px] text-gray-900 truncate">{name}</div>
               <div className="text-[10px] text-gray-500 truncate">{email}</div>
           </div>
         </div>
