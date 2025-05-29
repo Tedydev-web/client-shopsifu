@@ -11,6 +11,7 @@ import { useResponsive } from '@/hooks/useResponsive'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import { ProfileDropdownSidebar } from './ProfileDropdown-Sidebar'
+import { useTranslation } from 'react-i18next'
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -24,6 +25,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange, onCollapse }: Side
   const [internalOpen, setInternalOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { isMobile } = useResponsive()
+  const {t} = useTranslation('')
 
   const open = externalOpen ?? internalOpen
   const setOpen = (value: boolean) => {
@@ -255,7 +257,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange, onCollapse }: Side
               className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-[#52525B] hover:bg-primary/10 font-semibold text-sm"
             >
               <Settings className="w-5 h-5 text-[#52525B]" />
-              <span>Cài đặt</span>
+              <span>{t('admin.sidebar.settings.settings')}</span>
             </Link>
           </div>
         )}

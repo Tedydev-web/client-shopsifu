@@ -7,6 +7,7 @@ import { authService } from '@/services/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
 import { Verify2faResponse } from '@/types/auth.interface'
+import { useTranslation } from 'react-i18next'
 
 const SESSION_TOKEN_KEY = 'loginSessionToken'
 const USER_EMAIL_KEY = 'userEmail'
@@ -19,6 +20,10 @@ export function useVerify2FA() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = (searchParams.get('type') as TwoFactorType) || 'TOTP'
+
+  const {t} = useTranslation()
+  const recovery = recoveryCodeSchema(t)
+  const otp = otpSchema(t)
   
   const verify2FA = async (code: string) => {
     try {
@@ -69,12 +74,12 @@ export function useVerify2FA() {
     try {
       // Validate based on type
       if (type === 'RECOVERY') {
-        const result = recoveryCodeSchema.safeParse(data);
+        const result = recovery.safeParse(data);
         if (!result.success) {
           throw result.error;
         }
       } else {
-        otpSchema.parse(data);
+        otp.parse(data);
       }
       await verify2FA(data.otp);
     } catch (error) {
@@ -97,6 +102,6 @@ export function useVerify2FA() {
     // sendOTP, 
     type, 
     switchToRecovery,
-    schema: type === 'RECOVERY' ? recoveryCodeSchema : otpSchema 
+    schema: type === 'RECOVERY' ? recovery : otp 
   }
 }

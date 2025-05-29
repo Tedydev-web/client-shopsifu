@@ -7,6 +7,7 @@ import { authService } from '@/services/authService'
 import { ResetPasswordRequest } from '@/types/auth.interface'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
+import { useTranslation } from 'react-i18next'
 
 const RESET_PASSWORD_TOKEN_KEY = 'token_verify_code'
 
@@ -15,13 +16,16 @@ export function useReset() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const handleResetPassword = async (data: z.infer<typeof resetPasswordSchema>) => {
+  const {t} = useTranslation('')
+  const schema = resetPasswordSchema(t)
+
+  const handleResetPassword = async (data: z.infer<typeof schema>) => {
     try {
       // Lấy token từ localStorage
       const token = localStorage.getItem(RESET_PASSWORD_TOKEN_KEY)
       const email = searchParams.get('email')
       if (!token) {
-        showToast('Phiên làm việc đã hết hạn', 'info')
+        showToast(t('admin.showToast.auth.sessionExpired'), 'info')
         router.replace(ROUTES.BUYER.RESET_PASSWORD)
         return
       }
@@ -39,7 +43,7 @@ export function useReset() {
       // Xóa token sau khi đổi mật khẩu thành công
       localStorage.removeItem(RESET_PASSWORD_TOKEN_KEY)
       
-      showToast('Đổi mật khẩu thành công!', 'success')
+      showToast(t('admin.showToast.auth.changePasswordSuccessful'), 'success')
       router.replace(ROUTES.BUYER.SIGNIN)
     } catch (error) {
       showToast(parseApiError(error), 'error')

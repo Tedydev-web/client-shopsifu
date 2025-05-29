@@ -10,6 +10,7 @@ import {
 import { PaginationRequest } from "@/types/base.interface"
 import { Role } from "./roles-Columns"
 import { string } from "zod"
+import {t} from "i18next"
 
 export function useRoles() {
   const [roles, setRoles] = useState<Role[]>([])
@@ -70,7 +71,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.create(data)
-      showToast("Tạo vai trò thành công", "success")
+      showToast(t('admin.showToast.role.createSuccessful'), "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -86,7 +87,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.update(String(id), data)
-      showToast("Cập nhật vai trò thành công", "success")
+      showToast(t('admin.showToast.role.createSuccessful'), "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -102,7 +103,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.delete(String(id))
-      showToast("Xóa vai trò thành công", "success")
+      showToast(t('admin.showToast.role.createSuccessful'), "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")

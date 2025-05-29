@@ -14,6 +14,7 @@ import {
   FolderClosed,
   Undo 
 } from 'lucide-react'
+import { t } from "i18next"
 
 export type SidebarItem = {
   title: string
@@ -25,100 +26,100 @@ export type SidebarItem = {
 
 export const sidebarConfig: SidebarItem[] = [
   {
-    title: 'Tổng quan',
+    title: t('admin.sidebar.dashboard'),
     href: '/admin',
     icon: <LayoutDashboard className="w-5 h-5" />,
   },
   {
-    title: 'Đơn hàng',
+    title: t('admin.sidebar.orders.orders'),
     href: '/admin/orders',
     icon: <ShoppingCart className="w-5 h-5" />,
     subItems: [
       {
-        title: 'Tất cả đơn hàng',
+        title: t('admin.sidebar.orders.allOrders'),
         href: '/admin/orders',
         icon: null,
       },
       {
-        title: 'Đơn hàng mới',
+        title: t('admin.sidebar.orders.newOrders'),
         href: '/admin/orders/new',
         icon: null,
       },
       {
-        title: 'Đơn hàng đã xử lý',
+        title: t('admin.sidebar.orders.processedOrders'),
         href: '/admin/orders/processed',
         icon: null,
       },
     ],
   },
   {
-    title: 'Sản phẩm',
+    title: t('admin.sidebar.products.products'),
     href: '/admin/products',
     icon: <Package className="w-5 h-5" />,
     subItems: [
       {
-        title: 'Danh sách sản phẩm',
+        title: t('admin.sidebar.products.productsList'),
         href: '/admin/product',
         icon: null,
       },
       {
-        title: 'Thêm sản phẩm',
+        title: t('admin.sidebar.products.addProducts'),
         href: '/admin/products/add',
         icon: null,
       },
       {
-        title: 'Danh mục',
+        title: t('admin.sidebar.categories.categories'),
         href: '/admin/products/categories',
         icon: null,
       },
     ],
   },  
   {
-    title: 'Hệ thống',
+    title: t('admin.sidebar.system.system'),
     href: '/admin/system',
     icon: <MonitorCog className="w-5 h-5" />,
     subItems: [
       {
-        title: 'Quản lý phân quyền',
+        title: t('admin.sidebar.system.permissionManager'),
         href: '/admin/permissions',
         icon: null,
       },
       {
-        title: 'Quản lý vai trò',
+        title: t('admin.sidebar.system.roleManager'),
         href: '/admin/roles',
         icon: null,
       },
       {
-        title: 'Quản Lý Người Dùng',
+        title: t('admin.sidebar.system.userManager'),
         href: '/admin/users',
         icon: null,
       },
       {
-        title: 'Nhật ký hệ thống',
+        title: t('admin.sidebar.system.systemLog'),
         href: '/admin/audit-logs',
         icon: null,
       },
       {
-        title: 'Quản lý thiết bị',
+        title: t('admin.sidebar.system.deviceManager'),
         href: '/admin/device',
         icon: null,
       },
     ],
   },  
   {
-    title: 'Danh mục',
+    title: t('admin.sidebar.categories.categories'),
     href: '/admin/categories',
     icon: <FolderClosed className="w-5 h-5" />,
     subItems: [
       {
-        title: 'Quản lý ngôn ngữ',
+        title: t('admin.sidebar.language.languageManager'),
         href: '/admin/languages',
         icon: null,
       },
     ],
   },
   {
-    title: 'Cài đặt',
+    title: t('admin.sidebar.settings.settings'),
     href: '/admin/settings',
     icon: <Settings className="w-5 h-5" />,
   },
@@ -126,21 +127,21 @@ export const sidebarConfig: SidebarItem[] = [
 
 export const settingsSidebarConfig: SidebarItem[] = [
   {
-    title: 'Cài đặt hệ thống',
+    title: t('admin.sidebar.settings.systemSettings'),
     href: '/admin',
     icon: <Undo className="w-5 h-5" />,
     isTitle: true
   },
   {
-    title: 'Cài đặt tài khoản',
+    title: t('admin.sidebar.settings.accountSettings'),
     href: '/admin/settings',
     subItems:[
       {
-        title: 'Hồ sơ cá nhân',
+        title: t('admin.sidebar.settings.profile'),
         href: '/admin/settings/profile',
       },
       {
-        title: 'Mật khẩu và bảo mật',
+        title: t('admin.sidebar.settings.passwordAndSecurity'),
         href: '/admin/settings/password-and-security',
       },
     ]

@@ -23,11 +23,12 @@ import { useTranslation } from 'react-i18next'
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handleSignin, loading } = useSignin()
   const { t } = useTranslation()
+  const Schema = LoginSchema(t)
 
-  type LoginFormData = z.infer<typeof LoginSchema>;
+  type LoginFormData = z.infer<typeof Schema>;
 
 const form = useForm<LoginFormData>({
-  resolver: zodResolver(LoginSchema),
+  resolver: zodResolver(Schema),
   defaultValues: { 
     email: '', 
     password: '',

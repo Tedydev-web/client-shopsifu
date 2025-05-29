@@ -9,6 +9,7 @@ import {
   LangGetAllResponse
 } from "@/types/languages.interface"
 import { PaginationRequest } from "@/types/base.interface"
+import { t } from "i18next"
 
 export function useLanguages() {
   const [languages, setLanguages] = useState<Language[]>([])
@@ -65,7 +66,7 @@ export function useLanguages() {
     try {
       setLoading(true)
       const response = await languagesService.create(data)
-      showToast("Tạo thành công ngôn ngữ", "success")
+      showToast(t('admin.showToast.language.createSuccessful'), "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -81,7 +82,7 @@ export function useLanguages() {
     try {
       setLoading(true)
       const response = await languagesService.update(id, data)
-      showToast("Cập nhật thành công ngôn ngữ", "success")
+      showToast(t('admin.showToast.language.updateSuccessful'), "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -97,7 +98,7 @@ export function useLanguages() {
     try {
       setLoading(true)
       const response = await languagesService.deleteById(id)
-      showToast("Xóa thành công ngôn ngữ", "success")
+      showToast(t('admin.showToast.language.deleteSuccessful'), "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), 'error')

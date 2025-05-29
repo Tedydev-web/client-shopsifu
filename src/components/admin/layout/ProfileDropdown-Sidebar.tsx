@@ -7,6 +7,7 @@ import React from 'react'
 import { useChangeLang } from '@/hooks/useChangeLang'
 import { useLogout } from '@/hooks/useLogout'
 import { useRouter } from 'next/navigation'
+import { t } from 'i18next'
 
 export function ProfileDropdownSidebar() {
   // Static user info for demo
@@ -42,20 +43,20 @@ export function ProfileDropdownSidebar() {
         <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 px-4 py-2"
         onClick={() => router.push('/admin/settings/profile')}>
           <User className="w-4 h-4 mr-2 text-gray-600" />
-          Quản lý hồ sơ
+          {t('admin.profileDropdown.profileManage')}
         </DropdownMenuItem>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger className="text-gray-700 hover:bg-gray-100 px-4 py-2">
             <Languages className="w-4 h-4 mr-2 text-gray-600"/>
-            Ngôn ngữ: {currentLangName}
+            {t('admin.profileDropdown.language')} {currentLangName}
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="w-56 bg-white border border-gray-200 rounded-lg shadow-lg">
             <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 px-4 py-2" onClick={() => changeLanguage('vi')}>
-              Tiếng Việt
+              {t('admin.profileDropdown.lang.vi')}
               {currentSelectedLang === 'vi' && <Check className="w-4 h-4 text-green-500" />}
             </DropdownMenuItem>
             <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 px-4 py-2" onClick={() => changeLanguage('en')}>
-              English
+              {t('admin.profileDropdown.lang.en')}
               {currentSelectedLang === 'en' && <Check className="w-4 h-4 text-green-500" />}
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -66,7 +67,7 @@ export function ProfileDropdownSidebar() {
         disabled={logoutLoading}
         >
           <LogOut className="w-4 h-4 mr-2 text-gray-600" />
-          Đăng xuất
+          {t('admin.profileDropdown.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

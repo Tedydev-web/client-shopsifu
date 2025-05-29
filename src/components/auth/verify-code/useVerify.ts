@@ -7,7 +7,7 @@ import { authService } from '@/services/authService'
 import { VerifyOTPRequest } from '@/types/auth.interface'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
-
+import { useTranslation } from 'react-i18next'
 
 const TOKEN_KEY = 'token_verify_code'
 
@@ -20,9 +20,12 @@ export function useVerify() {
   const email = searchParams.get('email')
   const action = (searchParams.get('action') as ActionType) || 'signup'
 
+  const {t} = useTranslation()
+  const otp = otpSchema(t)
+
   const verifyOTP = async (otp: string) => {
     if (!email) {
-      showToast('Không tìm thấy email, vui lòng thử lại', 'error')
+      showToast(t('admin.showToast.auth.emailNotFound'), 'error')
       router.replace(action === 'signup' ? ROUTES.BUYER.SIGNUP : ROUTES.BUYER.RESET_PASSWORD)
       return
     }
@@ -39,7 +42,7 @@ export function useVerify() {
       
       if (response.otpToken) {
         localStorage.setItem(TOKEN_KEY, response.otpToken)
-        showToast('Xác thực thành công', 'success')
+        showToast(t('admin.showToast.auth.authSuccessful'), 'success')
         
         if (action === 'forgot') {
           router.replace(`${ROUTES.BUYER.RESET_PASSWORD}?email=${encodeURIComponent(email)}`)
@@ -47,7 +50,7 @@ export function useVerify() {
           router.replace(`${ROUTES.BUYER.SIGNUP}?email=${encodeURIComponent(email)}`)
         }
       } else {
-        throw new Error('Token không hợp lệ')
+        throw new Error(t('admin.showToast.auth.invalidToken'))
       }
     } catch (error) {
       showToast(parseApiError(error), 'error')
@@ -58,7 +61,7 @@ export function useVerify() {
 
   const resendOTP = async () => {
     if (!email) {
-      showToast('Không tìm thấy email, vui lòng thử lại', 'error')
+      showToast(t('admin.showToast.auth.emailNotFound'), 'error')
       router.replace(action === 'signup' ? ROUTES.BUYER.SIGNUP : ROUTES.BUYER.RESET_PASSWORD)
       return
     }
@@ -69,7 +72,7 @@ export function useVerify() {
         email,
         type: action === 'signup' ? 'REGISTER' : 'RESET_PASSWORD'
       })
-      showToast('Đã gửi lại mã OTP mới', 'success')
+      showToast(t('admin.showToast.auth.sentNewOtp'), 'success')
     } catch (error) {
       showToast(parseApiError(error), 'error')
     } finally {
@@ -77,7 +80,7 @@ export function useVerify() {
     }
   }
 
-  const handleVerifyCode = async (data: z.infer<typeof otpSchema>) => {
+  const handleVerifyCode = async (data: z.infer<typeof otp>) => {
     await verifyOTP(data.otp)
   }
 

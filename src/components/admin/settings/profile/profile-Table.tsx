@@ -28,17 +28,17 @@ export function ProfileSettingsTable() {
   } = useProfile()
 
   const columns: SettingTableColumn[] = [
-    { label: 'Tên', value: profile.name },
+    { label: t('admin.profileSettings.name'), value: profile.name },
     { label: 'Email', value: profile.email },
-    { label: 'Ngôn ngữ', value: profile.language },
+    { label: t('admin.profileSettings.lang'), value: profile.language },
   ]
 
   return (
     <>
       <SettingTable
         columns={columns}
-        title="Thông tin tài khoản"
-        subtitle="Quản lý thông tin tài khoản của bạn"
+        title={t('admin.profileSettings.accountInfo')}
+        subtitle={t('admin.profileSettings.manageAccount')}
         rightAction={
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -49,7 +49,7 @@ export function ProfileSettingsTable() {
             <DropdownMenuContent align="center" className="p-0 px-2">
               <DropdownMenuItem onClick={() => setOpenUpdate(true)}>
                 <Pencil className="w-4 h-4" />
-                Chỉnh sửa
+                {t('admin.profileSettings.edit')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

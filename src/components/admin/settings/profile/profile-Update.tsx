@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { SheetRework } from '@/components/ui/component/sheet-rework'
+import { useTranslation } from 'react-i18next'
 
 interface ProfileUpdateSheetProps {
   open: boolean
@@ -19,13 +20,14 @@ export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileU
   const [name, setName] = useState(initialData.name)
   const [email, setEmail] = useState(initialData.email)
   const [language, setLanguage] = useState(initialData.language)
+  const {t} = useTranslation()
 
   return (
     <SheetRework
       open={open}
       onOpenChange={onOpenChange}
-      title="Chỉnh sửa thông tin tài khoản"
-      subtitle="Cập nhật các trường thông tin bên dưới và nhấn lưu để hoàn tất."
+      title={t('admin.profileUpdate.title')}
+      subtitle={'admin.profileUpdate.subtitle'}
       onCancel={() => onOpenChange(false)}
       onConfirm={() => { /* handle save here */ }}
       confirmText="Lưu thay đổi"
@@ -33,7 +35,7 @@ export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileU
     >
       <form className="flex flex-col gap-5">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Tên</label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">{t('admin.profileUpdate.name')}</label>
           <Input id="name" value={name} onChange={e => setName(e.target.value)} autoFocus />
         </div>
         <div>
@@ -41,7 +43,7 @@ export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileU
           <Input id="email" value={email} onChange={e => setEmail(e.target.value)} type="email" />
         </div>
         <div>
-          <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">Ngôn ngữ</label>
+          <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">{t('admin.profileUpdate.lang')}</label>
           <Input id="language" value={language} onChange={e => setLanguage(e.target.value)} />
         </div>
       </form>

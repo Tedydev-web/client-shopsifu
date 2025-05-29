@@ -1,141 +1,156 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { User } from '@/types/user.interface' // Import User type
+import { User } from '@/types/user.interface'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DataTableColumnHeader } from '@/components/ui/data-table-component/data-table-column-header' // Assuming you will create this for sorting
-import { DataTableRowActions, ActionItem } from '@/components/ui/data-table-component/data-table-row-actions' // Import ActionItem
-import { Edit, Trash2, Eye, UserCog } from 'lucide-react'; // Ví dụ icons
+import { DataTableColumnHeader } from '@/components/ui/data-table-component/data-table-column-header'
+import { DataTableRowActions, ActionItem } from '@/components/ui/data-table-component/data-table-row-actions'
+import { Edit, Trash2, Eye, UserCog } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
-// Hàm tạo danh sách actions cụ thể cho User
 const getUserActions = (
   rowUser: User,
   onDelete: (user: User) => void,
-  onEdit: (user: User) => void
+  onEdit: (user: User) => void,
+  t: (key: string) => string
 ): ActionItem<User>[] => [
   {
     type: 'command',
-    label: 'Xem chi tiết',
+    label: t('admin.users.actions.view'),
     icon: <Eye />,
-    // onClick: (user) => {
-    //   console.log('Xem chi tiết user:', user.id);
-    //   // router.push(`/admin/users/${user.id}`)
-    // },
   },
   {
     type: 'command',
-    label: 'Sửa thông tin',
+    label: t('admin.users.actions.edit'),
     icon: <Edit />,
-    onClick: (user) => {
-      onEdit(user);
-    },
+    onClick: (user) => onEdit(user),
   },
   {
     type: 'command',
-    label: 'Phân quyền',
+    label: t('admin.users.actions.assignPermissions'),
     icon: <UserCog />,
     onClick: (user) => {
-      console.log('Phân quyền user:', user.id);
-      // Open modal phân quyền
+      console.log('Phân quyền user:', user.id)
     },
   },
-  { type: 'separator' }, // Đây là SeparatorAction
+  { type: 'separator' },
   {
     type: 'command',
-    label: 'Xóa người dùng',
+    label: t('admin.users.actions.delete'),
     icon: <Trash2 />,
     onClick: (user) => onDelete(user),
     className: 'text-red-600 hover:!text-red-700',
   },
-];
+]
 
 export const userColumns = (
-  { onDelete, onEdit }: { onDelete: (user: User) => void, onEdit: (user: User) => void }
-  ): ColumnDef<User>[] => [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'name',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên người dùng" />
-    ),
-    cell: ({ row }) => <div>{row.getValue('name')}</div>,
-    enableSorting: true,
-    enableHiding: true,
-  },
-  {
-    accessorKey: 'email',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
-    ),
-    cell: ({ row }) => <div>{row.getValue('email')}</div>,
-    enableSorting: true,
-    enableHiding: true,
-  },
-  {
-    accessorKey: 'role',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Vai trò" />
-    ),
-    cell: ({ row }) => {
-      const role = row.getValue('role') as string
-      return <Badge variant={role === 'admin' ? 'destructive' : 'outline'}>{role}</Badge>
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string
-      let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'secondary'
-      if (status === 'active') variant = 'default' // Green or primary
-      if (status === 'inactive') variant = 'outline'
-      if (status === 'pending') variant = 'secondary' // Yellow or secondary
+  { onDelete, onEdit }: { onDelete: (user: User) => void; onEdit: (user: User) => void }
+): ColumnDef<User>[] => {
+  const { t } = useTranslation()
 
-      return <Badge variant={variant} className={`capitalize ${status === 'active' ? 'bg-green-100 text-green-700' : status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700' }`}>{status}</Badge>
+  return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="translate-y-[2px]"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="translate-y-[2px]"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+    {
+      accessorKey: 'name',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('admin.users.table.name')} />
+      ),
+      cell: ({ row }) => <div>{row.getValue('name')}</div>,
+      enableSorting: true,
+      enableHiding: true,
     },
-  },
-  {
-    accessorKey: 'createdAt',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày tạo" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue('createdAt'))
-      return <span>{date.toLocaleDateString('vi-VN')}</span>
+    {
+      accessorKey: 'email',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('admin.users.table.email')} />
+      ),
+      cell: ({ row }) => <div>{row.getValue('email')}</div>,
+      enableSorting: true,
+      enableHiding: true,
     },
-  },
-  {
-    id: 'actions',
-    //header: () => <div className="text-right">Hành động</div>, // Hoặc để trống nếu không muốn title cho cột actions
-    cell: ({ row }) => <DataTableRowActions row={row} actions={getUserActions(row.original, onDelete, onEdit)} />,
-  },
-]
+    {
+      accessorKey: 'role',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('admin.users.table.role')} />
+      ),
+      cell: ({ row }) => {
+        const role = row.getValue('role') as string
+        const label = t(`admin.users.role.${role}`)
+        return <Badge variant={role === 'admin' ? 'destructive' : 'outline'}>{label}</Badge>
+      },
+      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    },
+    {
+      accessorKey: 'status',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('admin.users.table.status')} />
+      ),
+      cell: ({ row }) => {
+        const status = row.getValue('status') as string
+        const label = t(`admin.users.status.${status}`)
+
+        let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'secondary'
+        if (status === 'active') variant = 'default'
+        if (status === 'inactive') variant = 'outline'
+        if (status === 'pending') variant = 'secondary'
+
+        return (
+          <Badge
+            variant={variant}
+            className={`capitalize ${
+              status === 'active'
+                ? 'bg-green-100 text-green-700'
+                : status === 'pending'
+                ? 'bg-yellow-100 text-yellow-700'
+                : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            {label}
+          </Badge>
+        )
+      },
+      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    },
+    {
+      accessorKey: 'createdAt',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('admin.users.table.createdAt')} />
+      ),
+      cell: ({ row }) => {
+        const date = new Date(row.getValue('createdAt'))
+        return <span>{date.toLocaleDateString('vi-VN')}</span>
+      },
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">{t('admin.users.table.actions')}</div>,
+      cell: ({ row }) => (
+        <DataTableRowActions
+          row={row}
+          actions={getUserActions(row.original, onDelete, onEdit, t)}
+        />
+      ),
+    },
+  ]
+}
