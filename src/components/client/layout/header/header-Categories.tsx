@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Nếu bạn đang dùng Tailwind Merge/clsx
+import { ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface SubCategory {
   id: string;
@@ -47,24 +48,67 @@ const categories: Category[] = [
 
 export function Categories() {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+  const [open, setOpen] = useState(false)
+  
+  const handleMouseEnter = () => setOpen(true);
+  const handleMouseLeave = () => setOpen(false);
+    return (    
+    
+    <div 
+      className="relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="relative">
+        {/* Background animation layer - positioned absolutely */}
+        <motion.div
+          className="absolute inset-0 rounded-full backdrop-blur-sm"
+          initial={{ backgroundColor: "rgba(255,255,255,0)" }}
+          animate={{ 
+            backgroundColor: open ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0)",
+            boxShadow: open ? "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" : "none" 
+          }}
+          whileHover={{ 
+            backgroundColor: "rgba(255,255,255,0.12)",
+            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+            scale: 1.05,
+            y: -2
+          }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 400, 
+            damping: 20 
+          }}
+        />
+        
+        {/* Content layer - stays in place */}
+        <div className="relative whitespace-nowrap inline-flex items-center gap-1 p-4 text-white font-semibold text-sm z-10">
+          Danh mục
+          <motion.span
+            animate={{ rotate: open ? 180 : 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <ChevronDown className="w-4 h-4" />
+          </motion.span>
+        </div>
+      </div>
 
-  return (
-    <div className="relative group">
-      <button className="px-4 py-2 text-white font-medium text-sm hover:text-gray-200 transition-colors">
-        Danh mục
-      </button>
 
-      <div className="absolute top-full left-0 min-w-[950px] bg-white rounded-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      <div 
+        className={cn(
+          "border-1 border-gray-200 absolute top-full left-0 min-w-[950px] bg-white rounded-xs shadow-xl transition-all duration-300 ease-in-out z-50",
+          open ? "opacity-100 visible" : "opacity-0 invisible"
+        )}>
         <div className="flex w-full">
           {/* Left: Main categories */}
-          <div className="w-1/4 bg-white border-r-1 py-4 px-2 rounded-l-md">
+          <div className="w-1/4 bg-white border-r-1 pr-2 py-4 rounded-l-md">
             <ul className="space-y-1">
               {categories.map((cat) => (
                 <li
                   key={cat.id}
                   onMouseEnter={() => setActiveCategory(cat)}
                   className={cn(
-                    'flex items-center justify-between px-3 py-2 text-[14px] text-[#333] font-medium cursor-pointer rounded hover:bg-white transition-colors',
+                    'flex items-center justify-between px-3 py-2 text-[14px] text-[#333] font-medium cursor-pointer hover:bg-white transition-colors',
                     activeCategory?.id === cat.id && 'bg-gray-100 hover:bg-gray-100'
                   )}
                 >

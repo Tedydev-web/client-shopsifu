@@ -23,7 +23,7 @@ export function SearchInput() {
       </div>
 
       {/* Search Suggestions */}
-      <div className="absolute pb-2 capitalize top-full left-0 right-0 mt-1 flex items-center gap-4 text-[12px] text-white/90">
+      {/* <div className="absolute pb-2 capitalize top-full left-0 right-0 mt-1 flex items-center gap-4 text-[12px] text-white/90">
         <div className="flex items-center gap-3">
           <a href="#" className="hover:text-white transition-colors">áo thun</a>
           <a href="#" className="hover:text-white transition-colors">quần jean</a>
@@ -36,7 +36,7 @@ export function SearchInput() {
           <a href="#" className="hover:text-white transition-colors">túi xách</a>
           <a href="#" className="hover:text-white transition-colors">đồng hồ</a>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
