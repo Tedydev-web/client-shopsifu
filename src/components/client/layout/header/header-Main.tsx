@@ -3,17 +3,18 @@
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import { SearchInput } from './search-Input';
-import { CartDropdown } from './cart-Dropdown';
+import { CartDropdown } from './header-Cart';
 import Image from 'next/image';
 import { TopBar } from './header-TopBar';
+import { Categories } from './header-Categories';
 import './style.css';
 
 export function Header() {
   return (
     <>
-      <TopBar />
+      {/* <TopBar /> */}
       <header
-        className="text-white max-h-[125px] h-[110px]"
+        className="text-white max-h-[125px] h-[110px] text-[13px] font-bold"
         style={{
           background: '#D70018',
         }}
@@ -22,20 +23,21 @@ export function Header() {
           <div className="px-4 h-full flex items-center justify-between gap-4">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="header-logo">
+              <div className="header-logo rounded-xl overflow-hidden">
                 <Image
-                  src="/images/logo/png-jpeg/Logo-Full-White.png"
+                  src="/images/logo/png-jpeg/Logo-Full-BgRed.png"
                   alt="Shopsifu Logo"
-                  width={140}
+                  width={55}
                   height={40}
                   priority
-                  className="object-contain"
+                  className="object-contain rounded-xl"
                 />
               </div>
             </Link>
 
             <div className="flex-1 max-w-[1000px] flex flex-col">
-              <div className="flex items-center">
+              <div className="flex items-center gap-4">
+                <Categories />
                 <SearchInput />
               </div>
             </div>

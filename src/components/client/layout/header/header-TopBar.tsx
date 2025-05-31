@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useChangeLang } from '@/hooks/useChangeLang';
 import { useState, useRef, useEffect } from 'react';
-import { ProfileDropdown } from './profile-Dropdown';
+import { ProfileDropdown } from './header-Profile';
 
 export function TopBar() {
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang();
