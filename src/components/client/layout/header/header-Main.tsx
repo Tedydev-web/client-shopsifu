@@ -14,7 +14,7 @@ export function Header() {
     <>
       {/* <TopBar /> */}
       <header
-        className="text-white max-h-[125px] h-[110px] text-[13px] font-bold"
+        className="text-white max-h-[125px] h-[110px] text-[13px]"
         style={{
           background: '#D70018',
         }}
