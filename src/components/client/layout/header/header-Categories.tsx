@@ -48,109 +48,146 @@ const categories: Category[] = [
 
 export function Categories() {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   
   const handleMouseEnter = () => setOpen(true);
   const handleMouseLeave = () => setOpen(false);
-    return (    
-    
-    <div 
-      className="relative"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className="relative">
-        {/* Background animation layer - positioned absolutely */}
-        <motion.div
-          className="absolute inset-0 rounded-full backdrop-blur-sm"
-          initial={{ backgroundColor: "rgba(255,255,255,0)" }}
-          animate={{ 
-            backgroundColor: open ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0)",
-            boxShadow: open ? "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" : "none" 
-          }}
-          whileHover={{ 
-            backgroundColor: "rgba(255,255,255,0.12)",
-            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-            scale: 1.05,
-            y: -2
-          }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 400, 
-            damping: 20 
-          }}
-        />
-        
-        {/* Content layer - stays in place */}
-        <div className="relative whitespace-nowrap inline-flex items-center gap-1 p-4 text-white font-semibold text-sm z-10">
-          Danh mục
-          <motion.span
-            animate={{ rotate: open ? 180 : 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <ChevronDown className="w-4 h-4" />
-          </motion.span>
-        </div>
-      </div>
 
-
+  return (    
+    <>
+      {/* Background overlay when dropdown is open - positioned below header */}
       <div 
         className={cn(
-          "border-1 border-gray-200 absolute top-full left-0 min-w-[950px] bg-white rounded-xs shadow-xl transition-all duration-300 ease-in-out z-50",
-          open ? "opacity-100 visible" : "opacity-0 invisible"
-        )}>
-        <div className="flex w-full">
-          {/* Left: Main categories */}
-          <div className="w-1/4 bg-white border-r-1 pr-2 py-4 rounded-l-md">
-            <ul className="space-y-1">
-              {categories.map((cat) => (
-                <li
-                  key={cat.id}
-                  onMouseEnter={() => setActiveCategory(cat)}
-                  className={cn(
-                    'flex items-center justify-between px-3 py-2 text-[14px] text-[#333] font-medium cursor-pointer hover:bg-white transition-colors',
-                    activeCategory?.id === cat.id && 'bg-gray-100 hover:bg-gray-100'
-                  )}
-                >
-                  {cat.name}
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Right: Sub categories */}
-          <div className="w-3/4 p-4 bg-white rounded-r-md">
-            {activeCategory ? (
-              <div className="grid grid-cols-4 gap-4">
-                {activeCategory.children.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/product/${item.id}`}
-                    className="group block text-center hover:bg-gray-100 p-2 rounded-md"
-                  >
-                    <div className="w-full aspect-square relative mb-1 rounded-md overflow-hidden bg-gray-50">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        layout="fill"
-                        objectFit="cover"
-                      />
-                    </div>
-                    <span className="text-[13px] text-[#333] group-hover:text-[#D70018] font-normal leading-tight">
-                      {item.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="h-full flex items-center justify-center text-sm text-gray-400">
-                Di chuột vào danh mục để xem sản phẩm
-              </div>
-            )}
+          "fixed top-[75px] left-0 right-0 bottom-0 bg-black transition-all duration-300 category-backdrop",
+          open 
+            ? "opacity-50 visible z-40" 
+            : "opacity-0 invisible"
+        )}
+        onClick={handleMouseLeave}
+      />
+      
+      <div 
+        className="relative z-50 category-hover-container"
+      >
+        {/* Invisible extended hover area to maintain hover state */}
+        {open && (
+          <div 
+            className="absolute top-0 left-[-20px] w-[260px] h-[calc(100%+18px)] category-hover-area"
+            onMouseEnter={handleMouseEnter}
+          />
+        )}
+        
+        <div 
+          className="relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Background animation layer - positioned absolutely */}
+          <motion.div
+            className="absolute inset-0 rounded-full backdrop-blur-sm"
+            initial={{ backgroundColor: "rgba(255,255,255,0)" }}
+            animate={{ 
+              backgroundColor: open ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0)",
+              boxShadow: open ? "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" : "none" 
+            }}
+            whileHover={{ 
+              backgroundColor: "rgba(255,255,255,0.12)",
+              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+              scale: 1.05,
+              y: -2
+            }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 400, 
+              damping: 20 
+            }}
+          />
+          
+          {/* Content layer - stays in place */}
+          <div className="cursor-pointer relative whitespace-nowrap inline-flex items-center gap-1 px-4 py-3 text-white font-semibold text-sm z-10">
+            Danh mục
+            <motion.span
+              animate={{ rotate: open ? 180 : 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <ChevronDown className="w-4 h-4" />
+            </motion.span>
           </div>
         </div>
+
+        <motion.div 
+          className={cn(
+            "border-1 border-gray-200 absolute top-[calc(100%+12px)] left-[-180px] min-w-[950px] min-h-[900px] bg-white rounded-xs shadow-xl z-50",
+            open ? "opacity-100 visible" : "opacity-0 invisible"
+          )}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ 
+            opacity: open ? 1 : 0, 
+            y: open ? 0 : -10,
+            transition: {
+              duration: 0.3,
+              ease: "easeOut"
+            }
+          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Bubble arrow pointing to the title */}
+          <div className="absolute left-[230px] top-[-7px] w-3 h-3 bg-white transform rotate-45 border-t-1 border-l-1 border-gray-200 z-1"></div>
+
+          <div className="flex h-full w-full relative z-10">
+            {/* Left: Main categories */}
+            <div className="h-full w-1/4 bg-white border-r-1 pr-2 py-4 rounded-l-md">
+              <ul className="space-y-1">
+                {categories.map((cat) => (
+                  <li
+                    key={cat.id}
+                    onMouseEnter={() => setActiveCategory(cat)}
+                    className={cn(
+                      'flex items-center justify-between px-3 py-2 text-[14px] text-[#333] font-medium cursor-pointer hover:bg-white transition-colors',
+                      activeCategory?.id === cat.id && 'bg-gray-100 hover:bg-gray-100'
+                    )}
+                  >
+                    {cat.name}
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right: Sub categories */}
+            <div className="w-3/4 p-4 bg-white rounded-r-md">
+              {activeCategory ? (
+                <div className="grid grid-cols-4 gap-4">
+                  {activeCategory.children.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/product/${item.id}`}
+                      className="group block text-center hover:bg-gray-100 p-2 rounded-md"
+                    >
+                      <div className="w-full aspect-square relative mb-1 rounded-md overflow-hidden bg-gray-50">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </div>
+                      <span className="text-[13px] text-[#333] group-hover:text-[#D70018] font-normal leading-tight">
+                        {item.name}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center text-sm text-gray-400">
+                  Di chuột vào danh mục để xem sản phẩm
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </>
   );
 }

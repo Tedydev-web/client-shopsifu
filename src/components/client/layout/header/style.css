@@ -9,3 +9,49 @@
   width: auto !important;
   object-fit: fill;
 } */
+
+/* Backdrop blur effect for category dropdown */
+.category-backdrop {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  position: fixed;
+  pointer-events: auto;
+}
+
+/* Enhance dropdown menu appearance */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50 !important;
+  box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Category hover improvements */
+.category-hover-container {
+  position: relative;
+}
+
+.category-hover-area {
+  position: absolute;
+  background-color: transparent;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+/* Improve dropdown animation */
+.category-dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.category-dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+.category-dropdown-exit {
+  opacity: 1;
+}
+.category-dropdown-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}

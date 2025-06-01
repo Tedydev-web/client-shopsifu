@@ -14,10 +14,10 @@ export function Header() {
     <>
       {/* <TopBar /> */}
       <header
-        className="text-white max-h-[125px] h-[80px] text-[13px]"
-        style={{
-          background: '#D70018',
-        }}
+        className="text-white max-h-[125px] h-[75px] text-[13px] relative z-50 bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg"
+        // style={{
+        //   background: '#D70018',
+        // }}
       >
         <div className="max-w-[1100px] mx-auto h-full">
           <div className="px-4 h-full flex items-center justify-between gap-4">
@@ -48,4 +48,4 @@ export function Header() {
       </header>
     </>
   );
-} 
+}

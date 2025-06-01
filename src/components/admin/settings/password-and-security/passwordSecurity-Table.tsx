@@ -72,7 +72,7 @@ export function PasswordSecurityTable() {
 
   return (
     <>
-      <SettingTable
+      <SettingTable                                                                                               
         title="Bảo mật & Mật khẩu"
         subtitle="Quản lý bảo mật tài khoản và các thiết lập liên quan đến mật khẩu."
         columns={columns}

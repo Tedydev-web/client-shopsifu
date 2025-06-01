@@ -27,7 +27,7 @@ export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps
   return (
     <SettingTable
       title={
-        <Button variant="ghost" className="flex items-center gap-2 p-0 -ml-2" onClick={onBack}>
+        <Button variant="ghost" className="flex items-center gap-2 p-0 -ml-2 px-2" onClick={onBack}>
           <ChevronLeft className="w-5 h-5" />
           <span>Thiết bị đăng nhập</span>
         </Button>
