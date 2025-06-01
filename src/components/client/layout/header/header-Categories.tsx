@@ -113,13 +113,16 @@ export function Categories() {
               <ChevronDown className="w-4 h-4" />
             </motion.span>
           </div>
-        </div>
-
-        <motion.div 
+        </div>        <motion.div 
           className={cn(
-            "border-1 border-gray-200 absolute top-[calc(100%+12px)] left-[-180px] min-w-[950px] min-h-[900px] bg-white rounded-xs shadow-xl z-50",
+            "border-1 border-gray-200 absolute top-[calc(100%+12px)] left-[-180px] min-w-[950px] bg-white rounded-xs shadow-xl z-50",
             open ? "opacity-100 visible" : "opacity-0 invisible"
           )}
+          style={{
+            height: '900px',
+            maxHeight: 'calc(90vh - 120px)', // 90vh để còn khoảng trống ở dưới
+            marginBottom: '20px'
+          }}
           initial={{ opacity: 0, y: -10 }}
           animate={{ 
             opacity: open ? 1 : 0, 
@@ -153,10 +156,8 @@ export function Categories() {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            {/* Right: Sub categories */}
-            <div className="w-3/4 p-4 bg-white rounded-r-md">
+            </div>            {/* Right: Sub categories */}
+            <div className="w-3/4 p-4 bg-white rounded-r-md overflow-y-auto h-full">
               {activeCategory ? (
                 <div className="grid grid-cols-4 gap-4">
                   {activeCategory.children.map((item) => (
