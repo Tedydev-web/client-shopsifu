@@ -102,9 +102,8 @@ export function SearchInput() {
 					</Link>
 				</motion.div>				{/* Search dropdown with AnimatePresence for smooth enter/exit */}
 				<AnimatePresence>
-					{isFocused && (
-						<motion.div
-							className='absolute top-[calc(100%+12px)] left-0 w-full bg-white/90 backdrop-blur-sm rounded-lg shadow-xl z-50 border border-gray-100'
+					{isFocused && (							<motion.div
+							className='absolute top-[calc(100%+12px)] search-dropdown bg-white rounded-lg shadow-xl z-50 border border-gray-100 w-full max-w-[600px] left-1/2 transform -translate-x-1/2'
 							initial={{ opacity: 0, y: -10 }}
 							animate={{
 								opacity: 1,
@@ -124,100 +123,78 @@ export function SearchInput() {
 							}}
 						>
 							{/* Bubble arrow pointing to the search bar */}
-							<div className='absolute left-[70px] top-[-7px] w-3 h-3 bg-white transform rotate-45 border-t-1 border-l-1 border-gray-200'></div>
-
-							<div className='p-4'>
-								{!searchTerm ? (
-									<>
-										{/* Layout khi chưa nhập gì - Hiển thị danh mục phổ biến */}
-										{/* Trending searches */}
-										<div className='mb-4'>
-											<div className='flex items-center mb-2'>
-												<TrendingUp className='h-4 w-4 text-red-500 mr-2' />
-												<h3 className='text-sm font-medium'>Xu hướng tìm kiếm</h3>
-											</div>
-											<div className='space-y-2'>
-												{trendingSearches.map((item) => (
-													<div
-														key={item.id}
-														className='flex items-center justify-between hover:bg-gray-50 p-2 rounded-lg cursor-pointer'
-														onClick={() => handleSearchTermClick(item.text)}
-													>
-														<div className='flex items-center'>
-															<Clock className='h-4 w-4 text-gray-400 mr-2' />
-															<span className='text-sm'>{item.text}</span>
-														</div>
-														<span className='text-xs text-gray-400'>{item.category}</span>
-													</div>
-												))}
-											</div>
-										</div>
-
-										{/* Popular categories */}
+							<div className='absolute search-dropdown-arrow w-3 h-3 bg-white transform rotate-45 border-t border-l border-gray-200' style={{ left: 'calc(50% - 6px)', top: '-6px' }}></div>
+							<div className='p-5'>
+								{!searchTerm ? (									<>
+										{/* Layout khi chưa nhập gì - Chỉ hiển thị danh mục phổ biến */}
 										<div>
-											<h3 className='text-sm font-medium mb-3'>Danh mục phổ biến</h3>
-											<div className='grid grid-cols-5 gap-3'>
-												{popularCategories.map((category) => (
-													<Link
-														href={`/category/${category.id}`}
-														key={category.id}
-														className='group text-center'
-														onClick={() => setOpenDropdown('none')}
-													>
-														<div className='w-full aspect-square relative mb-2 rounded-full overflow-hidden border border-gray-100'>
-															<Image
-																src={category.image}
-																alt={category.name}
-																layout='fill'
-																objectFit='cover'
-																className='transition-transform duration-300 group-hover:scale-110'
-															/>
-														</div>
-														<span className='text-xs text-gray-700 group-hover:text-red-500 line-clamp-1'>
-															{category.name}
-														</span>
-													</Link>
+											<h3 className='text-[16px] font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-2'>Danh mục phổ biến</h3><div className='flex flex-col gap-y-2'>
+												{/* Organize categories by rows (5 categories per row) */}
+												{Array.from({ length: 5 }).map((_, rowIndex) => (
+													<div key={rowIndex} className='flex gap-x-4 w-full'>
+														{popularCategories.slice(rowIndex * 5, (rowIndex + 1) * 5).map((category) => (
+															<Link
+																href={`/category/${category.id}`}
+																key={category.id}
+																className='group flex-1 text-center bg-white rounded-lg p-2 hover:bg-gray-50 transition-all duration-200'
+																onClick={() => setOpenDropdown('none')}
+															>
+																<div className='aspect-square w-full relative mb-2 overflow-hidden rounded-lg border border-gray-100'>
+																	<Image
+																		src={category.image}
+																		alt={category.name}
+																		layout='fill'
+																		objectFit='cover'
+																		className='transition-transform duration-300 group-hover:scale-110'
+																	/>
+																</div>
+																<span className='text-sm text-gray-800 font-medium group-hover:text-red-600 line-clamp-2'>
+																	{category.name}
+																</span>
+															</Link>
+														))}
+													</div>
 												))}
 											</div>
 										</div>
 									</>
 								) : (
-									<>
-										{/* Layout khi đã nhập - Hiển thị kết quả liên quan */}
-										<div className='mb-4'>
-											<div className='flex items-center mb-2'>
+									<>										{/* Layout khi đã nhập - Hiển thị kết quả liên quan */}
+										<div className='mb-6'>
+											<div className='flex items-center mb-3'>
 												<Search className='h-4 w-4 text-red-500 mr-2' />
-												<h3 className='text-sm font-medium'>Kết quả liên quan</h3>
+												<h3 className='text-[15px] font-semibold'>Kết quả liên quan</h3>
 											</div>
 											
 											{/* Filtered results based on search term */}
-											<div className='space-y-2'>
+											<div className='space-y-1'>
 												{trendingSearches
 													.filter(item => 
 														item.text.toLowerCase().includes(searchTerm.toLowerCase())
 													)
 													.slice(0, 5)
 													.map((item) => (
-														<div
+														<motion.div
 															key={item.id}
-															className='flex items-center justify-between hover:bg-gray-50 p-2 rounded-lg cursor-pointer'
+															className='flex items-center justify-between p-2.5 rounded-lg cursor-pointer'
 															onClick={() => handleSearchTermClick(item.text)}
+															whileHover={{ backgroundColor: 'rgba(240, 240, 240, 0.8)' }}
 														>
 															<div className='flex items-center'>
-																<Search className='h-4 w-4 text-gray-400 mr-2' />
-																<span className='text-sm'>{item.text}</span>
+																<Search className='h-4 w-4 text-gray-500 mr-2.5' />
+																<span className='text-sm font-medium text-gray-800'>{item.text}</span>
 															</div>
-															<span className='text-xs text-gray-400'>{item.category}</span>
-														</div>
+															<span className='text-xs text-gray-500'>{item.category}</span>
+														</motion.div>
 													))
 												}
 											</div>
 										</div>
 										
 										{/* Filtered categories */}
-										<div className='mb-4'>
-											<h3 className='text-sm font-medium mb-3'>Danh mục liên quan</h3>
-											<div className='flex flex-wrap gap-2'>
+										<div className='mb-6'>
+											<h3 className='text-[15px] font-semibold mb-3'>Danh mục liên quan</h3>
+											<div className='grid grid-cols-2 gap-3'>
 												{popularCategories
 													.filter(cat => 
 														cat.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -227,24 +204,31 @@ export function SearchInput() {
 														<Link
 															href={`/category/${category.id}`}
 															key={category.id}
-															className='flex items-center bg-gray-50 hover:bg-gray-100 rounded-full px-3 py-1.5 text-sm text-gray-700'
+															className='flex items-center bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-lg px-3 py-2.5 text-sm text-gray-700'
 															onClick={() => setOpenDropdown('none')}
 														>
-															<span className='mr-1.5'>{category.name}</span>
+															<div className='w-10 h-10 relative mr-3 rounded overflow-hidden'>
+																<Image 
+																	src={category.image}
+																	alt={category.name}
+																	layout='fill'
+																	objectFit='cover'
+																/>
+															</div>
+															<span className='font-medium'>{category.name}</span>
 														</Link>
 													))
 												}
 											</div>
 										</div>
-										
-										{/* "Tìm kiếm theo từ khóa" button */}
-										<div className='mt-4 border-t pt-3'>
+												{/* "Tìm kiếm theo từ khóa" button */}
+										<div className='mt-5 border-t border-gray-100 pt-4'>
 											<Link
 												href={`/search?q=${encodeURIComponent(searchTerm)}`}
-												className='flex items-center justify-center w-full bg-gray-50 hover:bg-gray-100 text-red-600 font-medium p-3 rounded-lg'
+												className='flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-3.5 rounded-lg transition-colors duration-200'
 												onClick={() => setOpenDropdown('none')}
 											>
-												<Search className='h-4 w-4 mr-2' />
+												<Search className='h-4 w-4 mr-2.5' />
 												<span>Tìm kiếm theo từ khóa "{searchTerm}"</span>
 											</Link>
 										</div>
