@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <div className="container mx-auto px-4">
       {/* Hero Section */}
-      <section className="py-12 md:py-24">
+      {/* <section className="py-12 md:py-24">
         <div className="text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Thời Trang Nam Cao Cấp
@@ -16,10 +16,10 @@ export default function HomePage() {
             Mua sắm ngay
           </Button>
         </div>
-      </section>
+      </section> */}
 
       {/* Categories Section */}
-      <section className="py-12 bg-gray-50">
+      {/* <section className="py-12 bg-gray-50">
         <h2 className="text-3xl font-bold text-center mb-12">Danh mục sản phẩm</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {categories.map((category) => (
@@ -38,7 +38,7 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }
