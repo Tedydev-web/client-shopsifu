@@ -159,26 +159,68 @@ export function Categories() {
             </div>            {/* Right: Sub categories */}
             <div className="w-3/4 p-4 bg-white rounded-r-md overflow-y-auto h-full">
               {activeCategory ? (
-                <div className="grid grid-cols-4 gap-4">
-                  {activeCategory.children.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={`/product/${item.id}`}
-                      className="group block text-center hover:bg-gray-100 p-2 rounded-md"
-                    >
-                      <div className="w-full aspect-square relative mb-1 rounded-md overflow-hidden bg-gray-50">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          layout="fill"
-                          objectFit="cover"
-                        />
-                      </div>
-                      <span className="text-[13px] text-[#333] group-hover:text-[#D70018] font-normal leading-tight">
-                        {item.name}
-                      </span>
+                <div className="space-y-6">
+                  {/* Category title with arrow */}
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-bold text-gray-800">{activeCategory.name}</h3>
+                    <Link href={`/category/${activeCategory.id}`} className="flex items-center text-sm text-red-600 hover:underline font-medium">
+                      Xem tất cả
+                      <ChevronRight className="w-4 h-4 ml-1" />
                     </Link>
-                  ))}
+                  </div>
+                  
+                  {/* Items grid - 5 items per row */}
+                  <div className="grid grid-cols-5 gap-4">
+                    {activeCategory.children.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/product/${item.id}`}
+                        className="group block text-center p-2 rounded-lg transition-all duration-200"
+                      >
+                        <div className="w-full aspect-square relative mb-2 rounded-full overflow-hidden border border-gray-100">
+                          <Image
+                            src="/images/demo/3.webp"
+                            alt={item.name}
+                            layout="fill"
+                            objectFit="cover"
+                            className="transition-transform duration-300 group-hover:scale-110"
+                          />
+                        </div>
+                        <span className="text-[13px] text-[#333] group-hover:text-[#D70018] font-normal leading-tight line-clamp-2 h-10">
+                          {item.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                  
+                  {/* Additional section for featured items */}
+                  {/* <div className="mt-6 pt-6 border-t">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-medium text-gray-700">Sản phẩm nổi bật</h3>
+                    </div>
+                    <div className="grid grid-cols-5 gap-4">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Link
+                          key={`featured-${i}`}
+                          href={`/product/featured-${i}`}
+                          className="group block text-center hover:bg-gray-50 p-2 rounded-lg transition-all duration-200"
+                        >
+                          <div className="w-full aspect-square relative mb-2 rounded-full overflow-hidden bg-gray-50 border border-gray-100">
+                            <Image
+                              src="/images/demo/3.webp"
+                              alt={`Sản phẩm nổi bật ${i}`}
+                              layout="fill"
+                              objectFit="cover"
+                              className="transition-transform duration-300 group-hover:scale-110"
+                            />
+                          </div>
+                          <span className="text-[13px] text-[#333] group-hover:text-[#D70018] font-normal leading-tight line-clamp-2 h-10">
+                            {activeCategory.name} nổi bật {i}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div> */}
                 </div>
               ) : (
                 <div className="h-full flex items-center justify-center text-sm text-gray-400">
