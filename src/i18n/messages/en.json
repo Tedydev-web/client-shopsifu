@@ -377,8 +377,8 @@
     "profileUpdate": {
       "title": "Edit account information",
       "subtitle": "Update the information fields below and click save to complete.",
-      "name": "name",
-      "lang": "language",
+      "name": "Name",
+      "lang": "Language",
       "confirm": "Save changes",
       "cancel": "Cancel"
     },
@@ -698,6 +698,94 @@
       "emptyDesc": "You don't have any notifications at the moment, but once you do they will live here.",
       "esc": "esc",
       "close": "Close"
+    }
+  },
+  "user": {
+    "account": {
+      "home": "Home",
+      "manageAccount": "Manage your account information",
+
+      "notifications": {
+        "notifications": "Notifications"
+      },
+
+      "profile": {
+        "profile": "Profile",
+        "manageProfile": "Manage Your Profile",
+        "title": "My profile",
+        "subtitle": "Manage profile information for account security",
+        "currentPasswordRequired": "",
+        "newPasswordInvalid": "",
+        "confirmPasswordRequired": "",
+        "passwordsMismatch": "",
+        "emailPhone": "Email&Phone",
+        "noPhone": "",
+        "password": "Password",
+        "twoFactor": "Two-Factor",
+        "twoFactorDescription": "Protect your account by adding an extra layer of security.",
+        "thirdPartyAccounts": "Third-party accounts",
+        "turnOn": "Turn On",
+        "edit": "Edit",
+
+        "editEmailPhone": "Email&Phone",
+        "email": "Email",
+        "phoneNumber": "Phone Number",
+        "cancel": "Cancel",
+        "save": "Save Changes",
+
+        "editPassword": "Edit Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+
+        "enable2FA": "Enable Two-Factor Authentication",
+        "enable2FADescription": "Are you sure you want to enable two-factor authentication? You will need to scan a QR code with your authenticator app.",
+        "enable": "Enable"
+      },
+
+      "address": {
+        "title": "Change Password",
+        "subtitle": "Your password must have a minimum of 6 characters and include numbers, letters and special characters",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+
+        "currentPasswordPlaceholder": "Enter Your Current Password",
+        "newPasswordPlaceholder": "Enter Your New Password",
+        "confirmPasswordPlaceholder": "Re-enter the new password",
+
+        "address": "Address",
+        "myAddresses": "My Addresses",
+        "addNewAddress": "Add New Address",
+        "noAddress": "You don’t have any addresses yet.",
+        "processing": "Processing...",
+        "changePassword": "Change password"
+      },
+
+      "payment": {
+        "payment": "Payment",
+        "creditDebitCard": "Credit / Debit Card",
+        "addNewCard": "Add New Card",
+        "noCardLinked": "You don't have cards yet.",
+        "bankAccount": "My Bank Account",
+        "addBankLink": "Add New Bank Account",
+        "noBankLinked": "You don’t have bank accounts yet."
+      },
+
+      "security": {
+        "security": "Security",
+        "title": "Change Password",
+        "subtitle": "For your account's security, do not share your password with anyone else",
+        "newPass": "New Password",
+        "newPassPlaceholder": "Enter password",
+        "confirmnewPassword": "Confirm new password",
+        "confirmnewPasswordPlaceholder": "Confirm new password",
+        "save": "Confirm"
+      },
+
+      "myPurchase": {
+        "myPurchase": "My Purchase"
+      }
     }
   }
 }

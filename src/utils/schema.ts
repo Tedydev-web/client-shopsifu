@@ -14,4 +14,9 @@ export const passwordSchema = z.object({
   path: ["confirmPassword"]
 })
 
+export const EmailSchema = z.object({
+  email: z.string().email({ message: "Email không đúng" }),
+});
+
+
 export type PasswordFormData = z.infer<typeof passwordSchema>
