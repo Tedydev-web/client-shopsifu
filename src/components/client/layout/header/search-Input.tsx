@@ -135,11 +135,11 @@ export function SearchInput() {
 								{/* Header section with padding */}
 								<div className='px-5 pt-5'>
 									{!searchTerm ? (
-										<h3 className='text-[16px] font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-2'>Danh mục phổ biến</h3>
+										<h3 className='text-[16px] font-semibold text-gray-800 border-b border-gray-100 pb-2'>Danh mục phổ biến</h3>
 									) : (
-										<div className='flex items-center mb-3'>
-											<Search className='h-4 w-4 text-red-500 mr-2' />
-											<h3 className='text-[15px] font-semibold text-black'>Kết quả liên quan</h3>
+										<div className='flex items-center mb-2'>
+											{/* <Search className='h-4 w-4 text-red-500 mr-2' /> */}
+											<h3 className='text-[16px] font-semibold text-black'>Kết quả liên quan</h3>
 										</div>
 									)}
 								</div>
@@ -155,16 +155,17 @@ export function SearchInput() {
 														key={category.id}
 														className='cursor-pointer'
 														onClick={() => setOpenDropdown('none')}
-														whileHover={{ backgroundColor: 'rgba(240, 240, 240, 0.8)' }}
+														whileHover={{ backgroundColor: 'rgba(230, 230, 230, 0.9)' }}
+														transition={{ duration: 0.1 }}
 													>
-														<div className='px-5 py-2.5'>
+														<div className='px-5 py-2'>
 															<Link
 																href={`/category/${category.id}`}
 																className='w-full flex items-center justify-between'
 																onClick={(e) => e.stopPropagation()}
 															>
 																<div className='flex items-center'>
-																	<div className='w-10 h-10 relative overflow-hidden rounded-lg border border-gray-100 mr-3'>
+																	<div className='w-10 h-10 relative overflow-hidden rounded-full border border-gray-100 mr-3'>
 																		<Image
 																			src={category.image}
 																			alt={category.name}
@@ -198,7 +199,8 @@ export function SearchInput() {
 																key={item.id}
 																className='cursor-pointer'
 																onClick={() => handleSearchTermClick(item.text)}
-																whileHover={{ backgroundColor: 'rgba(240, 240, 240, 0.8)' }}
+																whileHover={{ backgroundColor: 'rgba(230, 230, 230, 0.9)' }}
+																transition={{ duration: 0.1 }}
 															>
 																<div className='px-5 py-2.5 flex items-center justify-between'>
 																	<div className='flex items-center'>
