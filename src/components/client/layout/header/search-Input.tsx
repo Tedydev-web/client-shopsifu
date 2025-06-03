@@ -42,13 +42,15 @@ export function SearchInput() {
 
 	return (
 		<>
-			{/* Background overlay khi search focused */}			<div
+			{/* Background overlay khi search focused */}			
+			<div
 				className={cn(
 					'fixed top-[75px] left-0 right-0 bottom-0 bg-black transition-all duration-300 search-backdrop',
 					isFocused ? 'opacity-50 visible z-40' : 'opacity-0 invisible'
 				)}
 				onClick={() => setOpenDropdown('none')}
-			/><div className='relative w-4/5 max-w-[500px] z-50 search-container' ref={searchRef}>
+			/>
+			<div className='relative w-4/5 max-w-[600px] z-50 search-container' ref={searchRef}>
 				<motion.div
 					className='flex items-center bg-white rounded-full overflow-hidden shadow-sm flex-grow text-black'
 					animate={{
@@ -102,8 +104,9 @@ export function SearchInput() {
 					</Link>
 				</motion.div>				{/* Search dropdown with AnimatePresence for smooth enter/exit */}
 				<AnimatePresence>
-					{isFocused && (							<motion.div
-							className='absolute top-[calc(100%+12px)] search-dropdown bg-white rounded-lg shadow-xl z-50 border border-gray-100 w-full max-w-[600px] left-1/2 transform -translate-x-1/2'
+					{isFocused && (							
+						<motion.div
+							className='absolute top-[calc(100%+12px)] search-dropdown bg-white rounded-lg shadow-xl z-50 border border-gray-100 w-full max-w-[800px] left-1/2 transform -translate-x-1/2'
 							initial={{ opacity: 0, y: -10 }}
 							animate={{
 								opacity: 1,
@@ -128,32 +131,36 @@ export function SearchInput() {
 								{!searchTerm ? (									<>
 										{/* Layout khi chưa nhập gì - Chỉ hiển thị danh mục phổ biến */}
 										<div>
-											<h3 className='text-[16px] font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-2'>Danh mục phổ biến</h3><div className='flex flex-col gap-y-2'>
-												{/* Organize categories by rows (5 categories per row) */}
-												{Array.from({ length: 5 }).map((_, rowIndex) => (
-													<div key={rowIndex} className='flex gap-x-4 w-full'>
-														{popularCategories.slice(rowIndex * 5, (rowIndex + 1) * 5).map((category) => (
-															<Link
-																href={`/category/${category.id}`}
-																key={category.id}
-																className='group flex-1 text-center bg-white rounded-lg p-2 hover:bg-gray-50 transition-all duration-200'
-																onClick={() => setOpenDropdown('none')}
-															>
-																<div className='aspect-square w-full relative mb-2 overflow-hidden rounded-lg border border-gray-100'>
+											<h3 className='text-[16px] font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-2'>Danh mục phổ biến</h3>
+											<div className='space-y-1'>
+												{/* Display categories in a column format similar to search results */}
+												{popularCategories.slice(0, 8).map((category) => (
+													<motion.div
+														key={category.id}
+														className='flex items-center justify-between p-2.5 rounded-lg cursor-pointer'
+														onClick={() => setOpenDropdown('none')}
+														whileHover={{ backgroundColor: 'rgba(240, 240, 240, 0.8)' }}
+													>
+														<Link
+															href={`/category/${category.id}`}
+															className='w-full flex items-center justify-between'
+															onClick={(e) => e.stopPropagation()}
+														>
+															<div className='flex items-center'>
+																<div className='w-10 h-10 relative overflow-hidden rounded-lg border border-gray-100 mr-3'>
 																	<Image
 																		src={category.image}
 																		alt={category.name}
 																		layout='fill'
 																		objectFit='cover'
-																		className='transition-transform duration-300 group-hover:scale-110'
+																		className='transition-transform duration-300'
 																	/>
 																</div>
-																<span className='text-sm text-gray-800 font-medium group-hover:text-red-600 line-clamp-2'>
-																	{category.name}
-																</span>
-															</Link>
-														))}
-													</div>
+																<span className='text-sm font-medium text-gray-800'>{category.name}</span>
+															</div>
+															<Tag className='h-4 w-4 text-gray-500' />
+														</Link>
+													</motion.div>
 												))}
 											</div>
 										</div>
@@ -161,10 +168,10 @@ export function SearchInput() {
 								) : (
 									<>										{/* Layout khi đã nhập - Hiển thị kết quả liên quan */}
 										<div className='mb-6'>
-											<div className='flex items-center mb-3'>
+											{/* <div className='flex items-center mb-3'>
 												<Search className='h-4 w-4 text-red-500 mr-2' />
-												<h3 className='text-[15px] font-semibold'>Kết quả liên quan</h3>
-											</div>
+												<h3 className='text-[15px] font-semibold text-black'>Kết quả liên quan</h3>
+											</div> */}
 											
 											{/* Filtered results based on search term */}
 											<div className='space-y-1'>
@@ -186,37 +193,6 @@ export function SearchInput() {
 															</div>
 															<span className='text-xs text-gray-500'>{item.category}</span>
 														</motion.div>
-													))
-												}
-											</div>
-										</div>
-										
-										{/* Filtered categories */}
-										<div className='mb-6'>
-											<h3 className='text-[15px] font-semibold mb-3'>Danh mục liên quan</h3>
-											<div className='grid grid-cols-2 gap-3'>
-												{popularCategories
-													.filter(cat => 
-														cat.name.toLowerCase().includes(searchTerm.toLowerCase())
-													)
-													.slice(0, 4)
-													.map((category) => (
-														<Link
-															href={`/category/${category.id}`}
-															key={category.id}
-															className='flex items-center bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-lg px-3 py-2.5 text-sm text-gray-700'
-															onClick={() => setOpenDropdown('none')}
-														>
-															<div className='w-10 h-10 relative mr-3 rounded overflow-hidden'>
-																<Image 
-																	src={category.image}
-																	alt={category.name}
-																	layout='fill'
-																	objectFit='cover'
-																/>
-															</div>
-															<span className='font-medium'>{category.name}</span>
-														</Link>
 													))
 												}
 											</div>
