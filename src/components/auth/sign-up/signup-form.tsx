@@ -179,7 +179,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
           <div className="text-center text-sm">
             {t('auth.register.Have an account')}{' '}
             <Link
-              href="/buyer/sign-in"
+              href="/sign-in"
               className="underline underline-offset-4 text-primary hover:text-primary/90"
             >
               {t('auth.register.login')}

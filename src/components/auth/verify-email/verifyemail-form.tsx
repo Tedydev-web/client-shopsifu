@@ -60,7 +60,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
           successMessage: t('auth.register.success'),
           buttonText: t('auth.register.continue'),
           linkText: t('auth.register.Have an account?'),
-          linkHref: '/buyer/sign-in',
+          linkHref: '/sign-in',
           linkLabel: t('auth.register.login')
         }
       case 'forgot':
@@ -70,7 +70,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
           successMessage: t('auth.forgotPassword.success'),
           buttonText: t('auth.forgotPassword.Sending'),
           linkText: t('auth.forgotPassword.Remember password'),
-          linkHref: '/buyer/sign-in',
+          linkHref: '/sign-in',
           linkLabel: t('auth.forgotPassword.login')
         }
       default:
@@ -80,7 +80,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
           successMessage: t('auth.verifyEmail.success'),
           buttonText: t('auth.verifyEmail.confirm'),
           linkText: t('auth.verifyEmail.back'),
-          linkHref: '/buyer/sign-in',
+          linkHref: '/sign-in',
           linkLabel: t('auth.verifyEmail.login')
         }
     }

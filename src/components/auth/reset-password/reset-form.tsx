@@ -104,7 +104,7 @@ export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRe
             <div className="text-center text-sm">
               {t('auth.resetPassword.Remember password')}{' '}
               <Link
-                href="/buyer/sign-in"
+                href="/sign-in"
                 className="underline underline-offset-4 text-primary hover:text-primary/90"
               >
                 {t('auth.resetPassword.login')}

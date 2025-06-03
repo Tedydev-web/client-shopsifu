@@ -45,7 +45,7 @@ export function useSignup() {
       localStorage.removeItem(TOKEN_KEY)
       
       showToast(t('admin.showToast.auth.registerSuccessful'), 'success')
-      router.push('/buyer/sign-in')
+      router.push('/sign-in')
     } catch (error) {
       showToast(parseApiError(error), 'error')
       console.error('Registration error:', error)

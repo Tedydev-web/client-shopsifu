@@ -29,7 +29,7 @@ export function useVerifyEmail() {
       showToast(t('admin.showToast.auth.sentCode'), 'success')
       
       // Chuyển hướng đến trang nhập mã xác thực với email và action
-      router.push(`/buyer/verify-code?email=${encodeURIComponent(email)}&action=${action}`)
+      router.push(`/verify-code?email=${encodeURIComponent(email)}&action=${action}`)
       return true
     } catch (error) {
       showToast(parseApiError(error), 'error')

@@ -81,7 +81,7 @@ const form = useForm<LoginFormData>({
                     <div className="flex items-center justify-between">
                       <FormLabel>{t('auth.common.password')}</FormLabel>
                       <Link
-                        href="/buyer/verify-email?action=forgot"
+                        href="/verify-email?action=forgot"
                         className="text-sm text-primary hover:underline underline-offset-4"
                       >
                         {t('auth.login.forgot password')}
@@ -135,7 +135,7 @@ const form = useForm<LoginFormData>({
               <div className="text-center text-sm">
                 {t('auth.login.no account')}{' '}
                 <Link
-                  href="/buyer/verify-email?action=signup"
+                  href="/verify-email?action=signup"
                   className="underline underline-offset-4 text-primary hover:text-primary/90"
                 >
                   {t('auth.login.register')}
