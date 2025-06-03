@@ -13,7 +13,7 @@ import './style.css';
 export function Header() {
   return (
     <DropdownProvider>
-      {/* <TopBar /> */}
+      <TopBar />
       <header
         className="text-white max-h-[125px] h-[75px] text-[13px] relative z-50 bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg"
         // style={{
