@@ -10,7 +10,7 @@ export default function Verify2faHandler() {
   useEffect(() => {
     if (!type) {
       // Chuyển hướng client-side
-      window.location.replace('/buyer/verify-2fa?type=TOTP')
+      window.location.replace('/verify-2fa?type=TOTP')
     }
   }, [type])
 
