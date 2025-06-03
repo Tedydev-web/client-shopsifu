@@ -13,7 +13,7 @@ export type SettingTableColumn = {
 
 interface SettingTableProps {
   columns?: SettingTableColumn[];
-  title?: string;
+  title?: React.ReactNode;
   subtitle?: string;
   rightAction?: React.ReactNode;
   children?: React.ReactNode; // for extra rows (e.g. 2FA toggle)
