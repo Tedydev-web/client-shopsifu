@@ -40,6 +40,16 @@ export function SearchInput() {
 		}
 	};
 
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newSearchTerm = e.target.value;
+        setSearchTerm(newSearchTerm);
+        
+        // Nếu đang nhập text và modal chưa mở, mở modal
+        if (newSearchTerm && openDropdown !== 'search') {
+            setOpenDropdown('search');
+        }
+    };
+
 	return (
 		<>
 			{/* Background overlay khi search focused */}			
@@ -69,7 +79,8 @@ export function SearchInput() {
 						onFocus={handleFocus}
 						onBlur={handleBlur}
 						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
+						// onChange={(e) => setSearchTerm(e.target.value)}
+						onChange={handleInputChange}
 					/>
 					{searchTerm && (
 						<motion.button
@@ -145,7 +156,7 @@ export function SearchInput() {
 								</div>
 								
 								{/* Content section with full-width hover backgrounds */}
-								<div className='mb-5'>
+								<div className='mb-0'> {/* Changed mb-5 to mb-0 to remove extra space at bottom */}
 									{!searchTerm ? (
 										<>
 											{/* Layout khi chưa nhập gì - Chỉ hiển thị danh mục phổ biến */}
@@ -153,12 +164,10 @@ export function SearchInput() {
 												{popularCategories.slice(0, 8).map((category) => (
 													<motion.div
 														key={category.id}
-														className='cursor-pointer'
+														className='cursor-pointer modal-input' /* Fixed class name syntax */
 														onClick={() => setOpenDropdown('none')}
-														whileHover={{ backgroundColor: 'rgba(230, 230, 230, 0.9)' }}
-														transition={{ duration: 0.1 }}
 													>
-														<div className='px-5 py-2'>
+														<div className='px-5 py-2.5'> {/* Standardized padding */}
 															<Link
 																href={`/category/${category.id}`}
 																className='w-full flex items-center justify-between'
@@ -174,9 +183,9 @@ export function SearchInput() {
 																			className='transition-transform duration-300'
 																		/>
 																	</div>
-																	<span className='text-sm font-medium text-gray-800'>{category.name}</span>
+																	<span className='text-sm text-gray-800'>{category.name}</span>
 																</div>
-																<Tag className='h-4 w-4 text-gray-500' />
+																{/* <Tag className='h-4 w-4 text-gray-500' /> */}
 															</Link>
 														</div>
 													</motion.div>
@@ -197,10 +206,8 @@ export function SearchInput() {
 														.map((item) => (
 															<motion.div
 																key={item.id}
-																className='cursor-pointer'
+																className='cursor-pointer modal-input' /* Applied same class for consistency */
 																onClick={() => handleSearchTermClick(item.text)}
-																whileHover={{ backgroundColor: 'rgba(230, 230, 230, 0.9)' }}
-																transition={{ duration: 0.1 }}
 															>
 																<div className='px-5 py-2.5 flex items-center justify-between'>
 																	<div className='flex items-center'>
@@ -218,9 +225,9 @@ export function SearchInput() {
 									)}
 								</div>
 								
-								{/* Footer section with padding */}
+								{/* Footer section with padding - added pt-5 to create proper spacing */}
 								{searchTerm && (
-									<div className='px-5 pb-5'>
+									<div className='px-5 pb-5 pt-5'>
 										<div className='border-t border-gray-100 pt-4'>
 											<Link
 												href={`/search?q=${encodeURIComponent(searchTerm)}`}
