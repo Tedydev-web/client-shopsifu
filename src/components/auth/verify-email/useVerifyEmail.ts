@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { authService } from '@/services/authService'
 import { showToast } from '@/components/ui/toastify'
-import { ErrorResponse } from '@/types/base.interface'
 import { parseApiError } from '@/utils/error'
 import {t} from "i18next"
 
@@ -18,18 +17,27 @@ export function useVerifyEmail() {
     try {
       setLoading(true)
       
-      // Xác định type dựa vào action
-      const type = action === 'signup' ? 'REGISTER' : 'RESET_PASSWORD'
-      
-      await authService.sendOTP({
-        email,
-        type
-      })
+      // Sử dụng API khác nhau dựa trên action
+      if (action === 'signup') {
+        // Sử dụng register_send cho đăng ký
+        await authService.register_send({ email })
+      } else {
+        // Action là 'forgot' - phần này sẽ được thêm khi có API
+        // Hiện tại làm sẵn cấu trúc cho future implementation
+        // TODO: Uncomment khi có API forgot password
+        // await authService.forgotPassword({ email })
+        
+        // Tạm thời sử dụng sendOTP với type RESET_PASSWORD
+        await authService.sendOTP({
+          email,
+          type: 'RESET_PASSWORD'
+        })
+      }
 
       showToast(t('admin.showToast.auth.sentCode'), 'success')
       
-      // Chuyển hướng đến trang nhập mã xác thực với email và action
-      router.push(`/verify-code?email=${encodeURIComponent(email)}&action=${action}`)
+      // Chuyển hướng đến trang nhập mã xác thực và truyền action để giữ nguyên luồng xử lý
+      router.push(`/verify-code?action=${action}`)
       return true
     } catch (error) {
       showToast(parseApiError(error), 'error')

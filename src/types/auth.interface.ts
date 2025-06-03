@@ -41,6 +41,11 @@ export interface RegisterResponse {
   updatedAt: string
 }
 
+export interface RegisterSendRequest{
+  email: string;
+}
+
+
 // VERIFY + SEND
 export interface SendOTPRequest {
   code?: string
@@ -55,17 +60,19 @@ export interface SendOTPResponse {
 }
 
 export interface VerifyOTPRequest {
-  email: string
   code: string
-  type: string
 }
 
 export interface VerifyOTPResponse {
-  otpToken: string
-  token: string
-  email: string
-  type: string
-  verified: boolean
+  message: string
+  statusCode?: number
+  data?: {
+    otpToken?: string
+    token?: string
+    email?: string
+    type?: string
+    verified?: boolean
+  }
 }
 
 // RESET PASSWORD

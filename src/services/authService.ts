@@ -4,6 +4,7 @@ import {
   LoginResponse, 
   RegisterRequest, 
   RegisterResponse,
+  RegisterSendRequest,
   SendOTPRequest,
   SendOTPResponse,
   oAuthLoginResponse,
@@ -32,6 +33,11 @@ export const authService = {
 
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
     const response = await privateAxios.post<RegisterResponse>(API_ENDPOINTS.AUTH.SIGNUP, data);
+    return response.data;
+  },
+
+  register_send: async (data: RegisterSendRequest): Promise<void> =>{
+    const response = await privateAxios.post(API_ENDPOINTS.AUTH.SIGNUP_SEND, data);
     return response.data;
   },
 
