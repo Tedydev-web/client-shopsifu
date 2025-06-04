@@ -15,12 +15,9 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion'
+import {t} from "i18next"
 
-interface PasswordSecuritySessionProps {
-  onBack: () => void;
-}
-
-export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps) {
+export function PasswordSecuritySession() {
   const devices = sessionMockData;
   const totalSessions = devices.reduce((total, device) => total + device.sessions.length, 0);
 
@@ -28,13 +25,10 @@ export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps
     <div className="min-h-screen bg-white p-6">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <Button variant="ghost" className="p-0 h-auto" onClick={onBack}>
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        <h2 className="text-lg font-semibold">Thiết bị đăng nhập</h2>
+        <h2 className="text-lg font-semibold">{t('user.account.security.loggedInDevices')}</h2>
       </div>
       <p className="text-sm text-gray-500 mb-6">
-        Tổng số {totalSessions} phiên hoạt động trên {devices.length} thiết bị
+        {t('user.account.security.total')} {totalSessions} {t('user.account.security.active')} {devices.length} {t('user.account.security.device')}
       </p>
 
       {/* Danh sách thiết bị */}
@@ -49,7 +43,7 @@ export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps
                 <Monitor className="w-6 h-6 text-gray-600 flex-shrink-0" />
                 <div className="flex-1 text-left">
                   <div className="text-base font-semibold text-gray-900">{device.deviceName}</div>
-                  <div className="text-sm text-gray-500">{device.sessions.length} phiên đăng nhập</div>
+                  <div className="text-sm text-gray-500">{device.sessions.length} {t('user.account.security.loginSession')}</div>
                 </div>
               </div>
             </AccordionTrigger>
@@ -81,7 +75,7 @@ export function PasswordSecuritySession({ onBack }: PasswordSecuritySessionProps
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => { /* TODO: handle terminate session */ }}>
-                            Xóa phiên này
+                            {t('user.account.security.deleteSession')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

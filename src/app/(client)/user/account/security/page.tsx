@@ -1,5 +1,5 @@
 "use client";
-import { PasswordSecurityTable } from "@/components/client/user/account/security/security-Table";
+import { PasswordSecuritySession } from '@/components/client/user/account/security/security-Session';
 import { useTranslation } from 'react-i18next';
 
 export default function ProfilePage() {
@@ -12,7 +12,7 @@ export default function ProfilePage() {
           {t('user.account.security.subtitle')}
         </p> */}
       </div>
-      <PasswordSecurityTable />
+      <PasswordSecuritySession />
     </div>
   );
 }

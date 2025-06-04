@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChangePasswordModal } from "./profile-PasswordUpdate";
 import { ProfileUpdateSheet } from "./profile-Update";
 import { TwoFactorAuthModal } from "./profile-2FA";
+import { DeleteAccountModal } from "./profile-DeleteAccount";
 
 export default function ProfileIndex() {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ export default function ProfileIndex() {
   const [profileSheetOpen, setProfileSheetOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [is2FAModalOpen, setIs2FAModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [userInfo, setUserInfo] = useState({
     name: "Nguyễn Văn A",
@@ -22,14 +24,18 @@ export default function ProfileIndex() {
   });
 
   const handleEnable2FA = () => {
-    // TODO: Call API để bật xác thực 2 bước
     console.log("2FA enabled");
     setIs2FAModalOpen(false);
   };
 
+  const handleDeleteAccount = () => {
+    // TODO: Gọi API xóa tài khoản
+    console.log("Account deleted");
+  };
+
   return (
     <div className="py-8 space-y-6">
-      {/* Thông tin Email & Tên */}
+      {/* Email & Tên */}
       <div className="border-b pb-4 px-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
@@ -65,7 +71,7 @@ export default function ProfileIndex() {
         </div>
       </div>
 
-      {/* Xác thực 2 bước */}
+      {/* 2FA */}
       <div className="border-b pb-4 px-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
@@ -108,7 +114,20 @@ export default function ProfileIndex() {
         ))}
       </div>
 
-      {/* Sheet cập nhật thông tin */}
+      {/* Account Termination Section */}
+      <div className="border-t pt-6 px-4 flex items-center justify-between">
+        <p className="text-sm text-gray-700 font-medium">
+          {t("user.account.profile.accountTermination")}
+        </p>
+        <button
+          onClick={() => setIsDeleteModalOpen(true)}
+          className="text-red-600 text-sm font-medium hover:underline"
+        >
+          {t("user.account.profile.deleteAccount")}
+        </button>
+      </div>
+
+      {/* Modals */}
       <ProfileUpdateSheet
         open={profileSheetOpen}
         onOpenChange={setProfileSheetOpen}
@@ -119,18 +138,22 @@ export default function ProfileIndex() {
         }}
       />
 
-      {/* Modal đổi mật khẩu */}
       <ChangePasswordModal
         open={isPasswordModalOpen}
         onOpenChange={setIsPasswordModalOpen}
         userInfo={userInfo}
       />
 
-      {/* Modal xác thực 2 bước */}
       <TwoFactorAuthModal
         open={is2FAModalOpen}
         onOpenChange={setIs2FAModalOpen}
         onConfirm={handleEnable2FA}
+      />
+
+      <DeleteAccountModal
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={handleDeleteAccount}
       />
     </div>
   );
