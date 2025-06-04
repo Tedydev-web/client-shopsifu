@@ -6,7 +6,7 @@ import { otpSchema, recoveryCodeSchema } from '../schema/index'
 import { authService } from '@/services/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
-import { Verify2faResponse } from '@/types/auth.interface'
+import { Verify2faResponse } from '@/types/auth/auth.interface'
 import { useTranslation } from 'react-i18next'
 
 const SESSION_TOKEN_KEY = 'loginSessionToken'

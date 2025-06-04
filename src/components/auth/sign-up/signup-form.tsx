@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/animated-form'
 import { OAuthForm } from '../layout/OAuthForm'
 import { useTranslation } from 'react-i18next'
-import { RegisterRequest } from '@/types/auth.interface'
+import { RegisterRequest } from '@/types/auth/auth.interface'
 interface SignupFormProps {
   email: string
   className?: string

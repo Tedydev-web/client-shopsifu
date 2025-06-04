@@ -34,8 +34,8 @@ export const RegisterSchema = (t: TFunction) =>
 
 export const LoginSchema = (t: TFunction) =>
   z.object({
-    email: z.string().email({
-      message: t('validation.email')
+    emailOrUsername: z.string().min(1, {
+      message: t('validation.emailOrUsername')
     }),
     password: z
       .string()

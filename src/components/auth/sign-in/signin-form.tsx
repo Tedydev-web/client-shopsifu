@@ -30,7 +30,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
 const form = useForm<LoginFormData>({
   resolver: zodResolver(Schema),
   defaultValues: { 
-    email: '', 
+    emailOrUsername: '', 
     password: '',
     rememberMe: false
   }
@@ -55,16 +55,15 @@ const form = useForm<LoginFormData>({
           </AnimatedFormItem>
 
           {/* Form */}
-          <div className="grid gap-6">
-            <AnimatedFormItem>
+          <div className="grid gap-6">            <AnimatedFormItem>
               <FormField
                 control={form.control}
-                name="email"
+                name="emailOrUsername"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('auth.login.emailOrUsername')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" placeholder="m@example.com" />
+                      <Input {...field} type="text" placeholder="Email hoặc tên người dùng" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

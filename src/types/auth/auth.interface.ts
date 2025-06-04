@@ -1,16 +1,22 @@
 // LOGIN
 export interface LoginRequest {
-  email: string
+  emailOrUsername: string
   password: string
   rememberMe: boolean
 }
 
 export interface LoginResponse {
-  accessToken: string
-  refreshToken: string
-  loginSessionToken: string
-  twoFactorMethod: string
-  message: string
+  statusCode: string
+    message: string
+    data:{
+      statusCode: string
+      data:{
+        requiresDeviceVerification: string
+        verificationType: string
+        verificationRedirectUrl: string
+      }
+        
+    }
 }
 
 export interface oAuthLoginResponse {

@@ -21,7 +21,7 @@ import {
   Confirm2faRequest,
   Confirm2faResponse,
   RefreshTokenResponse,
-} from '@/types/auth.interface';
+} from '@/types/auth/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
 
