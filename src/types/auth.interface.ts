@@ -22,12 +22,12 @@ export interface LogoutRequest {
 }
 // REGISTER
 export interface RegisterRequest {
-  name: string
-  email: string
+  firstName: string
+  lastName: string
+  username: string
   password: string
   confirmPassword: string
   phoneNumber: string
-  otpToken: string
 }
 
 export interface RegisterResponse {
@@ -39,6 +39,7 @@ export interface RegisterResponse {
   status: string
   createdAt: string
   updatedAt: string
+  message: string
 }
 
 export interface RegisterSendRequest{
@@ -57,6 +58,7 @@ export interface SendOTPResponse {
   type: string
   expiresAt: string
   createdAt: string
+  message: string
 }
 
 export interface VerifyOTPRequest {

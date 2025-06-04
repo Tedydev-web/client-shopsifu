@@ -7,16 +7,18 @@ export const EmailSchema = (t: TFunction) => z.object({
 
 export const RegisterSchema = (t: TFunction) =>
   z.object({
-    email: z.string().email({
-      message: t('validation.email')
+    firstName: z.string().min(1, {
+      message: t('validation.firstName')
     }),
-    name: z.string().min(1, {
-      message: t('validation.fullName')
+    lastName: z.string().min(1, {
+      message: t('validation.lastName')
+    }),
+    username: z.string().min(3, {
+      message: t('validation.username')
     }),
     phoneNumber: z.string().min(10, {
       message: t('validation.minLengthPhone')
     }),
-    token: z.string(),
     password: z
       .string()
       .min(6, { message: t('validation.password.minLength') })

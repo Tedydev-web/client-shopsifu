@@ -7,44 +7,28 @@ import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
 import { useTranslation } from 'react-i18next'
 
-const TOKEN_KEY = 'token_verify_code'
-
 export function useSignup() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const email = searchParams.get('email')
 
   const {t} = useTranslation()
   const Schema = RegisterSchema(t)
-
   const handleSignup = async (data: z.infer<typeof Schema>) => {
-    if (!email) {
-      showToast(t('admin.showToast.auth.emailNotFound'), 'error')
-      return
-    }
-
-    const token = localStorage.getItem(TOKEN_KEY)
-    if (!token) {
-      showToast(t('admin.showToast.auth.sessionExpireds'), 'error')
-      return
-    }
 
     try {
       setLoading(true)
-      await authService.register({
-        name: data.name,
-        email: email,
+      const response = await authService.register({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
         password: data.password,
         confirmPassword: data.confirmPassword,
         phoneNumber: data.phoneNumber,
-        otpToken: token
       })
       
-      // Clear token after successful registration
-      localStorage.removeItem(TOKEN_KEY)
+      const successMessage = response?.message || (t('admin.showToast.auth.registerSuccessful'))
+      showToast(t(successMessage), 'success')
       
-      showToast(t('admin.showToast.auth.registerSuccessful'), 'success')
       router.push('/sign-in')
     } catch (error) {
       showToast(parseApiError(error), 'error')

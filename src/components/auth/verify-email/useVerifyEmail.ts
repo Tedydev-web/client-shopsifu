@@ -33,7 +33,7 @@ export function useVerifyEmail() {
           type: 'RESET_PASSWORD'
         })
       }
-
+      
       showToast(t('admin.showToast.auth.sentCode'), 'success')
       
       // Chuyển hướng đến trang nhập mã xác thực và truyền action để giữ nguyên luồng xử lý

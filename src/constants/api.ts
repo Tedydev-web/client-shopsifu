@@ -4,7 +4,7 @@ const API_BASE = '/api/v1';
 export const API_ENDPOINTS = {
   AUTH: {
     SIGNIN: `${API_BASE}/auth/login`,
-    SIGNUP: `${API_BASE}/auth/register`,
+    SIGNUP: `${API_BASE}/auth/complete-registration`,
     SIGNUP_SEND: `${API_BASE}/auth/initiate-registration`,
     REFRESH_TOKEN: `${API_BASE}/auth/refresh-token`,
     LOGOUT: `${API_BASE}/auth/logout`,

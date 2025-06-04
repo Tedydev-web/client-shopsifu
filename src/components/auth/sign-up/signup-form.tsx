@@ -3,7 +3,6 @@ import * as z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import {
   Form,
@@ -14,7 +13,6 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { RegisterSchema } from '../schema/index'
 import { useSignup } from './useSignup'
 import {
@@ -22,10 +20,9 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
-import { useEffect } from 'react'
 import { OAuthForm } from '../layout/OAuthForm'
 import { useTranslation } from 'react-i18next'
-
+import { RegisterRequest } from '@/types/auth.interface'
 interface SignupFormProps {
   email: string
   className?: string
@@ -36,21 +33,17 @@ export function SignupForm({ email, className }: SignupFormProps) {
   const { t } = useTranslation('')
   const Schema = RegisterSchema(t)
 
-  const registerForm = useForm<z.infer<typeof Schema>>({
+  const registerForm = useForm<RegisterRequest>({
     resolver: zodResolver(Schema),
     defaultValues: { 
-      name: '', 
-      email: '', 
+      firstName: '', 
+      lastName: '', 
+      username: '',
       password: '', 
       confirmPassword: '',
       phoneNumber: '',
-      token: ''
     }
   })
-
-  useEffect(() => {
-    registerForm.setValue('email', email, { shouldValidate: true })
-  }, [email, registerForm])
 
   return (
     <>
@@ -69,46 +62,59 @@ export function SignupForm({ email, className }: SignupFormProps) {
               </div>
             </AnimatedFormItem>
 
-            <div className="grid gap-6">
+            <div className="grid gap-6">              
+              <AnimatedFormItem>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={registerForm.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('auth.common.first name')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="Văn A"/>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('auth.common.last name')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="Nguyễn"/>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </AnimatedFormItem>
+              
               <AnimatedFormItem>
                 <FormField
                   control={registerForm.control}
-                  name="name"
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('auth.common.full name')}</FormLabel>
+                      <FormLabel>{t('auth.common.username')}</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Nguyễn Văn A"/>
+                          placeholder="nguyen_van_a"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </AnimatedFormItem>
-
-              <AnimatedFormItem>
-                <FormField
-                  control={registerForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          type="email" 
-                          disabled 
-                          value={email} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </AnimatedFormItem>
-
               <AnimatedFormItem>
                 <FormField
                   control={registerForm.control}
