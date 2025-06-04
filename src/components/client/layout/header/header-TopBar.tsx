@@ -1,43 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Facebook, Instagram, Bell, HelpCircle, Globe, ChevronDown, Check } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
-import { useChangeLang } from '@/hooks/useChangeLang';
-import { useState, useRef, useEffect } from 'react';
+import { Facebook, Instagram, Bell, HelpCircle } from 'lucide-react';
 import { ProfileDropdown } from './header-Profile';
+import { ChangeLangs } from './header-ChangeLangs';
 
 export function TopBar() {
-  const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang();
-  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setIsLanguageDropdownOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setIsLanguageDropdownOpen(false);
-    }, 500);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="bg-white">
@@ -67,47 +35,8 @@ export function TopBar() {
             <Link href="#" className="flex items-center gap-1.5 hover:opacity-70 hover:underline transition-opacity text-[13px] font-medium">
               <HelpCircle className="h-4 w-4" />
               <span>Hỗ trợ</span>
-            </Link>
-
-            {/* Language Switch */}
-            <div 
-              className="relative"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              <DropdownMenu open={isLanguageDropdownOpen} onOpenChange={setIsLanguageDropdownOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="cursor-pointer bg- hover:bg- h-auto px-0 flex items-center gap-1.5 text-black hover:opactity-70 text-[13px] font-medium"
-                  >
-                    <Globe className="h-4 w-4" />
-                    <span>{currentLangName}</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
-                  className="w-40 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-700 text-[11px] [&>button]:hover:bg-none [&>button]:hover:underline"
-                  sideOffset={5}
-                >
-                  <DropdownMenuItem 
-                    className="hover:bg-none px-4 py-2 cursor-pointer" 
-                    onClick={() => changeLanguage('vi')}
-                  >
-                    Tiếng Việt
-                    {currentSelectedLang === 'vi' && <Check className="w-3.5 h-3.5 text-green-500 ml-auto" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="hover:bg-none px-4 py-2 cursor-pointer" 
-                    onClick={() => changeLanguage('en')}
-                  >
-                    English
-                    {currentSelectedLang === 'en' && <Check className="w-3.5 h-3.5 text-green-500 ml-auto" />}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            </Link>            {/* Language Switch */}
+            <ChangeLangs />
 
             {/* Profile Dropdown */}
             <ProfileDropdown />

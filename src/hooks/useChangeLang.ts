@@ -16,7 +16,7 @@ export const useChangeLang = () => {
 
   const changeLanguage = (lang: "vi" | "en") => {
     dispatch(setLanguage(lang));
-    // window.location.reload();
+    window.location.reload();
   };
 
   useEffect(() => {

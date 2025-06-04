@@ -8,12 +8,14 @@ import Image from 'next/image';
 import { TopBar } from './header-TopBar';
 import { Categories } from './header-Categories';
 import { DropdownProvider } from './dropdown-context';
+import { ProfileDropdown } from './header-Profile';
+import { ChangeLangs } from './header-ChangeLangs';
 import './style.css';
 
 export function Header() {
   return (
     <DropdownProvider>
-      <TopBar />
+      {/* <TopBar /> */}
       <header
         className="text-white max-h-[125px] h-[75px] text-[13px] relative z-50 bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg"
         // style={{
@@ -42,9 +44,11 @@ export function Header() {
                 <SearchInput />
               </div>
             </div>
-
+            <ProfileDropdown/>
+            <ChangeLangs/>
             <CartDropdown />
-          </div>        </div>
+          </div>        
+        </div>
       </header>
     </DropdownProvider>
   );
