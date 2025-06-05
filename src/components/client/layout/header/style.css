@@ -118,3 +118,30 @@ header {
 .modal-input:hover{
     background-color: rgba(240, 240, 240, 0.8);
 }
+
+/* Mobile header styles */
+@media (max-width: 768px) {
+  .search-dropdown {
+    width: 100%;
+    min-width: unset;
+    max-width: 100%;
+  }
+  
+  /* Mobile search styling */
+  .mobile-search-container {
+    position: relative;
+    z-index: 60;
+  }
+  
+  .mobile-search-overlay {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    z-index: 55;
+  }
+}
