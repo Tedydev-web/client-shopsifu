@@ -55,3 +55,38 @@ export const categories: Category[] = [
     ],
   },
 ];
+
+
+
+export const cartItems = [
+    {
+      id: 1,
+      name: '[BH Trọn Đời] Dây Chuyền Bạc S9...',
+      price: '395.000',
+      image: '/images/demo/1.webp', // Replace with actual image path
+    },
+    {
+      id: 2,
+      name: 'Tinh Dầu Xịt Thơm White Tea & Fig ...',
+      price: '49.000',
+      image: '/images/demo/2.webp', // Using a different placeholder image
+    },
+     {
+      id: 3,
+      name: 'Đèn Treo Màn Hình Máy Tính Lym...',
+      price: '339.000',
+      image: '/images/demo/3.webp', // Using a different placeholder image
+    },
+     {
+      id: 4,
+      name: '[HÀNG IN ĐẸP] Móc khóa yêu nướ...',
+      price: '19.000',
+      image: '/images/demo/4.webp', // Using a different placeholder image
+    },
+     {
+      id: 5,
+      name: 'Giá đỡ Laptop chân xoay 360 độ, ...',
+      price: '219.000',
+      image: '/images/demo/5.webp', // Using a different placeholder image
+    },
+  ];

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Các loại dropdown có thể mở
-export type DropdownType = 'categories' | 'search' | 'cart' | 'user' | 'none';
+export type DropdownType = 'categories' | 'search' | 'cart' | 'user' | 'profile' | 'language' | 'none';
 
 // Định nghĩa context
 interface DropdownContextType {
@@ -29,7 +29,10 @@ export function DropdownProvider({ children }: { children: React.ReactNode }) {
         event.target instanceof Element && 
         (
           event.target.closest('.category-hover-container') || 
-          event.target.closest('.search-container')
+          event.target.closest('.search-container') ||
+          event.target.closest('.profile-container') ||
+          event.target.closest('.language-container') ||
+          event.target.closest('.cart-container')
         )
       );
 

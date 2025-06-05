@@ -1,11 +1,12 @@
 'use client';
 
 import { User, LogOut, ShoppingCart, LucideIcon } from 'lucide-react';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { useLogout } from '@/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useDropdown } from './dropdown-context';
 
 interface MenuItemProps {
   icon: LucideIcon;
@@ -15,12 +16,14 @@ interface MenuItemProps {
 }
 
 export function ProfileDropdown() {
-  const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const name = "Nguyen Phat";
   const email = "nguyendangphat1312@gmail.com";
   const { handleLogout, loading: logoutLoading } = useLogout();
   const router = useRouter();
+  const { openDropdown, setOpenDropdown } = useDropdown();
+  
+  const isOpen = openDropdown === 'profile';
   
   const menuItems: MenuItemProps[] = [
     {
@@ -40,31 +43,19 @@ export function ProfileDropdown() {
       onClick: handleLogout
     }
   ];
-  // Xử lý click outside để đóng dropdown
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (isOpen && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
   
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
   const avatarText = name ? name[0].toUpperCase() : 'U';
   return (
     <div 
-      className="relative group" 
+      className="relative group profile-container" 
       ref={dropdownRef}
-    >      {/* Trigger Button */}
+    >
+      {/* Trigger Button */}
       <div 
         className="cursor-pointer relative whitespace-nowrap inline-flex items-center gap-2 px-4 py-3 text-white font-semibold text-sm"
-        onClick={() => setIsOpen(!isOpen)}
-        onMouseEnter={() => setIsOpen(true)}
+        onClick={() => setOpenDropdown(isOpen ? 'none' : 'profile')}
+        onMouseEnter={() => setOpenDropdown('profile')}
       >
         {/* Backdrop blur effect */}
         <motion.div
@@ -107,7 +98,7 @@ export function ProfileDropdown() {
       </div>
       
       {/* Invisible gap to prevent dropdown from closing when moving cursor to dropdown */}
-      <div className="absolute h-3 w-full top-full"></div>
+      <div className="absolute h-2 w-full top-full"></div>
       
       {/* Dropdown Menu */}
       <motion.div
@@ -115,8 +106,8 @@ export function ProfileDropdown() {
           "absolute top-[calc(100%+3px)] right-0 w-72 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50",
           isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         )}
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
+        onMouseEnter={() => setOpenDropdown('profile')}
+        onMouseLeave={() => setOpenDropdown('none')}
         initial={{ opacity: 0, y: -10 }}
         animate={{ 
           opacity: isOpen ? 1 : 0, 

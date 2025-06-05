@@ -60,7 +60,7 @@ export function SearchInput() {
 				)}
 				onClick={() => setOpenDropdown('none')}
 			/>
-			<div className='relative w-4/5 max-w-[600px] z-50 search-container' ref={searchRef}>
+			<div className='relative w-4/5 max-w-[700px] z-50 search-container' ref={searchRef}>
 				<motion.div
 					className='flex items-center bg-white rounded-full overflow-hidden shadow-sm flex-grow text-black'
 					animate={{

@@ -1,44 +1,35 @@
 'use client';
 
 import { ChevronDown, Check } from 'lucide-react';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { useChangeLang } from '@/hooks/useChangeLang';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { useDropdown } from './dropdown-context';
 
 export function ChangeLangs() {
-  const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang();
+  const { openDropdown, setOpenDropdown } = useDropdown();
+  
+  const isOpen = openDropdown === 'language';
   
   // Xác định đường dẫn tới hình ảnh cờ quốc gia dựa trên ngôn ngữ hiện tại
   const flagImage = currentSelectedLang === 'vi' 
     ? '/images/client/flag/vietnam.png' 
     : '/images/client/flag/united-states.png';
 
-  // Xử lý click outside để đóng dropdown
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (isOpen && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  return (    <div 
-      className="relative group flex items-center" 
+  return (    
+    <div 
+      className="relative group flex items-center language-container" 
       ref={dropdownRef}
     >
-      {/* Trigger Button */}      <div 
+      {/* Trigger Button */}      
+      <div 
         className="cursor-pointer relative whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-3 text-black font-medium text-[13px]"
-        onClick={() => setIsOpen(!isOpen)}
-        onMouseEnter={() => setIsOpen(true)}
+        onClick={() => setOpenDropdown(isOpen ? 'none' : 'language')}
+        onMouseEnter={() => setOpenDropdown('language')}
       >
         {/* Backdrop blur effect */}
         <motion.div
@@ -74,22 +65,22 @@ export function ChangeLangs() {
         />
         
         {/* Content layer */}       
-        <div className="relative z-10 w-4 h-4 rounded-full overflow-hidden flex-shrink-0 border">
+        <div className="relative z-10 w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border">
           <Image 
             src={flagImage} 
             alt={currentSelectedLang === 'vi' ? 'Tiếng Việt' : 'English'}
-            width={16}
-            height={16}
-            className="object-cover"
+            width={24}
+            height={24}
+            className="object-cover w-full h-full"
           />
         </div>
-        <span className="z-10 relative ml-1">{currentLangName}</span>
+        <span className="z-10 relative ml-1.5 text-white">{currentLangName}</span>
         <motion.span
           className="z-10 relative"
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-4 h-4 text-white" />
         </motion.span>
       </div>
       
@@ -102,8 +93,8 @@ export function ChangeLangs() {
           "absolute top-[calc(100%+3px)] right-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50",
           isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         )}
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
+        onMouseEnter={() => setOpenDropdown('language')}
+        onMouseLeave={() => setOpenDropdown('none')}
         initial={{ opacity: 0, y: -10 }}
         animate={{ 
           opacity: isOpen ? 1 : 0, 
@@ -123,7 +114,7 @@ export function ChangeLangs() {
             className="relative flex items-center px-4 py-2 cursor-pointer text-[13px] text-gray-800"
             onClick={() => {
               changeLanguage('vi');
-              setIsOpen(false);
+              setOpenDropdown('none');
             }}
           >
             {/* Hover background effect */}
@@ -151,7 +142,7 @@ export function ChangeLangs() {
             className="relative flex items-center px-4 py-2 cursor-pointer text-[13px] text-gray-800"
             onClick={() => {
               changeLanguage('en');
-              setIsOpen(false);
+              setOpenDropdown('none');
             }}
           >
             {/* Hover background effect */}
