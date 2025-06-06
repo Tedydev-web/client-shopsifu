@@ -2,15 +2,15 @@
 
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
-import { SearchInput } from './search-Input';
-import { CartDropdown } from './header-Cart';
+import { SearchInput } from './desktop-SearchInput';
+import { CartDropdown } from './desktop-Cart';
 import Image from 'next/image';
-import { Categories } from './header-Categories';
-import { DropdownProvider } from './dropdown-context';
-import { ProfileDropdown } from './header-Profile';
-import { ChangeLangs } from './header-ChangeLangs';
+import { Categories } from './desktop-Categories';
+import { DropdownProvider } from '../dropdown-context';
+import { ProfileDropdown } from './desktop-Profile';
+import { ChangeLangs } from './desktop-ChangeLangs';
 import { useScrollHeader } from '@/hooks/useScrollHeader';
-import './style.css';
+import '../style.css';
 
 export function Header() {
   const showHeader = useScrollHeader();

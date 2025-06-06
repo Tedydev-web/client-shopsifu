@@ -6,9 +6,9 @@ import Image from 'next/image';
 import { ChevronRight, ChevronDown, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { categories, Category } from './header-MockData';
-import { useDropdown } from './dropdown-context';
-import './style.css';
+import { categories, Category } from './desktop-Mockdata';
+import { useDropdown } from '../dropdown-context';
+import '../style.css';
 
 
 

@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { cartItems } from './header-MockData';
-import { useDropdown } from './dropdown-context';
+import { cartItems } from './desktop-Mockdata';
+import { useDropdown } from '../dropdown-context';
 
 export function CartDropdown() {
   const dropdownRef = useRef<HTMLDivElement>(null);

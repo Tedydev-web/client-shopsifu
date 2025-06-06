@@ -6,7 +6,7 @@ import { useChangeLang } from '@/hooks/useChangeLang';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { useDropdown } from './dropdown-context';
+import { useDropdown } from '../dropdown-context';
 
 export function ChangeLangs() {
   const dropdownRef = useRef<HTMLDivElement>(null);

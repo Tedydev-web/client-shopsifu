@@ -6,7 +6,7 @@ import { useLogout } from '@/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useDropdown } from './dropdown-context';
+import { useDropdown } from '../dropdown-context';
 
 interface MenuItemProps {
   icon: LucideIcon;

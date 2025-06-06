@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { Search, ShoppingCart, Menu } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
-import { CartDropdown } from './header-Cart';
-import { ProfileDropdown } from './header-Profile';
+import { CartDropdown } from '../desktop/desktop-Cart';
+import { ProfileDropdown } from '../desktop/desktop-Profile';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DropdownProvider } from './dropdown-context';
+import { DropdownProvider } from '../dropdown-context';
 import { cn } from '@/lib/utils';
 import { useScrollHeader } from '@/hooks/useScrollHeader';
-import './style.css';
+import '../style.css';
 
 export function MobileHeader() {
   const showHeader = useScrollHeader();

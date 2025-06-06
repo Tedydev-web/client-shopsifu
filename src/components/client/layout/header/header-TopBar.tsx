@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { Facebook, Instagram, Bell, HelpCircle } from 'lucide-react';
-import { ProfileDropdown } from './header-Profile';
-import { ChangeLangs } from './header-ChangeLangs';
+import { ProfileDropdown } from './desktop/desktop-Profile';
+import { ChangeLangs } from './desktop/desktop-ChangeLangs';
 
 export function TopBar() {
 

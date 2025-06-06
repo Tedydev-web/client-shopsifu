@@ -1,7 +1,7 @@
 'use client';
 
-import { Header as DesktopHeader } from './header-Desktop';
-import { MobileHeader } from './header-Mobile';
+import { Header as DesktopHeader } from './desktop/desktop-Index';
+import { MobileHeader } from './moblie/moblie-Index';
 import { DropdownProvider } from './dropdown-context';
 
 export function Header() {
