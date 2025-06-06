@@ -11,14 +11,14 @@ import { PasswordSecuritySession } from './passwordSecurity-Session'
 export function PasswordSecurityTable() {
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [currentView, setCurrentView] = useState('table') // 'table' or 'sessions'
-
   const {
     is2FAEnabled,
     show2FADialog,
     setShow2FADialog,
     showQRDialog,
     setShowQRDialog,
-    qrUri,
+    qrCodeImage,
+    secret,
     loading,
     totpCode,
     setTotpCode,
@@ -81,16 +81,15 @@ export function PasswordSecurityTable() {
         open={showChangePassword}
         onOpenChange={setShowChangePassword}
         userInfo={userInfo}
-      />
-      <Profile2FAModal
+      />      <Profile2FAModal
         show2FADialog={show2FADialog}
         setShow2FADialog={setShow2FADialog}
         showQRDialog={showQRDialog}
         setShowQRDialog={setShowQRDialog}
         is2FAEnabled={is2FAEnabled}
         loading={loading}
-        qrUri={qrUri}
-        secret={qrUri.split('secret=')[1]?.split('&')[0] || ''}
+        qrCodeImage={qrCodeImage}
+        secret={secret}
         recoveryCodes={recoveryCodes}
         totpCode={totpCode}
         setTotpCode={setTotpCode}

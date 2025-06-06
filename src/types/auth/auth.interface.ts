@@ -6,16 +6,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  statusCode: string
+    statusCode: number
+    success: string
     message: string
     data:{
-      statusCode: string
-      data:{
-        requiresDeviceVerification: string
-        verificationType: string
-        verificationRedirectUrl: string
-      }
-        
+      verificationType: string
     }
 }
 
@@ -97,12 +92,15 @@ export interface ResetPasswordResponse {
 
 // 2FA
 export interface Setup2faResponse {
-  uri: string
-  setupToken: string
+  success: string
+  statusCode: number
+  data:{
+    secret: string
+    qrCode: string
+  }
 }
 
 export interface Confirm2faRequest {
-  setupToken: string
   totpCode: string
 }
 

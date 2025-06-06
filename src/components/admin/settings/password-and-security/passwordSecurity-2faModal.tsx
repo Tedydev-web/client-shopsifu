@@ -31,8 +31,8 @@ interface Profile2FAModalProps {
   setShowQRDialog: (open: boolean) => void
   is2FAEnabled: boolean
   loading?: boolean
-  qrUri: string
-  secret?: string
+  qrCodeImage: string
+  secret: string
   recoveryCodes?: string[]
   totpCode: string
   setTotpCode: (code: string) => void
@@ -48,7 +48,7 @@ export function Profile2FAModal({
   setShowQRDialog,
   is2FAEnabled,
   loading = false,
-  qrUri,
+  qrCodeImage,
   secret,
   recoveryCodes = [],
   totpCode,
@@ -111,9 +111,12 @@ export function Profile2FAModal({
             </div>
             {/* Bước 2: QR */}
             <div className="mb-6">
-              <div className="font-semibold mb-2">{t('admin.profileSettings.scanQRCode')}</div>
-              <div className="flex flex-col items-center">
-                <QRCodeSVG value={qrUri} size={160} />
+              <div className="font-semibold mb-2">{t('admin.profileSettings.scanQRCode')}</div>              <div className="flex flex-col items-center">
+                {qrCodeImage ? (
+                  <img src={qrCodeImage} alt="QR Code" width={160} height={160} />
+                ) : (
+                  <QRCodeSVG value={secret || "placeholder"} size={160} />
+                )}
               </div>
               <div className="text-gray-300 text-sm mt-2">
                 {t('admin.profileSettings.openApp')}

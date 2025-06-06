@@ -9,10 +9,10 @@ export function usePasswordSecurity() {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false)
   const [show2FADialog, setShow2FADialog] = useState(false)
   const [showQRDialog, setShowQRDialog] = useState(false)
-  const [qrUri, setQrUri] = useState('')
+  const [qrCodeImage, setQrCodeImage] = useState('')
+  const [secret, setSecret] = useState('')
   const [loading, setLoading] = useState(false)
   const [totpCode, setTotpCode] = useState('')
-  const [setupToken, setSetupToken] = useState('')
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([])
 
   const handle2FAToggle = async () => {
@@ -25,8 +25,10 @@ export function usePasswordSecurity() {
       if (!is2FAEnabled) {
         // Setup 2FA
         const response = await authService.setup2fa()
-        setQrUri(response.uri)
-        setSetupToken(response.setupToken)
+
+        // Handle new response format with qrCode and secret
+        setQrCodeImage(response.data?.qrCode || '')
+        setSecret(response.data?.secret || '')
         setShowQRDialog(true)
         showToast(t('admin.profileSettings.scanQRFirst'), 'info')
       } else {
@@ -49,7 +51,6 @@ export function usePasswordSecurity() {
     try {
       setLoading(true)
       const response = await authService.confirm2fa({
-        setupToken,
         totpCode: totpCode
       })
       setIs2FAEnabled(true)
@@ -70,7 +71,8 @@ export function usePasswordSecurity() {
     setShow2FADialog,
     showQRDialog,
     setShowQRDialog,
-    qrUri,
+    qrCodeImage,
+    secret,
     loading,
     totpCode,
     setTotpCode,
