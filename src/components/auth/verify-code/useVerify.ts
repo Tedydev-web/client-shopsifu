@@ -35,7 +35,7 @@ export function useVerify() {
         router.replace(ROUTES.BUYER.RESET_PASSWORD)
       } else if (action === 'signup') {
         router.replace(ROUTES.BUYER.SIGNUP)
-      } else if (action === 'login' && response.statusCode === 200) {
+      } else if (action === 'login' && response.statusCode === 201) {
         showToast(t('admin.showToast.auth.loginSuccessful'), 'success')
         router.replace(ROUTES.ADMIN.DASHBOARD)
       } else {
