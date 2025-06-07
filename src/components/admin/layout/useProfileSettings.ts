@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { authService } from '@/services/authService'
+import { authService } from '@/services/auth/authService'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
 

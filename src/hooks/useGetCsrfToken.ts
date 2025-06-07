@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { authService } from '@/services/authService';
+import { authService } from '@/services/auth/authService';
 
 export const useGetCsrfToken = () => {
   const [isLoading, setIsLoading] = useState(false);

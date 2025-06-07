@@ -8,7 +8,7 @@ import axios, {
 import Cookies from 'js-cookie'
 import jwt from 'jsonwebtoken';
 import { addHours, differenceInMinutes } from 'date-fns';
-import { authService } from '@/services/authService';
+import { authService } from '@/services/auth/authService';
 import { useLogout } from '@/hooks/useLogout';
 import { ROUTES } from '@/constants/route';
 import { getStore } from '@/store/store';

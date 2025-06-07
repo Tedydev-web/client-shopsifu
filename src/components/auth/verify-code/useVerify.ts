@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { z } from 'zod'
 import { showToast } from '@/components/ui/toastify'
 import { otpSchema } from '../schema/index'
-import { authService } from '@/services/authService'
+import { authService } from '@/services/auth/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
 import { useTranslation } from 'react-i18next'
@@ -36,7 +36,8 @@ export function useVerify() {
       } else if (action === 'signup') {
         router.replace(ROUTES.BUYER.SIGNUP)
       } else if (action === 'login' && response.statusCode === 201) {
-        showToast(t('admin.showToast.auth.loginSuccessful'), 'success')
+        showToast(t(successMessage), 'success')
+
         router.replace(ROUTES.ADMIN.DASHBOARD)
       } else {
         router.replace(ROUTES.BUYER.SIGNIN)

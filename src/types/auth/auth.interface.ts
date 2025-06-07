@@ -1,4 +1,12 @@
-// LOGIN
+export interface oAuthLoginResponse {
+  url: string
+}
+// ĐĂNG XUẤT TÀI KHOẢN - LOGOUT
+export interface LogoutRequest {
+  refreshToken?: string
+}
+
+// ĐĂNG NHẬP TÀI KHOẢN - SIGN-IN
 export interface LoginRequest {
   emailOrUsername: string
   password: string
@@ -14,14 +22,19 @@ export interface LoginResponse {
     }
 }
 
-export interface oAuthLoginResponse {
-  url: string
+export interface RequestDeviceResponse{
+    statusCode: string
+    message: string
+    data:{
+        requiresDeviceVerification: string
+        verificationType: string
+        verificationRedirectUrl: string
+    }
 }
-//LOGOUT
-export interface LogoutRequest {
-  refreshToken?: string
-}
-// REGISTER
+
+
+
+// ĐĂNG KÝ TÀI KHOẢN - SIGN-UP
 export interface RegisterRequest {
   firstName: string
   lastName: string
@@ -48,20 +61,25 @@ export interface RegisterSendRequest{
 }
 
 
-// VERIFY + SEND
-export interface SendOTPRequest {
-  code?: string
-  email?: string
-  type?: string
-}
-export interface SendOTPResponse {
+// ĐỔI MẬT KHẨU TÀI KHOẢN - RESET PASSWORD
+
+export interface ResetPasswordSendRequest{
   email: string
-  type: string
-  expiresAt: string
-  createdAt: string
+}
+export interface ResetPasswordRequest {
+  email?: string
+  otpToken?: string
+  newPassword: string
+  confirmPassword: string
+  revokeAllSessions: string
+}
+
+export interface ResetPasswordResponse {
   message: string
 }
 
+
+// XÁC THỰC & GỬI CODE - VERIFY + SEND CODE
 export interface VerifyOTPRequest {
   code: string
 }
@@ -78,38 +96,9 @@ export interface VerifyOTPResponse {
   }
 }
 
-// RESET PASSWORD
-export interface ResetPasswordRequest {
-  email: string
-  otpToken: string
-  newPassword: string
-  confirmNewPassword: string
-}
-
-export interface ResetPasswordResponse {
-  message: string
-}
-
-// 2FA
-export interface Setup2faResponse {
-  success: string
-  statusCode: number
-  data:{
-    secret: string
-    qrCode: string
-  }
-}
-
-export interface Confirm2faRequest {
-  totpCode: string
-}
-
-export interface Confirm2faResponse {
-  message: string
-  recoveryCodes:[]
-}
 export interface Verify2faRequest {
   code: string
+  method: string
 }
 
 export interface Verify2faResponse {
@@ -121,9 +110,49 @@ export interface Verify2faResponse {
   currentDeviceId: string
 }
 
+export interface ResendOTPRequest{
+  code: string
+}
+
+export interface SendOTPRequest {
+  code?: string
+  email?: string
+  type?: string
+}
+export interface SendOTPResponse {
+  email: string
+  type: string
+  expiresAt: string
+  createdAt: string
+  message: string
+}
+
+
+
+
+// THIẾT LẬP 2FA - SETUP 2FA
+export interface Setup2faResponse {
+  success: string
+  statusCode: number
+  data:{
+    secret: string
+    qrCode: string
+  }
+}
+
+export interface Confirm2faRequest {
+  code: string
+}
+
+export interface Confirm2faResponse {
+  message: string
+  recoveryCodes:[]
+}
+
+
 export interface Disable2faRequest {
   code: string
-  type: string
+  method: string
 }
 
 export interface Disable2faResponse {

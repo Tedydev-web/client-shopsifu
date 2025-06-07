@@ -6,7 +6,7 @@ import { showToast } from '@/components/ui/toastify';
 import { ROUTES } from '@/constants/route';
 import { logOut } from '@/store/features/auth/authSlide';
 import { AppDispatch } from '@/store/store';
-import { authService } from '@/services/authService';
+import { authService } from '@/services/auth/authService';
 
 export function useLogout() {
   const [loading, setLoading] = useState(false);

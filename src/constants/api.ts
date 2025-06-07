@@ -4,20 +4,27 @@ const API_BASE = '/api/v1';
 export const API_ENDPOINTS = {
   AUTH: {
     SIGNIN: `${API_BASE}/auth/login`,
-    SIGNUP: `${API_BASE}/auth/complete-registration`,
-    SIGNUP_SEND: `${API_BASE}/auth/initiate-registration`,
     REFRESH_TOKEN: `${API_BASE}/auth/refresh-token`,
     LOGOUT: `${API_BASE}/auth/logout`,
     PROFILE: `${API_BASE}/auth/profile`,
     SEND_OTP: `${API_BASE}/auth/send-otp`,
     GOOGLE_LOGIN: `${API_BASE}/auth/google-link`,
-    VERIFY_OTP: `${API_BASE}/auth/otp/verify`,
-    RESET_PASSWORD: `${API_BASE}/auth/reset-password`,
-    VERIFY_2FA: `${API_BASE}/auth/login/verify`,
-    SETUP_2FA: `${API_BASE}/auth/2fa/setup`,
-    DISABLE_2FA: `${API_BASE}/auth/2fa/disable`,
     GET_CSRF_TOKEN: `${API_BASE}/get-cookies`,
+    // SIGN-UP -----
+    SIGNUP: `${API_BASE}/auth/complete-registration`,
+    SIGNUP_SEND: `${API_BASE}/auth/initiate-registration`,
+    // RESET PASSWORD -----
+    RESET_PASSWORD: `${API_BASE}/auth/password/set-new`,
+    RESET_PASSWORD_SEND: `${API_BASE}/auth/password/initiate-reset`,
+    //VERIFY & RESEND
+    VERIFY_OTP: `${API_BASE}/auth/otp/verify`,
+    VERIFY_2FA: `${API_BASE}/auth/login/verify`, //TOTP hoặc RECOVERY
+    RESEND_OTP: `${API_BASE}/auth/otp/resend`,
+    //SETUP 2FA 
+    SETUP_2FA: `${API_BASE}/auth/2fa/setup`,
     CONFIRM_2FA: `${API_BASE}/auth/2fa/confirm-setup`,
+    DISABLE_2FA: `${API_BASE}/auth/2fa/disable`,
+    // DEVICE
     TRUST_DEVICE: `${API_BASE}/auth/sessions/current-device/trust`,
     UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`
   },

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { authService } from '@/services/authService'
+import { authService } from '@/services/auth/authService'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
 
@@ -12,7 +12,7 @@ export function usePasswordSecurity() {
   const [qrCodeImage, setQrCodeImage] = useState('')
   const [secret, setSecret] = useState('')
   const [loading, setLoading] = useState(false)
-  const [totpCode, setTotpCode] = useState('')
+  const [Code, setCode] = useState('')
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([])
 
   const handle2FAToggle = async () => {
@@ -33,7 +33,7 @@ export function usePasswordSecurity() {
         showToast(t('admin.profileSettings.scanQRFirst'), 'info')
       } else {
         // Disable 2FA
-        await authService.disable2fa({ type: 'totp', code: totpCode })
+        await authService.disable2fa({ method: 'totp', code: Code })
         setIs2FAEnabled(false)
         setRecoveryCodes([])
         showToast(t('admin.profileSettings.2faDisabledSuccess'), 'success')
@@ -51,7 +51,7 @@ export function usePasswordSecurity() {
     try {
       setLoading(true)
       const response = await authService.confirm2fa({
-        totpCode: totpCode
+        code: Code
       })
       setIs2FAEnabled(true)
       setRecoveryCodes(response.recoveryCodes || [])
@@ -74,8 +74,8 @@ export function usePasswordSecurity() {
     qrCodeImage,
     secret,
     loading,
-    totpCode,
-    setTotpCode,
+    Code,
+    setCode,
     recoveryCodes,
     handle2FAToggle,
     handleConfirm2FA,

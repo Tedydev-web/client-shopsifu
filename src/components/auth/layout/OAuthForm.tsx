@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useState } from 'react'
 import { AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
-import { authService } from '@/services/authService'
+import { authService } from '@/services/auth/authService'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 

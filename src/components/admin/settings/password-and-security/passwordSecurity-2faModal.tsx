@@ -34,8 +34,8 @@ interface Profile2FAModalProps {
   qrCodeImage: string
   secret: string
   recoveryCodes?: string[]
-  totpCode: string
-  setTotpCode: (code: string) => void
+  Code: string
+  setCode: (code: string) => void
   onConfirm2FA: () => void
   onConfirmSetup: () => void
   t: (key: string) => string
@@ -51,8 +51,8 @@ export function Profile2FAModal({
   qrCodeImage,
   secret,
   recoveryCodes = [],
-  totpCode,
-  setTotpCode,
+  Code,
+  setCode,
   onConfirm2FA,
   onConfirmSetup,
   t,
@@ -151,13 +151,13 @@ export function Profile2FAModal({
                 <Input
                   className="bg-[#181a20] border border-gray-600 text-white font-mono text-lg w-40"
                   maxLength={6}
-                  value={totpCode}
-                  onChange={e => setTotpCode(e.target.value)}
+                  value={Code}
+                  onChange={e => setCode(e.target.value)}
                   placeholder="000 000"
                 />
                 <Button
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                  disabled={loading || totpCode.length !== 6}
+                  disabled={loading || Code.length !== 6}
                   onClick={onConfirmSetup}
                 >
                   {loading ? t('admin.profileSettings.verifying') : t('admin.profileSettings.activate2FA')}

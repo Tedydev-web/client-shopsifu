@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react';
-import { authService } from '@/services/authService';
+import { authService } from '@/services/auth/authService';
 
 export default function ClientLayout({
   children,

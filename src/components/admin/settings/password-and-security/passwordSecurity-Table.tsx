@@ -20,8 +20,8 @@ export function PasswordSecurityTable() {
     qrCodeImage,
     secret,
     loading,
-    totpCode,
-    setTotpCode,
+    Code,
+    setCode,
     recoveryCodes,
     handle2FAToggle,
     handleConfirm2FA,
@@ -91,8 +91,8 @@ export function PasswordSecurityTable() {
         qrCodeImage={qrCodeImage}
         secret={secret}
         recoveryCodes={recoveryCodes}
-        totpCode={totpCode}
-        setTotpCode={setTotpCode}
+        Code={Code}
+        setCode={setCode}
         onConfirm2FA={handleConfirm2FA}
         onConfirmSetup={handleConfirmSetup}
         t={t}
