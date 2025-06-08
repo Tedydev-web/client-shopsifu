@@ -315,6 +315,28 @@
       "backToHome": "Back to Home"
     },
     "profileSettings": {
+      "QrCode": {
+        "title": "Your Recovery Codes",
+        "description": "Store these codes in a safe place. You will need them if you lose access to your authenticator device.",
+        "nofound": "No recovery codes found",
+        "email": "The recovery codes have also been sent to your email address.",
+        "copy": "Copy All",
+        "download": "Download",
+        "done": "Done",
+        "title2fa": "Two-Factor Authentication",
+        "description2fa": "Set up two-factor authentication to enhance the security of your account",
+        "downloadAuth": "Download Authenticator App",
+        "downloadSetup": "Download and Install",
+        "or": "or",
+        "or2": "on your device",
+        "qr": "Scan QR Code",
+        "openQr": "Open your authenticator app and scan this QR code",
+        "secret": "Enter Secret Key Manually",
+        "confirm": "Confirm Setup",
+        "6code": "Enter the 6-digit code from your authenticator app",
+        "authen": "Authenticating...",
+        "2fa": "Enable 2FA"
+      },
       "title": "Profile Settings",
       "description": "Manage your personal information and account security",
       "personalInfo": "Personal Information",

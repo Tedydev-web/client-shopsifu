@@ -26,7 +26,7 @@ export function TrustDeviceModal() {
 
       const id = toast(
         <div className="flex flex-col gap-2 p-2 w-full">
-          <div className="text-base font-semibold text-gray-900">Tin tưởng thiết bị này?</div>
+          <div className="text-base font-semibold text-black">Tin tưởng thiết bị này?</div>
           <div className="text-sm text-gray-500 leading-snug">Bạn có muốn tin tưởng thiết bị này không? Nếu tin tưởng, bạn sẽ không cần xác minh 2FA trong 30 ngày tới.</div>
           <div className="flex justify-end gap-2 mt-2">            <Button
               variant="outline"
@@ -45,7 +45,7 @@ export function TrustDeviceModal() {
                 handleTrustDevice();
               }}
               disabled={loading}
-              className="relative"
+              className="relative text-white bg-red-600"
             >
               {loading ? (
                 <span className="flex items-center">

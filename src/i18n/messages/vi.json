@@ -314,6 +314,28 @@
       "backToHome": "Về trang chủ"
     },
     "profileSettings": {
+      "QrCode":{
+        "title": "Mã khôi phục của bạn",
+        "description": "Lưu trữ các mã này ở nơi an toàn. Bạn sẽ cần chúng nếu mất quyền truy cập vào thiết bị xác thực.",
+        "nofound": "Không tìm thấy mã khôi phục",
+        "email": "Các mã khôi phục cũng đã được gửi tới địa chỉ email của bạn.",
+        "copy": "Sao chép tất cả",
+        "download": "Tải xuống",
+        "done": "Hoàn tất",
+        "title2fa": "Xác thực hai yếu tố",
+        "description2fa": "Thiết lập xác thực hai yếu tố để tăng cường bảo mật tài khoản của bạn",
+        "downloadAuth": "Tải ứng dụng xác thực",
+        "downloadSetup": "Tải và cài đặt",
+        "or": "hoặc",
+        "or2": "trên thiết bị của bạn",
+        "qr": "Quét mã QR",
+        "openQr": "Mở ứng dụng xác thực và quét mã QR này",
+        "secret": "Nhập mã bí mật thủ công",
+        "confirm": "Xác nhận thiết lập",
+        "6code": "Nhập mã 6 chữ số từ ứng dụng xác thực của bạn",
+        "authen": "Đang xác thực...",
+        "2fa": "Kích hoạt 2FA"
+      },
       "title": "Cài đặt hồ sơ",
       "description": "Quản lý thông tin cá nhân và bảo mật tài khoản",
       "personalInfo": "Thông tin cá nhân",

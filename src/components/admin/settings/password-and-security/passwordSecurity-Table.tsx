@@ -11,12 +11,15 @@ import { PasswordSecuritySession } from './passwordSecurity-Session'
 export function PasswordSecurityTable() {
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [currentView, setCurrentView] = useState('table') // 'table' or 'sessions'
+  
   const {
     is2FAEnabled,
     show2FADialog,
     setShow2FADialog,
     showQRDialog,
     setShowQRDialog,
+    showRecoveryCodesDialog,
+    setShowRecoveryCodesDialog,
     qrCodeImage,
     secret,
     loading,
@@ -26,6 +29,8 @@ export function PasswordSecurityTable() {
     handle2FAToggle,
     handleConfirm2FA,
     handleConfirmSetup,
+    copyAllRecoveryCodes,
+    downloadRecoveryCodes,
     t
   } = usePasswordSecurity()
 
@@ -81,11 +86,14 @@ export function PasswordSecurityTable() {
         open={showChangePassword}
         onOpenChange={setShowChangePassword}
         userInfo={userInfo}
-      />      <Profile2FAModal
+      />      
+      <Profile2FAModal
         show2FADialog={show2FADialog}
         setShow2FADialog={setShow2FADialog}
         showQRDialog={showQRDialog}
         setShowQRDialog={setShowQRDialog}
+        showRecoveryCodesDialog={showRecoveryCodesDialog}
+        setShowRecoveryCodesDialog={setShowRecoveryCodesDialog}
         is2FAEnabled={is2FAEnabled}
         loading={loading}
         qrCodeImage={qrCodeImage}
@@ -95,6 +103,8 @@ export function PasswordSecurityTable() {
         setCode={setCode}
         onConfirm2FA={handleConfirm2FA}
         onConfirmSetup={handleConfirmSetup}
+        copyAllRecoveryCodes={copyAllRecoveryCodes}
+        downloadRecoveryCodes={downloadRecoveryCodes}
         t={t}
       />
     </>

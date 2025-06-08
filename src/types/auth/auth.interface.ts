@@ -153,7 +153,10 @@ export interface Confirm2faRequest {
 
 export interface Confirm2faResponse {
   message: string
-  recoveryCodes:[]
+  data:{
+    recoveryCodes:[]
+  }
+  
 }
 
 

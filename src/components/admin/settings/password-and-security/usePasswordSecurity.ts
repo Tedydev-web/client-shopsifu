@@ -9,6 +9,7 @@ export function usePasswordSecurity() {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false)
   const [show2FADialog, setShow2FADialog] = useState(false)
   const [showQRDialog, setShowQRDialog] = useState(false)
+  const [showRecoveryCodesDialog, setShowRecoveryCodesDialog] = useState(false)
   const [qrCodeImage, setQrCodeImage] = useState('')
   const [secret, setSecret] = useState('')
   const [loading, setLoading] = useState(false)
@@ -46,7 +47,6 @@ export function usePasswordSecurity() {
       setShow2FADialog(false)
     }
   }
-
   const handleConfirmSetup = async () => {
     try {
       setLoading(true)
@@ -54,8 +54,12 @@ export function usePasswordSecurity() {
         code: Code
       })
       setIs2FAEnabled(true)
-      setRecoveryCodes(response.recoveryCodes || [])
+      // Lưu recovery codes từ response
+      setRecoveryCodes(response.data.recoveryCodes || [])
+      // Đóng modal QR code
       setShowQRDialog(false)
+      // Mở modal recovery codes
+      setShowRecoveryCodesDialog(true)
       showToast(t('admin.profileSettings.2faSetupSuccess'), 'success')
     } catch (error: any) {
       console.error('Error confirming 2FA:', error)
@@ -63,7 +67,43 @@ export function usePasswordSecurity() {
     } finally {
       setLoading(false)
     }
-  }
+  }  // Hàm sao chép tất cả recovery codes
+  const copyAllRecoveryCodes = () => {
+    if (recoveryCodes.length > 0) {
+      const recoveryCodesText = recoveryCodes.join('\n');
+      navigator.clipboard.writeText(recoveryCodesText)
+        .then(() => {
+          showToast('Đã sao chép mã khôi phục vào clipboard', 'success');
+        })
+        .catch((error) => {
+          console.error('Error copying recovery codes:', error);
+          showToast('Không thể sao chép mã khôi phục', 'error');
+        });
+    }
+  };
+
+  // Hàm tải xuống recovery codes dưới dạng file text
+  const downloadRecoveryCodes = () => {
+    if (recoveryCodes.length > 0) {
+      const recoveryCodesText = recoveryCodes.join('\n');
+      const blob = new Blob([recoveryCodesText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = 'recovery-codes.txt';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // Giải phóng URL object
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 100);
+      
+      showToast('Đã tải xuống mã khôi phục', 'success');
+    }
+  };
 
   return {
     is2FAEnabled,
@@ -71,6 +111,8 @@ export function usePasswordSecurity() {
     setShow2FADialog,
     showQRDialog,
     setShowQRDialog,
+    showRecoveryCodesDialog,
+    setShowRecoveryCodesDialog,
     qrCodeImage,
     secret,
     loading,
@@ -80,6 +122,8 @@ export function usePasswordSecurity() {
     handle2FAToggle,
     handleConfirm2FA,
     handleConfirmSetup,
+    copyAllRecoveryCodes,
+    downloadRecoveryCodes,
     t,
   }
 }
