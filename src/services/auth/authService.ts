@@ -81,6 +81,12 @@ export const authService = {
     )
     return response.data
   },
+  resendOTP: async (): Promise<SendOTPResponse> =>{
+      const response = await privateAxios.post<SendOTPResponse>(
+        API_ENDPOINTS.AUTH.RESEND_OTP
+    )
+    return response.data
+  },
   verifyOTP: async (data: VerifyOTPRequest): Promise<VerifyOTPResponse> => {
     const response = await privateAxios.post<VerifyOTPResponse>(
       API_ENDPOINTS.AUTH.VERIFY_OTP,

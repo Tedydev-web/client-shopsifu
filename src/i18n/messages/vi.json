@@ -77,7 +77,9 @@
       "forgot password": "Quên mật khẩu?",
       "no account": "Chưa có tài khoản?",
       "register": "Đăng ký",
-      "remember me": "Ghi nhớ đăng nhập"
+      "remember me": "Ghi nhớ đăng nhập",
+      "emailOrUsername": "Email hoặc tên tài khoản",
+      "placeholder":"Nhập email hoặc tài khoản người dùng"
     },
     "forgotPassword": {
       "title": "Quên mật khẩu",

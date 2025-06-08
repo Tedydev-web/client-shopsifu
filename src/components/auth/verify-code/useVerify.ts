@@ -8,7 +8,7 @@ import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
 import { useTranslation } from 'react-i18next'
 
-type ActionType = 'signup' | 'forgot' | 'login'
+type ActionType = 'signup' | 'forgot'
 
 export function useVerify() {
   const [loading, setLoading] = useState(false)
@@ -17,8 +17,7 @@ export function useVerify() {
   const action = (searchParams.get('action') as ActionType) || 'signup'
   const { t } = useTranslation()
   const otp = otpSchema(t)
-  
-  const verifyOTP = async (code: string) => {
+    const verifyOTP = async (code: string) => {
     try {
       setLoading(true)
       
@@ -35,10 +34,6 @@ export function useVerify() {
         router.replace(ROUTES.BUYER.RESET_PASSWORD)
       } else if (action === 'signup') {
         router.replace(ROUTES.BUYER.SIGNUP)
-      } else if (action === 'login' && response.statusCode === 201) {
-        showToast(t(successMessage), 'success')
-
-        router.replace(ROUTES.ADMIN.DASHBOARD)
       } else {
         router.replace(ROUTES.BUYER.SIGNIN)
       }
@@ -48,25 +43,14 @@ export function useVerify() {
       setLoading(false)
     }
   }
-  
   const resendOTP = async () => {
     try {
       setLoading(true)
       
-      // Xác định loại OTP dựa trên action
-      let otpType = 'REGISTER';
-      if (action === 'forgot') {
-        otpType = 'RESET_PASSWORD';
-      } else if (action === 'login') {
-        otpType = 'LOGIN';
-      }
+      // Sử dụng phương thức resendOTP từ authService mà không có tham số
+      const response = await authService.resendOTP()
       
-      // Truyền action vào API để server có context đúng
-      const response = await authService.sendOTP({
-        type: otpType
-      })
-      
-      // Hiển thị message từ API response
+      // Hiển thị message từ API response hoặc message mặc định
       const successMessage = response?.message || t('admin.showToast.auth.sentNewOtp')
       showToast(t(successMessage), 'success')
     } catch (error) {

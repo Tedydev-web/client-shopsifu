@@ -47,10 +47,14 @@ export function PasswordSecurityTable() {
       startIcon: <Lock />,
       endIcon: <ChevronRight />,
       onClick: () => setShowChangePassword(true)
-    },
-    {
+    },    {
       label: "Xác minh 2 bước",
-      value: is2FAEnabled ? "Đã bật" : "Chưa bật",
+      value: (
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${is2FAEnabled ? "bg-green-500" : "bg-red-500"}`}></div>
+          <span>{is2FAEnabled ? "Đã bật" : "Chưa bật"}</span>
+        </div>
+      ),
       startIcon: <Shield />,
       endIcon: <ChevronRight />,
       onClick: handle2FAToggle
@@ -61,10 +65,14 @@ export function PasswordSecurityTable() {
       startIcon: <Clock />,
       endIcon: <ChevronRight />,
       onClick: () => setCurrentView('sessions')
-    },
-    {
+    },    {
       label: "Mã khôi phục",
-      value: is2FAEnabled ? "Đã tạo" : "Chưa tạo",
+      value: (
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${is2FAEnabled ? "bg-green-500" : "bg-gray-400"}`}></div>
+          <span>{is2FAEnabled ? "Đã tạo" : "Chưa tạo"}</span>
+        </div>
+      ),
       startIcon: <KeyRound />,
       endIcon: <ChevronRight />
     }

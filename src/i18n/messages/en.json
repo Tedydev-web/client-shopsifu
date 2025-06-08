@@ -77,7 +77,9 @@
       "forgot password": "Forgot password?",
       "no account": "Don't have an account?",
       "register": "Register",
-      "remember me": "Remember me"
+      "remember me": "Remember me",
+      "emailOrUsername": "Email or UserName",
+      "placeholder": "Enter your email or username"
     },
     "forgotPassword": {
       "title": "Forgot password",

@@ -55,7 +55,8 @@ const form = useForm<LoginFormData>({
           </AnimatedFormItem>
 
           {/* Form */}
-          <div className="grid gap-6">            <AnimatedFormItem>
+          <div className="grid gap-6">            
+            <AnimatedFormItem>
               <FormField
                 control={form.control}
                 name="emailOrUsername"
@@ -63,7 +64,7 @@ const form = useForm<LoginFormData>({
                   <FormItem>
                     <FormLabel>{t('auth.login.emailOrUsername')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="text" placeholder="Email hoặc tên người dùng" />
+                      <Input {...field} type="text" placeholder={t('auth.login.placeholder')} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
