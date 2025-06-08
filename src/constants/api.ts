@@ -18,7 +18,7 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD_SEND: `${API_BASE}/auth/password/initiate-reset`,
     //VERIFY & RESEND
     VERIFY_OTP: `${API_BASE}/auth/otp/verify`,
-    VERIFY_2FA: `${API_BASE}/auth/login/verify`, //TOTP hoặc RECOVERY
+    VERIFY_2FA: `${API_BASE}/auth/2fa/verify`, //TOTP hoặc RECOVERY
     RESEND_OTP: `${API_BASE}/auth/otp/resend`,
     //SETUP 2FA 
     SETUP_2FA: `${API_BASE}/auth/2fa/setup`,

@@ -30,7 +30,7 @@ export function useSignin() {
           return;
         }
 
-        showToast(response.message || t('admin.showToast.auth.loginFailed'), 'error');
+        showToast(response.message || t('admin.showToast.auth.success'), 'success');
         router.push(ROUTES.ADMIN.DASHBOARD);
       } else {
         showToast(response.message || t('admin.showToast.auth.loginFailed'), 'error');

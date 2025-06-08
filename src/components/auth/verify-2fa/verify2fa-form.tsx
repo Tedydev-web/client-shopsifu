@@ -30,7 +30,15 @@ import {t} from "i18next"
 
 export function Verify2FAForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const router = useRouter()
-  const { loading, handleVerifyCode,type, switchToRecovery, schema } = useVerify2FA()
+  const { 
+    loading, 
+    handleVerifyCode, 
+    handleResendOTP, 
+    type, 
+    switchToRecovery, 
+    switchToTOTP, 
+    schema 
+  } = useVerify2FA()
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -64,14 +72,8 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
         form.handleSubmit(handleVerifyCode)();
       }
     }
-  }
-
-  // Gửi OTP khi component mount nếu type là OTP
-  // useEffect(() => {
-  //   if (type === 'OTP') {
-  //     sendOTP()
-  //   }
-  // }, [])
+  }  // Không tự động gửi OTP khi component mount
+  // Chỉ gửi khi người dùng chủ động yêu cầu thông qua nút "Resend OTP"
 
   const renderTitle = () => {
     switch (type) {
@@ -94,18 +96,19 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
         return t('auth.2faVerify.sent6DigitCodeAuthenticator')
     }
   }
-
   const renderSwitchMethod = () => {
+    // OTP là phương thức xác thực tách biệt, không có chuyển đổi giữa OTP và TOTP/RECOVERY
     if (type === 'OTP') {
       return null // Không hiển thị nút chuyển đổi khi đang ở chế độ OTP
     }
 
+    // Chỉ cho phép chuyển đổi giữa TOTP và RECOVERY
     return (
       <AnimatedFormItem>
         <div className="text-center text-sm">
           <button
             type="button"
-            onClick={type === 'TOTP' ? switchToRecovery : () => router.replace('?type=TOTP')}
+            onClick={type === 'TOTP' ? switchToRecovery : switchToTOTP}
             disabled={loading}
             className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
           >
@@ -189,10 +192,9 @@ export function Verify2FAForm({ className, ...props }: React.ComponentPropsWitho
           {type === 'OTP' && (
             <AnimatedFormItem>
               <div className="text-center text-sm">
-                {t('auth.2faVerify.didnotReceiveCode')}{' '}
-                <button
+                {t('auth.2faVerify.didnotReceiveCode')}{' '}                <button
                   type="button"
-                  // onClick={sendOTP}
+                  onClick={handleResendOTP}
                   disabled={loading}
                   className="underline underline-offset-4 text-primary hover:text-primary/90 disabled:opacity-50"
                 >

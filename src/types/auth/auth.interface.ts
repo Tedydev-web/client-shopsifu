@@ -85,14 +85,16 @@ export interface VerifyOTPRequest {
 }
 
 export interface VerifyOTPResponse {
+  success: boolean
+  statusCode: number
   message: string
-  statusCode?: number
-  data?: {
-    otpToken?: string
-    token?: string
-    email?: string
-    type?: string
-    verified?: boolean
+  data: {
+    user: {
+      id: number
+      username: string
+      avatar: string | null
+      isDeviceTrustedInSession: boolean
+    }
   }
 }
 
@@ -102,12 +104,17 @@ export interface Verify2faRequest {
 }
 
 export interface Verify2faResponse {
-  userId: string
-  email: string
-  name: string
-  role: string
-  isDeviceTrustedInSession: boolean
-  currentDeviceId: string
+  success: boolean
+  statusCode: number
+  message: string
+  data: {
+    user: {
+      id: number
+      username: string
+      avatar: string | null
+      isDeviceTrustedInSession: boolean
+    }
+  }
 }
 
 export interface ResendOTPRequest{

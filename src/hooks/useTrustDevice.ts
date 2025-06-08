@@ -15,25 +15,32 @@ export function useTrustDevice() {
       setIsOpen(true)
     }
   }
-
   const handleTrustDevice = async () => {
     try {
       setLoading(true)
+      // Gọi API xử lý tin tưởng thiết bị
       await authService.trustDevice()
+      // Sau khi API thành công, xóa key khỏi session storage
       sessionStorage.removeItem(TRUST_DEVICE_KEY)
+      // Đóng modal
       setIsOpen(false)
+      // Hiển thị thông báo thành công
       showToast('Thiết bị đã được tin tưởng', 'success')
-      sessionStorage.removeItem(TRUST_DEVICE_KEY)
     } catch (error) {
+      // Hiển thị lỗi nếu có
       showToast(parseApiError(error), 'error')
     } finally {
+      // Luôn tắt trạng thái loading khi API hoàn thành (dù thành công hay thất bại)
       setLoading(false)
     }
   }
 
   const handleClose = () => {
-    setIsOpen(false)
-    sessionStorage.removeItem(TRUST_DEVICE_KEY)
+    // Không cho đóng modal khi đang trong trạng thái loading
+    if (!loading) {
+      setIsOpen(false)
+      sessionStorage.removeItem(TRUST_DEVICE_KEY)
+    }
   }
 
   return {
