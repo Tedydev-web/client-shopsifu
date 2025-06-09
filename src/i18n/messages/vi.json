@@ -693,5 +693,101 @@
       "esc": "thoát",
       "close": "Đóng"
     }
+  },
+  "user": {
+    "account": {
+      "home": "Trang chủ",
+      "manageAccount": "Quản lý thông tin tài khoản của bạn",
+
+      "notifications": {
+        "notifications": "Thông báo"
+      },
+
+      "profile": {
+        "profile": "Hồ sơ",
+        "manageProfile": "Quản lý hồ sơ của bạn",
+        "title": "Hồ sơ của tôi",
+        "subtitle": "Quản lý thông tin hồ sơ để bảo mật tài khoản",
+        "currentPasswordRequired": "Mật khẩu hiện tại là bắt buộc",
+        "newPasswordInvalid": "Mật khẩu mới không hợp lệ",
+        "confirmPasswordRequired": "Xác nhận mật khẩu là bắt buộc",
+        "passwordsMismatch": "Mật khẩu không khớp",
+        "emailPhone": "Email & Số điện thoại",
+        "noPhone": "Chưa có số điện thoại",
+        "password": "Mật khẩu",
+        "twoFactor": "Xác thực hai yếu tố",
+        "twoFactorDescription": "Bảo vệ tài khoản của bạn bằng một lớp bảo mật bổ sung.",
+        "thirdPartyAccounts": "Tài khoản bên thứ ba",
+        "turnOn": "Bật",
+        "edit": "Chỉnh sửa",
+
+        "editEmailPhone": "Email & Số điện thoại",
+        "email": "Email",
+        "phoneNumber": "Số điện thoại",
+        "cancel": "Hủy",
+        "save": "Lưu thay đổi",
+
+        "editPassword": "Chỉnh sửa mật khẩu",
+        "currentPassword": "Mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu",
+
+        "enable2FA": "Bật xác thực hai yếu tố",
+        "enable2FADescription": "Bạn có chắc chắn muốn bật xác thực hai yếu tố không? Bạn sẽ cần quét mã QR bằng ứng dụng xác thực.",
+        "enable": "Bật",
+
+        "deleteAccount": "Xóa tài khoản",
+        "confirmDelete": "Xác nhận xóa",
+        "accountTermination": "Xóa tài khoản"
+      },
+
+      "address": {
+        "title": "Đổi mật khẩu",
+        "subtitle": "Mật khẩu của bạn phải có ít nhất 6 ký tự và bao gồm chữ, số và ký tự đặc biệt",
+        "currentPassword": "Mật khẩu hiện tại",
+        "newPassword": "Mật khẩu mới",
+        "confirmPassword": "Xác nhận mật khẩu",
+
+        "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+        "newPasswordPlaceholder": "Nhập mật khẩu mới",
+        "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
+
+        "address": "Địa chỉ",
+        "myAddresses": "Địa chỉ của tôi",
+        "addNewAddress": "Thêm địa chỉ mới",
+        "noAddress": "Bạn chưa có địa chỉ nào.",
+        "processing": "Đang xử lý...",
+        "changePassword": "Đổi mật khẩu"
+      },
+
+      "payment": {
+        "payment": "Thanh toán",
+        "creditDebitCard": "Thẻ tín dụng / ghi nợ",
+        "addNewCard": "Thêm thẻ mới",
+        "noCardLinked": "Bạn chưa liên kết thẻ nào.",
+        "bankAccount": "Tài khoản ngân hàng",
+        "addBankLink": "Thêm tài khoản ngân hàng mới",
+        "noBankLinked": "Bạn chưa có tài khoản ngân hàng nào."
+      },
+
+      "security": {
+        "security": "Bảo mật",
+        "title": "Thiết bị đang hoạt động",
+        "subtitle": "Để đảm bảo an toàn, không chia sẻ mật khẩu với người khác",
+        "loggedInDevices": "Thiết bị đã đăng nhập",
+        "totalSessionsSummary": "Tổng cộng có {{totalSessions}} phiên hoạt động trên {{deviceCount}} thiết bị",
+        "total": "Tổng cộng",
+        "active": "phiên hoạt động trên",
+        "device": "thiết bị",
+        "deviceSessionCount": "{{count}} phiên hoạt động",
+        "terminateSession": "Kết thúc phiên này",
+        "deleteSession": "Xóa phiên này",
+        "loginSession": "Phiên đăng nhập"
+      },
+
+      "myPurchase": {
+        "myPurchase": "Đơn mua của tôi"
+      }
+    }
   }
 }

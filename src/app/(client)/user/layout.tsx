@@ -27,8 +27,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="w-64 m-0 p-0 h-screen top-0"
-              >
+                className="w-64 m-0 p-0 h-screen top-0">
                 <UserSidebar />
               </SheetContent>
             </Sheet>
@@ -39,12 +38,12 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       {/* MAIN CONTENT */}
       <div className={isMobile ? 'p-4' : 'flex'}>
         {!isMobile && (
-          <aside className="w-64 border-r h-screen sticky top-0">
+          <aside className="w-64 h-screen sticky top-0">
             <UserSidebar />
           </aside>
         )}
 
-        <main className={isMobile ? '' : 'flex-1 p-4'}>
+        <main className={isMobile ? '' : 'flex-1 p-4 pl-0'}>
           <div className="max-w-4xl mx-auto">{children}</div>
         </main>
       </div>

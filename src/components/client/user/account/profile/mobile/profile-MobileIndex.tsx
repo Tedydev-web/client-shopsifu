@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ChangePasswordModal } from "./profile-PasswordUpdate";
-import { ProfileUpdateSheet } from "./profile-Update";
-import { TwoFactorAuthModal } from "./profile-2FA";
-import { DeleteAccountModal } from "./profile-DeleteAccount";
+import { ChangePasswordModal } from "./profile-MobilePasswordUpdate";
+import { ProfileUpdateSheet } from "./profile-MobileUpdate";
+import { TwoFactorAuthModal } from "./profile-Mobile2FA";
+import { DeleteAccountModal } from "./profile-MobileDeleteAccount";
 
-export default function ProfileIndex() {
+export default function ProfileMobileIndex() {
   const { t } = useTranslation();
 
   const [profileSheetOpen, setProfileSheetOpen] = useState(false);
@@ -31,6 +31,7 @@ export default function ProfileIndex() {
   const handleDeleteAccount = () => {
     // TODO: Gọi API xóa tài khoản
     console.log("Account deleted");
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -39,7 +40,9 @@ export default function ProfileIndex() {
       <div className="border-b pb-4 px-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="font-medium text-gray-900">{t("user.account.profile.emailPhone")}</p>
+            <p className="font-medium text-gray-900">
+              {t("user.account.profile.emailPhone")}
+            </p>
             <div className="mt-1 text-sm text-gray-700 space-y-1">
               <p>{userInfo.email}</p>
               <p>{userInfo.phoneNumber || t("user.account.profile.noPhone")}</p>
@@ -48,7 +51,7 @@ export default function ProfileIndex() {
           <Button
             type="button"
             onClick={() => setProfileSheetOpen(true)}
-            className="bg-orange-500 text-white rounded-full px-4 py-2 w-24 h-10 ml-4"
+            className="bg-red-600 text-white rounded-full px-4 py-2 w-24 h-10 ml-4"
           >
             {t("user.account.profile.edit")}
           </Button>
@@ -59,12 +62,14 @@ export default function ProfileIndex() {
       <div className="border-b pb-4 px-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="font-medium text-gray-900">{t("user.account.profile.password")}</p>
+            <p className="font-medium text-gray-900">
+              {t("user.account.profile.password")}
+            </p>
           </div>
           <Button
             type="button"
             onClick={() => setIsPasswordModalOpen(true)}
-            className="bg-orange-500 text-white rounded-full px-4 py-2 w-24 h-10"
+            className="bg-red-600 text-white rounded-full px-4 py-2 w-24 h-10"
           >
             {t("user.account.profile.edit")}
           </Button>
@@ -76,7 +81,8 @@ export default function ProfileIndex() {
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="font-medium text-gray-900">
-              {t("user.account.profile.twoFactor")}: <span className="font-normal">Off</span>
+              {t("user.account.profile.twoFactor")}:{" "}
+              <span className="font-normal">Off</span>
             </p>
             <p className="text-sm text-gray-600">
               {t("user.account.profile.twoFactorDescription")}
@@ -85,7 +91,7 @@ export default function ProfileIndex() {
           <Button
             type="button"
             onClick={() => setIs2FAModalOpen(true)}
-            className="bg-orange-500 text-white rounded-full px-4 py-2 w-24 h-10"
+            className="bg-red-600 text-white rounded-full px-4 py-2 w-24 h-10"
           >
             {t("user.account.profile.turnOn")}
           </Button>
@@ -93,38 +99,45 @@ export default function ProfileIndex() {
       </div>
 
       {/* Liên kết tài khoản bên thứ ba */}
-      <div className="px-4">
-        <p className="font-medium text-gray-900">{t("user.account.profile.thirdPartyAccounts")}</p>
-        {[{ provider: "Google", status: "Linked" }].map(({ provider, status }) => (
-          <div key={provider} className="flex items-center justify-between py-2">
-            <div className="flex-1 flex items-center space-x-2">
-              {provider === "Google" && (
-                <img
-                  src="https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png"
-                  alt="Google G logo"
-                  className="h-5 w-5"
-                />
-              )}
-              <p className="text-sm text-gray-800">{provider}</p>
+      <div>
+        <p className="font-medium text-gray-900 text-sm">
+          {t("user.account.profile.thirdPartyAccounts")}
+        </p>
+        {[{ provider: "Google", status: "Linked" }].map(
+          ({ provider, status }) => (
+            <div
+              key={provider}
+              className="flex items-center justify-between py-2"
+            >
+              <div className="flex items-center space-x-2">
+                {provider === "Google" && (
+                  <img
+                    src="https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png"
+                    alt="Google G logo"
+                    className="h-4 w-4"
+                  />
+                )}
+                <p className="text-xs text-gray-800">{provider}</p>
+              </div>
+              <span className="text-red-600 font-medium text-xs">{status}</span>
             </div>
-            <span className="text-orange-500 font-medium w-24 h-10 flex items-center justify-center">
-              {status}
-            </span>
-          </div>
-        ))}
+          )
+        )}
       </div>
 
-      {/* Account Termination Section */}
-      <div className="border-t pt-6 px-4 flex items-center justify-between">
-        <p className="text-sm text-gray-700 font-medium">
-          {t("user.account.profile.accountTermination")}
-        </p>
-        <button
-          onClick={() => setIsDeleteModalOpen(true)}
-          className="text-red-600 text-sm font-medium hover:underline"
-        >
-          {t("user.account.profile.deleteAccount")}
-        </button>
+      {/* Xóa tài khoản */}
+      <div className="border-t pt-4">
+        <div className="flex justify-between items-center">
+          <p className="text-xs text-gray-700 font-medium">
+            {t("user.account.profile.accountTermination")}
+          </p>
+          <button
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="text-red-600 text-xs font-medium hover:underline"
+          >
+            {t("user.account.profile.deleteAccount")}
+          </button>
+        </div>
       </div>
 
       {/* Modals */}

@@ -1,5 +1,5 @@
 "use client";
-import ProfileIndex from "@/components/client/user/account/profile/profile-Index";
+import { ProfileMain } from '@/components/client/user/account/profile/profile-Main';
 import { useTranslation } from 'react-i18next';
 
 export default function ProfilePage() {
@@ -12,7 +12,7 @@ export default function ProfilePage() {
           {t('user.account.profile.subtitle')}
         </p>
       </div>
-      <ProfileIndex />
+      <ProfileMain />
     </div>
   );
 }

@@ -743,7 +743,8 @@
         "enable": "Enable",
 
         "deleteAccount": "Delete Account",
-        "confirmDelete": "Delete"
+        "confirmDelete": "Delete",
+        "accountTermination": "Account Terminate"
       },
 
       "address": {
@@ -787,9 +788,7 @@
         "deviceSessionCount": "{{count}} active sessions",
         "terminateSession": "Terminate this session",
         "deleteSession": "Delete this session",
-        "loginSession": "Login session",
-        "accountTermination": "Account Terminate"
-        
+        "loginSession": "Login session"
       },
 
       "myPurchase": {
