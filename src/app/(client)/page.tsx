@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <main className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <HeroSection className="mt-4" />
+      <HeroSection/>
       
       {/* Categories Section - Will be implemented later */}
       {/* 
