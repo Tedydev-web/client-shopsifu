@@ -1,107 +1,105 @@
+// src/components/client/layout/header/mobile/mobile-Index.tsx
 'use client';
 
 import Link from 'next/link';
-import { Search, ShoppingCart, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { CartDropdown } from '../desktop/desktop-Cart';
 import { ProfileDropdown } from '../desktop/desktop-Profile';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DropdownProvider } from '../dropdown-context';
-import { cn } from '@/lib/utils';
 import { useScrollHeader } from '@/hooks/useScrollHeader';
+import { MobileSearchInput } from './moblie-SearchInput';
 import '../style.css';
 
 export function MobileHeader() {
   const showHeader = useScrollHeader();
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleSearch = () => {
-    setIsSearchActive(!isSearchActive);
-    if (isSearchActive) {
-      setSearchTerm('');
-    }
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
   };
 
   return (
     <DropdownProvider>
+      {/* Header Container */}
       <header
-        className={`text-white h-[60px] text-[13px] relative z-50 bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg transition-transform duration-500 ease-in-out ${
-          showHeader ? 'translate-y-0' : '-translate-y-full'
-        } md:hidden`}
+        className={`fixed top-0 left-0 right-0 text-white h-[60px] text-[13px] 
+          bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg 
+          transition-transform duration-500 ease-in-out
+          ${showHeader ? 'translate-y-0' : '-translate-y-full'} 
+          md:hidden z-50`}
       >
         <div className="h-full">
+          {/* Header Content */}
           <div className="px-3 h-full flex items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <div className="rounded-xl overflow-hidden">
-                <Image
-                  src="/images/logo/png-jpeg/Logo-Full-White.png"
-                  alt="Shopsifu Logo"
-                  width={100}
-                  height={35}
-                  priority
-                  className="object-contain rounded-xl"
-                />
-              </div>
-            </Link>
+            {/* Left Section - Menu & Logo */}
+            <div className="flex items-center gap-3">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 hover:bg-red-800 rounded-full transition-colors"
+                aria-label="Toggle menu"
+              >
+                <Menu className="h-6 w-6 text-white" />
+              </motion.button>
 
-            <div className="flex items-center gap-4">
-              {/* Search Icon & Input */}
-              <div className="relative">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={toggleSearch}
-                  className="flex items-center justify-center p-2"
-                >
-                  <Search className="h-5 w-5 text-white" />
-                </motion.button>
+              <Link href="/" className="flex items-center">
+                <div className="rounded-xl overflow-hidden">
+                  <Image
+                    src="/images/logo/png-jpeg/Logo-Full-White.png"
+                    alt="ShopSifu Logo"
+                    width={80}
+                    height={30}
+                    priority
+                    className="object-contain rounded-xl"
+                  />
+                </div>
+              </Link>
+            </div>
 
-                <AnimatePresence>
-                  {isSearchActive && (
-                    <motion.div
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: "calc(100vw - 120px)" }}
-                      exit={{ opacity: 0, width: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute right-0 top-0 z-50 flex items-center"
-                    >
-                      <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full py-2 px-3 text-black text-sm rounded-l-md focus:outline-none"
-                        placeholder="Tìm sản phẩm..."
-                        autoFocus
-                      />
-                      <Link
-                        href={searchTerm ? `/search?q=${encodeURIComponent(searchTerm)}` : '#'}
-                        onClick={(e) => !searchTerm && e.preventDefault()}
-                      >
-                        <button className="bg-red-500 hover:bg-red-600 h-full py-2 px-3 rounded-r-md">
-                          <Search className="h-4 w-4 text-white" />
-                        </button>
-                      </Link>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Cart */}
+            {/* Right Section - Search, Cart, Profile */}
+            <div className="flex items-center gap-3">
+              {/* Search Component */}
+              <MobileSearchInput />
+              
+              {/* Cart Dropdown */}
               <div className="relative">
                 <CartDropdown />
               </div>
 
-              {/* User Profile */}
+              {/* Profile Dropdown */}
               <div className="relative">
                 <ProfileDropdown />
               </div>
             </div>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu with Animation */}
+        <AnimatePresence mode="wait">
+          {isMenuOpen && (
+            <>
+              {/* Dark Overlay */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                onClick={handleCloseMenu}
+              />
+              
+              {/* Navigation Menu */}
+              {/* <MobileNavigation onClose={handleCloseMenu} /> */}
+            </>
+          )}
+        </AnimatePresence>
       </header>
+
+      {/* Spacer for fixed header */}
+      <div className="h-[60px] md:hidden" />
     </DropdownProvider>
   );
 }
