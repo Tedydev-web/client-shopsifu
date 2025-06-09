@@ -5,7 +5,7 @@ import React, { useRef } from 'react';
 import { useChangeLang } from '@/hooks/useChangeLang';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { VN, US } from 'country-flag-icons/react/3x2';
 import { useDropdown } from '../dropdown-context';
 
 export function ChangeLangs() {
@@ -15,11 +15,6 @@ export function ChangeLangs() {
   
   const isOpen = openDropdown === 'language';
   
-  // Xác định đường dẫn tới hình ảnh cờ quốc gia dựa trên ngôn ngữ hiện tại
-  const flagImage = currentSelectedLang === 'vi' 
-    ? '/images/client/flag/vietnam.png' 
-    : '/images/client/flag/united-states.png';
-
   return (    
     <div 
       className="relative group flex items-center language-container" 
@@ -33,7 +28,7 @@ export function ChangeLangs() {
       >
         {/* Backdrop blur effect */}
         <motion.div
-          className="absolute inset-0 rounded-full backdrop-blur-sm"
+          className="absolute rounded-full inset-0 backdrop-blur-sm"
           initial={{ 
             backgroundColor: "rgba(233, 233, 233, 0)", 
             scaleX: 0.5,
@@ -65,14 +60,12 @@ export function ChangeLangs() {
         />
         
         {/* Content layer */}       
-        <div className="relative z-10 w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border">
-          <Image 
-            src={flagImage} 
-            alt={currentSelectedLang === 'vi' ? 'Tiếng Việt' : 'English'}
-            width={24}
-            height={24}
-            className="object-cover w-full h-full"
-          />
+        <div className="relative z-10 w-7 h-7 overflow-hidden flex-shrink-0">
+          {currentSelectedLang === 'vi' ? (
+            <VN title="Tiếng Việt" className="w-full h-full object-cover" />
+          ) : (
+            <US title="English" className="w-full h-full object-cover" />
+          )}
         </div>
         <span className="z-10 relative ml-1.5 text-white">{currentLangName}</span>
         <motion.span

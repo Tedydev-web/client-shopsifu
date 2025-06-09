@@ -144,7 +144,6 @@ header {
 
 /* Show overlay when hovering header */
 .header-hovered ~ .body-overlay {
-  /* display: block; */ /* No longer needed */
   opacity: 1;
   pointer-events: all; /* Becomes interactive when visible */
 }

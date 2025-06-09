@@ -11,6 +11,7 @@ import { ProfileDropdown } from './desktop-Profile';
 import { ChangeLangs } from './desktop-ChangeLangs';
 import { useScrollHeader } from '@/hooks/useScrollHeader';
 import { useDropdown } from '../dropdown-context';
+import {TopBar} from './header-TopBar';
 import '../style.css';
 
 export function Header() {
@@ -44,6 +45,7 @@ export function Header() {
 
   return (
     <>
+      <TopBar />
       <DropdownProvider>
         <header
           className={`text-white max-h-[125px] h-[75px] text-[13px] relative z-50 
