@@ -1,10 +1,3 @@
-/* Backdrop blur effect for category dropdown */
-.category-backdrop, .search-backdrop {
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
-  position: fixed;
-  pointer-events: auto;
-}
 
 /* Enhance dropdown menu appearance */
 header {
@@ -121,22 +114,29 @@ header {
 
 /* Lock scroll when header is hovered */
 .scroll-locked {
-  overflow: hidden;
+  overflow: auto;
 }
+
+/* Backdrop blur effect for category dropdown */
+.category-backdrop, .search-backdrop {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  position: fixed;
+  pointer-events: auto;
+}
+
 
 /* Body overlay styles */
 .body-overlay {
-  display: none;
+  /* display: none; */ /* Replaced by opacity and pointer-events logic */
   position: fixed;
   top: 75px; /* Same as header height */
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.5); /* Dark semi-transparent background */
   z-index: 40;
-  pointer-events: all;
+  pointer-events: none; /* Initially not interactive and invisible */
   transition: all 0.3s ease;
   opacity: 0;
   will-change: opacity;
@@ -144,13 +144,9 @@ header {
 
 /* Show overlay when hovering header */
 .header-hovered ~ .body-overlay {
-  display: block;
+  /* display: block; */ /* No longer needed */
   opacity: 1;
-}
-
-/* Prevent body scroll when overlay is active */
-body:has(.body-overlay[style*="opacity: 1"]) {
-  overflow: hidden;
+  pointer-events: all; /* Becomes interactive when visible */
 }
 
 /* Mobile header styles */
