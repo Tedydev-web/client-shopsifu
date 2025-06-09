@@ -66,7 +66,8 @@ export const API_ENDPOINTS = {
   },
   SESSIONS: {
     GETALL: `${API_BASE}/auth/sessions`,
-    REVOKE: `${API_BASE}/auth/sessions`,
+    REVOKE: `${API_BASE}/auth/sessions/revoke`,
+    REVOKE_ALL: `${API_BASE}/auth/sessions/revoke-all`
   },
   // ... các endpoints khác
 }
