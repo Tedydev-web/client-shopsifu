@@ -25,114 +25,93 @@ export function useVerify2FA() {
   // Được cập nhật từ kết quả API sau khi xác thực thành công
   const recovery = recoveryCodeSchema(t)
   const otp = otpSchema(t)
-  // Xử lý xác minh 2FA (cho cả TOTP và RECOVERY)
-  const verify2FA = async (code: string, method: 'TOTP' | 'RECOVERY') => {
-    try {
-      setLoading(true);
-      const response = await authService.verify2fa({
-        code,
-        method // Truyền method tương ứng (TOTP hoặc RECOVERY)
-      }) as Verify2faResponse;
-  
-      // Kiểm tra response theo cấu trúc API mới
-      if (response.success && response.data?.user) {
-        // Đảm bảo lưu giá trị vào sessionStorage trước khi reload
-        const isDeviceTrusted = response.data.user.isDeviceTrustedInSession;
-        sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
-        
-        // Hiển thị thông báo thành công
-        showToast(response.message || t('auth.2faVerify.verificationSuccess'), 'success');
-        
-        // Reload trang sau khi đã lưu giá trị
-        window.location.href = ROUTES.ADMIN.DASHBOARD;
-      } else {
-        throw new Error(response.message || t('auth.2faVerify.verificationFailed'));
-      }
-    } catch (error) {
-      showToast(parseApiError(error), 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-  // Xử lý xác minh OTP (dành riêng cho loại OTP)
-  const verifyOTP = async (code: string) => {
-    try {
-      setLoading(true);
-      const response = await authService.verifyOTP({
-        code
-      }) as VerifyOTPResponse;
-      
-      // Kiểm tra response theo cấu trúc API mới
-      if (response.success && response.data?.user) {
-        // Lưu trạng thái isDeviceTrustedInSession vào sessionStorage trước khi điều hướng
-        const isDeviceTrusted = response.data.user.isDeviceTrustedInSession;
-        sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
-        
-        // Hiển thị thông báo thành công từ response
-        showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
-        
-        // Điều hướng sau khi xác thực OTP thành công
-        window.location.href = ROUTES.ADMIN.DASHBOARD;
-      } else {
-        throw new Error(response.message || t('auth.2faVerify.otpVerificationFailed'));
-      }
-    } catch (error) {
-      showToast(parseApiError(error), 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
   // Gửi OTP qua email - sử dụng trong phương thức OTP
   const handleResendOTP = async () => {
     try {
       setLoading(true)
-      await authService.sendOTP({
+      const response = await authService.sendOTP({
         type: 'LOGIN'
       })
-      showToast(t('auth.2faVerify.otpSent'), 'success')
+      showToast(response.message || t('auth.2faVerify.otpSent'), 'success')
     } catch (error) {
       showToast(parseApiError(error), 'error')
     } finally {
       setLoading(false)
     }
   }
-  // Xử lý cho TOTP và RECOVERY
+
+  // Hợp nhất logic xác thực và gọi API cho 2FA (TOTP/RECOVERY)
   const handleVerify2FA = async (data: { otp: string }) => {
     try {
+      setLoading(true);
+      let method: 'TOTP' | 'RECOVERY';
+
       if (type === 'RECOVERY') {
         const result = recovery.safeParse(data);
         if (!result.success) {
           throw result.error;
         }
-        await verify2FA(data.otp, 'RECOVERY');
+        method = 'RECOVERY';
       } else if (type === 'TOTP') {
         otp.parse(data);
-        await verify2FA(data.otp, 'TOTP');
+        method = 'TOTP';
+      } else {
+        // Trường hợp không mong muốn, nhưng để an toàn
+        throw new Error('Invalid 2FA method type.');
+      }
+
+      const response = await authService.verify2fa({
+        code: data.otp,
+        method
+      }) as Verify2faResponse;
+
+      if (response.status === 201 && response.data?.user) {
+        const isDeviceTrusted = response.data.user.isDeviceTrustedInSession;
+        sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
+        showToast(response.message || t('auth.2faVerify.verificationSuccess'), 'success');
+        window.location.href = ROUTES.ADMIN.DASHBOARD;
+      } else {
+        throw new Error(response.message || t('auth.2faVerify.verificationFailed'));
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.log('Zod error:', error.errors);
         showToast(error.errors[0].message, 'error');
       } else {
         showToast(parseApiError(error), 'error');
       }
+    } finally {
+      setLoading(false);
     }
-  }
-  
-  // Xử lý riêng cho OTP
-  const handleVerifyOTP = async (data: { otp: string }) => {
+  };
+
+  // Hợp nhất logic xác thực và gọi API cho OTP
+  const handleVerifyOTP = async (data: { otp:string }) => {
     try {
+      setLoading(true);
       otp.parse(data);
-      await verifyOTP(data.otp);
+      
+      const response = await authService.verifyOTP({
+        code: data.otp
+      }) as VerifyOTPResponse;
+
+      if (response.status === 201 && response.data?.user) {
+        const isDeviceTrusted = response.data.user.isDeviceTrustedInSession;
+        sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
+        showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
+        window.location.href = ROUTES.ADMIN.DASHBOARD;
+      } else {
+        throw new Error(response.message || t('auth.2faVerify.otpVerificationFailed'));
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.log('Zod error:', error.errors);
         showToast(error.errors[0].message, 'error');
       } else {
         showToast(parseApiError(error), 'error');
       }
+    } finally {
+      setLoading(false);
     }
-  }
+  };
   // Chỉ cho phép chuyển đổi giữa TOTP và RECOVERY
   const switchToRecovery = () => {
     router.replace(`?type=RECOVERY`)

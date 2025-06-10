@@ -63,7 +63,7 @@
       "registering": "Đang đăng ký...",
       "password": "Mật khẩu",
       "confirm password": "Xác nhận mật khẩu",
-      "Have an account": "Đã có tài khoản?",
+      "haveaccount": "Đã có tài khoản?",
       "login": "Đăng nhập",
       "start": "Nhập email để bắt đầu đăng ký",
       "success": "Mã xác minh đã được gửi đến email của bạn",
@@ -87,7 +87,8 @@
       "Remember password": "Nhớ mật khẩu?",
       "login": "Đăng nhập",
       "confirm": "Xác nhận",
-      "Sending": "Đang gửi"
+      "Sending": "Đang gửi",
+      "continue": "Tiếp tục"
     },
     "resetPassword": {
       "title": "Đặt lại mật khẩu",

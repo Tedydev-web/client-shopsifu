@@ -19,6 +19,8 @@ import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
 import { OAuthForm } from '../layout/OAuthForm'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handleSignin, loading } = useSignin()
@@ -27,14 +29,16 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
 
   type LoginFormData = z.infer<typeof Schema>;
 
-const form = useForm<LoginFormData>({
-  resolver: zodResolver(Schema),
-  defaultValues: { 
-    emailOrUsername: '', 
-    password: '',
-    rememberMe: false
-  }
-});
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(Schema),
+    defaultValues: { 
+      emailOrUsername: '', 
+      password: '',
+      rememberMe: false
+    }
+  });
+
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <Form {...form}>
@@ -88,7 +92,24 @@ const form = useForm<LoginFormData>({
                       </Link>
                     </div>
                     <FormControl>
-                      <Input {...field} type="password" placeholder="******" />
+                      <div className="relative">
+                        <Input
+                          {...field}
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="******"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:animate-pulse" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:animate-pulse" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

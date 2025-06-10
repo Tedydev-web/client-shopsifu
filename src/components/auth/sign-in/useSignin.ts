@@ -19,21 +19,21 @@ export function useSignin() {
       setLoading(true);
       const response = await authService.login(data);
       // Check verificationType in the response
-      if (response.success && response.statusCode === 200) {
+      if (response.status === 200) {
         if (response.data?.verificationType === 'OTP') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
-          showToast(response.message || t('auth.device.verification.required'), 'info');
+          showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;
         } else if (response.data?.verificationType === '2FA') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
-          showToast(response.message || t('auth.device.verification.required'), 'info');
+          showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;
         }
 
-        showToast(response.message || t('admin.showToast.auth.success'), 'success');
+        showToast(response.data.message || t('admin.showToast.auth.success'), 'success');
         router.push(ROUTES.ADMIN.DASHBOARD);
       } else {
-        showToast(response.message || t('admin.showToast.auth.loginFailed'), 'error');
+        showToast(response.data.message || t('admin.showToast.auth.loginFailed'), 'error');
       }
     } catch (error: any) {
       console.error('Login error:', error)

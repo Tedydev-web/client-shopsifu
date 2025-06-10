@@ -46,7 +46,7 @@ export const authService = {
     return response.data;
   },
 
-  register_send: async (data: RegisterSendRequest): Promise<void> =>{
+  register_send: async (data: RegisterSendRequest): Promise<RegisterResponse> =>{
     const response = await privateAxios.post(API_ENDPOINTS.AUTH.SIGNUP_SEND, data);
     return response.data;
   },
@@ -60,7 +60,7 @@ export const authService = {
     )
     return response.data
   },
-  resetPassword_send: async(data: ResetPasswordSendRequest): Promise<ResetPasswordSendRequest> =>{
+  resetPassword_send: async(data: ResetPasswordSendRequest): Promise<ResetPasswordResponse> =>{
      const response = await privateAxios.post(API_ENDPOINTS.AUTH.RESET_PASSWORD_SEND, data);
      return response.data;
   }, 

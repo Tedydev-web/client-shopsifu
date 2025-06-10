@@ -1,3 +1,5 @@
+import { BaseResponse } from "../base.interface";
+
 export interface oAuthLoginResponse {
   url: string
 }
@@ -13,18 +15,14 @@ export interface LoginRequest {
   rememberMe: boolean
 }
 
-export interface LoginResponse {
-    statusCode: number
-    success: string
+export interface LoginResponse extends BaseResponse {
+  data:{
     message: string
-    data:{
-      verificationType: string
-    }
+    verificationType: string
+  }
 }
 
-export interface RequestDeviceResponse{
-    statusCode: string
-    message: string
+export interface RequestDeviceResponse extends BaseResponse{
     data:{
         requiresDeviceVerification: string
         verificationType: string
@@ -44,16 +42,14 @@ export interface RegisterRequest {
   phoneNumber: string
 }
 
-export interface RegisterResponse {
+export interface RegisterResponse extends BaseResponse{
   id: string
   email: string
   name: string
   phoneNumber: string
   roleId: number
-  status: string
   createdAt: string
   updatedAt: string
-  message: string
 }
 
 export interface RegisterSendRequest{
@@ -67,14 +63,12 @@ export interface ResetPasswordSendRequest{
   email: string
 }
 export interface ResetPasswordRequest {
-  email?: string
-  otpToken?: string
   newPassword: string
   confirmPassword: string
-  revokeAllSessions: string
+  revokeAllSessions?: string
 }
 
-export interface ResetPasswordResponse {
+export interface ResetPasswordResponse extends BaseResponse{
   message: string
 }
 
@@ -84,10 +78,8 @@ export interface VerifyOTPRequest {
   code: string
 }
 
-export interface VerifyOTPResponse {
+export interface VerifyOTPResponse extends BaseResponse{
   success: boolean
-  statusCode: number
-  message: string
   data: {
     user: {
       id: number
@@ -103,7 +95,7 @@ export interface Verify2faRequest {
   method: string
 }
 
-export interface Verify2faResponse {
+export interface Verify2faResponse extends BaseResponse{
   success: boolean
   statusCode: number
   message: string

@@ -59,7 +59,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
           subtitle: t('auth.register.start'),
           successMessage: t('auth.register.success'),
           buttonText: t('auth.register.continue'),
-          linkText: t('auth.register.Have an account?'),
+          linkText: t('auth.register.haveaccount'),
           linkHref: '/sign-in',
           linkLabel: t('auth.register.login')
         }
@@ -68,7 +68,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
           title: t('auth.forgotPassword.title'),
           subtitle: t('auth.forgotPassword.subtitle'),
           successMessage: t('auth.forgotPassword.success'),
-          buttonText: t('auth.forgotPassword.Sending'),
+          buttonText: t('auth.forgotPassword.continue'),
           linkText: t('auth.forgotPassword.Remember password'),
           linkHref: '/sign-in',
           linkLabel: t('auth.forgotPassword.login')

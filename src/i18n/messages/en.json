@@ -63,7 +63,7 @@
       "registering": "Registering...",
       "password": "Password",
       "confirm password": "Confirm password",
-      "Have an account": "Have an account?",
+      "haveaccount": "Have an account?",
       "login": "Login",
       "start": "Enter your email to begin registration",
       "success": "The verification code has been sent to your email",
@@ -87,7 +87,8 @@
       "Remember password": "Remember password?",
       "login": "Login",
       "confirm": "Confirm",
-      "Sending": "Send"
+      "Sending": "Send",
+      "continue": "Continue"
     },
     "resetPassword": {
       "title": "Reset password",

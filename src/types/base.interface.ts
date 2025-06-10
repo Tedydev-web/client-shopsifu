@@ -1,10 +1,9 @@
-export interface ErrorResponse {
-    message: Array<{
-      message: string
-      path: string
-    }>
-    error: string;
-    statusCode: number;
+export interface BaseResponse {
+    status: number;
+    title: string;
+    message: string;
+    timestamp: string;
+    requestId: string;
   }
 
 
@@ -15,3 +14,5 @@ export interface PaginationRequest {
     sortBy?: string;
     sortOrder?: string;
 }
+
+

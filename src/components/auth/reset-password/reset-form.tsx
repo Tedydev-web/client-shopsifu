@@ -23,15 +23,15 @@ import {
 } from '@/components/ui/animated-form'
 import { useTranslation } from 'react-i18next'
 
-const {t} = useTranslation('')
-const schema = resetPasswordSchema(t)
+
 
 export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
+  const {t} = useTranslation('')
+const schema = resetPasswordSchema(t)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { password: '', confirmPassword: '' }
   })
-  const { t } = useTranslation('')
   const { loading, handleResetPassword } = useReset()
 
   return (
