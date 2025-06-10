@@ -1,3 +1,4 @@
+import { UserProfile } from "@/store/features/auth/profileSlide";
 import { BaseResponse } from "../base.interface";
 
 export interface oAuthLoginResponse {
@@ -18,7 +19,8 @@ export interface LoginRequest {
 export interface LoginResponse extends BaseResponse {
   data:{
     message: string
-    verificationType: string
+    verificationType?: string
+    user?: UserProfile
   }
 }
 

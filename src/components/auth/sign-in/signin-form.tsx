@@ -104,9 +104,9 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                           className="absolute inset-y-0 right-0 flex items-center pr-3"
                         >
                           {showPassword ? (
-                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:animate-pulse" />
+                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
                           ) : (
-                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:animate-pulse" />
+                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
                           )}
                         </button>
                       </div>

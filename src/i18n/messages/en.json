@@ -54,7 +54,10 @@
       "signinWithGoogle": "Sign in with Google",
       "signupWithGoogle": "Sign up with Google",
       "cancel": "Cancel",
-      "delete": "Delete?"
+      "delete": "Delete?",
+      "firstname": "First name",
+      "lastname": "Last name",
+      "username": "User name"
     },
     "register": {
       "title": "Register an account",

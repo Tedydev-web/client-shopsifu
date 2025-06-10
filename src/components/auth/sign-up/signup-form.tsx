@@ -23,6 +23,8 @@ import {
 import { OAuthForm } from '../layout/OAuthForm'
 import { useTranslation } from 'react-i18next'
 import { RegisterRequest } from '@/types/auth/auth.interface'
+import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 interface SignupFormProps {
   email: string
   className?: string
@@ -31,6 +33,8 @@ interface SignupFormProps {
 export function SignupForm({ email, className }: SignupFormProps) {
   const { loading, handleSignup } = useSignup()
   const { t } = useTranslation('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const Schema = RegisterSchema(t)
 
   const registerForm = useForm<RegisterRequest>({
@@ -70,7 +74,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('auth.common.first name')}</FormLabel>
+                        <FormLabel>{t('auth.common.firstname')}</FormLabel>
                         <FormControl>
                           <Input 
                             {...field} 
@@ -85,7 +89,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('auth.common.last name')}</FormLabel>
+                        <FormLabel>{t('auth.common.lastname')}</FormLabel>
                         <FormControl>
                           <Input 
                             {...field} 
@@ -139,7 +143,24 @@ export function SignupForm({ email, className }: SignupFormProps) {
                     <FormItem>
                       <FormLabel>{t('auth.register.password')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="******" />
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="******"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,7 +176,24 @@ export function SignupForm({ email, className }: SignupFormProps) {
                     <FormItem>
                       <FormLabel>{t('auth.register.confirm password')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="******" />
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder="******"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -183,7 +221,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
       <div className="mt-8 space-y-6">
         <AnimatedFormItem>
           <div className="text-center text-sm">
-            {t('auth.register.Have an account')}{' '}
+            {t('auth.register.haveaccount')}{' '}
             <Link
               href="/sign-in"
               className="underline underline-offset-4 text-primary hover:text-primary/90"

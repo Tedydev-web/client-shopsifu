@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDropdown } from '../dropdown-context';
+import { useUserData } from '@/hooks/useGetData-UserLogin';
 
 interface MenuItemProps {
   icon: LucideIcon;
@@ -17,8 +18,6 @@ interface MenuItemProps {
 
 export function ProfileDropdown() {
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const name = "Nguyen Phat";
-  const email = "nguyendangphat1312@gmail.com";
   const { handleLogout, loading: logoutLoading } = useLogout();
   const router = useRouter();
   const { openDropdown, setOpenDropdown } = useDropdown();
@@ -44,6 +43,10 @@ export function ProfileDropdown() {
     }
   ];
   
+  const userData = useUserData();
+  const name = userData?.username;
+  const email = userData?.email;
+  const avatar = userData?.avatar;
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
   const avatarText = name ? name[0].toUpperCase() : 'U';
   return (

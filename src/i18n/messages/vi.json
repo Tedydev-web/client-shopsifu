@@ -54,7 +54,10 @@
       "signinWithGoogle": "Đăng nhập với Google",
       "signupWithGoogle": "Đăng ký với Google",
       "cancel": "Hủy",
-      "delete": "Xóa?"
+      "delete": "Xóa?",
+      "firstname": "Họ",
+      "lastname": "Tên",
+      "username": "Tên tài khoản"
     },
     "register": {
       "title": "Đăng ký tài khoản",

@@ -7,10 +7,13 @@ import { ROUTES } from '@/constants/route'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { setProfile } from '@/store/features/auth/profileSlide'
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const dispatch = useDispatch()
 
   const {t} = useTranslation()
   const Schema = LoginSchema(t)  
@@ -30,6 +33,9 @@ export function useSignin() {
           return;
         }
 
+        if (response.data.user) {
+          dispatch(setProfile(response.data.user));
+        }
         showToast(response.data.message || t('admin.showToast.auth.success'), 'success');
         router.push(ROUTES.ADMIN.DASHBOARD);
       } else {
