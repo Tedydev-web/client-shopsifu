@@ -6,7 +6,7 @@ export const API_ENDPOINTS = {
     SIGNIN: `${API_BASE}/auth/login`,
     REFRESH_TOKEN: `${API_BASE}/auth/refresh-token`,
     LOGOUT: `${API_BASE}/auth/logout`,
-    PROFILE: `${API_BASE}/auth/profile`,
+    PROFILE: `${API_BASE}/profile`,
     SEND_OTP: `${API_BASE}/auth/send-otp`,
     GOOGLE_LOGIN: `${API_BASE}/auth/google-link`,
     GET_CSRF_TOKEN: `${API_BASE}/get-cookies`,
