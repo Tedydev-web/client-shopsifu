@@ -30,7 +30,6 @@ import { Button } from '@/components/ui/button'
 import { useChangeLang } from '@/hooks/useChangeLang'
 import { SearchItem } from './SearchItem'
 import { useTranslation } from 'react-i18next'
-import { ProfileSetting } from './ProfileSetting'
 import { NotificationSheet } from './Notification-Sheet'
 import { useState } from 'react'
 
@@ -78,7 +77,6 @@ export function Header({ onToggleSidebar }: HeaderProps) {
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
           </Button>
 
-          <ProfileSetting />
 
           {/* Dropdown Profile */}
           {/* {
