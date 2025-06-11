@@ -7,6 +7,7 @@ import { ChangePasswordModal } from './passwordSecurity-ChangePassword'
 import { Profile2FAModal } from './passwordSecurity-2faModal'
 import { usePasswordSecurity } from './usePasswordSecurity'
 import { PasswordSecuritySession } from './passwordSecurity-Session'
+import { useUserData } from '@/hooks/useGetData-UserLogin'
 
 export function PasswordSecurityTable() {
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -35,9 +36,12 @@ export function PasswordSecurityTable() {
   } = usePasswordSecurity()
 
   // Mock user data - replace with actual user data
+  const userData = useUserData()
   const userInfo = {
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@example.com"
+    name: userData?.firstName + " " + userData?.lastName,
+    email: userData?.email,
+    twoFactorEnabled: userData?.twoFactorEnabled,
+    username: userData?.username
   }
 
   const columns: SettingTableColumn[] = [
@@ -51,8 +55,8 @@ export function PasswordSecurityTable() {
       label: "Xác minh 2 bước",
       value: (
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${is2FAEnabled ? "bg-green-500" : "bg-red-500"}`}></div>
-          <span>{is2FAEnabled ? "Đã bật" : "Chưa bật"}</span>
+          <div className={`w-2 h-2 rounded-full ${userInfo.twoFactorEnabled ? "bg-green-500" : "bg-red-500"}`}></div>
+          <span>{userInfo.twoFactorEnabled ? "Đã bật" : "Chưa bật"}</span>
         </div>
       ),
       startIcon: <Shield />,
@@ -93,7 +97,11 @@ export function PasswordSecurityTable() {
       <ChangePasswordModal
         open={showChangePassword}
         onOpenChange={setShowChangePassword}
-        userInfo={userInfo}
+        userInfo={{
+          ...userInfo,
+          email: userInfo.email ?? "",
+          username: userInfo.username ?? "",
+        }}
       />      
       <Profile2FAModal
         show2FADialog={show2FADialog}

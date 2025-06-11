@@ -234,7 +234,7 @@ export function SearchInput() {
 												className='flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-3.5 rounded-lg transition-colors duration-200'
 												onClick={() => setOpenDropdown('none')}
 											>
-								z				<Search className='h-4 w-4 mr-2.5' />
+												<Search className='h-4 w-4 mr-2.5' />
 												<span>Tìm kiếm theo từ khóa "{searchTerm}"</span>
 											</Link>
 										</div>

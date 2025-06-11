@@ -9,6 +9,7 @@ import { Categories } from './desktop-Categories';
 import { DropdownProvider } from '../dropdown-context';
 import { ProfileDropdown } from './desktop-Profile';
 import { ChangeLangs } from './desktop-ChangeLangs';
+import DesktopCommit from "./desktop-Commit";
 import { useScrollHeader } from '@/hooks/useScrollHeader';
 import { useDropdown } from '../dropdown-context';
 import {TopBar} from './header-TopBar';
@@ -56,7 +57,7 @@ export function Header() {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="max-w-[1400px] mx-auto h-full header-container">
+          <div className="max-w-[1350px] mx-auto h-full header-container">
             <div className="px-4 h-full flex items-center justify-between gap-4">
               {/* Logo */}
               <Link href="/" className="flex items-center gap-2 header-logo">
@@ -97,6 +98,7 @@ export function Header() {
             </div>
           </div>
         </header>
+        <DesktopCommit />
       </DropdownProvider>
 
       {/* Body Overlay with scroll lock */}

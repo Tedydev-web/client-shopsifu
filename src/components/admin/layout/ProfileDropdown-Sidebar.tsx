@@ -8,11 +8,15 @@ import { useChangeLang } from '@/hooks/useChangeLang'
 import { useLogout } from '@/hooks/useLogout'
 import { useRouter } from 'next/navigation'
 import { t } from 'i18next'
+import { useUserData } from '@/hooks/useGetData-UserLogin';
+import { AiOutlineHome } from "react-icons/ai";
+
 
 export function ProfileDropdownSidebar() {
   // Static user info for demo
-  const name = "Nguyen Phat"
-  const email = "nguyendangphat1312@gmail.com"
+  const userData = useUserData();
+  const name = userData?.username
+  const email = userData?.email
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
   const { handleLogout, loading: logoutLoading } = useLogout()
   const router = useRouter()
@@ -21,7 +25,7 @@ export function ProfileDropdownSidebar() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="w-full flex items-center justify-start gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
           <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-lg">
-            {name[0]}
+            {name?.[0]}
           </div>
           <span className="font-medium text-sm text-left flex flex-col">
             <span className="leading-tight">{name}</span>
@@ -32,7 +36,7 @@ export function ProfileDropdownSidebar() {
       <DropdownMenuContent className="w-56 p-0 bg-white border border-gray-200 rounded-lg shadow-lg">
       <div className="flex items-center justify-center pt-4 pb-2 w-full">
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold mr-3 flex-shrink-0">
-            {name[0]}
+            {name?.[0]}
         </div>
         <div className="flex flex-col max-w-[150px]">
             <div className="font-medium text-base text-gray-900 truncate">{name}</div>
@@ -40,6 +44,11 @@ export function ProfileDropdownSidebar() {
         </div>
         </div>
         <DropdownMenuSeparator className="bg-gray-200" />
+        <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 px-4 py-2"
+        onClick={() => router.push('/')}>
+          <AiOutlineHome className="w-4 h-4 mr-2 text-gray-600" />
+          {t('admin.profileDropdown.home')}
+        </DropdownMenuItem>
         <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 px-4 py-2"
         onClick={() => router.push('/admin/settings/profile')}>
           <User className="w-4 h-4 mr-2 text-gray-600" />

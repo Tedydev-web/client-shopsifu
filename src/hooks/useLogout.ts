@@ -5,7 +5,8 @@ import { removeToken } from '@/lib/auth';
 import { showToast } from '@/components/ui/toastify';
 import { ROUTES } from '@/constants/route';
 import { logOut } from '@/store/features/auth/authSlide';
-import { AppDispatch } from '@/store/store';
+import { clearProfile } from '@/store/features/auth/profileSlide';
+import { AppDispatch, getStore } from '@/store/store';
 import { authService } from '@/services/auth/authService';
 
 export function useLogout() {
@@ -26,6 +27,11 @@ export function useLogout() {
 
       // Cập nhật Redux
       dispatch(logOut());
+      dispatch(clearProfile());
+
+      // Xóa Redux Persist
+      const { persistor } = getStore();
+      await persistor.purge();
 
       // Lấy CSRF token mới
       await authService.getCsrfToken();

@@ -12,6 +12,8 @@ import { authService } from '@/services/auth/authService';
 import { useLogout } from '@/hooks/useLogout';
 import { ROUTES } from '@/constants/route';
 import { getStore } from '@/store/store';
+import { cookies } from 'next/headers';
+import { clearProfile } from '@/store/features/auth/profileSlide';
 
 // Constants
 const TOKEN_CHECK_INTERVAL = 300000; // 5 minutes
@@ -227,17 +229,44 @@ privateAxios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Helper function to clear all cookies for the current domain
+const clearAllCookies = () => {
+  const cookies = document.cookie.split(";");
+  for (const cookie of cookies) {
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    // To delete a cookie, we must set its expiration date to the past and specify the same path and domain attributes if they were used when the cookie was set.
+    // Setting path=/ should cover most cases for site-wide cookies.
+    document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+  }
+};
 
 // Response Interceptor → Xử lý lỗi 401
 privateAxios.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     if (error.response?.status === 401) {
       console.log('Token bị vô hiệu hóa hoặc không hợp lệ:', error.response?.data);
+
+      const { store, persistor } = getStore();
+
+      // 1. Clear all site cookies
+      clearAllCookies();
+
+      // 2. Purge persisted state from storage
+      await persistor.purge();
+
+      // 3. Dispatch action to clear profile from the current redux state
+      store.dispatch(clearProfile());
+
       showToast('Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại', 'info');
-      window.location.href = ROUTES.BUYER.SIGNIN;
+
+      // 4. Redirect to sign-in page after a short delay to allow state changes to process
+      setTimeout(() => {
+        window.location.href = ROUTES.BUYER.SIGNIN;
+      }, 100);
     }
     return Promise.reject(error);
   }

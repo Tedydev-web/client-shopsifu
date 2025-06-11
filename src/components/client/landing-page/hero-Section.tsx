@@ -55,7 +55,7 @@ export function HeroSection({ className }: HeroSectionProps) {
           {/* Left column - 8 cols */}
           <div className="lg:col-span-8">
             <div 
-              className="relative w-full h-[400px] rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out"
+              className="relative w-full h-[350px] rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out"
             >
               <Carousel
                 plugins={[
@@ -72,7 +72,7 @@ export function HeroSection({ className }: HeroSectionProps) {
               >
                 <CarouselContent className="h-full"> {/* Content should also fill height */}
                   {heroImages.map((src, index) => (
-                    <CarouselItem key={index} className="h-[400px] relative"> {/* TEMP: Fixed height for debugging */} {/* z-index for image will be handled by Next/Image or its direct parent if needed */}
+                    <CarouselItem key={index} className="h-[350px] relative"> {/* TEMP: Fixed height for debugging */} {/* z-index for image will be handled by Next/Image or its direct parent if needed */}
                       <Image
                         src={src}
                         alt={`Hero image ${index + 1}`}
@@ -118,7 +118,7 @@ export function HeroSection({ className }: HeroSectionProps) {
           {/* Right column - 4 cols */}
           <div className="lg:col-span-4">
           <div 
-  className="relative w-full h-[400px] rounded-2xl overflow-hidden 
+  className="relative w-full h-[350px] rounded-2xl overflow-hidden 
              border border-transparent hover:border-[#ccc] 
              shadow transition-all duration-300 ease-in-out 
              hover:shadow-[8px_8px_120px_rgba(1,0,0,0.2)]"

@@ -4,6 +4,7 @@ import { User, LogOut, ShoppingCart, LucideIcon } from 'lucide-react';
 import React, { useRef } from 'react';
 import { useLogout } from '@/hooks/useLogout';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/route';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDropdown } from '../dropdown-context';
@@ -44,9 +45,21 @@ export function ProfileDropdown() {
   ];
   
   const userData = useUserData();
-  const name = userData?.username;
-  const email = userData?.email;
-  const avatar = userData?.avatar;
+
+  if (!userData) {
+    return (
+      <span
+        onClick={() => router.push(ROUTES.BUYER.SIGNIN)}
+        className="cursor-pointer inline-flex items-center justify-center px-4 py-3 text-white font-semibold text-[13px]"
+      >
+        Đăng nhập
+      </span>
+    );
+  }
+
+  const name = userData.username;
+  const email = userData.email;
+  const avatar = userData.avatar;
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
   const avatarText = name ? name[0].toUpperCase() : 'U';
   return (

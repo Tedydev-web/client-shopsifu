@@ -8,6 +8,7 @@ import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
 import { Verify2faResponse, VerifyOTPResponse } from '@/types/auth/auth.interface'
 import { useTranslation } from 'react-i18next'
+import { useGetProfile } from '@/hooks/useGetProfile'
 
 const TRUST_DEVICE_KEY = 'askToTrustDevice'
 
@@ -18,6 +19,7 @@ export function useVerify2FA() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = (searchParams.get('type') as TwoFactorType) || 'TOTP'
+  const { fetchProfile } = useGetProfile()
 
   const {t} = useTranslation()
   
@@ -68,6 +70,7 @@ export function useVerify2FA() {
       if (response.status === 201 && response.data?.user) {
         const isDeviceTrusted = response.data.user.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
+        await fetchProfile();
         showToast(response.message || t('auth.2faVerify.verificationSuccess'), 'success');
         window.location.href = ROUTES.ADMIN.DASHBOARD;
       } else {
@@ -97,6 +100,7 @@ export function useVerify2FA() {
       if (response.status === 201 && response.data?.user) {
         const isDeviceTrusted = response.data.user.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
+        await fetchProfile();
         showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
         window.location.href = ROUTES.ADMIN.DASHBOARD;
       } else {

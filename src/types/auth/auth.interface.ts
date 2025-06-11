@@ -83,12 +83,7 @@ export interface VerifyOTPRequest {
 export interface VerifyOTPResponse extends BaseResponse{
   success: boolean
   data: {
-    user: {
-      id: number
-      username: string
-      avatar: string | null
-      isDeviceTrustedInSession: boolean
-    }
+    user?: UserProfile
   }
 }
 
@@ -102,12 +97,7 @@ export interface Verify2faResponse extends BaseResponse{
   statusCode: number
   message: string
   data: {
-    user: {
-      id: number
-      username: string
-      avatar: string | null
-      isDeviceTrustedInSession: boolean
-    }
+    user?: UserProfile
   }
 }
 

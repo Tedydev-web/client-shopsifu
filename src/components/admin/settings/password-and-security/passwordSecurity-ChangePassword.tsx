@@ -26,6 +26,8 @@ interface ChangePasswordModalProps {
   userInfo: {
     name: string
     email: string
+    twoFactorEnabled?: boolean
+    username: string
   }
 }
 
