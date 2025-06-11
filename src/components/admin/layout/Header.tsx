@@ -77,7 +77,6 @@ export function Header({ onToggleSidebar }: HeaderProps) {
             <Bell className="h-5 w-5 text-gray-600" />
             <span className="absolute top-1 right-1 bg-red-600 rounded-full w-2 h-2"></span>
           </Button>
-
           <ProfileSetting />
 
           {/* Dropdown Profile */}

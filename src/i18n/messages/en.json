@@ -718,7 +718,7 @@
         "newPasswordInvalid": "",
         "confirmPasswordRequired": "",
         "passwordsMismatch": "",
-        "emailPhone": "Email&Phone",
+        "emailPhone": "Information",
         "noPhone": "",
         "password": "Password",
         "twoFactor": "Two-Factor",

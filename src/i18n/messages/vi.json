@@ -712,7 +712,7 @@
         "newPasswordInvalid": "Mật khẩu mới không hợp lệ",
         "confirmPasswordRequired": "Xác nhận mật khẩu là bắt buộc",
         "passwordsMismatch": "Mật khẩu không khớp",
-        "emailPhone": "Email & Số điện thoại",
+        "emailPhone": "Thông tin",
         "noPhone": "Chưa có số điện thoại",
         "password": "Mật khẩu",
         "twoFactor": "Xác thực hai yếu tố",

@@ -51,7 +51,7 @@ export default function ProfileMobileIndex() {
           <Button
             type="button"
             onClick={() => setProfileSheetOpen(true)}
-            className="bg-red-600 text-white rounded-full px-4 py-2 w-24 h-10 ml-4"
+            className="bg-red-600 text-xs text-white rounded-full px-5 py-2 w-17 h-8"
           >
             {t("user.account.profile.edit")}
           </Button>
@@ -69,7 +69,7 @@ export default function ProfileMobileIndex() {
           <Button
             type="button"
             onClick={() => setIsPasswordModalOpen(true)}
-            className="bg-red-600 text-white rounded-full px-4 py-2 w-24 h-10"
+            className="bg-red-600 text-xs text-white rounded-full px-5 py-2 w-17 h-8"
           >
             {t("user.account.profile.edit")}
           </Button>
@@ -91,7 +91,7 @@ export default function ProfileMobileIndex() {
           <Button
             type="button"
             onClick={() => setIs2FAModalOpen(true)}
-            className="bg-red-600 text-white rounded-full px-4 py-2 w-24 h-10"
+            className="bg-red-600 text-xs text-white rounded-full px-5 py-2 w-17 h-8"
           >
             {t("user.account.profile.turnOn")}
           </Button>

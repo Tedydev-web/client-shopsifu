@@ -59,7 +59,7 @@ export default function UserSidebar() {
         <Link href="/" className="hover:underline">
           {t('user.account.home')}
         </Link>
-        <span className="mx-2">{'>'}</span>
+        <span className="mx-2">{'/'}</span>
         <span>{activeSubItem ? t(activeSubItem) : t('user.account.profile.profile')}</span>
       </div>
 

@@ -1,7 +1,15 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 interface DeleteAccountModalProps {
   open: boolean;
@@ -12,23 +20,21 @@ interface DeleteAccountModalProps {
 export function DeleteAccountModal({ open, onOpenChange, onConfirm }: DeleteAccountModalProps) {
   const { t } = useTranslation();
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-xl max-w-sm w-full shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">
-          {t("user.account.profile.deleteAccount")}
-        </h2>
-        <p className="text-sm text-gray-600 mb-6">
-          {t("user.account.profile.deleteAccountDescription")}
-        </p>
-        <div className="flex justify-end space-x-2">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t("user.account.profile.deleteAccount")}</DialogTitle>
+          <DialogDescription>
+            {t("user.account.profile.deleteAccountDescription")}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("user.account.profile.cancel")}
           </Button>
-          <Button
-            className="bg-red-600 text-white"
+          <Button 
+            variant="destructive" 
             onClick={() => {
               onConfirm();
               onOpenChange(false);
@@ -36,8 +42,8 @@ export function DeleteAccountModal({ open, onOpenChange, onConfirm }: DeleteAcco
           >
             {t("user.account.profile.confirmDelete")}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

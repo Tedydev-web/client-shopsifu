@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
@@ -28,80 +29,87 @@ export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileU
   const [language, setLanguage] = useState(initialData.language);
   const { t } = useTranslation();
 
-  const handleConfirm = () => {
+  const handleSubmit = () => {
     // handle save here
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[300px] p-4 rounded-xl">
-        <DialogHeader className="flex justify-between items-center border-b pb-2">
-          <DialogTitle className="text-lg font-semibold">
-            {t("admin.profileUpdate.title")}
-          </DialogTitle>
-          <DialogClose className="text-gray-500 hover:text-gray-700" />
-        </DialogHeader>
-        <div className="py-3 space-y-4">
-          <form className="space-y-3">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                {t("admin.profileUpdate.name")}
-              </label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoFocus
-                className="w-full text-sm p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email
-              </label>
-              <Input
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                className="w-full text-sm p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="language"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                {t("admin.profileUpdate.lang")}
-              </label>
-              <Input
-                id="language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="w-full text-sm p-2 border rounded"
-              />
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                {t("user.account.profile.cancel")}
-              </Button>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent>
+        <div className="h-[100vh] mx-auto w-full max-w-sm ">
+          <DrawerHeader>
+            <DrawerTitle className="text-xl font-semibold">
+              {t("admin.profileUpdate.title")}
+            </DrawerTitle>
+          </DrawerHeader>
+
+          <div className="p-4 space-y-4">
+            <form className="space-y-4">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("admin.profileUpdate.name")}
+                </label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoFocus
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="language"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("admin.profileUpdate.lang")}
+                </label>
+                <Input
+                  id="language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </form>
+          </div>
+
+          <DrawerFooter className="border-t">
+            <div className="flex justify-end gap-2">
+              <DrawerClose asChild>
+                <Button variant="outline">
+                  {t("user.account.profile.cancel")}
+                </Button>
+              </DrawerClose>
               <Button
                 className="bg-red-600 text-white"
-                onClick={handleConfirm}
+                onClick={handleSubmit}
               >
                 {t("user.account.profile.save")}
               </Button>
             </div>
-          </form>
+          </DrawerFooter>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }
