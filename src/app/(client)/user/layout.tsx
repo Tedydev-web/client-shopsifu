@@ -69,3 +69,6 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     </div>
   )
 }
+// Chia 2 Layout giữa Desktop và Moblie ở đây
+// Riêng Desktop thì sẽ xử lý Layout chia 1 bên Sidebar 1 bên Nội dung Children để có thể hiển thị được nội dung 
+// Của Page Layout Desktop

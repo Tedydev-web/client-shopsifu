@@ -7,7 +7,7 @@ import { DropdownProvider } from './dropdown-context';
 import { useResponsive } from '@/hooks/useResponsive';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import '../style.css';
+import './style.css';
 
 export function Header() {
   const { isMobile } = useResponsive();
@@ -66,7 +66,6 @@ export function Header() {
           </header>
 
           {/* Spacer to prevent content from hiding under fixed header */}
-          <div className="h-[60px]" />
         </motion.div>
       </AnimatePresence>
     </DropdownProvider>
