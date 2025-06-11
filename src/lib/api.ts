@@ -8,7 +8,7 @@ import axios, {
 import Cookies from 'js-cookie'
 import jwt from 'jsonwebtoken';
 import { addHours, differenceInMinutes } from 'date-fns';
-import { authService } from '@/services/auth/authService';
+import { API_ENDPOINTS } from '@/constants/api';
 import { useLogout } from '@/hooks/useLogout';
 import { ROUTES } from '@/constants/route';
 import { getStore } from '@/store/store';
@@ -17,7 +17,7 @@ import { clearProfile } from '@/store/features/auth/profileSlide';
 
 // Constants
 const TOKEN_CHECK_INTERVAL = 300000; // 5 minutes
-const TOKEN_REFRESH_THRESHOLD = 7; // minutes
+const TOKEN_REFRESH_THRESHOLD = 10; // minutes
 const MAX_REFRESH_RETRIES = 3;
 
 // Types
@@ -32,43 +32,43 @@ let isRefreshing = false;
 let failedQueue: any[] = [];
 let refreshPromise: Promise<void> | null = null;
 
-const processQueue = (error: any = null, token: string | null = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
+// const processQueue = (error: any = null, token: string | null = null) => {
+//   failedQueue.forEach(prom => {
+//     if (error) {
+//       prom.reject(error);
+//     } else {
+//       prom.resolve(token);
+//     }
+//   });
+//   failedQueue = [];
+// };
 
-const refreshTokenWithRetry = async (retries = MAX_REFRESH_RETRIES) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      await authService.refreshToken();
-      return true;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-    }
-  }
-  return false;
-};
+// const refreshTokenWithRetry = async (retries = MAX_REFRESH_RETRIES) => {
+//   for (let i = 0; i < retries; i++) {
+//     try {
+//       await authService.refreshToken();
+//       return true;
+//     } catch (error) {
+//       if (i === retries - 1) throw error;
+//       await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+//     }
+//   }
+//   return false;
+// };
 
-const refreshToken = async (): Promise<void> => {
-  if (refreshPromise) {
-    return refreshPromise;
-  }
+// const refreshToken = async (): Promise<void> => {
+//   if (refreshPromise) {
+//     return refreshPromise;
+//   }
   
-  refreshPromise = refreshTokenWithRetry()
-    .then(() => {}) // Convert Promise<boolean> to Promise<void>
-    .finally(() => {
-      refreshPromise = null;
-    });
+//   refreshPromise = refreshTokenWithRetry()
+//     .then(() => {}) // Convert Promise<boolean> to Promise<void>
+//     .finally(() => {
+//       refreshPromise = null;
+//     });
     
-  return refreshPromise;
-};
+//   return refreshPromise;
+// };
 
 // ==================== PUBLIC AXIOS (Truyền csrf-token vào header) ====================
 
@@ -139,41 +139,6 @@ refreshAxios.interceptors.request.use(
 
 // ==================== PRIVATE AXIOS (Thêm access token và xử lý lỗi 401) ====================
 
-// export const privateAxios = axios.create({
-//   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-//   withCredentials: true,
-// })
-
-// // Request Interceptor → Gắn access token và csrf token
-// privateAxios.interceptors.request.use(
-//   (config: InternalAxiosRequestConfig) => {
-//     if (typeof window !== 'undefined') {
-//       const csrfToken = Cookies.get('xsrf-token')
-
-//       if (csrfToken && config.headers) {
-//         config.headers['x-csrf-token'] = csrfToken
-//       }
-//     }
-
-//     return config
-//   },
-//   (error) => Promise.reject(error)
-// )
-
-// // Response Interceptor → Xử lý lỗi 401
-// privateAxios.interceptors.response.use(
-//   (response: AxiosResponse) => {
-//     return response
-//   },
-//   (error: AxiosError) => {
-//     if (error.response?.status === 401) {
-//       showToast('Vui lòng đăng nhập tài khoản', 'info')
-//       window.location.href = '/buyer/sign-in' 
-//     }
-//     return Promise.reject(error)
-//   }
-// )
-
 
 // Hàm kiểm tra thời gian còn lại của token
 const getTokenTimeLeft = (expTimestamp: number): number => {
@@ -199,8 +164,6 @@ const getTokenTimeLeft = (expTimestamp: number): number => {
     return -1; // Trả về -1 nếu có lỗi
   }
 };
-
-
 // Tạo instance privateAxios
 export const privateAxios = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -276,38 +239,54 @@ privateAxios.interceptors.response.use(
 const checkToken = async () => {
   const accessToken = Cookies.get('access_token');
   if (!accessToken) {
-    console.warn('Không tìm thấy access token');
+    // Not an error, just means the user is not logged in.
     return;
   }
 
   try {
     const decodedToken = jwt.decode(accessToken) as DecodedToken;
     if (!decodedToken?.exp) {
-      console.warn('Token không hợp lệ hoặc thiếu trường exp');
-      return;
+      console.warn('Token không hợp lệ hoặc thiếu trường exp, thử làm mới...');
+      try {
+        await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+        console.log('✅ Token refreshed successfully (vì token cũ không hợp lệ)');
+        return;
+      } catch (error) {
+        console.error('❌ Không thể làm mới token khi token cũ không hợp lệ:', error);
+        // If refresh fails here, it's better to logout to get a clean state
+        clearAllCookies();
+        window.location.href = ROUTES.BUYER.SIGNIN;
+        return;
+      }
     }
 
     const timeLeftInMinutes = getTokenTimeLeft(decodedToken.exp);
-    
+
     if (timeLeftInMinutes < 0) {
-      console.warn('Token đã hết hạn');
+      console.warn('Token đã hết hạn. Đăng xuất...');
+      clearAllCookies();
       window.location.href = ROUTES.BUYER.SIGNIN;
       return;
     }
 
     if (timeLeftInMinutes <= TOKEN_REFRESH_THRESHOLD) {
       try {
-        await refreshToken();
-        console.log('✅ Token refreshed successfully');
+        console.log(`Token sắp hết hạn (còn ${timeLeftInMinutes.toFixed(2)} phút), đang làm mới...`);
+        await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+        console.log('✅ Token refreshed thành công');
       } catch (error) {
-        console.error('❌ Failed to refresh token:', error);
-        window.location.href = ROUTES.BUYER.SIGNIN;
+        console.error('❌ Không thể làm mới token:', error);
+        // Don't redirect here, as the old token might still be valid for a short time.
+        // The interceptor will handle the 401 if an API call fails.
       }
     } else {
-      console.log(`Token còn ${timeLeftInMinutes} phút`);
+      console.log(`Token còn ${timeLeftInMinutes.toFixed(2)} phút`);
     }
   } catch (error) {
-    console.error('Lỗi khi kiểm tra token:', error);
+    console.error('Lỗi khi giải mã hoặc kiểm tra token:', error);
+    // This could happen if the token is malformed.
+    clearAllCookies();
+    window.location.href = ROUTES.BUYER.SIGNIN;
   }
 };
 
