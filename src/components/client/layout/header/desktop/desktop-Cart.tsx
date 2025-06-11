@@ -118,7 +118,7 @@ export function CartDropdown() {
                           <Minus className="h-4 w-4" />
                         </Button>
                         <span className="px-3 text-sm font-medium">{item.quantity}</span>
-                        <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity + 1)}>
+                      <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity + 1)}>
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
