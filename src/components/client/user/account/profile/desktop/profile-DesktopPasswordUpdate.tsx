@@ -3,13 +3,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useState } from "react"
-import { passwordSchema, type PasswordFormData } from "@/utils/schema"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { passwordSchema, type PasswordFormData } from "@/utils/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -17,48 +17,54 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Info } from "lucide-react"
-import { t } from "i18next"
+} from "@/components/ui/form";
+import { Info } from "lucide-react";
+import { t } from "i18next";
 
 interface ChangePasswordModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   userInfo: {
-    name: string
-    email: string
-  }
+    name: string;
+    email: string;
+  };
 }
 
-export function ChangePasswordModal({ open, onOpenChange, userInfo }: ChangePasswordModalProps) {
-  const [loading, setLoading] = useState(false)
+export function ChangePasswordModal({
+  open,
+  onOpenChange,
+  userInfo,
+}: ChangePasswordModalProps) {
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
-      confirmPassword: ""
-    }
-  })
+      confirmPassword: "",
+    },
+  });
 
   const onSubmit = async (data: PasswordFormData) => {
-    setLoading(true)
+    setLoading(true);
     try {
       // TODO: Call API to change password
-      onOpenChange(false)
+      onOpenChange(false);
     } catch (error) {
       // Handle error
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">{t('user.account.address.title')}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {t("user.account.address.title")}
+          </DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <div className="mb-6">
@@ -69,7 +75,7 @@ export function ChangePasswordModal({ open, onOpenChange, userInfo }: ChangePass
           <div className="flex items-center gap-2 p-3 mb-4 bg-blue-50 rounded-lg">
             <Info className="w-4 h-4 text-blue-600" />
             <p className="text-sm text-blue-600">
-              {t('user.account.address.subtitle')} (!$@%).
+              {t("user.account.address.subtitle")} (!$@%).
             </p>
           </div>
 
@@ -80,11 +86,15 @@ export function ChangePasswordModal({ open, onOpenChange, userInfo }: ChangePass
                 name="currentPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('user.account.address.currentPassword')}</FormLabel>
+                    <FormLabel>
+                      {t("user.account.address.currentPassword")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder={t('user.account.address.currentPasswordPlaceholder')}
+                        placeholder={t(
+                          "user.account.address.currentPasswordPlaceholder"
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -98,11 +108,15 @@ export function ChangePasswordModal({ open, onOpenChange, userInfo }: ChangePass
                 name="newPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('user.account.address.newPassword')}</FormLabel>
+                    <FormLabel>
+                      {t("user.account.address.newPassword")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder={t('user.account.address.newPasswordPlaceholder')}
+                        placeholder={t(
+                          "user.account.address.newPasswordPlaceholder"
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -116,11 +130,15 @@ export function ChangePasswordModal({ open, onOpenChange, userInfo }: ChangePass
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('user.account.address.confirmPassword')}</FormLabel>
+                    <FormLabel>
+                      {t("user.account.address.confirmPassword")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder={t('user.account.address.newPasswordPlaceholder')}
+                        placeholder={t(
+                          "user.account.address.newPasswordPlaceholder"
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -129,17 +147,15 @@ export function ChangePasswordModal({ open, onOpenChange, userInfo }: ChangePass
                 )}
               />
 
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={loading}
-              >
-                {loading ? t('user.account.address.processing') : t('user.account.address.changePassword')}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading
+                  ? t("user.account.address.processing")
+                  : t("user.account.address.changePassword")}
               </Button>
             </form>
           </Form>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

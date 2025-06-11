@@ -124,7 +124,7 @@ export function Categories() {
         <motion.div 
           ref={dropdownRef}
           className={cn(
-            "border-1 border-gray-200 absolute top-[calc(100%+12px)] left-[-180px] min-w-[950px] bg-white rounded-lg shadow-xl z-50 mb-5 overflow-y-auto dropdown-container",
+            "border-1 border-gray-200 absolute top-[calc(100%+12px)] left-[-180px] min-w-full md:min-w-[950px] bg-white rounded-lg shadow-xl z-50 mb-5 overflow-y-auto dropdown-container",
             open ? "opacity-100 visible" : "opacity-0 invisible"
           )}
           initial={{ opacity: 0, y: -10 }}

@@ -747,7 +747,7 @@
         "newPasswordInvalid": "",
         "confirmPasswordRequired": "",
         "passwordsMismatch": "",
-        "emailPhone": "Email&Phone",
+        "emailPhone": "Information",
         "noPhone": "",
         "password": "Password",
         "twoFactor": "Two-Factor",
@@ -769,7 +769,11 @@
 
         "enable2FA": "Enable Two-Factor Authentication",
         "enable2FADescription": "Are you sure you want to enable two-factor authentication? You will need to scan a QR code with your authenticator app.",
-        "enable": "Enable"
+        "enable": "Enable",
+
+        "deleteAccount": "Delete Account",
+        "confirmDelete": "Delete",
+        "accountTermination": "Account Terminate"
       },
 
       "address": {
@@ -803,13 +807,17 @@
 
       "security": {
         "security": "Security",
-        "title": "Change Password",
+        "title": "Active devices",
         "subtitle": "For your account's security, do not share your password with anyone else",
-        "newPass": "New Password",
-        "newPassPlaceholder": "Enter password",
-        "confirmnewPassword": "Confirm new password",
-        "confirmnewPasswordPlaceholder": "Confirm new password",
-        "save": "Confirm"
+        "loggedInDevices": "Logged-in devices",
+        "totalSessionsSummary": "Total of {{totalSessions}} active sessions on {{deviceCount}} devices",
+        "total": "Total of",
+        "active": "active sessions on",
+        "device": "device",
+        "deviceSessionCount": "{{count}} active sessions",
+        "terminateSession": "Terminate this session",
+        "deleteSession": "Delete this session",
+        "loginSession": "Login session"
       },
 
       "myPurchase": {

@@ -53,13 +53,13 @@ export default function UserSidebar() {
   }, [pathname])
 
   return (
-    <nav className="px-4 py-6 space-y-2">
+    <nav className="w-full ms:w-[240px] px-4 py-6 space-y-2 bg-white">
       {/* Breadcrumb */}
       <div className="text-sm text-gray-500 mb-4 px-2">
         <Link href="/" className="hover:underline">
           {t('user.account.home')}
         </Link>
-        <span className="mx-2">{'>'}</span>
+        <span className="mx-2">{'/'}</span>
         <span>{activeSubItem ? t(activeSubItem) : t('user.account.profile.profile')}</span>
       </div>
 
@@ -95,7 +95,7 @@ export default function UserSidebar() {
                         className={cn(
                           'block py-2 px-3 pl-[1.75rem] text-sm font-semibold transition-colors', // 👈 chỉnh lề này
                           pathname === subItem.href
-                            ? 'bg-orange-100 text-black border-l-4 border-orange-500'
+                            ? 'bg-orange-100 text-black border-l-4 border-red-600'
                             : 'text-gray-900 hover:bg-gray-100'
                         )}
                       >
@@ -113,7 +113,7 @@ export default function UserSidebar() {
                 className={cn(
                   'flex items-center px-3 py-2 text-sm font-semibold transition-colors',
                   pathname === item.href
-                    ? 'bg-orange-100 text-black border-l-4 border-orange-500'
+                    ? 'bg-orange-100 text-black border-l-4 border-red-600'
                     : 'text-gray-900 hover:bg-gray-100'
                 )}
               >
