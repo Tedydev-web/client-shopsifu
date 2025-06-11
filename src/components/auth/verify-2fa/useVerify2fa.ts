@@ -9,6 +9,7 @@ import { parseApiError } from '@/utils/error'
 import { Verify2faResponse, VerifyOTPResponse } from '@/types/auth/auth.interface'
 import { useTranslation } from 'react-i18next'
 import { useGetProfile } from '@/hooks/useGetProfile'
+import { useUserData } from '@/hooks/useGetData-UserLogin'
 
 const TRUST_DEVICE_KEY = 'askToTrustDevice'
 
@@ -20,7 +21,9 @@ export function useVerify2FA() {
   const searchParams = useSearchParams()
   const type = (searchParams.get('type') as TwoFactorType) || 'TOTP'
   const { fetchProfile } = useGetProfile()
+  const userData = useUserData();
 
+  const role = userData?.role;
   const {t} = useTranslation()
   
   // Khóa lưu trữ trạng thái thiết bị trong session storage
@@ -72,7 +75,11 @@ export function useVerify2FA() {
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
         showToast(response.message || t('auth.2faVerify.verificationSuccess'), 'success');
-        window.location.href = ROUTES.ADMIN.DASHBOARD;
+        if(role === 'Admin'){
+          window.location.href = ROUTES.ADMIN.DASHBOARD;
+        }else{
+          window.location.href = ROUTES.HOME;
+        }
       } else {
         throw new Error(response.message || t('auth.2faVerify.verificationFailed'));
       }
@@ -102,7 +109,11 @@ export function useVerify2FA() {
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
         showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
-        window.location.href = ROUTES.ADMIN.DASHBOARD;
+        if(role === 'Admin'){
+          window.location.href = ROUTES.ADMIN.DASHBOARD;
+        }else{
+          window.location.href = ROUTES.HOME;
+        }
       } else {
         throw new Error(response.message || t('auth.2faVerify.otpVerificationFailed'));
       }

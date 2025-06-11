@@ -39,9 +39,9 @@ export function middleware(request: NextRequest) {
 
         if (decoded && decoded.roleName) {
           // Redirect dựa trên roleName cho các route auth
-          if (decoded.roleName === 'ADMIN') {
+          if (decoded.roleName === 'Admin') {
             return NextResponse.redirect(new URL('/admin', request.url));
-          } else if (decoded.roleName === 'USER' || decoded.roleName === 'Customer') {
+          } else if (decoded.roleName === 'Customer') {
             // Cả USER và CLIENT đều redirect về /
             return NextResponse.redirect(new URL('/', request.url));
           }
@@ -65,7 +65,7 @@ export function middleware(request: NextRequest) {
         const decoded = jwt.decode(accessToken) as AccessTokenPayload | null;
 
         if (decoded && decoded.roleName) {
-          if (decoded.roleName !== 'ADMIN') {
+          if (decoded.roleName !== 'Admin') {
             // Ngăn chặn tất cả role không phải ADMIN (bao gồm CLIENT, USER, v.v.)
             return NextResponse.rewrite(new URL('/not-found', request.url));
           }

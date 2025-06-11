@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { User, LogOut, ShoppingCart, LucideIcon } from 'lucide-react';
 import React, { useRef } from 'react';
 import { useLogout } from '@/hooks/useLogout';
@@ -29,12 +31,12 @@ export function ProfileDropdown() {
     {
       icon: User,
       label: 'Tài khoản của tôi',
-      onClick: () => router.push('/admin/settings/profile')
+      onClick: () => router.push(ROUTES.BUYER.MY_ACCOUNT)
     },
     {
       icon: ShoppingCart,
       label: 'Đơn hàng mua',
-      onClick: () => router.push('/admin/settings/profile'),
+      onClick: () => router.push(ROUTES.BUYER.MY_ORDERS),
       requireDivider: true
     },
     {
@@ -58,6 +60,7 @@ export function ProfileDropdown() {
   }
 
   const name = userData.username;
+  const role = userData.role;
   const email = userData.email;
   const avatar = userData.avatar;
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
@@ -151,6 +154,14 @@ export function ProfileDropdown() {
         <div className="h-px bg-gray-200 mx-6 my-1"></div>
           {/* Menu Items */}
         <div>
+          {role === 'Admin' && (
+            <>
+              <Link href={ROUTES.ADMIN.DASHBOARD} className="flex items-center px-5 py-3 hover:bg-indigo-50 cursor-pointer text-[14px] font-semibold text-indigo-600">
+                Trang quản trị
+              </Link>
+              <div className="h-px bg-gray-200 mx-6 my-1"></div>
+            </>
+          )}
           {menuItems.map((item, index) => (
             <React.Fragment key={index}>
               <div 

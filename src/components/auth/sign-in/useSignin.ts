@@ -8,12 +8,16 @@ import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
 import { useTranslation } from 'react-i18next'
 import { useGetProfile } from '@/hooks/useGetProfile'
+import { useUserData } from '@/hooks/useGetData-UserLogin'
+
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { fetchProfile } = useGetProfile()
+  const userData = useUserData();
 
+  const role = userData?.role;
   const {t} = useTranslation()
   const Schema = LoginSchema(t)  
   const handleSignin = async (data: z.infer<typeof Schema>) => {
@@ -34,7 +38,11 @@ export function useSignin() {
 
         await fetchProfile();
         showToast(response.data.message || t('admin.showToast.auth.success'), 'success');
-        router.push(ROUTES.ADMIN.DASHBOARD);
+        if(role === 'Admin'){
+          window.location.href = ROUTES.ADMIN.DASHBOARD;
+        }else{
+          window.location.href = ROUTES.HOME;
+        }
       } else {
         showToast(response.data.message || t('admin.showToast.auth.loginFailed'), 'error');
       }

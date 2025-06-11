@@ -116,7 +116,6 @@ header {
 .scroll-locked {
   overflow: auto;
 }
-
 /* Backdrop blur effect for category dropdown */
 .category-backdrop, .search-backdrop {
   -webkit-backdrop-filter: blur(3px);
@@ -142,8 +141,8 @@ header {
   will-change: opacity;
 }
 
-/* Show overlay when hovering header */
-.header-hovered ~ .body-overlay {
+/* Show overlay when a dropdown is active */
+.body-overlay.overlay-active {
   opacity: 1;
   pointer-events: all; /* Becomes interactive when visible */
 }

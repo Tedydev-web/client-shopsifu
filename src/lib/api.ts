@@ -238,53 +238,66 @@ privateAxios.interceptors.response.use(
 // Token check function
 const checkToken = async () => {
   const accessToken = Cookies.get('access_token');
-  if (!accessToken) {
-    // Not an error, just means the user is not logged in.
+  const refreshTokenExists = !!Cookies.get('refresh_token');
+
+  // Case 1: No access token, but a refresh token exists. Try to recover the session.
+  if (!accessToken && refreshTokenExists) {
+    console.log('Không có access token, đang thử làm mới từ refresh token...');
+    try {
+      await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+      console.log('✅ Token đã được làm mới thành công khi khởi tạo.');
+    } catch (error) {
+      console.error('❌ Không thể làm mới token. Đăng xuất người dùng.', error);
+      clearAllCookies();
+      if (window.location.pathname !== ROUTES.BUYER.SIGNIN) {
+        window.location.href = ROUTES.BUYER.SIGNIN;
+      }
+    }
+    return; // End this check cycle. The next one will have the new access token.
+  }
+
+  // Case 2: No tokens at all. User is not logged in. Do nothing.
+  if (!accessToken && !refreshTokenExists) {
     return;
   }
 
+  // Case 3: Access token exists. Proceed with validation.
   try {
-    const decodedToken = jwt.decode(accessToken) as DecodedToken;
+    const decodedToken = jwt.decode(accessToken!) as DecodedToken;
     if (!decodedToken?.exp) {
-      console.warn('Token không hợp lệ hoặc thiếu trường exp, thử làm mới...');
-      try {
-        await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
-        console.log('✅ Token refreshed successfully (vì token cũ không hợp lệ)');
-        return;
-      } catch (error) {
-        console.error('❌ Không thể làm mới token khi token cũ không hợp lệ:', error);
-        // If refresh fails here, it's better to logout to get a clean state
-        clearAllCookies();
-        window.location.href = ROUTES.BUYER.SIGNIN;
-        return;
-      }
+      throw new Error('Token không hợp lệ hoặc thiếu trường exp');
     }
 
     const timeLeftInMinutes = getTokenTimeLeft(decodedToken.exp);
 
+    // If token is already expired, try to refresh it.
     if (timeLeftInMinutes < 0) {
-      console.warn('Token đã hết hạn. Đăng xuất...');
-      clearAllCookies();
-      window.location.href = ROUTES.BUYER.SIGNIN;
+      console.warn('Token đã hết hạn. Thử làm mới...');
+      try {
+        await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+        console.log('✅ Token đã được làm mới do đã hết hạn.');
+      } catch (error) {
+        console.error('❌ Không thể làm mới token đã hết hạn. Đăng xuất...', error);
+        clearAllCookies();
+        window.location.href = ROUTES.BUYER.SIGNIN;
+      }
       return;
     }
 
+    // If token is nearing expiry, refresh it proactively.
     if (timeLeftInMinutes <= TOKEN_REFRESH_THRESHOLD) {
       try {
         console.log(`Token sắp hết hạn (còn ${timeLeftInMinutes.toFixed(2)} phút), đang làm mới...`);
         await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
         console.log('✅ Token refreshed thành công');
       } catch (error) {
-        console.error('❌ Không thể làm mới token:', error);
-        // Don't redirect here, as the old token might still be valid for a short time.
-        // The interceptor will handle the 401 if an API call fails.
+        console.error('❌ Không thể làm mới token chủ động:', error);
       }
     } else {
-      console.log(`Token còn ${timeLeftInMinutes.toFixed(2)} phút`);
+      // console.log(`Token còn ${timeLeftInMinutes.toFixed(2)} phút`);
     }
   } catch (error) {
-    console.error('Lỗi khi giải mã hoặc kiểm tra token:', error);
-    // This could happen if the token is malformed.
+    console.error('Lỗi khi giải mã hoặc kiểm tra token. Token có thể bị lỗi:', error);
     clearAllCookies();
     window.location.href = ROUTES.BUYER.SIGNIN;
   }

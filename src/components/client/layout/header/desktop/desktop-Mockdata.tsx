@@ -34,24 +34,24 @@ export const categories: Category[] = [
     id: '1',
     name: 'Điện thoại',
     children: [
-      { id: 'p1', name: 'iPhone 15 Pro', image: '/images/products/iphone.jpg' },
-      { id: 'p2', name: 'Samsung S24', image: '/images/products/samsung.jpg' },
+      { id: 'p1', name: 'iPhone 15 Pro', image: '/images/demo/1.webp' },
+      { id: 'p2', name: 'Samsung S24', image: '/images/demo/2.webp' },
     ],
   },
   {
     id: '2',
     name: 'Laptop',
     children: [
-      { id: 'p3', name: 'MacBook Pro', image: '/images/products/macbook.jpg' },
-      { id: 'p4', name: 'Dell XPS', image: '/images/products/dell.jpg' },
+      { id: 'p3', name: 'MacBook Pro', image: '/images/demo/3.webp' },
+      { id: 'p4', name: 'Dell XPS', image: '/images/demo/4.webp' },
     ],
   },
   {
     id: '3',
     name: 'Phụ kiện',
     children: [
-      { id: 'p5', name: 'Tai nghe AirPods', image: '/images/products/airpods.jpg' },
-      { id: 'p6', name: 'Sạc dự phòng', image: '/images/products/powerbank.jpg' },
+      { id: 'p5', name: 'Tai nghe AirPods', image: '/images/demo/5.webp' },
+      { id: 'p6', name: 'Sạc dự phòng', image: '/images/demo/1.webp' },
     ],
   },
 ];

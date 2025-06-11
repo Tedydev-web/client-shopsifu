@@ -1,155 +1,158 @@
 'use client';
 
-import { ShoppingCart } from 'lucide-react';
-import React, { useRef } from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react';
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ShoppingCart, Trash2, Plus, Minus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { cartItems } from './desktop-Mockdata';
-import { useDropdown } from '../dropdown-context';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { cartItems as mockCartItems } from './desktop-Mockdata';
+
+// Define the structure for a cart item, now with a 'selected' state
+interface CartItem {
+  id: number;
+  name: string;
+  price: string; // Keep as string from mock
+  image: string;
+  quantity: number;
+  selected: boolean;
+}
+
+// Utility to parse price string (e.g., "395.000") into a number
+const parsePrice = (price: string): number => {
+  return parseInt(price.replace(/\./g, ''), 10);
+};
 
 export function CartDropdown() {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const { openDropdown, setOpenDropdown } = useDropdown();
-  
-  const isOpen = openDropdown === 'cart';
-  
+  // Initialize state from mock data, adding quantity and selected status
+  const [cart, setCart] = useState<CartItem[]>(
+    mockCartItems.map(item => ({ ...item, quantity: 1, selected: true }))
+  );
+
+  const handleQuantityChange = (id: number, newQuantity: number) => {
+    setCart(currentCart =>
+      currentCart.map(item =>
+        item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
+      )
+    );
+  };
+
+  const handleRemoveItem = (id: number) => {
+    setCart(currentCart => currentCart.filter(item => item.id !== id));
+  };
+
+  const handleToggleSelect = (id: number) => {
+    setCart(currentCart =>
+      currentCart.map(item => (item.id === id ? { ...item, selected: !item.selected } : item))
+    );
+  };
+
+  const handleToggleSelectAll = (checked: boolean | 'indeterminate') => {
+    const isSelected = checked === true;
+    setCart(currentCart => currentCart.map(item => ({ ...item, selected: isSelected })));
+  };
+
+  const calculateTotal = () => {
+    return cart
+      .filter(item => item.selected)
+      .reduce((total, item) => {
+        const price = parsePrice(item.price);
+        return total + price * item.quantity;
+      }, 0);
+  };
+
+  const allItemsSelected = cart.length > 0 && cart.every(item => item.selected);
+  const isIndeterminate = cart.some(item => item.selected) && !allItemsSelected;
+  const noItemsSelected = cart.every(item => !item.selected);
+
   return (
-    <div 
-      className="relative group cart-container" 
-      ref={dropdownRef}
-    >
-      {/* Trigger Button */}
-      <div 
-        className="cursor-pointer relative whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-3"
-        onClick={() => setOpenDropdown(isOpen ? 'none' : 'cart')}
-        onMouseEnter={() => setOpenDropdown('cart')}
-      >
-        {/* Backdrop blur effect */}
-        <motion.div
-          className="absolute inset-0 rounded-full backdrop-blur-sm"
-          initial={{ 
-            backgroundColor: "rgba(233, 233, 233, 0)", 
-            scaleX: 0.5,
-            scaleY: 0.8
-          }}
-          animate={{
-            backgroundColor: isOpen ? "rgba(233, 233, 233, 0.4)" : "rgba(233, 233, 233, 0)", 
-            boxShadow: isOpen
-              ? "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
-              : "none",
-            scaleX: isOpen ? 1 : 0.5,
-            scaleY: isOpen ? 1 : 0.8
-          }}
-          whileHover={{
-            backgroundColor: "rgba(233, 233, 233, 0.4)",
-            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-            scaleX: [0.8, 1.1, 1], 
-            scaleY: [0.9, 1.05, 1],
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 350, 
-            damping: 12, 
-            backgroundColor: { duration: 0.15 }, 
-            boxShadow: { duration: 0.15 }, 
-            scaleX: { duration: 0.35, ease: "easeOut" }, 
-            scaleY: { duration: 0.25, ease: "easeOut" },
-          }}
-        />
-        
-        {/* Content layer */}       
-        <div className="relative z-10">
-          <ShoppingCart className="w-6 h-6 text-white" />
-          {/* Item count badge */}
-          <span className="absolute -top-1 -right-4 inline-flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-white text-xs font-bold">
-            {cartItems.length}
-          </span>
-        </div>
-      </div>
-      
-      {/* Invisible gap to prevent dropdown from closing when moving cursor to dropdown */}
-      <div className="absolute h-3 w-full top-full"></div>
-      
-      {/* Dropdown Menu */}
-      <motion.div
-        className={cn(
-          "absolute top-[calc(100%+3px)] right-0 w-[300px] sm:w-[400px] md:w-[500px] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50",
-          isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-        )}
-        onMouseEnter={() => setOpenDropdown('cart')}
-        onMouseLeave={() => setOpenDropdown('none')}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ 
-          opacity: isOpen ? 1 : 0, 
-          y: isOpen ? 0 : -10,
-          transition: {
-            duration: 0.2,
-            ease: "easeOut"
-          }
-        }}
-      >
-        {/* Bubble arrow pointing to the cart icon */}
-        <div className="absolute right-4 top-[-7px] w-3 h-3 bg-white transform rotate-45 border-t border-l border-gray-200 z-1"></div>
-        
-        {/* Cart Header */}
-        <div className="px-4 py-6">
-          <h3 className="text-[16px] font-medium text-gray-800">Sản Phẩm Mới Thêm ({cartItems.length})</h3>
-        </div>
-        
-        {/* Cart Items */}
-        <div className="max-h-[350px] overflow-y-auto">
-          {cartItems.length > 0 ? (
-            cartItems.map(item => (
-              <motion.div 
-                key={item.id} 
-                className="relative cursor-pointer"
-                whileHover={{ backgroundColor: "rgba(240, 240, 240, 0.8)" }}
-              >
-                <div className="px-4 py-2.5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 relative overflow-hidden rounded border border-gray-100">
-                      <Image 
-                        src={item.image} 
-                        alt={item.name} 
-                        layout="fill" 
-                        objectFit="cover" 
-                        className="transition-transform duration-300" 
-                      />
-                    </div>
-                    <div className="flex-1 text-sm overflow-hidden">
-                      <p className="text-gray-800 font-medium truncate">{item.name}</p>
-                      {/* <p className="text-xs text-gray-500 mt-0.5">Loại: {item.category}</p> */}
-                    </div>
-                    <div className="text-sm font-semibold text-red-600">
-                      ₫{item.price.toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))
-          ) : (
-            <div className="py-8 px-4 text-center">
-              <div className="w-16 h-16 mx-auto mb-3 opacity-30">
-                <ShoppingCart className="w-full h-full text-gray-400" />
-              </div>
-              <p className="text-gray-500 text-sm">Giỏ hàng của bạn đang trống</p>
-            </div>
+    <Sheet>
+      <SheetTrigger asChild>
+        <div className="rounded-full cursor-pointer relative whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-3">
+          <ShoppingCart className="h-6 w-6 text-white" />
+          {cart.length > 0 && (
+            <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+              {cart.reduce((count, item) => count + item.quantity, 0)}
+            </span>
           )}
         </div>
-        
-        {/* Cart Footer */}
-        <div className="p-4 border-t border-gray-100">
-          <Link 
-            href="/cart" 
-            className="flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-3 rounded-lg transition-colors duration-200"
-            onClick={() => setOpenDropdown('none')}
-          >
-            <span>Xem Giỏ Hàng</span>
-          </Link>
-        </div>
-      </motion.div>
-    </div>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full max-w-md p-0 flex flex-col rounded-md">
+        <SheetHeader className="px-6 pt-6 pb-4 border-b border-gray-200">
+          <SheetTitle className="text-lg font-semibold text-gray-900 mb-1">Giỏ hàng của bạn</SheetTitle>
+        </SheetHeader>
+
+        {cart.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+            <ShoppingCart size={48} className="text-gray-300 mb-4" />
+            <p className="text-gray-500">Giỏ hàng của bạn đang trống</p>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto">
+            <div className="flex items-center justify-between pb-4 pl-4 border-b border-gray-200 bg-gray-50">
+                <label htmlFor="select-all" className="flex items-center space-x-3 cursor-pointer">
+                    <Checkbox
+                        id="select-all"
+                        checked={isIndeterminate ? 'indeterminate' : allItemsSelected}
+                        onCheckedChange={handleToggleSelectAll}
+                    />
+                    <span className="text-sm font-medium">Chọn tất cả ({cart.length} sản phẩm)</span>
+                </label>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {cart.map(item => (
+                <div key={item.id} className="flex items-center p-4">
+                  <Checkbox
+                    id={`select-item-${item.id}`}
+                    checked={item.selected}
+                    onCheckedChange={() => handleToggleSelect(item.id)}
+                  />
+                  <label htmlFor={`select-item-${item.id}`} className="flex items-center ml-4 cursor-pointer">
+                    <Image src={item.image} alt={item.name} width={80} height={80} className="rounded-md object-cover" />
+                    <div className="ml-4 flex-1">
+                      <h3 className="text-sm font-medium text-gray-800 line-clamp-2">{item.name}</h3>
+                      <p className="text-sm text-red-600 font-semibold mt-1">{item.price}₫</p>
+                      <div className="flex items-center mt-2">
+                        <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity - 1)}>
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="px-3 text-sm font-medium">{item.quantity}</span>
+                        <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity + 1)}>
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </label>
+                  {/* <Button variant="ghost" size="icon" className="ml-4 text-gray-400 hover:text-red-500" onClick={() => handleRemoveItem(item.id)}>
+                    <Trash2 className="h-5 w-5" />
+                  </Button> */}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {cart.length > 0 && (
+          <SheetFooter className="p-6 border-t border-gray-200 bg-white">
+            <div className="w-full space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-md font-semibold text-gray-800">Tổng cộng</span>
+                <span className="text-xl font-bold text-red-600">{calculateTotal().toLocaleString('vi-VN')}₫</span>
+              </div>
+              <Button size="lg" className="w-full bg-red-600 hover:bg-red-700" disabled={noItemsSelected}>
+                Thanh toán
+              </Button>
+              <Button asChild size="lg" variant="outline" className="w-full">
+                <Link href="/cart" className="flex items-center justify-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span>Xem giỏ hàng</span>
+                </Link>
+              </Button>
+            </div>
+          </SheetFooter>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
