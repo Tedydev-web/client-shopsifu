@@ -14,7 +14,8 @@ export interface UserProfile {
   username: string;
   phoneNumber: string | null;
   avatar: string | null;
-  isDeviceTrustedInSession?: boolean; // Make optional to preserve value during partial updates
+  isDeviceTrustedInSession?: boolean;
+  createdAt: string; // Make optional to preserve value during partial updates
 }
 
 // Define a type for the slice state

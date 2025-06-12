@@ -37,14 +37,14 @@ export function useSignin() {
         }
 
         await fetchProfile();
-        showToast(response.data.message || t('admin.showToast.auth.success'), 'success');
+        showToast(response.message || t('admin.showToast.auth.success'), 'success');
         if(role === 'Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;
         }else{
           window.location.href = ROUTES.HOME;
         }
       } else {
-        showToast(response.data.message || t('admin.showToast.auth.loginFailed'), 'error');
+        showToast(response.message || t('admin.showToast.auth.loginFailed'), 'error');
       }
     } catch (error: any) {
       console.error('Login error:', error)
