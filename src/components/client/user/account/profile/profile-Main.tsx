@@ -4,11 +4,11 @@ import { useCheckDevice } from "@/hooks/useCheckDevices";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ProfileDesktop = dynamic(() => import("./desktop/profile-DesktopIndex"), {
+const ProfileDesktop = dynamic(() => import("../desktop/profile/profile-DesktopIndex"), {
   loading: () => <Skeleton className="w-full h-full" />,
   ssr: false,
 });
-const ProfileMobile = dynamic(() => import("./mobile/profile-MobileIndex"), {
+const ProfileMobile = dynamic(() => import("../moblie/profile/profile-MobileIndex"), {
   loading: () => <Skeleton className="w-full h-full" />,
   ssr: false,
 });

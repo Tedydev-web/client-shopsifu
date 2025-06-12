@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import { Header } from "@/components/client/layout/header/header-Main";
 import { Footer } from "@/components/client/layout/Footer";
+import { ScrollLock } from "@/components/client/layout/ScrollLock";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +19,7 @@ export default function ClientLayout({
 }>) {
   return (
     <div className="min-h-screen w-full flex flex-col">
+      <ScrollLock />
       <Header />
       <main className="flex-grow">
         <div className="max-w-[1350px] w-full mx-auto px-4 sm:px-6">

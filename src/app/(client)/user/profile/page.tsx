@@ -6,7 +6,7 @@ export default function ProfilePage() {
   const { t } = useTranslation();
   return (
     <div>
-      <div className="pt-6 mt-6">
+      <div className="pt-4">
         <h2 className="text-2xl font-bold tracking-tight">
           {t("user.account.profile.title")}
         </h2>

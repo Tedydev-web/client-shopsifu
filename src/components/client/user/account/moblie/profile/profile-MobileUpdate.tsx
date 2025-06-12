@@ -17,16 +17,22 @@ interface ProfileUpdateSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialData: {
-    name: string;
-    email: string;
+    firstName: string;
+    lastName: string,
+    userName: string,
+    email: string,
+    phoneNumber: string;
     language: string;
   };
 }
 
 export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileUpdateSheetProps) {
-  const [name, setName] = useState(initialData.name);
+  const [userName, setUserName] = useState(initialData.userName);
   const [email, setEmail] = useState(initialData.email);
   const [language, setLanguage] = useState(initialData.language);
+  const [phoneNumber, setPhoneNumber] = useState(initialData.phoneNumber || "");
+  const [firstName, setFirstName] = useState(initialData.firstName || "");
+  const [lastName, setLastName] = useState(initialData.lastName || "");
   const { t } = useTranslation();
 
   const handleSubmit = () => {
@@ -55,8 +61,8 @@ export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileU
                 </label>
                 <Input
                   id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
                   autoFocus
                   className="w-full"
                 />
