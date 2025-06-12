@@ -38,7 +38,7 @@ export function useSignin() {
 
         await fetchProfile();
         showToast(response.message || t('admin.showToast.auth.success'), 'success');
-        if(role === 'Admin'){
+        if(role === 'Admin' || role === 'Super Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;
         }else{
           window.location.href = ROUTES.HOME;

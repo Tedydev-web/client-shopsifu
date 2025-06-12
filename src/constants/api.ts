@@ -26,7 +26,9 @@ export const API_ENDPOINTS = {
     DISABLE_2FA: `${API_BASE}/auth/2fa/disable`,
     // DEVICE
     TRUST_DEVICE: `${API_BASE}/auth/sessions/current-device/trust`,
-    UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`
+    UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`,
+    //GET ABILITY BY ROLE (PERMISSION)
+    GET_ABILITY: `${API_BASE}/auth/ui-capabilities`,
   },
   ROLES:{
     GETALL: `${API_BASE}/roles`,

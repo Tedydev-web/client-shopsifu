@@ -27,7 +27,11 @@ import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
 
 export const authService = {
-
+  //GET ABILITY BY ROLE (PERMISSION)
+  getAbility: async (): Promise<any> => {
+    const response = await privateAxios.get(API_ENDPOINTS.AUTH.GET_ABILITY);
+    return response.data;
+  },
 
   // ĐĂNG NHẬP TÀI KHOẢN - SIGN-IN
   login: async (data: LoginRequest): Promise<LoginResponse> => {
