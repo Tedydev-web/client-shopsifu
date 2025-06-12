@@ -238,10 +238,10 @@ privateAxios.interceptors.response.use(
 // Token check function
 const checkToken = async () => {
   const accessToken = Cookies.get('access_token');
-  const refreshTokenExists = !!Cookies.get('refresh_token');
+  const refreshToken = Cookies.get('refresh_token');
 
   // Case 1: No access token, but a refresh token exists. Try to recover the session.
-  if (!accessToken && refreshTokenExists) {
+  if (!accessToken && refreshToken) {
     console.log('Không có access token, đang thử làm mới từ refresh token...');
     try {
       await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
@@ -257,7 +257,8 @@ const checkToken = async () => {
   }
 
   // Case 2: No tokens at all. User is not logged in. Do nothing.
-  if (!accessToken && !refreshTokenExists) {
+  if (!accessToken && !refreshToken) {
+    console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
     return;
   }
 
@@ -306,7 +307,7 @@ const checkToken = async () => {
 // Interval management
 let tokenCheckInterval: NodeJS.Timeout;
 
-const startTokenCheck = () => {
+export const startTokenCheck = () => {
   console.log('Bắt đầu kiểm tra access_token');
   if (typeof window !== 'undefined') {
     if (tokenCheckInterval) {
@@ -320,14 +321,14 @@ const startTokenCheck = () => {
   }
 };
 
-const stopTokenCheck = () => {
+export const stopTokenCheck = () => {
   if (tokenCheckInterval) {
     clearInterval(tokenCheckInterval);
   }
 };
 
 // Initialize token check
-if (typeof window !== 'undefined') {
-  startTokenCheck();
-  window.addEventListener('beforeunload', stopTokenCheck);
-}
+// if (typeof window !== 'undefined') {
+//   startTokenCheck();
+//   window.addEventListener('beforeunload', stopTokenCheck);
+// }

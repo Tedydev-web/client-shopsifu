@@ -78,7 +78,7 @@ export function ProfileSettingsTable() {
       <ProfileUpdateSheet
         open={openUpdate}
         onOpenChange={setOpenUpdate}
-        initialData={user} // Pass the user data to the update sheet
+        initialData={user}
       />
     </>
   );
