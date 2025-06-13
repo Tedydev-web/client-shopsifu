@@ -9,7 +9,7 @@ export const profileService = {
     return response.data;
   },
   updateProfile: async (data: UpdateProfileRequest): Promise<UserProfileResponse> => {
-    const response = await privateAxios.put<UserProfileResponse>(API_ENDPOINTS.AUTH.UPDATE_PROFILE, data);
+    const response = await privateAxios.patch<UserProfileResponse>(API_ENDPOINTS.AUTH.UPDATE_PROFILE, data);
     return response.data;
   },
   changePassword: async (data: ChangePasswordRequest): Promise<ChangePasswordResponse> => {

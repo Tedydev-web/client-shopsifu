@@ -42,14 +42,17 @@ export interface UserProfileResponse extends BaseResponse {
             avatar: string | null
         }
     },
+    createdAt: string,
+    updatedAt: string,
 }
 
+
 export interface UpdateProfileRequest {
-    firstName: string;
-    lastName: string;
-    username: string;
-    phoneNumber: string | null;
-    avatar: string | null;
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+    phoneNumber?: string | null;
+    avatar?: string | null;
 }
 
 export interface UpdateProfileResponse extends BaseResponse {
