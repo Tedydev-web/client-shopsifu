@@ -74,6 +74,7 @@ export function useVerify2FA() {
         const isDeviceTrusted = response.data.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
+        await authService.getAbility();
         showToast(response.message || t('auth.2faVerify.verificationSuccess'), 'success');
         if(role === 'Admin' || role === 'Super Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;
@@ -108,6 +109,7 @@ export function useVerify2FA() {
         const isDeviceTrusted = response.data.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
+        await authService.getAbility();
         showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
         if(role === 'Admin' || role === 'Super Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;

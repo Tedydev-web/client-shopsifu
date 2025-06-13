@@ -15,32 +15,41 @@ export function useSignin() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { fetchProfile } = useGetProfile()
-  const userData = useUserData();
-
-  const role = userData?.role;
-  const {t} = useTranslation()
+  const { t } = useTranslation()
   const Schema = LoginSchema(t)  
+  const userData = useUserData();
+  const role = userData?.role;
+
   const handleSignin = async (data: z.infer<typeof Schema>) => {
     try {
       setLoading(true);
       const response = await authService.login(data);
-      // Check verificationType in the response
+
       if (response.status === 200) {
+        // Handle 2FA/OTP redirection first
         if (response.data?.verificationType === 'OTP') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
           showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;
-        } else if (response.data?.verificationType === '2FA') {
+        }
+        if (response.data?.verificationType === '2FA') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
           showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;
         }
 
+        // After successful login, fetch profile to get user data
         await fetchProfile();
+        await authService.getAbility();
+
+        // Get role from the newly fetched profile dataa
+
         showToast(response.message || t('admin.showToast.auth.success'), 'success');
-        if(role === 'Admin' || role === 'Super Admin'){
+
+        // Redirect based on role
+        if (role === 'Admin' || role === 'Super Admin') {
           window.location.href = ROUTES.ADMIN.DASHBOARD;
-        }else{
+        } else {
           window.location.href = ROUTES.HOME;
         }
       } else {

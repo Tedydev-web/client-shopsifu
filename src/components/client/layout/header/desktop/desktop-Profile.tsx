@@ -24,7 +24,7 @@ export function ProfileDropdown() {
   const { handleLogout, loading: logoutLoading } = useLogout();
   const router = useRouter();
   const { openDropdown, setOpenDropdown } = useDropdown();
-  
+  const user = useUserData();
   const isOpen = openDropdown === 'profile';
   
   const menuItems: MenuItemProps[] = [
@@ -46,9 +46,8 @@ export function ProfileDropdown() {
     }
   ];
   
-  const userData = useUserData();
 
-  if (!userData) {
+  if (!user) {
     return (
       <span
         onClick={() => router.push(ROUTES.BUYER.SIGNIN)}
@@ -59,10 +58,10 @@ export function ProfileDropdown() {
     );
   }
 
-  const name = userData.username;
-  const role = userData.role;
-  const email = userData.email;
-  const avatar = userData.avatar;
+  const name = user.username;
+  const role = user.role;
+  const email = user.email;
+  const avatar = user.avatar;
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
   const avatarText = name ? name[0].toUpperCase() : 'U';
   return (

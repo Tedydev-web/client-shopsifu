@@ -16,15 +16,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 
 export function ProfileSettingsTable() {
-  const profileData = useUserData();
-  const user = profileData;
+  const user = useUserData();
 
   const [openUpdate, setOpenUpdate] = useState(false);
 
   if (!user) {
     return <div>Loading user data...</div>; // Or a skeleton loader
   }
-
   const columns: SettingTableColumn[] = [
     {
       label: 'Avatar',
@@ -36,7 +34,7 @@ export function ProfileSettingsTable() {
       )
     },
     { label: 'Tên người dùng', value: user.username },
-    { label: 'Họ và tên', value: `${user.firstName} ${user.lastName}` },
+    { label: 'Họ và tên', value: user.name },
     { label: 'Email', value: user.email },
     { label: 'Số điện thoại', value: user.phoneNumber },
     {

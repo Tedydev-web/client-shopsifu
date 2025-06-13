@@ -147,7 +147,7 @@ export const authService = {
     }
   },
   trustDevice: async (): Promise<void> =>{
-    const response = await privateAxios.patch(API_ENDPOINTS.AUTH.TRUST_DEVICE, {})
+    const response = await privateAxios.post(API_ENDPOINTS.AUTH.TRUST_DEVICE, {})
     return response.data
   }
 };
