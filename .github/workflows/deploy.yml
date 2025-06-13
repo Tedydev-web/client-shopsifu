@@ -6,33 +6,37 @@ on:
   workflow_dispatch:
     inputs:
       manual_rollback:
-        description: "Commit SHA hoặc tag để rollback (để trống để deploy bình thường)"
+        description: 'Commit SHA hoặc tag để rollback'
         required: false
 
 jobs:
-  # 1. Build & Test
   build:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Cache node_modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
 
       - name: Install dependencies
         run: npm ci
 
-      # - name: Run tests
-      #   run: npm test
+      - name: Build
+        run: npm run build
 
-  # 2. Deploy to Production
   deploy:
     name: Deploy to Production
     needs: build
@@ -43,7 +47,15 @@ jobs:
       NODE_ENV: staging
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
+
       - name: Deploy via SSH & PM2
         id: ssh_deploy
         run: |
@@ -51,27 +63,17 @@ jobs:
             set -euo pipefail
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            source ~/.bashrc; source ~/.profile
-            # Cài đặt jq nếu chưa có
-            if ! command -v jq &> /dev/null; then
-              sudo apt-get update && sudo apt-get install -y jq
-            fi
             cd ${{ secrets.STAGING_PATH_PROJECT }}
             git fetch origin master && git reset --hard origin/master
-            rm -rf dist node_modules
-            npm ci && npm run build
-            pm2 describe client-shopsifu &>/dev/null && pm2 restart client-shopsifu || pm2 start dist/main.js --name client-shopsifu
-            # Thêm độ trễ để ứng dụng ghi log và PM2 cập nhật trạng thái
-            sleep 12
-            # Lấy trạng thái PM2 dưới dạng JSON
-            pm2 jlist > /tmp/pm2_status.json
-            # Lấy log
-            pm2 logs client-shopsifu --lines 100 --nostream > /tmp/pm2_logs.txt
-            STATUS=$(pm2 info client-shopsifu | grep status | awk '{print $4}')
+            npm ci
+            [ -d dist ] || npm run build
+            pm2 restart server-shopsifu || pm2 start dist/index.js --name server-shopsifu
+            sleep 5
+            STATUS=$(pm2 jlist | jq -r '.[] | select(.name == "server-shopsifu") | .pm2_env.status')
             echo "$STATUS" > /tmp/app_status.txt
-            if [[ "$STATUS" != "online" ]]; then
-              exit 2
-            fi
+            pm2 jlist > /tmp/pm2_status.json
+            pm2 logs server-shopsifu --lines 300 --nostream > /tmp/pm2_logs.txt
+            [ "$STATUS" = "online" ] || exit 2
           EOF
         continue-on-error: true
 
@@ -79,43 +81,31 @@ jobs:
         if: always()
         id: pm2_logs
         run: |
+          # Lấy dữ liệu từ server và lưu vào file tạm trên runner
           sshpass -p "${{ secrets.STAGING_VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_VPS_USERNAME }}@${{ secrets.STAGING_VPS_IP_HOST }} << 'EOF'
-            # Trích xuất thông tin từ pm2 jlist
-            PM2_INFO=$(jq -r '.[] | select(.name == "client-shopsifu") | "Name: \(.name)\nStatus: \(.pm2_env.status)\nPID: \(.pid)\nUptime: \(.pm2_env.uptime // 0 | tostring + \"ms\")\nCPU: \(.monit.cpu)%\nMemory: \(.monit.memory / 1024 / 1024 | tostring + \"MB\")"' /tmp/pm2_status.json 2>/dev/null)
-            if [ -z "$PM2_INFO" ]; then
-              PM2_INFO="Không tìm thấy process client-shopsifu hoặc không thể lấy trạng thái PM2"
-            fi
-            echo "::set-output name=pm2_info::$PM2_INFO"
-            # Lấy log, lọc bỏ dòng hệ thống
-            if [ -f /tmp/pm2_logs.txt ]; then
-              PM2_LOGS=$(grep -v '\[TAILING\]' /tmp/pm2_logs.txt | tail -n 100)
-              if [ -z "$PM2_LOGS" ]; then
-                PM2_LOGS="Không có log ứng dụng hoặc log rỗng"
-              fi
-            else
-              PM2_LOGS="Không có log ứng dụng hoặc file log không tồn tại"
-            fi
-            echo "::set-output name=pm2_logs::$PM2_LOGS"
+            cat /tmp/pm2_status.json > /tmp/pm2_status.json
+            cat /tmp/pm2_logs.txt > /tmp/pm2_logs.txt
           EOF
+          # Xử lý dữ liệu trên runner
+          PM2_INFO=$(jq -r '.[] | select(.name == "server-shopsifu") | "Name: \(.name)\nStatus: \(.pm2_env.status)\nPID: \(.pid)\nUptime: \(.pm2_env.uptime // 0 | tostring + \"ms\")\nCPU: \(.monit.cpu)%\nMemory: \(.monit.memory / 1024 / 1024 | tostring + \"MB\")"' /tmp/pm2_status.json 2>/dev/null || echo "Không tìm thấy process server-shopsifu")
+          echo "pm2_info=$PM2_INFO" >> $GITHUB_OUTPUT
+          PM2_LOGS=$(grep -v '\[TAILING\]' /tmp/pm2_logs.txt | tail -n 50 || echo "Không có log ứng dụng")
+          echo "pm2_logs=$PM2_LOGS" >> $GITHUB_OUTPUT
 
       - name: Tag Release
-        if: success()
+        if: success() && contains(github.event.head_commit.message, '[release]')
         run: |
-          TAG=v$(date +'%Y.%m.%d.%H%M%S')
-          git tag $TAG
-          git push origin $TAG
+          git tag v$(date +'%Y.%m.%d.%H%M%S')
+          git push origin --tags
 
       - name: Get Commit Info
         id: commit_info
         run: |
-          COMMIT_SHA=$(git rev-parse HEAD)
-          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
-          echo "commit_message<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B | grep -v '^-')
+          echo "commit_message=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
 
-      - name: Send Discord Embed Notification
+      - name: Send Discord Notification
         if: always()
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
@@ -130,46 +120,28 @@ jobs:
           COMMIT_SHA: ${{ steps.commit_info.outputs.commit_sha }}
           COMMIT_MESSAGE: ${{ steps.commit_info.outputs.commit_message }}
         run: |
-          # Kiểm tra DISCORD_WEBHOOK
-          if [ -z "$DISCORD_WEBHOOK" ]; then
-            echo "Lỗi: DISCORD_WEBHOOK không được đặt"
-            exit 1
-          else
-            echo "DISCORD_WEBHOOK đã được đặt"
-          fi
-
-          # Cài đặt jq để xử lý JSON
           sudo apt-get update && sudo apt-get install -y jq
-
-          COLOR=3066993
-          ICON="✅"
-          if [ "$STATUS" != "success" ]; then
-            COLOR=15158332
-            ICON="❌"
-          fi
-
-          # Thoát PM2_LOGS và PM2_INFO an toàn bằng jq
-          ESCAPED_LOGS=$(echo "${PM2_LOGS:0:1500}" | jq -s -R .)
-          ESCAPED_PM2_INFO=$(echo "$PM2_INFO" | jq -s -R .)
-          ESCAPED_COMMIT_MESSAGE="$COMMIT_MESSAGE"
-
-          # Tạo JSON payload bằng jq để đảm bảo cú pháp đúng
+          COLOR=$([ "$STATUS" = "success" ] && echo 3066993 || echo 15158332)
+          ICON=$([ "$STATUS" = "success" ] && echo "✅" || echo "❌")
+          # Chuyển đổi github.run_started_at thành epoch time
+          RUN_STARTED_AT=$(date -d "${{ github.run_started_at }}" +%s)
           JSON_PAYLOAD=$(jq -n \
             --arg status "$STATUS" \
             --arg icon "$ICON" \
             --arg branch "$BRANCH" \
             --arg commit "$COMMIT" \
             --arg commit_sha "$COMMIT_SHA" \
-            --arg commit_message "$ESCAPED_COMMIT_MESSAGE" \
+            --arg commit_message "$COMMIT_MESSAGE" \
             --arg repo "$REPO" \
             --arg actor "$ACTOR" \
-            --arg pm2_info "$ESCAPED_PM2_INFO" \
-            --arg logs "$ESCAPED_LOGS" \
+            --arg pm2_info "$PM2_INFO" \
+            --arg logs "${PM2_LOGS:0:1000}" \
             --arg run_id "$RUN_ID" \
             --arg color "$COLOR" \
+            --arg started_at "$RUN_STARTED_AT" \
             '{
               embeds: [{
-                title: "🚀 CLIENT - Thông báo triển khai",
+                title: "🚀 CLIENT - Thông báo triển khai ✨",
                 color: ($color | tonumber),
                 fields: [
                   { name: "Trạng thái", value: "\($icon) \($status)", inline: true },
@@ -178,61 +150,59 @@ jobs:
                   { name: "Commit SHA", value: "`\($commit_sha)`", inline: false },
                   { name: "Commit Message", value: $commit_message, inline: false },
                   { name: "Người thực hiện", value: "`\($actor)`", inline: true },
-                  { name: "Trạng thái PM2", value: "```\n\($pm2_info)\n```", inline: false }
+                  { name: "Thời gian bắt đầu", value: "<t:\($started_at):R>", inline: true }
                 ],
-                description: "**100 dòng log cuối:**\n```\n\($logs)\n```",
+                description: "**50 dòng log cuối:**\n```\n\($logs)\n```",
                 url: "https://github.com/\($repo)/actions/runs/\($run_id)"
               }]
             }')
+          curl -s -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "$DISCORD_WEBHOOK" || echo "Lỗi gửi thông báo Discord"
 
-          # Ghi log payload để kiểm tra
-          echo "JSON Payload: $JSON_PAYLOAD"
-
-          # Gửi yêu cầu và ghi lại phản hồi
-          RESPONSE=$(curl -s -w "%{http_code}" -H "Content-Type: application/json" -X POST -d "$JSON_PAYLOAD" "$DISCORD_WEBHOOK")
-          HTTP_CODE=${RESPONSE: -3}
-          RESPONSE_BODY=${RESPONSE%???}
-
-          echo "Mã trạng thái HTTP: $HTTP_CODE"
-          echo "Nội dung phản hồi: $RESPONSE_BODY"
-
-          if [ "$HTTP_CODE" != "204" ]; then
-            echo "Lỗi: Không thể gửi thông báo Discord"
-            exit 1
-          fi
-
-  # 3. Automatic Rollback on Failure
   rollback-auto:
     name: Automatic Rollback
     needs: deploy
     runs-on: ubuntu-latest
     if: needs.deploy.result == 'failure'
     steps:
-      - name: Rollback to previous commit on server
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-
+
+      - name: Rollback to previous commit
         run: |
           sshpass -p "${{ secrets.STAGING_VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_VPS_USERNAME }}@${{ secrets.STAGING_VPS_IP_HOST }} << 'EOF'
             set -euo pipefail
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            source ~/.bashrc; source ~/.profile
             cd ${{ secrets.STAGING_PATH_PROJECT }}
-            git fetch origin master
-            git reset --hard HEAD~1
-            rm -rf dist node_modules
-            npm ci && npm run build
-            pm2 restart client-shopsifu
+            git fetch origin master && git reset --hard HEAD~1
+            npm ci
+            [ -d dist ] || npm run build
+            pm2 restart server-shopsifu || pm2 start dist/index.js --name server-shopsifu
           EOF
 
-  # 4. Manual Rollback
   manual-rollback:
     name: Manual Rollback
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.manual_rollback
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout specific commit/tag
-        uses: actions/checkout@v3
+      - name: Checkout specific commit
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.manual_rollback }}
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-build-${{ github.event.inputs.manual_rollback }}
+          restore-keys: ${{ runner.os }}-build-
 
       - name: Re-deploy to VPS
         run: |
@@ -240,12 +210,11 @@ jobs:
             set -euo pipefail
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            source ~/.bashrc; source ~/.profile
             cd ${{ secrets.STAGING_PATH_PROJECT }}
-            git reset --hard HEAD
-            rm -rf dist node_modules
-            npm ci && npm run build
-            pm2 restart client-shopsifu
+            git reset --hard ${{ github.event.inputs.manual_rollback }}
+            npm ci
+            [ -d dist ] || npm run build
+            pm2 restart server-shopsifu || pm2 start dist/index.js --name server-shopsifu
           EOF
 
 permissions:
