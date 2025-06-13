@@ -11,19 +11,19 @@ import { API_ENDPOINTS } from '@/constants/api';
 export const sessionService = {
     // Lấy danh sách phiên đăng nhập
     getAll: async (): Promise<SessionGetALLResponse> => {
-        const response = await privateAxios.get<SessionGetALLResponse>(API_ENDPOINTS.AUTH.SESSIONS);
+        const response = await privateAxios.get<SessionGetALLResponse>(API_ENDPOINTS.SESSIONS.GETALL);
         return response.data;
     },
 
     // Hủy tất cả phiên đăng nhập ngoại trừ phiên hiện tại
     revokeAll: async (data: SessionRevokeAllRequest): Promise<SessionRevokeAllResponse> => {
-        const response = await privateAxios.post<SessionRevokeAllResponse>(API_ENDPOINTS.AUTH.REVOKE_ALL, data);
+        const response = await privateAxios.post<SessionRevokeAllResponse>(API_ENDPOINTS.SESSIONS.REVOKE_ALL, data);
         return response.data;
     },
 
     // Hủy các phiên đăng nhập cụ thể
     revoke: async (data: SessionRevokeRequest): Promise<SessionRevokeResponse> => {
-        const response = await privateAxios.post<SessionRevokeResponse>(API_ENDPOINTS.AUTH.REVOKE, data);
+        const response = await privateAxios.post<SessionRevokeResponse>(API_ENDPOINTS.SESSIONS.REVOKE, data);
         return response.data;
     }
 };
