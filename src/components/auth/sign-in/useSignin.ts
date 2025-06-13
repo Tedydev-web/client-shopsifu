@@ -15,36 +15,41 @@ export function useSignin() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { fetchProfile } = useGetProfile()
-  const userData = useUserData();
-
-  const role = userData?.role;
-  const {t} = useTranslation()
+  const { t } = useTranslation()
   const Schema = LoginSchema(t)  
+  const userData = useUserData();
+  
+
   const handleSignin = async (data: z.infer<typeof Schema>) => {
     try {
       setLoading(true);
       const response = await authService.login(data);
-      // Check verificationType in the response
+
       if (response.status === 200) {
-        if (response.data?.verificationType === 'OTP') {
+        // Handle 2FA/OTP redirection first
+        if (response.verificationType === 'OTP') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
           showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;
-        } else if (response.data?.verificationType === '2FA') {
+        }
+        if (response.verificationType === '2FA') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
           showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;
         }
 
+       
         await fetchProfile();
-        showToast(response.data.message || t('admin.showToast.auth.success'), 'success');
-        if(role === 'Admin'){
+        await authService.getAbility();
+        const role = userData?.role;
+        showToast(response.message || t('admin.showToast.auth.success'), 'success');
+        if (role === 'Admin' || role === 'Super Admin') {
           window.location.href = ROUTES.ADMIN.DASHBOARD;
-        }else{
+        } else {
           window.location.href = ROUTES.HOME;
         }
       } else {
-        showToast(response.data.message || t('admin.showToast.auth.loginFailed'), 'error');
+        showToast(response.message || t('admin.showToast.auth.loginFailed'), 'error');
       }
     } catch (error: any) {
       console.error('Login error:', error)

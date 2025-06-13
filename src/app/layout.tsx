@@ -6,6 +6,9 @@ import { Toast } from "@/components/ui/toastify"
 import ClientLayout from "./client-layout";
 import { TrustDeviceModal } from "@/components/auth/layout/trustDevice-Modal";
 import { Toaster } from '@/components/ui/sonner';
+import { TokenManager } from "./token-manager";
+
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -29,6 +32,7 @@ export default function RootLayout({
             <ClientLayout>
               <Toast/>
               <TrustDeviceModal />
+              <TokenManager />
               {children}
             </ClientLayout>
             <Toaster position="bottom-right" />

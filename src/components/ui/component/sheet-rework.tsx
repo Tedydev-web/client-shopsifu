@@ -1,5 +1,6 @@
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { Loader2 } from 'lucide-react';
 import React from 'react'
 
 interface SheetReworkProps {
@@ -8,8 +9,9 @@ interface SheetReworkProps {
   title: string
   subtitle?: string
   children: React.ReactNode
-  onConfirm?: () => void
-  onCancel?: () => void
+  onConfirm?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onCancel?: () => void;
+  isConfirmLoading?: boolean;
   confirmText?: string
   cancelText?: string
   loading?: boolean
@@ -23,6 +25,7 @@ export function SheetRework({
   children,
   onConfirm,
   onCancel,
+  isConfirmLoading,
   confirmText = 'Xác nhận',
   cancelText = 'Hủy',
   loading = false,
@@ -44,8 +47,9 @@ export function SheetRework({
           <Button variant="outline" onClick={onCancel} type="button">
             {cancelText}
           </Button>
-          <Button onClick={onConfirm} type="button" disabled={loading}>
-            {loading ? 'Đang xử lý...' : confirmText}
+          <Button onClick={onConfirm} disabled={isConfirmLoading}>
+            {isConfirmLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {confirmText}
           </Button>
         </div>
       </SheetContent>

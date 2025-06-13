@@ -14,7 +14,12 @@ import { ROUTES } from '@/constants/route';
 import { getStore } from '@/store/store';
 import { cookies } from 'next/headers';
 import { clearProfile } from '@/store/features/auth/profileSlide';
+// import { useClearGlobalState } from '@/hooks/useClearGlobalState';
+import { clearClientState } from '@/utils/stateManager';
 
+
+
+// const { clearState } = useClearGlobalState();
 // Constants
 const TOKEN_CHECK_INTERVAL = 300000; // 5 minutes
 const TOKEN_REFRESH_THRESHOLD = 10; // minutes
@@ -238,17 +243,17 @@ privateAxios.interceptors.response.use(
 // Token check function
 const checkToken = async () => {
   const accessToken = Cookies.get('access_token');
-  const refreshTokenExists = !!Cookies.get('refresh_token');
+  const refreshToken = Cookies.get('refresh_token');
 
-  // Case 1: No access token, but a refresh token exists. Try to recover the session.
-  if (!accessToken && refreshTokenExists) {
+  // Case 1: Không có access token, nhưng có refresh token. Try to recover the session.
+  if (!accessToken && refreshToken) {
     console.log('Không có access token, đang thử làm mới từ refresh token...');
     try {
       await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
       console.log('✅ Token đã được làm mới thành công khi khởi tạo.');
     } catch (error) {
       console.error('❌ Không thể làm mới token. Đăng xuất người dùng.', error);
-      clearAllCookies();
+      await clearClientState();
       if (window.location.pathname !== ROUTES.BUYER.SIGNIN) {
         window.location.href = ROUTES.BUYER.SIGNIN;
       }
@@ -256,12 +261,14 @@ const checkToken = async () => {
     return; // End this check cycle. The next one will have the new access token.
   }
 
-  // Case 2: No tokens at all. User is not logged in. Do nothing.
-  if (!accessToken && !refreshTokenExists) {
+  // Case 2: Không có token. Người dùng chưa đăng nhập. Bỏ qua kiểm tra.
+  if (!accessToken && !refreshToken) {
+    console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
+    await clearClientState();
     return;
   }
 
-  // Case 3: Access token exists. Proceed with validation.
+  // Case 3: Access token tồn tại. Tiếp tục kiểm tra.
   try {
     const decodedToken = jwt.decode(accessToken!) as DecodedToken;
     if (!decodedToken?.exp) {
@@ -278,7 +285,7 @@ const checkToken = async () => {
         console.log('✅ Token đã được làm mới do đã hết hạn.');
       } catch (error) {
         console.error('❌ Không thể làm mới token đã hết hạn. Đăng xuất...', error);
-        clearAllCookies();
+        await clearClientState();
         window.location.href = ROUTES.BUYER.SIGNIN;
       }
       return;
@@ -298,7 +305,7 @@ const checkToken = async () => {
     }
   } catch (error) {
     console.error('Lỗi khi giải mã hoặc kiểm tra token. Token có thể bị lỗi:', error);
-    clearAllCookies();
+    await clearClientState();
     window.location.href = ROUTES.BUYER.SIGNIN;
   }
 };
@@ -306,7 +313,7 @@ const checkToken = async () => {
 // Interval management
 let tokenCheckInterval: NodeJS.Timeout;
 
-const startTokenCheck = () => {
+export const startTokenCheck = () => {
   console.log('Bắt đầu kiểm tra access_token');
   if (typeof window !== 'undefined') {
     if (tokenCheckInterval) {
@@ -320,14 +327,14 @@ const startTokenCheck = () => {
   }
 };
 
-const stopTokenCheck = () => {
+export const stopTokenCheck = () => {
   if (tokenCheckInterval) {
     clearInterval(tokenCheckInterval);
   }
 };
 
 // Initialize token check
-if (typeof window !== 'undefined') {
-  startTokenCheck();
-  window.addEventListener('beforeunload', stopTokenCheck);
-}
+// if (typeof window !== 'undefined') {
+//   startTokenCheck();
+//   window.addEventListener('beforeunload', stopTokenCheck);
+// }

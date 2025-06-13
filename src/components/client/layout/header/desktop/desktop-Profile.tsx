@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { User, LogOut, ShoppingCart, LucideIcon } from 'lucide-react';
+import { User, LogOut, ShoppingCart, LucideIcon, LayoutDashboard } from 'lucide-react';
 import React, { useRef } from 'react';
 import { useLogout } from '@/hooks/useLogout';
 import { useRouter } from 'next/navigation';
@@ -24,7 +24,7 @@ export function ProfileDropdown() {
   const { handleLogout, loading: logoutLoading } = useLogout();
   const router = useRouter();
   const { openDropdown, setOpenDropdown } = useDropdown();
-  
+  const user = useUserData();
   const isOpen = openDropdown === 'profile';
   
   const menuItems: MenuItemProps[] = [
@@ -46,9 +46,8 @@ export function ProfileDropdown() {
     }
   ];
   
-  const userData = useUserData();
 
-  if (!userData) {
+  if (!user) {
     return (
       <span
         onClick={() => router.push(ROUTES.BUYER.SIGNIN)}
@@ -59,10 +58,10 @@ export function ProfileDropdown() {
     );
   }
 
-  const name = userData.username;
-  const role = userData.role;
-  const email = userData.email;
-  const avatar = userData.avatar;
+  const name = user.username;
+  const role = user.role;
+  const email = user.email;
+  const avatar = user.avatar;
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
   const avatarText = name ? name[0].toUpperCase() : 'U';
   return (
@@ -154,9 +153,10 @@ export function ProfileDropdown() {
         <div className="h-px bg-gray-200 mx-6 my-1"></div>
           {/* Menu Items */}
         <div>
-          {role === 'Admin' && (
+          {role === 'Admin' || role === 'Super Admin' && (
             <>
-              <Link href={ROUTES.ADMIN.DASHBOARD} className="flex items-center px-5 py-3 hover:bg-indigo-50 cursor-pointer text-[14px] font-semibold text-indigo-600">
+              <Link href={ROUTES.ADMIN.DASHBOARD} className="flex items-center px-5 py-2 hover:bg-gray-50 cursor-pointer text-[14px] text-gray-800">
+                <LayoutDashboard className="w-4.5 h-4.5 mr-2 text-gray-800" />
                 Trang quản trị
               </Link>
               <div className="h-px bg-gray-200 mx-6 my-1"></div>

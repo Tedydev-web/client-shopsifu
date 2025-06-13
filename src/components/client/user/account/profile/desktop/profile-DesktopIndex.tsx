@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ChangePasswordModal } from "./profile-DesktopPasswordUpdate";
+// import { ChangePasswordModal } from "./profile-DesktopPasswordUpdate";
 import { ProfileUpdateSheet } from "./profile-DesktopUpdate";
 import { TwoFactorAuthModal } from "./profile-Desktop2FA";
 import { DeleteAccountModal } from "./profile-DesktopDeleteAccount";
@@ -138,11 +138,11 @@ export default function ProfileDesktopIndex() {
         }}
       />
 
-      <ChangePasswordModal
+      {/* <ChangePasswordModal
         open={isPasswordModalOpen}
         onOpenChange={setIsPasswordModalOpen}
         userInfo={userInfo}
-      />
+      /> */}
 
       <TwoFactorAuthModal
         open={is2FAModalOpen}

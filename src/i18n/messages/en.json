@@ -322,6 +322,37 @@
       "backToHome": "Back to Home"
     },
     "profileSettings": {
+      "changePassword":{
+        "title": "Change Password",
+        "subtitle": "Enter your new password below.",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmNewPassword": "Confirm New Password",
+        "rememberPassword": "Remember Password?",
+        "login": "Login",
+        "processing": "Processing...",
+        "success": "The reset password link has been sent to your email.",
+        "send": "Send",
+        "saving": "Saving...",
+        "saveChanges": "Save Changes",
+        "revokeOtherSessions": "Revoke other sessions",
+        "passwordPolicy": "Password must contain at least 6 characters, including uppercase, lowercase, numbers, and special characters"
+      },
+      "regenerateCodesTitle": "Regenerate Recovery Codes",
+      "regenerateCodesDescription": "Enter the 6-digit code from your authenticator app to regenerate recovery codes.",
+      "confirm": "Confirm",
+      "2fa":{
+        "enable2FAFirst": "Please enable 2FA first before regenerating recovery codes.",
+        "copyAllRecoveryCodes": "Recovery codes copied to clipboard.",
+        "downloadRecoveryCodes": "Recovery codes downloaded.",
+        "2faSetupSuccess": "2FA setup successful!",
+        "2faDisabledSuccess": "2FA disabled successfully!",
+        "2faError": "Error occurred during 2FA setup.",
+        "2faCodeManually": "2FA Code (Manually)",
+        "recoveryCode": "Recovery Code",
+        "recoveryCodes": "Store these codes in a safe place. You will need them if you lose access to your authenticator device.",
+        "scanQRCode": "Scan QR Code"
+      },
       "QrCode": {
         "title": "Your Recovery Codes",
         "description": "Store these codes in a safe place. You will need them if you lose access to your authenticator device.",
