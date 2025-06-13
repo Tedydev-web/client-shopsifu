@@ -5,7 +5,7 @@ import { ChevronRight, Lock, Shield, Clock, KeyRound } from 'lucide-react'
 import { useState } from 'react'
 import { ChangePasswordModal } from './passwordSecurity-ChangePassword'
 import { Profile2FAModal } from './passwordSecurity-2faModal'
-import { usePasswordSecurity } from './usePasswordSecurity'
+import { usePasswordSecurity } from './usePasswordSecurity-2fa'
 import { PasswordSecuritySession } from './passwordSecurity-Session'
 import { useUserData } from '@/hooks/useGetData-UserLogin'
 
@@ -30,10 +30,14 @@ export function PasswordSecurityTable() {
     handle2FAToggle,
     handleConfirm2FA,
     handleConfirmSetup,
+    handleRegenerateClick,
+    handleRegenerateRecoveryCodes,
+    showRegenerateConfirm,
+    setShowRegenerateConfirm,
     copyAllRecoveryCodes,
     downloadRecoveryCodes,
     t
-  } = usePasswordSecurity()
+  } = usePasswordSecurity({ isEnabled: user?.twoFactorEnabled ?? false })
 
 
 
@@ -63,15 +67,15 @@ export function PasswordSecurityTable() {
       endIcon: <ChevronRight />,
       onClick: () => setCurrentView('sessions')
     },    {
-      label: "Mã khôi phục",
+      label: "Tạo lại mã khôi phục",
       value: (
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${is2FAEnabled ? "bg-green-500" : "bg-gray-400"}`}></div>
-          <span>{is2FAEnabled ? "Đã tạo" : "Chưa tạo"}</span>
+          <span>Mã khôi phục sẽ được gửi về email của bạn</span>
         </div>
       ),
       startIcon: <KeyRound />,
-      endIcon: <ChevronRight />
+      endIcon: <ChevronRight />,
+      onClick: handleRegenerateClick
     }
   ]
 
@@ -97,6 +101,9 @@ export function PasswordSecurityTable() {
         }}
       />      
       <Profile2FAModal
+        showRegenerateConfirm={showRegenerateConfirm}
+        setShowRegenerateConfirm={setShowRegenerateConfirm}
+        handleRegenerateRecoveryCodes={handleRegenerateRecoveryCodes}
         show2FADialog={show2FADialog}
         setShow2FADialog={setShow2FADialog}
         showQRDialog={showQRDialog}

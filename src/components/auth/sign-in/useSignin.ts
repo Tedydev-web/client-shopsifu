@@ -38,15 +38,10 @@ export function useSignin() {
           return;
         }
 
-        // After successful login, fetch profile to get user data
+       
         await fetchProfile();
         await authService.getAbility();
-
-        // Get role from the newly fetched profile dataa
-
         showToast(response.message || t('admin.showToast.auth.success'), 'success');
-
-        // Redirect based on role
         if (role === 'Admin' || role === 'Super Admin') {
           window.location.href = ROUTES.ADMIN.DASHBOARD;
         } else {

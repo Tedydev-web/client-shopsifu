@@ -121,7 +121,10 @@ export const authService = {
     );
     return response.data;
   },
-  
+  regenerateRecoveryCodes: async (data: Confirm2faRequest): Promise<Confirm2faResponse> => {
+    const response = await privateAxios.post<Confirm2faResponse>(API_ENDPOINTS.AUTH.REGENERATE_RECOVERY_CODES, data)
+    return response.data
+  },
 
   // KHÁC
   refreshToken: async (): Promise<RefreshTokenResponse> => {

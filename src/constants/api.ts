@@ -29,6 +29,8 @@ export const API_ENDPOINTS = {
     UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`,
     //GET ABILITY BY ROLE (PERMISSION)
     GET_ABILITY: `${API_BASE}/auth/ui-capabilities`,
+    //RECOVERY CODE
+    REGENERATE_RECOVERY_CODES: `${API_BASE}/auth/2fa/regenerate-recovery-codes`,
   },
   ROLES:{
     GETALL: `${API_BASE}/roles`,

@@ -321,6 +321,21 @@
       "backToHome": "Về trang chủ"
     },
     "profileSettings": {
+      "regenerateCodesTitle": "Tạo lại mã khôi phục",
+      "regenerateCodesDescription": "Nhập mã 6 chữ số từ ứng dụng xác thực để tạo lại mã khôi phục.",
+      "confirm": "Xác nhận",
+      "2fa":{
+        "enable2FAFirst": "Vui lòng bật xác thực hai yếu tố trước khi tạo lại mã khôi phục.",
+        "copyAllRecoveryCodes": "Đã sao chép mã khôi phục vào clipboard",
+        "downloadRecoveryCodes": "Đã tải xuống mã khôi phục",
+        "2faSetupSuccess": "Thiết lập xác thực hai yếu tố thành công!",
+        "2faDisabledSuccess": "Đã tắt xác thực hai yếu tố!",
+        "2faError": "Đã xảy ra lỗi trong quá trình xác thực hai yếu tố",
+        "2faCodeManually": "Mã 2FA (Nhập thủ công)",
+        "recoveryCode": "Mã khôi phục",
+        "recoveryCodes": "Lưu các mã này để khôi phục tài khoản nếu bạn mất quyền truy cập 2FA.",
+        "scanQRCode": "Quét mã QR"
+      },
       "QrCode":{
         "title": "Mã khôi phục của bạn",
         "description": "Lưu trữ các mã này ở nơi an toàn. Bạn sẽ cần chúng nếu mất quyền truy cập vào thiết bị xác thực.",

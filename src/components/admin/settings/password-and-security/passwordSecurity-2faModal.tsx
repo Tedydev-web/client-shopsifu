@@ -25,6 +25,9 @@ import { ShieldCheck, Smartphone } from "lucide-react"
 import Link from "next/link"
 
 interface Profile2FAModalProps {
+  showRegenerateConfirm: boolean;
+  setShowRegenerateConfirm: (open: boolean) => void;
+  handleRegenerateRecoveryCodes: (code: string) => void;
   show2FADialog: boolean
   setShow2FADialog: (open: boolean) => void
   showQRDialog: boolean
@@ -64,8 +67,43 @@ export function Profile2FAModal({
   copyAllRecoveryCodes = () => {},
   downloadRecoveryCodes = () => {},
   t,
+  showRegenerateConfirm,
+  setShowRegenerateConfirm,
+  handleRegenerateRecoveryCodes,
 }: Profile2FAModalProps) {  return (
     <>      {/* 2FA Confirmation Dialog */}
+      {/* Regenerate Recovery Codes Confirmation Dialog */}
+      <Dialog open={showRegenerateConfirm} onOpenChange={setShowRegenerateConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('admin.profileSettings.regenerateCodesTitle')}</DialogTitle>
+            <DialogDescription>
+              {t('admin.profileSettings.regenerateCodesDescription')}
+              <div className="mt-4">
+                <Label htmlFor="regenerate-2fa-code">{t('admin.profileSettings.QrCode.6code')}</Label>
+                <Input
+                  id="regenerate-2fa-code"
+                  className="border border-gray-600 text-lg w-40 mt-1"
+                  maxLength={6}
+                  value={Code}
+                  onChange={e => setCode(e.target.value)}
+                  placeholder="000000"
+                />
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowRegenerateConfirm(false)} disabled={loading}>
+              {t('admin.profileSettings.cancel')}
+            </Button>
+            <Button onClick={() => handleRegenerateRecoveryCodes(Code)} disabled={loading || Code.length !== 6}>
+              {loading ? t('admin.profileSettings.processing') : t('admin.profileSettings.confirm')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 2FA Confirmation Dialog */}
       <Dialog open={show2FADialog} onOpenChange={setShow2FADialog}>
         <DialogContent>
           <DialogHeader>
@@ -73,16 +111,31 @@ export function Profile2FAModal({
               {is2FAEnabled ?  t('admin.profileSettings.disable2FATitle') : t('admin.profileSettings.enable2FATitle')}
             </DialogTitle>
             <DialogDescription>
-              {is2FAEnabled 
-                ? t('admin.profileSettings.disable2FADescription')
-                : t('admin.profileSettings.enable2FADescription')}
+              {is2FAEnabled ? (
+                <>
+                  <p>{t('admin.profileSettings.disable2FADescription')}</p>
+                  <div className="mt-4">
+                    <Label htmlFor="2fa-code">{t('admin.profileSettings.QrCode.6code')}</Label>
+                    <Input
+                      id="2fa-code"
+                      className="border border-gray-600 text-lg w-40 mt-1"
+                      maxLength={6}
+                      value={Code}
+                      onChange={e => setCode(e.target.value)}
+                      placeholder="000000"
+                    />
+                  </div>
+                </>
+              ) : (
+                t('admin.profileSettings.enable2FADescription')
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setShow2FADialog(false)} disabled={loading}>
               {t('admin.profileSettings.cancel')}
             </Button>
-            <Button onClick={onConfirm2FA} disabled={loading}>
+            <Button onClick={onConfirm2FA} disabled={loading || (is2FAEnabled && Code.length !== 6)}>
               {loading ? t('admin.profileSettings.processing') : is2FAEnabled ? t('admin.profileSettings.disable') : t('admin.profileSettings.enable')}
             </Button>
           </div>

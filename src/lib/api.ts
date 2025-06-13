@@ -215,7 +215,7 @@ privateAxios.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    if (error.response?.status === 403) {
+    if (error.response?.status === 401) {
       console.log('Token bị vô hiệu hóa hoặc không hợp lệ:', error.response?.data);
 
       const { store, persistor } = getStore();
