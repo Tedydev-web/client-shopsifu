@@ -26,7 +26,11 @@ export const API_ENDPOINTS = {
     DISABLE_2FA: `${API_BASE}/auth/2fa/disable`,
     // DEVICE
     TRUST_DEVICE: `${API_BASE}/auth/sessions/current-device/trust`,
-    UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`
+    UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`,
+    // SESSION
+    SESSIONS: `${API_BASE}/auth/sessions`,
+    REVOKE: `${API_BASE}/auth/sessions/revoke`,
+    REVOKE_ALL: `${API_BASE}/auth/sessions/revoke-all`
   },
   ROLES:{
     GETALL: `${API_BASE}/roles`,
