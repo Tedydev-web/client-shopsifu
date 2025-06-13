@@ -322,6 +322,25 @@
       "backToHome": "Back to Home"
     },
     "profileSettings": {
+      "changePassword":{
+        "title": "Change Password",
+        "subtitle": "Enter your new password below.",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmNewPassword": "Confirm New Password",
+        "rememberPassword": "Remember Password?",
+        "login": "Login",
+        "processing": "Processing...",
+        "success": "The reset password link has been sent to your email.",
+        "send": "Send",
+        "saving": "Saving...",
+        "saveChanges": "Save Changes",
+        "revokeOtherSessions": "Revoke other sessions",
+        "passwordPolicy": "Password must contain at least 6 characters, including uppercase, lowercase, numbers, and special characters"
+      },
+      "regenerateCodesTitle": "Regenerate Recovery Codes",
+      "regenerateCodesDescription": "Enter the 6-digit code from your authenticator app to regenerate recovery codes.",
+      "confirm": "Confirm",
       "2fa":{
         "enable2FAFirst": "Please enable 2FA first before regenerating recovery codes.",
         "copyAllRecoveryCodes": "Recovery codes copied to clipboard.",

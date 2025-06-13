@@ -27,12 +27,12 @@ export function useSignin() {
 
       if (response.status === 200) {
         // Handle 2FA/OTP redirection first
-        if (response.data?.verificationType === 'OTP') {
+        if (response.verificationType === 'OTP') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
           showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;
         }
-        if (response.data?.verificationType === '2FA') {
+        if (response.verificationType === '2FA') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
           showToast(response.data.message || t('auth.device.verification.required'), 'info');
           return;

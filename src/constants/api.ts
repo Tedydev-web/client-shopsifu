@@ -13,6 +13,8 @@ export const API_ENDPOINTS = {
     // SIGN-UP -----
     SIGNUP: `${API_BASE}/auth/complete-registration`,
     SIGNUP_SEND: `${API_BASE}/auth/initiate-registration`,
+    // CHANGE PASSWORD -----
+    CHANGE_PASSWORD: `${API_BASE}/auth/password/change`,
     // RESET PASSWORD -----
     RESET_PASSWORD: `${API_BASE}/auth/password/set-new`,
     RESET_PASSWORD_SEND: `${API_BASE}/auth/password/initiate-reset`,

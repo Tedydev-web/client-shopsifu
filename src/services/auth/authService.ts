@@ -22,6 +22,8 @@ import {
   Confirm2faResponse,
   RefreshTokenResponse,
   ResetPasswordSendRequest,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
 } from '@/types/auth/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
@@ -69,6 +71,13 @@ export const authService = {
      return response.data;
   }, 
 
+  changePassword: async (data: ChangePasswordRequest): Promise<ChangePasswordResponse> => {
+    const response = await privateAxios.post<ChangePasswordResponse>(
+      API_ENDPOINTS.AUTH.CHANGE_PASSWORD,
+      data
+    )
+    return response.data
+  },
 
   // XÁC THỰC & GỬI CODE - VERIFY & SEND CODE
   verify2fa: async (data: Verify2faRequest): Promise<Verify2faResponse> => {

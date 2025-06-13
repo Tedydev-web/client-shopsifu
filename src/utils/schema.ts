@@ -1,22 +1,19 @@
 import { z } from "zod"
 
-export const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Vui lòng nhập mật khẩu hiện tại"),
+export const passwordSchema = (t: (key: string) => string) => z.object({
+  currentPassword: z.string().min(1, { message: t('admin.profileSettings.password.validation.currentPasswordRequired') }),
   newPassword: z
     .string()
-    .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
-    .regex(/[0-9]/, "Mật khẩu phải chứa ít nhất 1 chữ số")
-    .regex(/[a-zA-Z]/, "Mật khẩu phải chứa ít nhất 1 chữ cái")
-    .regex(/[!$@%]/, "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt (!$@%)"),
-  confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu mới")
+    .min(8, { message: t('admin.profileSettings.password.validation.newPasswordMinLength') })
+    .regex(/[0-9]/, { message: t('admin.profileSettings.password.validation.newPasswordDigit') })
+    .regex(/[a-zA-Z]/, { message: t('admin.profileSettings.password.validation.newPasswordLetter') })
+    .regex(/[!$@%]/, { message: t('admin.profileSettings.password.validation.newPasswordSpecialChar') }),
+  confirmPassword: z.string().min(1, { message: t('admin.profileSettings.password.validation.confirmPasswordRequired') }),
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Mật khẩu xác nhận không khớp",
+  message: t('admin.profileSettings.password.validation.passwordsDoNotMatch'),
   path: ["confirmPassword"]
-})
-
-export const EmailSchema = z.object({
-  email: z.string().email({ message: "Email không đúng" }),
 });
 
-
-export type PasswordFormData = z.infer<typeof passwordSchema>
+export const EmailSchema = (t: (key: string) => string) => z.object({
+  email: z.string().email({ message: t('form.validation.email.invalid') }),
+});

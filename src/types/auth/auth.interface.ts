@@ -1,5 +1,6 @@
-import { UserProfile } from "@/store/features/auth/profileSlide";
 import { BaseResponse } from "../base.interface";
+import { UserProfile } from "./profile.interface";
+
 
 export interface oAuthLoginResponse {
   url: string
@@ -11,7 +12,7 @@ export interface LogoutRequest {
 
 // ĐĂNG NHẬP TÀI KHOẢN - SIGN-IN
 export interface LoginRequest {
-  emailOrUsername: string
+  email: string
   password: string
   rememberMe: boolean
 }
@@ -19,9 +20,9 @@ export interface LoginRequest {
 export interface LoginResponse extends BaseResponse {
   data:{
     message: string
-    verificationType?: string
     user?: UserProfile
   }
+  verificationType?: string
 }
 
 export interface RequestDeviceResponse extends BaseResponse{
@@ -58,9 +59,18 @@ export interface RegisterSendRequest{
   email: string;
 }
 
+// ĐỔI MẬT KHẨU TÀI KHOẢN ĐÃ ĐĂNG NHẬP - CHANGE PASSWORD
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+  revokeOtherSessions?: boolean
+}
+export interface ChangePasswordResponse extends BaseResponse{
+  message: string
+}
 
 // ĐỔI MẬT KHẨU TÀI KHOẢN - RESET PASSWORD
-
 export interface ResetPasswordSendRequest{
   email: string
 }

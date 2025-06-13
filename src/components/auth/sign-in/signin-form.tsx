@@ -32,7 +32,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
   const form = useForm<LoginFormData>({
     resolver: zodResolver(Schema),
     defaultValues: { 
-      emailOrUsername: '', 
+      email: '', 
       password: '',
       rememberMe: false
     }
@@ -63,7 +63,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
             <AnimatedFormItem>
               <FormField
                 control={form.control}
-                name="emailOrUsername"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('auth.login.emailOrUsername')}</FormLabel>
