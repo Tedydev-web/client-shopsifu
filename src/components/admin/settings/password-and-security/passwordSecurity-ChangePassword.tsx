@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Info } from 'lucide-react';
+import { Info, Eye, EyeOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -38,6 +38,9 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
   const user = useUserData();
   const { loading, handleChangePassword } = usePasswordSecurityChangePassword();
   const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Create the schema dynamically with the translation function
   const currentPasswordSchema = passwordSchema(t);
@@ -99,7 +102,24 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
                       {t('admin.profileSettings.changePassword.currentPassword')}
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          {...field}
+                          placeholder={'*********'}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        >
+                          {showCurrentPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,7 +134,24 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
                       {t('admin.profileSettings.changePassword.newPassword')}
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showNewPassword ? 'text' : 'password'}
+                          {...field}
+                          placeholder={'*********'}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        >
+                          {showNewPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -129,7 +166,24 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
                       {t('admin.profileSettings.changePassword.confirmNewPassword')}
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          {...field}
+                          placeholder={'*********'}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

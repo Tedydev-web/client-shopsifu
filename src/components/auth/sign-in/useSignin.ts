@@ -18,7 +18,7 @@ export function useSignin() {
   const { t } = useTranslation()
   const Schema = LoginSchema(t)  
   const userData = useUserData();
-  const role = userData?.role;
+  
 
   const handleSignin = async (data: z.infer<typeof Schema>) => {
     try {
@@ -41,6 +41,7 @@ export function useSignin() {
        
         await fetchProfile();
         await authService.getAbility();
+        const role = userData?.role;
         showToast(response.message || t('admin.showToast.auth.success'), 'success');
         if (role === 'Admin' || role === 'Super Admin') {
           window.location.href = ROUTES.ADMIN.DASHBOARD;

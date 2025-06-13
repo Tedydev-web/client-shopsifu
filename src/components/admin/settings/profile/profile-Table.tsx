@@ -76,7 +76,6 @@ export function ProfileSettingsTable() {
       <ProfileUpdateSheet
         open={openUpdate}
         onOpenChange={setOpenUpdate}
-        initialData={user}
       />
     </>
   );

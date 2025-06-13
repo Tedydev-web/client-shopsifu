@@ -43,3 +43,44 @@ export interface UserProfileResponse extends BaseResponse {
         }
     },
 }
+
+export interface UpdateProfileRequest {
+    firstName: string;
+    lastName: string;
+    username: string;
+    phoneNumber: string | null;
+    avatar: string | null;
+}
+
+export interface UpdateProfileResponse extends BaseResponse {
+    data: {
+        id: number;
+        email: string;
+        role: string;
+        status: string;
+        twoFactorEnabled: boolean;
+        googleId: string | null;
+        createdAt: string;
+        updatedAt: string;
+        userProfile: {
+            firstName: string;
+            lastName: string;
+            username: string;
+            phoneNumber: string | null;
+            avatar: string | null
+        }
+    },
+}
+
+
+// ĐỔI MẬT KHẨU TÀI KHOẢN ĐÃ ĐĂNG NHẬP - CHANGE PASSWORD
+export interface ChangePasswordRequest {
+    currentPassword: string
+    newPassword: string
+    confirmPassword: string
+    revokeOtherSessions?: boolean
+  }
+  export interface ChangePasswordResponse extends BaseResponse{
+    message: string
+    verificationType?: string
+  }

@@ -1,28 +1,43 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { showToast } from '@/components/ui/toastify'
-import { parseApiError } from '@/utils/error'
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { profileService } from '@/services/auth/profileService';
+import { UpdateProfileRequest } from '@/types/auth/profile.interface';
+import { showToast } from '@/components/ui/toastify';
+import { parseApiError } from '@/utils/error';
+import { setProfile } from '@/store/features/auth/profileSlide';
 
-export function useProfile() {
-  const { t } = useTranslation()
-  const [loading, setLoading] = useState(false)
+export const useUpdateProfile = (onSuccess?: () => void) => {
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  const handleUpdateProfile = async (data: any) => {
+  const updateProfile = async (data: UpdateProfileRequest) => {
+    setLoading(true);
     try {
-      setLoading(true)
-      // TODO: Call API to update profile
-      showToast(t('admin.profileSettings.updateSuccess'), 'success')
-    } catch (error: any) {
-      console.error('Error updating profile:', error)
-      showToast(parseApiError(error), 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
+      const response = await profileService.updateProfile(data);
+      showToast(response.message, 'success');
+      
+      const userProfilePayload = {
+        ...response.data.userProfile,
+        id: response.data.id,
+        email: response.data.email,
+        role: response.data.role,
+        status: response.data.status,
+        twoFactorEnabled: response.data.twoFactorEnabled,
+        googleId: response.data.googleId,
+        createdAt: response.data.createdAt,
+        updatedAt: response.data.updatedAt,
+      };
 
-  return {
-    loading,
-    handleUpdateProfile,
-    t,
-  }
-}
+      dispatch(setProfile(userProfilePayload));
+      onSuccess?.();
+    } catch (error) {
+      const apiError = parseApiError(error);
+      showToast(apiError, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { updateProfile, loading };
+};
+

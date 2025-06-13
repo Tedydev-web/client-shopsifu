@@ -94,11 +94,6 @@ export function PasswordSecurityTable() {
       <ChangePasswordModal
         open={showChangePassword}
         onOpenChange={setShowChangePassword}
-        userInfo={{
-          name: user?.name ?? "",
-          email: user?.email ?? "",
-          username: user?.username ?? "",
-        }}
       />      
       <Profile2FAModal
         showRegenerateConfirm={showRegenerateConfirm}

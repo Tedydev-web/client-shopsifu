@@ -66,7 +66,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('auth.login.emailOrUsername')}</FormLabel>
+                    <FormLabel>{t('auth.common.email')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="text" placeholder={t('auth.login.placeholder')} />
                     </FormControl>

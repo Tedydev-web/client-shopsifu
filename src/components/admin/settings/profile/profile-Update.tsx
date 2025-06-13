@@ -1,33 +1,57 @@
 "use client";
 
-import { Input } from '@/components/ui/input';
-import { useEffect, useState } from 'react';
-import { SheetRework } from '@/components/ui/component/sheet-rework';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { UserProfile } from '@/store/features/auth/profileSlide';
+
+import { Input } from '@/components/ui/input';
+import { SheetRework } from '@/components/ui/component/sheet-rework';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useUserData } from '@/hooks/useGetData-UserLogin';
+import { useUpdateProfile } from './useProfile';
+import { UpdateProfileSchema } from '@/utils/schema';
 
 interface ProfileUpdateSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: Partial<UserProfile>;
 }
 
-export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileUpdateSheetProps) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+export function ProfileUpdateSheet({ open, onOpenChange }: ProfileUpdateSheetProps) {
   const { t } = useTranslation();
+  const userData = useUserData();
+  const formSchema = UpdateProfileSchema(t);
+  const { updateProfile, loading } = useUpdateProfile(() => onOpenChange(false));
+
+  type ProfileFormData = z.infer<typeof formSchema>;
+
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      username: '',
+      phoneNumber: '',
+    },
+  });
 
   useEffect(() => {
-    if (initialData) {
-      setFirstName(initialData.firstName || '');
-      setLastName(initialData.lastName || '');
+    if (userData && open) {
+      form.reset({
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        username: userData.username || '',
+        phoneNumber: userData.phoneNumber || '',
+      });
     }
-  }, [initialData, open]);
+  }, [userData, open, form]);
 
-  const handleConfirm = () => {
-    // TODO: Implement API call to update profile
-    console.log('Saving:', { firstName, lastName });
-    onOpenChange(false);
+  const onSubmit = (data: ProfileFormData) => {
+    updateProfile({
+      ...data,
+      avatar: userData?.avatar || null, // Giữ lại avatar cũ nếu không thay đổi
+    });
   };
 
   return (
@@ -37,33 +61,69 @@ export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileU
       title={t('admin.profileUpdate.title')}
       subtitle={t('admin.profileUpdate.subtitle')}
       onCancel={() => onOpenChange(false)}
-      onConfirm={handleConfirm}
+      onConfirm={form.handleSubmit(onSubmit)}
+      isConfirmLoading={loading}
       confirmText="Lưu thay đổi"
       cancelText="Hủy"
     >
-      <form className="flex flex-col gap-5" onSubmit={(e) => { e.preventDefault(); handleConfirm(); }}>
-        <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-            Họ
-          </label>
-          <Input
-            id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            autoFocus
+      <Form {...form}>
+        <form className="flex flex-col gap-5" onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('auth.common.lastName')}</FormLabel>
+                  <FormControl>
+                    <Input {...field} autoFocus />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('auth.common.firstName')}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('auth.common.username')}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-            Tên
-          </label>
-          <Input
-            id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('auth.common.phoneNumber')}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-      </form>
+        </form>
+      </Form>
     </SheetRework>
   );
 }

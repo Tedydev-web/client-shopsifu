@@ -59,16 +59,6 @@ export interface RegisterSendRequest{
   email: string;
 }
 
-// ĐỔI MẬT KHẨU TÀI KHOẢN ĐÃ ĐĂNG NHẬP - CHANGE PASSWORD
-export interface ChangePasswordRequest {
-  currentPassword: string
-  newPassword: string
-  confirmPassword: string
-  revokeOtherSessions?: boolean
-}
-export interface ChangePasswordResponse extends BaseResponse{
-  message: string
-}
 
 // ĐỔI MẬT KHẨU TÀI KHOẢN - RESET PASSWORD
 export interface ResetPasswordSendRequest{
