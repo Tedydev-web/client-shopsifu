@@ -336,5 +336,3 @@ export const stopTokenCheck = () => {
 //   startTokenCheck();
 //   window.addEventListener('beforeunload', stopTokenCheck);
 // }
-
-//
