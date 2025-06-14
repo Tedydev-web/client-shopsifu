@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
     inputs:
       manual_rollback:
@@ -178,7 +178,7 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             cd ${{ secrets.STAGING_PATH_PROJECT }}
-            git fetch origin main && git reset --hard HEAD~1
+            git fetch origin master && git reset --hard HEAD~1
             npm ci
             [ -d .next ] || npm run build
             pm2 restart client-shopsifu || pm2 start npm --name client-shopsifu -- run start
