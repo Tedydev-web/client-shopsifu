@@ -164,7 +164,7 @@ export default function RolesTable() {
         />
       </div>
 
-      {totalPages > 0 && (
+      {totalPages >= 0 && (
         <Pagination
           limit={limit}
           page={page}

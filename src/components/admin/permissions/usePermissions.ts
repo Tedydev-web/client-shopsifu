@@ -25,21 +25,30 @@ export function usePermissions() {
     try {
       setLoading(true);
       const response = await permissionService.getAll(params);
-      const mappedPermissions: Permission[] = response.data.map(per => ({
-        id: Number(per.id),
-        code: per.id,
-        name: per.name,
-        description: per.description , // Giá trị mặc định
-        path: per.path || "", // Giá trị mặc định
-        method: per.method, // Giá trị mặc định
+
+      const flattenedPermissions = Object.entries(response.data).flatMap(([subject, items]) =>
+        items.map(item => ({
+          subject: subject,
+          ...item
+        }))
+      );
+
+      const mappedPermissions: Permission[] = flattenedPermissions.map(per => ({
+        id: per.id,
+        code: String(per.id),
+        name: per.description,
+        description: per.description,
+        path: per.subject,
+        method: per.action,
         isActive: true,
-        createdAt: per.createdAt,
-        updatedAt: per.updatedAt,
+        createdAt: '',
+        updatedAt: '',
       }));
+
       setPermissions(mappedPermissions);
-      setTotalItems(response.totalItems);
-      setCurrentPage(response.page);
-      setTotalPages(response.totalPages);
+      setTotalItems(response.meta.totalItems);
+      setCurrentPage(response.meta.currentPage);
+      setTotalPages(response.meta.totalPages);
     } catch (error) {
       showToast(parseApiError(error), 'error');
       console.error('Error fetching permissions:', error);

@@ -12,6 +12,7 @@ export const ROUTES = {
   ADMIN: {
     DASHBOARD: '/admin',
     PRODUCTS: '/admin/products',
-    ORDERS: '/admin/orders'
+    ORDERS: '/admin/orders',
+    SETTINGS_SECURITY: '/admin/settings/security'
   },
 }

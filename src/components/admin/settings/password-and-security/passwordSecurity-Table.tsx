@@ -22,7 +22,7 @@ export function PasswordSecurityTable() {
     showRecoveryCodesDialog,
     setShowRecoveryCodesDialog,
     qrCodeImage,
-    secret,
+    secret, 
     loading,
     Code,
     setCode,
@@ -44,7 +44,7 @@ export function PasswordSecurityTable() {
   const columns: SettingTableColumn[] = [
     {
       label: "Mật khẩu",
-      value: "Đã thay đổi cách đây 3 tháng",
+      value: "Thực hiện thay đổi mật khẩu",
       startIcon: <Lock />,
       endIcon: <ChevronRight />,
       onClick: () => setShowChangePassword(true)
