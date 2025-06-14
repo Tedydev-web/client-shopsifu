@@ -24,12 +24,12 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
 
-      - name: Cache build artifacts
+      - name: Cache Next.js build
         uses: actions/cache@v4
         with:
-          path: dist
-          key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-build-
+          path: .next
+          key: ${{ runner.os }}-next-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-next-
 
       - name: Install dependencies
         run: npm ci
@@ -44,17 +44,17 @@ jobs:
     if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !github.event.inputs.manual_rollback) }}
     environment: staging
     env:
-      NODE_ENV: staging
+      NODE_ENV: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache build artifacts
+      - name: Cache Next.js build
         uses: actions/cache@v4
         with:
-          path: dist
-          key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-build-
+          path: .next
+          key: ${{ runner.os }}-next-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-next-
 
       - name: Deploy via SSH & PM2
         id: ssh_deploy
@@ -63,16 +63,16 @@ jobs:
             set -euo pipefail
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            cd ${{ secrets.STAGING_PATH_PROJECT }}
+            cd shopsifu/client-shopsifu
             git fetch origin master && git reset --hard origin/master
             npm ci
-            [ -d dist ] || npm run build
-            pm2 restart server-shopsifu || pm2 start dist/index.js --name server-shopsifu
+            [ -d .next ] || npm run build
+            pm2 restart client-shopsifu
             sleep 5
-            STATUS=$(pm2 jlist | jq -r '.[] | select(.name == "server-shopsifu") | .pm2_env.status')
+            STATUS=$(pm2 jlist | jq -r '.[] | select(.name == "client-shopsifu") | .pm2_env.status')
             echo "$STATUS" > /tmp/app_status.txt
             pm2 jlist > /tmp/pm2_status.json
-            pm2 logs server-shopsifu --lines 300 --nostream > /tmp/pm2_logs.txt
+            pm2 logs client-shopsifu --lines 300 --nostream > /tmp/pm2_logs.txt
             [ "$STATUS" = "online" ] || exit 2
           EOF
         continue-on-error: true
@@ -81,13 +81,11 @@ jobs:
         if: always()
         id: pm2_logs
         run: |
-          # Lấy dữ liệu từ server và lưu vào file tạm trên runner
           sshpass -p "${{ secrets.STAGING_VPS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_VPS_USERNAME }}@${{ secrets.STAGING_VPS_IP_HOST }} << 'EOF'
             cat /tmp/pm2_status.json > /tmp/pm2_status.json
             cat /tmp/pm2_logs.txt > /tmp/pm2_logs.txt
           EOF
-          # Xử lý dữ liệu trên runner
-          PM2_INFO=$(jq -r '.[] | select(.name == "server-shopsifu") | "Name: \(.name)\nStatus: \(.pm2_env.status)\nPID: \(.pid)\nUptime: \(.pm2_env.uptime // 0 | tostring + \"ms\")\nCPU: \(.monit.cpu)%\nMemory: \(.monit.memory / 1024 / 1024 | tostring + \"MB\")"' /tmp/pm2_status.json 2>/dev/null || echo "Không tìm thấy process server-shopsifu")
+          PM2_INFO=$(jq -r '.[] | select(.name == "client-shopsifu") | "Name: \(.name)\nStatus: \(.pm2_env.status)\nPID: \(.pid)\nUptime: \(.pm2_env.uptime // 0 | tostring + \"ms\")\nCPU: \(.monit.cpu)%\nMemory: \(.monit.memory / 1024 / 1024 | tostring + \"MB\")"' /tmp/pm2_status.json 2>/dev/null || echo "Không tìm thấy process client-shopsifu")
           echo "pm2_info=$PM2_INFO" >> $GITHUB_OUTPUT
           PM2_LOGS=$(grep -v '\[TAILING\]' /tmp/pm2_logs.txt | tail -n 50 || echo "Không có log ứng dụng")
           echo "pm2_logs=$PM2_LOGS" >> $GITHUB_OUTPUT
@@ -123,7 +121,6 @@ jobs:
           sudo apt-get update && sudo apt-get install -y jq
           COLOR=$([ "$STATUS" = "success" ] && echo 3066993 || echo 15158332)
           ICON=$([ "$STATUS" = "success" ] && echo "✅" || echo "❌")
-          # Chuyển đổi github.run_started_at thành epoch time
           RUN_STARTED_AT=$(date -d "${{ github.run_started_at }}" +%s)
           JSON_PAYLOAD=$(jq -n \
             --arg status "$STATUS" \
@@ -167,12 +164,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache build artifacts
+      - name: Cache Next.js build
         uses: actions/cache@v4
         with:
-          path: dist
-          key: ${{ runner.os }}-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-build-
+          path: .next
+          key: ${{ runner.os }}-next-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-next-
 
       - name: Rollback to previous commit
         run: |
@@ -183,8 +180,8 @@ jobs:
             cd ${{ secrets.STAGING_PATH_PROJECT }}
             git fetch origin master && git reset --hard HEAD~1
             npm ci
-            [ -d dist ] || npm run build
-            pm2 restart server-shopsifu || pm2 start dist/index.js --name server-shopsifu
+            [ -d .next ] || npm run build
+            pm2 restart client-shopsifu || pm2 start npm --name client-shopsifu -- run start
           EOF
 
   manual-rollback:
@@ -197,12 +194,12 @@ jobs:
         with:
           ref: ${{ github.event.inputs.manual_rollback }}
 
-      - name: Cache build artifacts
+      - name: Cache Next.js build
         uses: actions/cache@v4
         with:
-          path: dist
-          key: ${{ runner.os }}-build-${{ github.event.inputs.manual_rollback }}
-          restore-keys: ${{ runner.os }}-build-
+          path: .next
+          key: ${{ runner.os }}-next-${{ github.event.inputs.manual_rollback }}
+          restore-keys: ${{ runner.os }}-next-
 
       - name: Re-deploy to VPS
         run: |
@@ -213,8 +210,8 @@ jobs:
             cd ${{ secrets.STAGING_PATH_PROJECT }}
             git reset --hard ${{ github.event.inputs.manual_rollback }}
             npm ci
-            [ -d dist ] || npm run build
-            pm2 restart server-shopsifu || pm2 start dist/index.js --name server-shopsifu
+            [ -d .next ] || npm run build
+            pm2 restart client-shopsifu || pm2 start npm --name client-shopsifu -- run start
           EOF
 
 permissions:
