@@ -82,7 +82,7 @@
       "register": "Đăng ký",
       "remember me": "Ghi nhớ đăng nhập",
       "emailOrUsername": "Email hoặc tên tài khoản",
-      "placeholder":"Nhập email hoặc tài khoản người dùng"
+      "placeholder": "Nhập email hoặc tài khoản người dùng"
     },
     "forgotPassword": {
       "title": "Quên mật khẩu",
@@ -321,7 +321,7 @@
       "backToHome": "Về trang chủ"
     },
     "profileSettings": {
-      "QrCode":{
+      "QrCode": {
         "title": "Mã khôi phục của bạn",
         "description": "Lưu trữ các mã này ở nơi an toàn. Bạn sẽ cần chúng nếu mất quyền truy cập vào thiết bị xác thực.",
         "nofound": "Không tìm thấy mã khôi phục",
@@ -724,6 +724,32 @@
     }
   },
   "user": {
+    "settings": {
+      "title": "Cài đặt",
+      "subtitle": "Tài khoản của bạn được bảo vệ",
+      "description": "Shopsifu bảo vệ thông tin cá nhân của bạn và giữ cho nó riêng tư, an toàn và bảo mật.",
+
+      "items": {
+        "Account security": "Bảo mật tài khoản",
+        "Privacy": "Quyền riêng tư",
+        "Permissions": "Quyền hạn",
+        "Safety center": "Trung tâm an toàn"
+      },
+
+      "section": {
+        "paymentmethods": "Phương thức thanh toán",
+        "country": "Quốc gia & khu vực",
+        "language": "Ngôn ngữ",
+        "currency": "Tiền tệ",
+        "notifications": "Thông báo",
+        "about": "Thông tin ứng dụng",
+        "legalTermPolicies": "Điều khoản & Chính sách",
+        "switchAccount": "Chuyển đổi tài khoản"
+      },
+
+      "signout": "Đăng xuất"
+    },
+
     "account": {
       "home": "Trang chủ",
       "manageAccount": "Quản lý thông tin tài khoản của bạn",
@@ -733,6 +759,9 @@
       },
 
       "profile": {
+        "protected": "Tài khoản của bạn được bảo vệ",
+        "protectionDescription": "Tài khoản Shopsifu của bạn được bảo vệ bởi hệ thống bảo mật nâng cao. Việc cập nhật thông tin này thường xuyên sẽ giúp tài khoản của bạn an toàn hơn.",
+
         "profile": "Hồ sơ",
         "manageProfile": "Quản lý hồ sơ của bạn",
         "title": "Hồ sơ của tôi",
@@ -756,6 +785,7 @@
         "cancel": "Hủy",
         "save": "Lưu thay đổi",
 
+        "passwordQuality": "Chất lượng mật khẩu",
         "editPassword": "Chỉnh sửa mật khẩu",
         "currentPassword": "Mật khẩu hiện tại",
         "newPassword": "Mật khẩu mới",
@@ -765,22 +795,32 @@
         "enable2FADescription": "Bạn có chắc chắn muốn bật xác thực hai yếu tố không? Bạn sẽ cần quét mã QR bằng ứng dụng xác thực.",
         "enable": "Bật",
 
+        "delete": "Xóa tài khoản",
         "deleteAccount": "Xóa tài khoản",
         "confirmDelete": "Xác nhận xóa",
         "accountTermination": "Xóa tài khoản"
       },
 
-      "address": {
+      "password": {
         "title": "Đổi mật khẩu",
         "subtitle": "Mật khẩu của bạn phải có ít nhất 6 ký tự và bao gồm chữ, số và ký tự đặc biệt",
         "currentPassword": "Mật khẩu hiện tại",
         "newPassword": "Mật khẩu mới",
         "confirmPassword": "Xác nhận mật khẩu",
+        "forgotPassword": "Quên mật khẩu?",
 
         "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
         "newPasswordPlaceholder": "Nhập mật khẩu mới",
         "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
 
+        "changePassword": "Đổi mật khẩu",
+        "processing": "Đang xử lý...",
+        "passwordChanged": "Mật khẩu đã được thay đổi thành công!",
+
+        "minLength": "Mật khẩu phải có ít nhất 6 ký tự"
+      },
+
+      "address": {
         "address": "Địa chỉ",
         "myAddresses": "Địa chỉ của tôi",
         "addNewAddress": "Thêm địa chỉ mới",

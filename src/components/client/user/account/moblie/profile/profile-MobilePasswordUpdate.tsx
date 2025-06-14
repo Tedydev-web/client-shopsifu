@@ -30,8 +30,11 @@ interface ChangePasswordModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   userInfo: {
-    name: string;
-    email: string;
+    firstName: string;
+    lastName: string,
+    userName: string,
+    phoneNumber: string;
+    avatar: string;
   };
 }
 
@@ -71,13 +74,12 @@ export function ChangePasswordModal({
             <div className="flex items-center gap-2">
               <Lock className="w-5 h-5 text-gray-600" />
               <DrawerTitle className="text-xl font-semibold">
-                Change Password
+                {t("user.account.password.title")}
               </DrawerTitle>
             </div>
             <DrawerDescription>
               <div className="mt-2">
-                <div className="font-medium text-sm">{userInfo.name}</div>
-                <div className="text-xs text-gray-500">{userInfo.email}</div>
+                <div className="font-medium text-sm">{userInfo.userName}</div>
               </div>
             </DrawerDescription>
           </DrawerHeader>
@@ -86,7 +88,7 @@ export function ChangePasswordModal({
             <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
               <Info className="w-4 h-4 text-blue-600 shrink-0" />
               <p className="text-xs text-blue-600">
-                {t("user.account.address.subtitle")} (!$@%).
+                {t("user.account.password.subtitle")} (!$@%).
               </p>
             </div>
 
@@ -99,17 +101,17 @@ export function ChangePasswordModal({
                     <FormItem className="space-y-1">
                       <div className="flex items-center justify-between">
                         <FormLabel className="text-sm font-medium">
-                          {t("user.account.address.currentPassword")}
+                          {t("user.account.password.currentPassword")}
                         </FormLabel>
                         <a href="#" className="text-xs text-gray-500 hover:underline">
-                          Forget password?
+                          {t("user.account.password.forgotPassword")}
                         </a>
                       </div>
                       <FormControl>
                         <Input
                           type="password"
                           className="text-sm"
-                          placeholder={t("user.account.address.currentPasswordPlaceholder")}
+                          placeholder={t("user.account.password.currentPasswordPlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -124,18 +126,18 @@ export function ChangePasswordModal({
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <FormLabel className="text-sm font-medium">
-                        {t("user.account.address.newPassword")}
+                        {t("user.account.password.newPassword")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="password"
                           className="text-sm"
-                          placeholder={t("user.account.address.newPasswordPlaceholder")}
+                          placeholder={t("user.account.password.newPasswordPlaceholder")}
                           {...field}
                         />
                       </FormControl>
                       <p className="text-xs text-gray-500">
-                        Minimum 8 characters required
+                        {t("user.account.password.minLength")}
                       </p>
                       <FormMessage className="text-xs" />
                     </FormItem>
@@ -148,13 +150,13 @@ export function ChangePasswordModal({
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <FormLabel className="text-sm font-medium">
-                        {t("user.account.address.confirmPassword")}
+                        {t("user.account.password.confirmPassword")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="password"
                           className="text-sm"
-                          placeholder={t("user.account.address.newPasswordPlaceholder")}
+                          placeholder={t("user.account.password.newPasswordPlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -179,8 +181,8 @@ export function ChangePasswordModal({
                 disabled={loading}
               >
                 {loading
-                  ? t("user.account.address.processing")
-                  : t("user.account.address.changePassword")}
+                  ? t("user.account.password.processing")
+                  : t("user.account.password.changePassword")}
               </Button>
             </div>
           </DrawerFooter>

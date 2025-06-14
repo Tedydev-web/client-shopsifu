@@ -90,19 +90,24 @@
       "Remember password": "Remember password?",
       "login": "Login",
       "confirm": "Confirm",
-      "Sending": "Send",
+      "Sending": "Sent...",
       "continue": "Continue"
     },
     "resetPassword": {
       "title": "Reset password",
       "subtitle": "Enter your new password below.",
+      "currentPassword": "Current password",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPasswordPlaceholder": "Re-enter your new password",
       "new password": "New password",
       "confirmnewPassword": "Confirm new password",
       "Remember password": "Remember password?",
+      "changePassword": "Change password",
       "login": "Login",
-      "Processing": "Processing",
+      "Processing": "Processing...",
       "success": "The password reset link has been sent to your email",
-      "send": "Sen link"
+      "send": "Send link"
     },
     "verifyOtp": {
       "title": "Enter the verification code",
@@ -730,99 +735,135 @@
     }
   },
   "user": {
-    "account": {
-      "home": "Home",
-      "manageAccount": "Manage your account information",
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Your account is protected",
+      "description": "Shopsifu protects your personal information and keeps it private, safe and secure.",
 
-      "notifications": {
-        "notifications": "Notifications"
+      "items": {
+        "Account security": "Account Security",
+        "Privacy": "Privacy",
+        "Permissions": "Permissions",
+        "Safety center": "Safety Center"
       },
 
-      "profile": {
-        "profile": "Profile",
-        "manageProfile": "Manage Your Profile",
-        "title": "My profile",
-        "subtitle": "Manage profile information for account security",
-        "currentPasswordRequired": "",
-        "newPasswordInvalid": "",
-        "confirmPasswordRequired": "",
-        "passwordsMismatch": "",
-        "emailPhone": "Information",
-        "noPhone": "",
-        "password": "Password",
-        "twoFactor": "Two-Factor",
-        "twoFactorDescription": "Protect your account by adding an extra layer of security.",
-        "thirdPartyAccounts": "Third-party accounts",
-        "turnOn": "Turn On",
-        "edit": "Edit",
-
-        "editEmailPhone": "Email&Phone",
-        "email": "Email",
-        "phoneNumber": "Phone Number",
-        "cancel": "Cancel",
-        "save": "Save Changes",
-
-        "editPassword": "Edit Password",
-        "currentPassword": "Current Password",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password",
-
-        "enable2FA": "Enable Two-Factor Authentication",
-        "enable2FADescription": "Are you sure you want to enable two-factor authentication? You will need to scan a QR code with your authenticator app.",
-        "enable": "Enable",
-
-        "deleteAccount": "Delete Account",
-        "confirmDelete": "Delete",
-        "accountTermination": "Account Terminate"
+      "section": {
+        "paymentmethods": "Your payment methods",
+        "country": "Country & region",
+        "language": "Language",
+        "currency": "Currency",
+        "notifications": "Notifications",
+        "about": "About this app",
+        "legalTermPolicies": "Legal Terms & Policies",
+        "switchAccount": "Switch Account"
       },
 
-      "address": {
-        "title": "Change Password",
-        "subtitle": "Your password must have a minimum of 6 characters and include numbers, letters and special characters",
-        "currentPassword": "Current Password",
-        "newPassword": "New Password",
-        "confirmPassword": "Confirm Password",
+      "signout": "Sign out"
+    },
 
-        "currentPasswordPlaceholder": "Enter Your Current Password",
-        "newPasswordPlaceholder": "Enter Your New Password",
-        "confirmPasswordPlaceholder": "Re-enter the new password",
+    "home": "Home",
+    "manageAccount": "Manage your account information",
 
-        "address": "Address",
-        "myAddresses": "My Addresses",
-        "addNewAddress": "Add New Address",
-        "noAddress": "You don’t have any addresses yet.",
-        "processing": "Processing...",
-        "changePassword": "Change password"
-      },
+    "notifications": {
+      "notifications": "Notifications"
+    },
 
-      "payment": {
-        "payment": "Payment",
-        "creditDebitCard": "Credit / Debit Card",
-        "addNewCard": "Add New Card",
-        "noCardLinked": "You don't have cards yet.",
-        "bankAccount": "My Bank Account",
-        "addBankLink": "Add New Bank Account",
-        "noBankLinked": "You don’t have bank accounts yet."
-      },
+    "profile": {
+      "protected": "Your account is protected",
+      "protectionDescription": "Your Shopsifu account is protected by advanced security. Keeping this information up-to-date safeguards your account even more.",
 
-      "security": {
-        "security": "Security",
-        "title": "Active devices",
-        "subtitle": "For your account's security, do not share your password with anyone else",
-        "loggedInDevices": "Logged-in devices",
-        "totalSessionsSummary": "Total of {{totalSessions}} active sessions on {{deviceCount}} devices",
-        "total": "Total of",
-        "active": "active sessions on",
-        "device": "device",
-        "deviceSessionCount": "{{count}} active sessions",
-        "terminateSession": "Terminate this session",
-        "deleteSession": "Delete this session",
-        "loginSession": "Login session"
-      },
+      "profile": "Profile",
+      "manageProfile": "Manage Your Profile",
+      "title": "My profile",
+      "subtitle": "Manage profile information for account security",
+      "currentPasswordRequired": "",
+      "newPasswordInvalid": "",
+      "confirmPasswordRequired": "",
+      "passwordsMismatch": "",
+      "emailPhone": "Information",
+      "noPhone": "",
+      "password": "Password",
+      "twoFactor": "Two-Factor",
+      "twoFactorDescription": "Protect your account by adding an extra layer of security.",
+      "thirdPartyAccounts": "Third-party accounts",
+      "turnOn": "Turn On",
+      "edit": "Edit",
 
-      "myPurchase": {
-        "myPurchase": "My Purchase"
-      }
+      "editEmailPhone": "Email&Phone",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+
+      "editPassword": "Edit Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+
+      "enable2FA": "Enable Two-Factor Authentication",
+      "enable2FADescription": "Are you sure you want to enable two-factor authentication? You will need to scan a QR code with your authenticator app.",
+      "enable": "Enable",
+
+      "deleteAccount": "Delete Account",
+      "confirmDelete": "Delete",
+      "accountTermination": "Account Terminate"
+    },
+
+    "password": {
+      "title": "Change Password",
+      "subtitle": "Your password must have a minimum of 6 characters and include numbers, letters and special characters",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "forgotPassword": "Forgot Password?",
+
+      "currentPasswordPlaceholder": "Enter Your Current Password",
+      "newPasswordPlaceholder": "Enter Your New Password",
+      "confirmPasswordPlaceholder": "Re-enter the new password",
+
+      "changePassword": "Change Password",
+      "processing": "Processing...",
+      "passwordChanged": "Your password has been changed successfully!",
+
+      "minLength": "Password must be at least 6 characters long"
+    },
+
+    "address": {
+      "address": "Address",
+      "myAddresses": "My Addresses",
+      "addNewAddress": "Add New Address",
+      "noAddress": "You don’t have any addresses yet.",
+      "processing": "Processing...",
+      "changePassword": "Change password"
+    },
+
+    "payment": {
+      "payment": "Payment",
+      "creditDebitCard": "Credit / Debit Card",
+      "addNewCard": "Add New Card",
+      "noCardLinked": "You don't have cards yet.",
+      "bankAccount": "My Bank Account",
+      "addBankLink": "Add New Bank Account",
+      "noBankLinked": "You don’t have bank accounts yet."
+    },
+
+    "security": {
+      "security": "Security",
+      "title": "Active devices",
+      "subtitle": "For your account's security, do not share your password with anyone else",
+      "loggedInDevices": "Logged-in devices",
+      "totalSessionsSummary": "Total of {{totalSessions}} active sessions on {{deviceCount}} devices",
+      "total": "Total of",
+      "active": "active sessions on",
+      "device": "device",
+      "deviceSessionCount": "{{count}} active sessions",
+      "terminateSession": "Terminate this session",
+      "deleteSession": "Delete this session",
+      "loginSession": "Login session"
+    },
+
+    "myPurchase": {
+      "myPurchase": "My Purchase"
     }
   }
 }

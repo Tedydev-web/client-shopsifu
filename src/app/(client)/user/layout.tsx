@@ -6,13 +6,18 @@ import { Menu } from 'lucide-react'
 import { Sidebar } from '@/components/client/user/layout/user-Sidebar'
 import MobileHeader from '@/components/client/user/account/moblie/moblie-Header'
 
-export default function AccountLayout({ children }: { children: React.ReactNode }) {
+interface AccountLayoutProps {
+  children: React.ReactNode
+  title?: string
+}
+
+export default function AccountLayout({ children, title = '' }: AccountLayoutProps) {
   const { isMobile } = useResponsive()
 
   if (isMobile) {
     return (
       <div className="fixed inset-0 z-50 bg-background">
-        <MobileHeader title="Account" />
+        <MobileHeader title={title} />
         <main className="px-4 h-[calc(100vh-72px)] overflow-y-auto">
           <div className="max-w-4xl mx-auto w-full">
             {children}

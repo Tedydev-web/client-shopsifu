@@ -1,3 +1,4 @@
+'use client'
 import {
   Lock,
   ShieldCheck,
@@ -7,7 +8,6 @@ import {
   Languages,
   BellDot,
   FileText,
-  Share,
   LogOut,
   Repeat2,
   CreditCard,
@@ -15,30 +15,79 @@ import {
 
 export const settingsMockData = {
   header: {
-    title: 'Settings',
-    statusTitle: 'Your account is protected',
-    statusDesc:
-      'Temu protects your personal information and keeps it private, safe and secure.',
+    title: 'user.settings.title',
+    statusTitle: 'user.settings.subtitle',
+    statusDesc: 'user.settings.description',
     items: [
-      { label: 'Account security', icon: <ShieldCheck className="w-4 h-4" />, href: '/user/profile' },
-      { label: 'Privacy', icon: <Lock className="w-4 h-4" />, href: '/user/privacy' },
-      { label: 'Permissions', icon: <UserCheck className="w-4 h-4" />, href: '/user/permissions' },
-      { label: 'Safety center', icon: <Shield className="w-4 h-4" />, href: '/user/safety' },
+      { 
+        label: 'user.settings.items.Account security', 
+        icon: <ShieldCheck className="w-4 h-4" />, 
+        href: '/user/profile' 
+      },
+      { 
+        label: 'user.settings.items.Privacy', 
+        icon: <Lock className="w-4 h-4" />, 
+        href: '/user/privacy' 
+      },
+      { 
+        label: 'user.settings.items.Permissions', 
+        icon: <UserCheck className="w-4 h-4" />, 
+        href: '/user/permissions' 
+      },
+      { 
+        label: 'user.settings.items.Safety center', 
+        icon: <Shield className="w-4 h-4" />, 
+        href: '/user/safety' 
+      },
     ],
   },
   sections: [
-    { label: 'Your payment methods', href: '/user/payment', icon: <CreditCard className="w-4 h-4" /> },
-    { label: 'Country & region', href: '/user/region', value: 'VN', icon: <Globe className="w-4 h-4" /> },
-    { label: 'Language', href: '/user/language', value: 'English', icon: <Languages className="w-4 h-4" /> },
-    { label: 'Currency', href: '/user/currency', value: 'VND', icon: <Globe className="w-4 h-4" /> },
-    { label: 'Notifications', href: '/user/notifications', icon: <BellDot className="w-4 h-4" /> },
-    { label: 'About this app', href: '/user/about', icon: <FileText className="w-4 h-4" /> },
-    { label: 'Legal terms & policies', href: '/user/legal', icon: <FileText className="w-4 h-4" /> },
-    { label: 'Share this app', href: '/user/share', icon: <Share className="w-4 h-4" /> },
-    { label: 'Switch accounts', href: '/user/switch', icon: <Repeat2 className="w-4 h-4" /> },
+    { 
+      label: 'user.settings.section.paymentmethods', 
+      href: '/user/payment', 
+      icon: <CreditCard className="w-4 h-4" /> 
+    },
+    { 
+      label: 'user.settings.section.country', 
+      href: '/user/region', 
+      value: 'VN', 
+      icon: <Globe className="w-4 h-4" /> 
+    },
+    { 
+      label: 'user.settings.section.language', 
+      href: '/user/language', 
+      value: 'English', 
+      icon: <Languages className="w-4 h-4" /> 
+    },
+    { 
+      label: 'user.settings.section.currency', 
+      href: '/user/currency', 
+      value: 'VND', 
+      icon: <Globe className="w-4 h-4" /> 
+    },
+    { 
+      label: 'user.settings.section.notifications', 
+      href: '/user/notifications', 
+      icon: <BellDot className="w-4 h-4" /> 
+    },
+    { 
+      label: 'user.settings.section.about', 
+      href: '/user/about', 
+      icon: <FileText className="w-4 h-4" /> 
+    },
+    { 
+      label: 'user.settings.section.legalTermPolicies', 
+      href: '/user/legal', 
+      icon: <FileText className="w-4 h-4" /> 
+    },
+    { 
+      label: 'user.settings.section.switchAccount', 
+      href: '/user/switch', 
+      icon: <Repeat2 className="w-4 h-4" /> 
+    },
   ],
   signOut: {
-    label: 'Sign out',
+    label: 'user.settings.signout',
     href: '/logout',
     icon: <LogOut className="w-4 h-4" />,
   },

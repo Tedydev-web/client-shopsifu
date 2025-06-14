@@ -18,21 +18,18 @@ interface ProfileUpdateSheetProps {
   onOpenChange: (open: boolean) => void;
   initialData: {
     firstName: string;
-    lastName: string,
-    userName: string,
-    email: string,
+    lastName: string;
+    userName: string;
     phoneNumber: string;
-    language: string;
+    avatar: string;
   };
 }
 
 export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileUpdateSheetProps) {
+  const [firstName, setFirstName] = useState(initialData.firstName);
+  const [lastName, setLastName] = useState(initialData.lastName);
   const [userName, setUserName] = useState(initialData.userName);
-  const [email, setEmail] = useState(initialData.email);
-  const [language, setLanguage] = useState(initialData.language);
-  const [phoneNumber, setPhoneNumber] = useState(initialData.phoneNumber || "");
-  const [firstName, setFirstName] = useState(initialData.firstName || "");
-  const [lastName, setLastName] = useState(initialData.lastName || "");
+  const [phoneNumber, setPhoneNumber] = useState(initialData.phoneNumber);
   const { t } = useTranslation();
 
   const handleSubmit = () => {
@@ -43,56 +40,61 @@ export function ProfileUpdateSheet({ open, onOpenChange, initialData }: ProfileU
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <div className="h-[100vh] mx-auto w-full max-w-sm ">
+        <div className="h-[100vh] mx-auto w-full max-w-sm">
           <DrawerHeader>
             <DrawerTitle className="text-xl font-semibold">
-              {t("admin.profileUpdate.title")}
+              {t("user.account.profile.updateProfile")}
             </DrawerTitle>
           </DrawerHeader>
 
           <div className="p-4 space-y-4">
             <form className="space-y-4">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  {t("admin.profileUpdate.name")}
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("user.account.profile.firstName")}
                 </label>
                 <Input
-                  id="name"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   autoFocus
                   className="w-full"
                 />
               </div>
+
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Email
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("user.account.profile.lastName")}
                 </label>
                 <Input
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   className="w-full"
                 />
               </div>
+
               <div>
-                <label
-                  htmlFor="language"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  {t("admin.profileUpdate.lang")}
+                <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("user.account.profile.username")}
                 </label>
                 <Input
-                  id="language"
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
+                  id="userName"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("user.account.profile.phone")}
+                </label>
+                <Input
+                  id="phoneNumber"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  type="tel"
                   className="w-full"
                 />
               </div>
