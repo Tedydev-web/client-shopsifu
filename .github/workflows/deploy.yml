@@ -177,7 +177,7 @@ jobs:
             set -euo pipefail
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            cd ${{ secrets.STAGING_PATH_PROJECT }}
+            cd shopsifu/client-shopsifu
             git fetch origin master && git reset --hard HEAD~1
             npm ci
             [ -d .next ] || npm run build
@@ -207,11 +207,11 @@ jobs:
             set -euo pipefail
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            cd ${{ secrets.STAGING_PATH_PROJECT }}
+            cd shopsifu/client-shopsifu
             git reset --hard ${{ github.event.inputs.manual_rollback }}
             npm ci
             [ -d .next ] || npm run build
-            pm2 restart client-shopsifu || pm2 start npm --name client-shopsifu -- run start
+            pm2 restart client-shopsifu
           EOF
 
 permissions:
