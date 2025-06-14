@@ -26,7 +26,7 @@ export function usePermissions() {
       setLoading(true);
       const response = await permissionService.getAll(params);
       const mappedPermissions: Permission[] = response.data.map(per => ({
-        id: parseInt(per.id),
+        id: Number(per.id),
         code: per.id,
         name: per.name,
         description: per.description , // Giá trị mặc định

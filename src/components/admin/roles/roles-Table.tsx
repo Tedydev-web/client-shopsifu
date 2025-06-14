@@ -137,12 +137,12 @@ export default function RolesTable() {
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2">
-        <SearchInput
+        {/* <SearchInput
           value={searchValue}
           onValueChange={handleSearch}
           placeholder={t("admin.roles.searchPlaceholder")}
           className="max-w-sm"
-        />
+        /> */}
         <Button onClick={() => handleOpenModal()} className="ml-auto">
           <PlusIcon className="w-4 h-4 mr-2" />
           {t("admin.roles.addAction")}

@@ -56,7 +56,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           )}
           <Link href="/admin" className="items-center hidden lg:flex">
             <Image 
-              src="/images/logo/logofullred.png" 
+              src="/images/logo/png-jpeg/Logo-Full-Red.png" 
               alt="Shopsifu Logo" 
               width={116} 
               height={66} 

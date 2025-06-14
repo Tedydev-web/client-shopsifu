@@ -19,11 +19,11 @@ export function AuthHeader() {
       >
         <a href="/" className="flex items-center">
           <Image
-            src="/images/logo/logofullred.png"
+            src="/images/logo/png-jpeg/Logo-Full-Red.png"
             alt="Shopsifu Logo"
-            width={220}
-            height={220}
-            className="h-18 w-auto"
+            width={200}
+            height={200}
+            className="h-10 w-auto"
             priority
           />
         </a>

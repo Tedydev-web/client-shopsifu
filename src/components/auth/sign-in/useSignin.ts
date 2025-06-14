@@ -29,16 +29,14 @@ export function useSignin() {
         // Handle 2FA/OTP redirection first
         if (response.verificationType === 'OTP') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
-          showToast(response.data.message || t('auth.device.verification.required'), 'info');
+          showToast(response.message || t('auth.device.verification.required'), 'info');
           return;
-        }
+        }	
         if (response.verificationType === '2FA') {
           router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
-          showToast(response.data.message || t('auth.device.verification.required'), 'info');
+          showToast(response.message || t('auth.device.verification.required'), 'info');
           return;
         }
-
-       
         await fetchProfile();
         await authService.getAbility();
         const role = userData?.role;
