@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       manual_rollback:
-        description: "Commit SHA hoặc tag để rollback (để trống để deploy bình thường)"
+        description: 'Commit SHA hoặc tag để rollback (để trống để deploy bình thường)'
         required: false
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
     if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !github.event.inputs.manual_rollback) }}
     environment: staging
     env:
-      NODE_ENV: staging
+      NODE_ENV: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

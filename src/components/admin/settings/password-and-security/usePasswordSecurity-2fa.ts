@@ -3,22 +3,57 @@ import { useTranslation } from 'react-i18next'
 import { authService } from '@/services/auth/authService'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
+import { useGetProfile } from '@/hooks/useGetProfile'
 
-export function usePasswordSecurity() {
+import { useEffect } from 'react';
+
+export function usePasswordSecurity({ isEnabled }: { isEnabled: boolean }) {
   const { t } = useTranslation()
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false)
+  const [is2FAEnabled, setIs2FAEnabled] = useState(isEnabled)
   const [show2FADialog, setShow2FADialog] = useState(false)
   const [showQRDialog, setShowQRDialog] = useState(false)
   const [showRecoveryCodesDialog, setShowRecoveryCodesDialog] = useState(false)
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
   const [qrCodeImage, setQrCodeImage] = useState('')
   const [secret, setSecret] = useState('')
   const [loading, setLoading] = useState(false)
   const [Code, setCode] = useState('')
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([])
+  const { fetchProfile } = useGetProfile();
+
+  useEffect(() => {
+    setIs2FAEnabled(isEnabled);
+  }, [isEnabled]);
 
   const handle2FAToggle = async () => {
     setShow2FADialog(true)
   }
+
+  const handleRegenerateClick = () => {
+    if (is2FAEnabled) {
+      setCode(''); // Reset code input
+      setShowRegenerateConfirm(true);
+    } else {
+      showToast(t('admin.profileSettings.2fa.enable2FAFirst'), 'info');``
+    }
+  };
+
+  const handleRegenerateRecoveryCodes = async (code: string) => {
+    try {
+      setLoading(true)
+      const response = await authService.regenerateRecoveryCodes({ code })
+      setRecoveryCodes(response.data.recoveryCodes || [])
+      setShowRegenerateConfirm(false) // Close confirmation modal
+      setShowRecoveryCodesDialog(true) // Open results modal
+      showToast(response.message, 'success')
+    } catch (error: any) {
+      console.error('Error regenerating recovery codes:', error)
+      showToast(parseApiError(error), 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
 
   const handleConfirm2FA = async () => {
     try {
@@ -31,13 +66,15 @@ export function usePasswordSecurity() {
         setQrCodeImage(response.data?.qrCode || '')
         setSecret(response.data?.secret || '')
         setShowQRDialog(true)
-        showToast(t('admin.profileSettings.scanQRFirst'), 'info')
+        showToast(t('admin.profileSettings.2fa.scanQRFirst'), 'info')
       } else {
         // Disable 2FA
-        await authService.disable2fa({ method: 'totp', code: Code })
+        const response = await authService.disable2fa({ method: 'totp', code: Code })
         setIs2FAEnabled(false)
+        fetchProfile();
         setRecoveryCodes([])
-        showToast(t('admin.profileSettings.2faDisabledSuccess'), 'success')
+        showToast(response.message, 'success')
+        await fetchProfile();
       }
     } catch (error: any) {
       console.error('Error toggling 2FA:', error)
@@ -54,13 +91,14 @@ export function usePasswordSecurity() {
         code: Code
       })
       setIs2FAEnabled(true)
+      fetchProfile();
       // Lưu recovery codes từ response
       setRecoveryCodes(response.data.recoveryCodes || [])
       // Đóng modal QR code
       setShowQRDialog(false)
       // Mở modal recovery codes
       setShowRecoveryCodesDialog(true)
-      showToast(t('admin.profileSettings.2faSetupSuccess'), 'success')
+      showToast(response.message, 'success')
     } catch (error: any) {
       console.error('Error confirming 2FA:', error)
       showToast(parseApiError(error), 'error')
@@ -73,7 +111,7 @@ export function usePasswordSecurity() {
       const recoveryCodesText = recoveryCodes.join('\n');
       navigator.clipboard.writeText(recoveryCodesText)
         .then(() => {
-          showToast('Đã sao chép mã khôi phục vào clipboard', 'success');
+          showToast(t('admin.profileSettings.2fa.copyAllRecoveryCodes'), 'success');
         })
         .catch((error) => {
           console.error('Error copying recovery codes:', error);
@@ -122,6 +160,10 @@ export function usePasswordSecurity() {
     handle2FAToggle,
     handleConfirm2FA,
     handleConfirmSetup,
+    handleRegenerateClick,
+    handleRegenerateRecoveryCodes,
+    showRegenerateConfirm,
+    setShowRegenerateConfirm,
     copyAllRecoveryCodes,
     downloadRecoveryCodes,
     t,

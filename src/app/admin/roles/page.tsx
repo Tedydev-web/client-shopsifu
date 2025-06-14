@@ -7,9 +7,9 @@ export default function LanguagesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">{t("admin.languages.title")}</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t("admin.roles.title")}</h2>
         <p className="text-muted-foreground">
-          {t("admin.languages.subtitle")}
+          {t("admin.roles.subtitle")}
         </p>
       </div>
       <RolesTable />

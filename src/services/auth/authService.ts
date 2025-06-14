@@ -27,7 +27,11 @@ import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
 
 export const authService = {
-
+  //GET ABILITY BY ROLE (PERMISSION)
+  getAbility: async (): Promise<any> => {
+    const response = await privateAxios.get(API_ENDPOINTS.AUTH.GET_ABILITY);
+    return response.data;
+  },
 
   // ĐĂNG NHẬP TÀI KHOẢN - SIGN-IN
   login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -64,7 +68,6 @@ export const authService = {
      const response = await privateAxios.post(API_ENDPOINTS.AUTH.RESET_PASSWORD_SEND, data);
      return response.data;
   }, 
-
 
   // XÁC THỰC & GỬI CODE - VERIFY & SEND CODE
   verify2fa: async (data: Verify2faRequest): Promise<Verify2faResponse> => {
@@ -117,7 +120,10 @@ export const authService = {
     );
     return response.data;
   },
-  
+  regenerateRecoveryCodes: async (data: Confirm2faRequest): Promise<Confirm2faResponse> => {
+    const response = await privateAxios.post<Confirm2faResponse>(API_ENDPOINTS.AUTH.REGENERATE_RECOVERY_CODES, data)
+    return response.data
+  },
 
   // KHÁC
   refreshToken: async (): Promise<RefreshTokenResponse> => {
@@ -143,7 +149,7 @@ export const authService = {
     }
   },
   trustDevice: async (): Promise<void> =>{
-    const response = await privateAxios.patch(API_ENDPOINTS.AUTH.TRUST_DEVICE, {})
+    const response = await privateAxios.post(API_ENDPOINTS.AUTH.TRUST_DEVICE, {})
     return response.data
   }
 };

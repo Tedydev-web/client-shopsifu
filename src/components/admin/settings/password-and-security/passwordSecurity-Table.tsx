@@ -5,14 +5,14 @@ import { ChevronRight, Lock, Shield, Clock, KeyRound } from 'lucide-react'
 import { useState } from 'react'
 import { ChangePasswordModal } from './passwordSecurity-ChangePassword'
 import { Profile2FAModal } from './passwordSecurity-2faModal'
-import { usePasswordSecurity } from './usePasswordSecurity'
+import { usePasswordSecurity } from './usePasswordSecurity-2fa'
 import { PasswordSecuritySession } from './passwordSecurity-Session'
 import { useUserData } from '@/hooks/useGetData-UserLogin'
 
 export function PasswordSecurityTable() {
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [currentView, setCurrentView] = useState('table') // 'table' or 'sessions'
-  
+  const user = useUserData();
   const {
     is2FAEnabled,
     show2FADialog,
@@ -30,19 +30,16 @@ export function PasswordSecurityTable() {
     handle2FAToggle,
     handleConfirm2FA,
     handleConfirmSetup,
+    handleRegenerateClick,
+    handleRegenerateRecoveryCodes,
+    showRegenerateConfirm,
+    setShowRegenerateConfirm,
     copyAllRecoveryCodes,
     downloadRecoveryCodes,
     t
-  } = usePasswordSecurity()
+  } = usePasswordSecurity({ isEnabled: user?.twoFactorEnabled ?? false })
 
-  // Mock user data - replace with actual user data
-  const userData = useUserData()
-  const userInfo = {
-    name: userData?.firstName + " " + userData?.lastName,
-    email: userData?.email,
-    twoFactorEnabled: userData?.twoFactorEnabled,
-    username: userData?.username
-  }
+
 
   const columns: SettingTableColumn[] = [
     {
@@ -55,8 +52,8 @@ export function PasswordSecurityTable() {
       label: "Xác minh 2 bước",
       value: (
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${userInfo.twoFactorEnabled ? "bg-green-500" : "bg-red-500"}`}></div>
-          <span>{userInfo.twoFactorEnabled ? "Đã bật" : "Chưa bật"}</span>
+          <div className={`w-2 h-2 rounded-full ${user?.twoFactorEnabled ? "bg-green-500" : "bg-red-500"}`}></div>
+          <span>{user?.twoFactorEnabled ? "Đã bật" : "Chưa bật"}</span>
         </div>
       ),
       startIcon: <Shield />,
@@ -70,15 +67,15 @@ export function PasswordSecurityTable() {
       endIcon: <ChevronRight />,
       onClick: () => setCurrentView('sessions')
     },    {
-      label: "Mã khôi phục",
+      label: "Tạo lại mã khôi phục",
       value: (
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${is2FAEnabled ? "bg-green-500" : "bg-gray-400"}`}></div>
-          <span>{is2FAEnabled ? "Đã tạo" : "Chưa tạo"}</span>
+          <span>Mã khôi phục sẽ được gửi về email của bạn</span>
         </div>
       ),
       startIcon: <KeyRound />,
-      endIcon: <ChevronRight />
+      endIcon: <ChevronRight />,
+      onClick: handleRegenerateClick
     }
   ]
 
@@ -97,13 +94,11 @@ export function PasswordSecurityTable() {
       <ChangePasswordModal
         open={showChangePassword}
         onOpenChange={setShowChangePassword}
-        userInfo={{
-          ...userInfo,
-          email: userInfo.email ?? "",
-          username: userInfo.username ?? "",
-        }}
       />      
       <Profile2FAModal
+        showRegenerateConfirm={showRegenerateConfirm}
+        setShowRegenerateConfirm={setShowRegenerateConfirm}
+        handleRegenerateRecoveryCodes={handleRegenerateRecoveryCodes}
         show2FADialog={show2FADialog}
         setShow2FADialog={setShow2FADialog}
         showQRDialog={showQRDialog}

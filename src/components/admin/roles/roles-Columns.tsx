@@ -6,6 +6,7 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-component/data
 import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
 import { Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
 
 export type RoleType = 'admin' | 'seller' | 'client' | 'editor';
 
@@ -99,18 +100,30 @@ export const RolesColumns = ({
       cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("description")}</div>,
     },
     {
-      accessorKey: "createdById",
+      accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created By" />
+        <DataTableColumnHeader column={column} title="Tạo lúc" />
       ),
-      cell: ({ row }) => <div>{row.getValue("createdById")}</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="w-[160px]">
+            {format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm")}
+          </div>
+        );
+      },
     },
     {
-      accessorKey: "updatedById",
+      accessorKey: "updatedAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Updated By" />
+        <DataTableColumnHeader column={column} title="Cập nhật lúc" />
       ),
-      cell: ({ row }) => <div>{row.getValue("updatedById")}</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="w-[160px]">
+            {format(new Date(row.getValue("updatedAt")), "dd/MM/yyyy HH:mm")}
+          </div>
+        );
+      },
     },
     {
       id: "actions",

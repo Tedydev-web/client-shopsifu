@@ -6,14 +6,18 @@ export const API_ENDPOINTS = {
     SIGNIN: `${API_BASE}/auth/login`,
     REFRESH_TOKEN: `${API_BASE}/auth/refresh-token`,
     LOGOUT: `${API_BASE}/auth/logout`,
-    PROFILE: `${API_BASE}/profile`,
     SEND_OTP: `${API_BASE}/auth/send-otp`,
     GOOGLE_LOGIN: `${API_BASE}/auth/google-link`,
     GET_CSRF_TOKEN: `${API_BASE}/get-cookies`,
-    // SIGN-UP -----
+    //PROFILE
+    PROFILE: `${API_BASE}/profile`,
+    UPDATE_PROFILE: `${API_BASE}/profile`,
+    // SIGN-UP 
     SIGNUP: `${API_BASE}/auth/complete-registration`,
     SIGNUP_SEND: `${API_BASE}/auth/initiate-registration`,
-    // RESET PASSWORD -----
+    // CHANGE PASSWORD 
+    CHANGE_PASSWORD: `${API_BASE}/auth/password/change`,
+    // RESET PASSWORD 
     RESET_PASSWORD: `${API_BASE}/auth/password/set-new`,
     RESET_PASSWORD_SEND: `${API_BASE}/auth/password/initiate-reset`,
     //VERIFY & RESEND
@@ -24,10 +28,16 @@ export const API_ENDPOINTS = {
     SETUP_2FA: `${API_BASE}/auth/2fa/setup`,
     CONFIRM_2FA: `${API_BASE}/auth/2fa/confirm-setup`,
     DISABLE_2FA: `${API_BASE}/auth/2fa/disable`,
+    //RECOVERY CODE
+    REGENERATE_RECOVERY_CODES: `${API_BASE}/auth/2fa/regenerate-recovery-codes`,
     // DEVICE
-    TRUST_DEVICE: `${API_BASE}/auth/sessions/current-device/trust`,
-    UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`
+    TRUST_DEVICE: `${API_BASE}/sessions/devices/trust-current`,
+    UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`,
+    //GET ABILITY BY ROLE (PERMISSION)
+    GET_ABILITY: `${API_BASE}/auth/ui-capabilities`,
   },
+
+  // QUẢN LÝ VAI TRÒ - ROLES
   ROLES:{
     GETALL: `${API_BASE}/roles`,
     GETBYID: `${API_BASE}/roles/:id`,
@@ -36,6 +46,7 @@ export const API_ENDPOINTS = {
     POST_ROLE_PERMISSIONS: `${API_BASE}/roles/:id/assign-permissions`,
     DELETE_BY_ID: `${API_BASE}/roles/:id`,
   },
+  // QUẢN LÝ QUYỀN - PERMISSIONS
   PERMISSION:{
     GETALL: `${API_BASE}/permissions`,
     GETBYID: `${API_BASE}/permissions/:id`,
@@ -43,6 +54,7 @@ export const API_ENDPOINTS = {
     POST: `${API_BASE}/permissions`,
     DELETE_BY_ID: `${API_BASE}/permissions/:id`,
   },
+  // QUẢN LÝ NGÔN NGỮ - LANGUAGES
   LANGUAGES:{
     GETALL: `${API_BASE}/languages`,
     GETBYID: `${API_BASE}/languages/:id`,
@@ -50,6 +62,7 @@ export const API_ENDPOINTS = {
     POST: `${API_BASE}/languages`,
     DELETE_BY_ID: `${API_BASE}/languages/:id`,
   },
+  // QUẢN LÝ SẢN PHẨM - PRODUCTS
   PRODUCTS: {
     LIST: `${API_BASE}/products`,
     DETAIL: `${API_BASE}/products/:id`,
@@ -57,6 +70,7 @@ export const API_ENDPOINTS = {
     UPDATE: `${API_BASE}/products/:id`,
     DELETE: `${API_BASE}/products/:id`
   },
+  // THỐNG KÊ LOGS - AUDIT LOGS
   AUDIT_LOGS: {
     GETALL: `${API_BASE}/audit-logs`,
     GET_STATS: `${API_BASE}/audit-logs/stats`,
@@ -64,6 +78,7 @@ export const API_ENDPOINTS = {
     GET_ACTIONS: `${API_BASE}/audit-logs/actions`,
     GET_ENTITIES: `${API_BASE}/audit-logs/entities`,
   },
+  // QUẢN LÝ SESSION - SESSIONS
   SESSIONS: {
     GETALL: `${API_BASE}/auth/sessions`,
     REVOKE: `${API_BASE}/auth/sessions/revoke`,

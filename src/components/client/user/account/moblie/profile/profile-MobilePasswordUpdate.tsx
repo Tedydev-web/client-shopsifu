@@ -1,30 +1,30 @@
-"use client";
+// "use client";
 
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerClose,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { passwordSchema, type PasswordFormData } from "@/utils/schema";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Info, Lock } from "lucide-react";
-import { t } from "i18next";
+// import {
+//   Drawer,
+//   DrawerContent,
+//   DrawerHeader,
+//   DrawerTitle,
+//   DrawerDescription,
+//   DrawerFooter,
+//   DrawerClose,
+// } from "@/components/ui/drawer";
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { useState } from "react";
+// import { passwordSchema, type PasswordFormData } from "@/utils/schema";
+// import { useForm } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import {
+//   Form,
+//   FormControl,
+//   FormField,
+//   FormItem,
+//   FormLabel,
+//   FormMessage,
+// } from "@/components/ui/form";
+// import { Info, Lock } from "lucide-react";
+// import { t } from "i18next";
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -38,33 +38,33 @@ interface ChangePasswordModalProps {
   };
 }
 
-export function ChangePasswordModal({
-  open,
-  onOpenChange,
-  userInfo,
-}: ChangePasswordModalProps) {
-  const [loading, setLoading] = useState(false);
+// export function ChangePasswordModal({
+//   open,
+//   onOpenChange,
+//   userInfo,
+// }: ChangePasswordModalProps) {
+//   const [loading, setLoading] = useState(false);
 
-  const form = useForm<PasswordFormData>({
-    resolver: zodResolver(passwordSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    },
-  });
+//   const form = useForm<PasswordFormData>({
+//     resolver: zodResolver(passwordSchema),
+//     defaultValues: {
+//       currentPassword: "",
+//       newPassword: "",
+//       confirmPassword: "",
+//     },
+//   });
 
-  const onSubmit = async (data: PasswordFormData) => {
-    setLoading(true);
-    try {
-      // TODO: Call API to change password
-      onOpenChange(false);
-    } catch (error) {
-      // Handle error
-    } finally {
-      setLoading(false);
-    }
-  };
+//   const onSubmit = async (data: PasswordFormData) => {
+//     setLoading(true);
+//     try {
+//       // TODO: Call API to change password
+//       onOpenChange(false);
+//     } catch (error) {
+//       // Handle error
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>

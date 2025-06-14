@@ -67,7 +67,7 @@ export const roleService = {
   ): Promise<RoleUpdateResponse> => {
     try {
       const url = API_ENDPOINTS.ROLES.UPDATE.replace(":id", id);
-      const response = await privateAxios.put(url, data);
+      const response = await privateAxios.patch(url, data);
       return response.data;
     } catch (error) {
       throw error;
