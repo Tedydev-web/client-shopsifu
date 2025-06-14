@@ -1,6 +1,5 @@
 import { showToast } from '@/components/ui/toastify';
 import axios, {
-  AxiosError,
   AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
@@ -214,10 +213,9 @@ privateAxios.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
-  async (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      console.log('Token bị vô hiệu hóa hoặc không hợp lệ:', error.response?.data);
-
+  async (error: any) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      console.error('❌ Lỗi 401 - Unauthorized. Token không hợp lệ hoặc đã hết hạn. Đang đăng xuất...');
       const { store, persistor } = getStore();
 
       // 1. Clear all site cookies
