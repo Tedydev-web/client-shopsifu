@@ -46,9 +46,9 @@ export function usePermissions() {
       }));
 
       setPermissions(mappedPermissions);
-      setTotalItems(response.meta.totalItems);
-      setCurrentPage(response.meta.currentPage);
-      setTotalPages(response.meta.totalPages);
+      setTotalItems(response.meta.totalItems || 0);
+      setCurrentPage(response.meta.currentPage || 1);
+      setTotalPages(response.meta.totalPages || 1);
     } catch (error) {
       showToast(parseApiError(error), 'error');
       console.error('Error fetching permissions:', error);

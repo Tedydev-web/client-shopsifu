@@ -49,7 +49,7 @@ export function PermissionsTable() {
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setIsSearching(true)
-      getAllPermissions({ page: 1, limit, search: debouncedSearchValue })
+      getAllPermissions({ meta: { currentPage: page, itemsPerPage: limit } })
       .finally(() => {
         setIsSearching(false)
       })
@@ -77,7 +77,7 @@ export function PermissionsTable() {
       const success = await deletePermission(permissionToDelete.id.toString()); // Chuyển id thành string
       if (success) {
         handleCloseDeleteModal();
-        getAllPermissions({ page: page, limit}); // Chuyển page và limit thành string
+        getAllPermissions({ meta: { currentPage: page, itemsPerPage: limit }}); // Chuyển page và limit thành string
       }
     } catch (error) {
       console.error('Lỗi khi xóa quyền:', error);
@@ -107,7 +107,7 @@ export function PermissionsTable() {
   
         if (response) {
           handleCloseModal();
-          getAllPermissions({ page, limit });
+          getAllPermissions({ meta: { currentPage: page, itemsPerPage: limit }});
         }
       } else {
         // Tạo mới
@@ -120,7 +120,7 @@ export function PermissionsTable() {
   
         if (response) {
           handleCloseModal();
-          getAllPermissions({ page, limit });
+          getAllPermissions({ meta: { currentPage: page, itemsPerPage: limit }});
         }
       }
     } catch (error) {
@@ -133,12 +133,12 @@ export function PermissionsTable() {
   }
 
   const handlePageChange = (newPage: number) => {
-    getAllPermissions({ page: newPage, limit })
+    getAllPermissions({ meta: { currentPage: newPage, itemsPerPage: limit } })
   }
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
-    getAllPermissions({ page: 1, limit: newLimit })
+    getAllPermissions({ meta: { currentPage: 1, itemsPerPage: newLimit } })
   }
 
   return (
@@ -182,8 +182,8 @@ export function PermissionsTable() {
         open={isModalOpen}
         onClose={handleCloseModal}
         mode={selectedPermission ? "edit" : "add"}
-        permission={selectedPermission}
-        onSubmit={handleSubmit}
+        // permission={selectedPermission}
+        // onSubmit={handleSubmit}
       />
 
       <ConfirmDeleteModal

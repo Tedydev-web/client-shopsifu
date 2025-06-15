@@ -21,7 +21,7 @@ interface PermissionsModalUpsertProps {
   onClose: () => void;
   mode: 'add' | 'edit';
   permission?: PermissionItem | null;
-  onSubmit: (data: Partial<PermissionItem>) => Promise<void>;
+  onSubmit?: (data: Partial<PermissionItem>) => Promise<void>;
 }
 
 export default function PermissionsModalUpsert({ open, onClose, mode, permission, onSubmit }: PermissionsModalUpsertProps) {
@@ -34,11 +34,9 @@ export default function PermissionsModalUpsert({ open, onClose, mode, permission
   useEffect(() => {
     if (mode === 'edit' && permission) {
       setAction(permission.action || '');
-      setSubject(permission.subject || '');
       setDescription(permission.description || '');
     } else {
       setAction('');
-      setSubject('');
       setDescription('');
     }
   }, [mode, permission, open]);
@@ -52,11 +50,11 @@ export default function PermissionsModalUpsert({ open, onClose, mode, permission
 
     setLoading(true);
     try {
-      const data: Partial<PermissionItem> = { action, subject, description };
+      const data: Partial<PermissionItem> = { action, description };
       if (mode === 'edit' && permission) {
         data.id = permission.id;
       }
-      await onSubmit(data);
+      await onSubmit?.(data);
       onClose();
     } catch (error) {
       // Error is already handled by the parent component's try-catch block
@@ -90,7 +88,7 @@ export default function PermissionsModalUpsert({ open, onClose, mode, permission
               required
             />
           </div>
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.subject")}</label>
             <Input
               value={subject}
@@ -98,7 +96,7 @@ export default function PermissionsModalUpsert({ open, onClose, mode, permission
               placeholder={t("admin.permissions.modal.subjectPlaceholder")}
               required
             />
-          </div>
+          </div> */}
           <div>
             <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.description")}</label>
             <Input

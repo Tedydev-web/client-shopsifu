@@ -38,7 +38,7 @@ export function AuditLogsTable() {
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setIsSearching(true);
-      getAllAuditLogs({ page: 1, limit, search: debouncedSearchValue }).finally(() => setIsSearching(false));
+      getAllAuditLogs({ meta: { currentPage: 1, itemsPerPage: limit, search: debouncedSearchValue } }).finally(() => setIsSearching(false));
     }
   }, [debouncedSearchValue, limit]);
 
@@ -47,12 +47,12 @@ export function AuditLogsTable() {
   };
 
   const handlePageChange = (newPage: number) => {
-    getAllAuditLogs({ page: newPage, limit });
+    getAllAuditLogs({ meta: { currentPage: newPage, itemsPerPage: limit, search: debouncedSearchValue } });
   };
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
-    getAllAuditLogs({ page: 1, limit: newLimit }); // Reset về trang 1 khi thay đổi limit
+    getAllAuditLogs({ meta: { currentPage: 1, itemsPerPage: newLimit, search: debouncedSearchValue } }); // Reset về trang 1 khi thay đổi limit
   };
 
   // Xử lý click vào row để mở modal
