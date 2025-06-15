@@ -1,4 +1,4 @@
-import { PaginationRequest, BaseResponse } from "./base.interface";
+import { PaginationRequest, BaseResponse } from "../base.interface";
 
 
 export interface PerCreateRequest {

@@ -6,7 +6,7 @@ import {
   RoleGetAllResponse,
   RoleCreateRequest,
   RoleUpdateRequest,
-} from "@/types/role.interface"
+} from "@/types/auth/role.interface"
 import { PaginationRequest } from "@/types/base.interface"
 import { Role } from "./roles-Columns"
 import { string } from "zod"

@@ -7,7 +7,7 @@ import {
   LangCreateRequest, 
   LangUpdateRequest,
   LangGetAllResponse
-} from "@/types/languages.interface"
+} from "@/types/admin/languages.interface"
 import { PaginationRequest } from "@/types/base.interface"
 import { t } from "i18next"
 

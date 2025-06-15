@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User } from '@/types/user.interface';
+import { User } from '@/types/admin/user.interface';
 import { mockUsers } from './users-MockData';
 
 export function useUsers() {

@@ -1,4 +1,4 @@
-import { BaseResponse, PaginationRequest } from "./base.interface";
+import { BaseResponse, PaginationRequest } from "../base.interface";
 
 
 export interface Permission {

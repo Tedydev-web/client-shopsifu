@@ -7,7 +7,7 @@ import {
   PerCreateRequest,
   PerUpdateRequest,
   PerGetAllResponse,
-} from "@/types/permission.interface";
+} from "@/types/auth/permission.interface";
 import { PaginationRequest } from "@/types/base.interface";
 import { Code } from "lucide-react";
 

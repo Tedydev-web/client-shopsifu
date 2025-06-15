@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { showToast } from "@/components/ui/toastify";
-import { PermissionItem } from '@/types/permission.interface';
+import { PermissionItem } from '@/types/auth/permission.interface';
 
 interface PermissionsModalUpsertProps {
   open: boolean;

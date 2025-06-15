@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Label } from '@/components/ui/label'
 import { permissionService } from '@/services/permissionService'
-import { PerGetAllResponse } from '@/types/permission.interface'
+import { PerGetAllResponse } from '@/types/auth/permission.interface'
 
 interface Role {
   id?: number

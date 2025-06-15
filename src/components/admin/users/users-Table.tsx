@@ -7,7 +7,7 @@ import { userColumns } from './users-Columns'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
 import UsersModalUpsert from './users-ModalUpsert'
 import { useUsers } from './useUsers'
-import { User } from '@/types/user.interface'
+import { User } from '@/types/admin/user.interface'
 
 export default function UserTable({ search }: { search: string }) {
   const { t } = useTranslation();

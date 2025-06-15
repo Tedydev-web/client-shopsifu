@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { auditLogsService } from '@/services/auditLogsService';
-import { AuditLogListResponse } from '@/types/auditLogs.interface';
+import { AuditLogListResponse } from '@/types/admin/auditLogs.interface';
 import { PaginationRequest } from '@/types/base.interface';
 
 export function useAuditLogs() {

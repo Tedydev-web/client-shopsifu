@@ -10,7 +10,7 @@ import {
   RoleDeleteResponse,
   RoleAssignPermissionRequest,
   RoleAssignPermissionResponse,
-} from "@/types/role.interface";
+} from "@/types/auth/role.interface";
 import { PaginationRequest } from "@/types/base.interface";
 
 export const roleService = {
