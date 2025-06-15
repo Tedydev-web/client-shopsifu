@@ -107,7 +107,6 @@ export default function RolesTable() {
         showToast(t('admin.roles.updatedSuccess'), 'success')
       } else {
         await createRole(payload)
-        showToast(t('admin.roles.createdSuccess'), 'success')
       }
       handleCloseModal()
       getAllRoles({ page, limit, search: debouncedSearchValue })

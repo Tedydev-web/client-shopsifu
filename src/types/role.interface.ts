@@ -1,3 +1,5 @@
+import { BaseResponse, PaginationRequest } from "./base.interface";
+
 
 export interface Permission {
     id: string;
@@ -74,25 +76,37 @@ export interface RoleGetByIdResponse {
 
 export interface RoleCreateRequest {
     name: string;
-    description: string;
-    isActive: boolean;
-    permissionIds: string[];
+    description?: string;
+    isSystemRole?: boolean;
+    isSuperAdmin?: boolean;
+    permissionIds?: string[];
 }
 
-export interface RoleCreateResponse {
-    name: string;
-    description: string;
-    role: RoleType;
-    isActive: boolean;
-    createdAt: string;
-    permissionIds: string[];
+export interface RoleCreateResponse extends BaseResponse {
+    data:{
+        id: number,
+        name: string,
+        description: string,
+        createdById: string,
+        updatedById: string,
+        deletedById: string,
+        deletedAt: string,
+        createdAt: string,
+        updatedAt: string,
+        isSystemRole: boolean,
+        isSuperAdmin: boolean,
+        permissions: Permission[]
+    }
+   
 }
+
 
 export interface RoleUpdateRequest {
     name: string;
-    description: string;
-    isActive: boolean;
-    permissionIds: string[];
+    description?: string;
+    isSystemRole?: boolean;
+    isSuperAdmin?: boolean;
+    permissionIds?: string[];
 }
 
 export interface RoleUpdateResponse {
