@@ -26,17 +26,17 @@ export const useGetProfile = () => {
         googleId: response.data.googleId,
         createdAt: response.data.createdAt,
         updatedAt: response.data.updatedAt,
-        firstName: response.data.userProfile.firstName,
-        lastName: response.data.userProfile.lastName,
-        username: response.data.userProfile.username,
-        phoneNumber: response.data.userProfile.phoneNumber,
-        avatar: response.data.userProfile.avatar,
+        firstName: response.data.userProfile?.firstName || '',
+        lastName: response.data.userProfile?.lastName || '',
+        username: response.data.userProfile?.username || '',
+        phoneNumber: response.data.userProfile?.phoneNumber || '',
+        avatar: response.data.userProfile?.avatar || '',
       };
 
       dispatch(setProfile(flattenedProfile));
       return flattenedProfile; // Trả về dữ liệu profile đã được làm phẳng
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to fetch profile';
+      const errorMessage = err.response?.message || 'Failed to fetch profile';
       setError(errorMessage);
       toast.error(errorMessage);
       return null; // Trả về null khi có lỗi

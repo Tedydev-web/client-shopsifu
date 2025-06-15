@@ -1,21 +1,35 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious, 
+  type CarouselApi 
+} from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
-import { useState, useEffect, useCallback } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { heroImages, serviceItems } from './landing-Mockdata';
 
 interface HeroSectionProps {
   className?: string;
 }
 
 export function HeroSection({ className }: HeroSectionProps) {
+  const isMobile = useIsMobile();
+  const plugin = useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true })
+  )
+
   const [api, setApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideCount, setSlideCount] = useState(0);
+
   useEffect(() => {
     if (!api) {
       return;
@@ -43,20 +57,6 @@ export function HeroSection({ className }: HeroSectionProps) {
     api?.scrollTo(index);
   }, [api]);
 
-  const heroImages = [
-    '/images/demo/lazada_1.avif',
-    '/images/demo/lazada_2.avif',
-    '/images/demo/lazada_3.avif',
-  ];
-  const serviceItems = [
-    { icon: '/images/client/categories/m/6.png', label: 'Mã Giảm Giá' },
-    { icon: '/images/client/categories/m/5.png', label: 'Khách Hàng Thân Thiết' },
-    { icon: '/images/client/categories/m/4.png', label: 'Hàng Chọn Giá Hời' },
-    { icon: '/images/client/categories/m/3.png', label: 'Shopee Style Voucher 30%' },
-    { icon: '/images/client/categories/m/1.png', label: 'Shopee Mall' },
-    { icon: '/images/client/categories/m/2.png', label: 'Săn Ngay 100.000 Xu' },
-  ];
-
   return (
     <section className={cn("w-full bg-white py-6 shadow-sm", className)}>
       <div className="container mx-auto px-4 justify-start max-w-[1250px]">
@@ -64,14 +64,14 @@ export function HeroSection({ className }: HeroSectionProps) {
           {/* Left column - 8 cols */}
           <div className="lg:col-span-8">
             <div  
-              className="relative h-[350px] rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out"
+              className={cn(
+                "relative rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out",
+                isMobile ? "h-[220px]" : "h-[350px]"
+              )}
             >
               <Carousel
                 plugins={[
-                  Autoplay({
-                    delay: 3000, // Time in ms before switching to the next image
-                    stopOnInteraction: true, // Autoplay stops on user interaction
-                  }),
+                  plugin.current,
                 ]}
                 opts={{
                   loop: true, // Carousel will loop indefinitely
@@ -95,8 +95,12 @@ export function HeroSection({ className }: HeroSectionProps) {
                   ))}
                 </CarouselContent>
                 {/* Navigation Buttons */}
-                <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
-                <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
+                {!isMobile && (
+                  <>
+                    <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
+                    <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
+                  </>
+                )}
               </Carousel>
               {/* Dot Indicators */}
               {slideCount > 0 && (
@@ -116,7 +120,7 @@ export function HeroSection({ className }: HeroSectionProps) {
               )}
 
               {/* Overlay content - optional */}
-              <div className="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/60 to-transparent z-10"> {/* Ensure overlay is on top */}
+              <div className={cn("absolute inset-0 flex-col justify-end p-8 bg-gradient-to-t from-black/60 to-transparent z-10", isMobile ? 'hidden' : 'flex')}> {/* Ensure overlay is on top */}
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Bộ sưu tập mới nhất</h2>
                 <p className="text-white mb-4 max-w-lg">Khám phá những xu hướng thời trang mới nhất cho mùa này</p>
                 <Button className="w-fit">Khám phá ngay</Button>
@@ -125,13 +129,13 @@ export function HeroSection({ className }: HeroSectionProps) {
           </div>
 
           {/* Right column - 4 cols */}
-          <div className="lg:col-span-4">
-          <div 
-            className="relative w-full h-[350px] rounded-2xl overflow-hidden 
-             border border-transparent hover:border-[#ccc] 
-             shadow transition-all duration-300 ease-in-out 
-             hover:shadow-[8px_8px_120px_rgba(1,0,0,0.2)]"
->
+          <div className={cn("lg:col-span-4", isMobile ? 'hidden' : 'flex')}>
+            <div 
+              className={cn(
+                "relative w-full rounded-2xl overflow-hidden border border-transparent hover:border-[#ccc] shadow transition-all duration-300 ease-in-out hover:shadow-[8px_8px_120px_rgba(1,0,0,0.2)]",
+                isMobile ? "h-[200px]" : "h-[350px]"
+              )}
+            >
               {/* Placeholder for the secondary image */}
               <div className="absolute inset-0">
                 <Image

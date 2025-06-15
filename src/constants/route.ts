@@ -15,4 +15,5 @@ export const ROUTES = {
     ORDERS: '/admin/orders',
     SETTINGS_SECURITY: '/admin/settings/security'
   },
+  PRODUCT: '/product/:id'
 }

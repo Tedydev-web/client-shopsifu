@@ -13,4 +13,5 @@ export interface Product {
   salePrice: number
   discount: number
   type: string
+  Isfavorite?: boolean
 }

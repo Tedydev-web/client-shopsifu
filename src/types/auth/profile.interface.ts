@@ -34,7 +34,7 @@ export interface UserProfileResponse extends BaseResponse {
         googleId: string | null;
         createdAt: string;
         updatedAt: string;
-        userProfile: {
+        userProfile?: {
             firstName: string;
             lastName: string;
             username: string;
