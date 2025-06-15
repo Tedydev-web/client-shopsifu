@@ -48,14 +48,23 @@ export function HeroSection({ className }: HeroSectionProps) {
     '/images/demo/lazada_2.avif',
     '/images/demo/lazada_3.avif',
   ];
+  const serviceItems = [
+    { icon: '/images/client/categories/m/6.png', label: 'Mã Giảm Giá' },
+    { icon: '/images/client/categories/m/5.png', label: 'Khách Hàng Thân Thiết' },
+    { icon: '/images/client/categories/m/4.png', label: 'Hàng Chọn Giá Hời' },
+    { icon: '/images/client/categories/m/3.png', label: 'Shopee Style Voucher 30%' },
+    { icon: '/images/client/categories/m/1.png', label: 'Shopee Mall' },
+    { icon: '/images/client/categories/m/2.png', label: 'Săn Ngay 100.000 Xu' },
+  ];
+
   return (
-    <section className={cn("w-full py-8 md:py-16", className)}>
-      <div className="container mx-auto px-4">
+    <section className={cn("w-full bg-white py-6 shadow-sm", className)}>
+      <div className="container mx-auto px-4 justify-start max-w-[1250px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left column - 8 cols */}
           <div className="lg:col-span-8">
-            <div 
-              className="relative w-full h-[350px] rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out"
+            <div  
+              className="relative h-[350px] rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out"
             >
               <Carousel
                 plugins={[
@@ -118,7 +127,7 @@ export function HeroSection({ className }: HeroSectionProps) {
           {/* Right column - 4 cols */}
           <div className="lg:col-span-4">
           <div 
-  className="relative w-full h-[350px] rounded-2xl overflow-hidden 
+            className="relative w-full h-[350px] rounded-2xl overflow-hidden 
              border border-transparent hover:border-[#ccc] 
              shadow transition-all duration-300 ease-in-out 
              hover:shadow-[8px_8px_120px_rgba(1,0,0,0.2)]"
@@ -145,6 +154,32 @@ export function HeroSection({ className }: HeroSectionProps) {
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Service Icons Section */}
+        <div className="mt-6">
+          <div className="grid grid-cols-3 sm:grid-cols-6 items-start justify-center gap-x-4 gap-y-2">
+            {serviceItems.map((item) => (
+              <a 
+                href="#" 
+                key={item.label} 
+                className="flex flex-col items-center text-center group"
+              >
+                <div className="flex items-center justify-center w-[52px] h-[52px] bg-white rounded-2xl transition-all duration-300 group-hover:-translate-y-1">
+                  <Image 
+                    src={item.icon} 
+                    alt={item.label} 
+                    width={46} 
+                    height={46}
+                    className="object-contain"
+                  />
+                </div>
+                <p className="text-xs sm:text-[13px] text-gray-800 leading-tight h-10 flex items-center justify-center">
+                  {item.label}
+                </p>
+              </a>
+            ))}
           </div>
         </div>
       </div>
