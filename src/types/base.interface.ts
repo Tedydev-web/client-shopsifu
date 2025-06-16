@@ -1,11 +1,11 @@
 export interface BaseResponse {
-    status: number;
-    success: boolean;
-    statusCode: number;
-    title: string;
-    message: string;
-    timestamp: string;
-    requestId: string;
+    status?: number;
+    success?: boolean;
+    statusCode?: number;
+    title?: string;
+    message?: string;
+    timestamp?: string;
+    requestId?: string;
   }
 
 

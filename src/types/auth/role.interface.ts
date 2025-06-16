@@ -87,12 +87,12 @@ export interface RoleGetByIdResponse {
     updatedAt: string;
 }
 
-export interface RoleCreateRequest {
+export interface RoleCreateRequest extends BaseResponse {
     name: string;
     description?: string;
     isSystemRole?: boolean;
     isSuperAdmin?: boolean;
-    permissionIds?: string[];
+    permissionIds?: number[];
 }
 
 export interface RoleCreateResponse extends BaseResponse {
@@ -113,16 +113,16 @@ export interface RoleCreateResponse extends BaseResponse {
    
 }
 
-
-export interface RoleUpdateRequest {
-    name: string;
+export interface RoleUpdateRequest extends BaseResponse {
+    name?: string;
     description?: string;
+    isActive?: boolean;
     isSystemRole?: boolean;
     isSuperAdmin?: boolean;
-    permissionIds?: string[];
+    permissionIds?: number[];
 }
 
-export interface RoleUpdateResponse {
+export interface RoleUpdateResponse extends BaseResponse {
     id: string;
     name: string;
     description: string;

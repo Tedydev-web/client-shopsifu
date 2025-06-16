@@ -17,10 +17,9 @@ import { showToast } from "@/components/ui/toastify"
 import { useTranslation } from "react-i18next"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Label } from '@/components/ui/label'
-import { permissionService } from '@/services/permissionService'
+import { Skeleton } from '@/components/ui/skeleton'
 import { PerGetAllResponse } from '@/types/auth/permission.interface'
-import { RoleGetAllResponse, Role } from '@/types/auth/role.interface'
-
+import { Role } from './roles-Columns'
 
 interface RolesModalUpsertProps {
   open: boolean
@@ -31,8 +30,10 @@ interface RolesModalUpsertProps {
     name: string
     description: string
     isActive: boolean
-    permissionIds: string[]
+    permissionIds: number[]
   }) => Promise<void>
+  permissionsData: PerGetAllResponse['data'];
+  isPermissionsLoading: boolean;
 }
 
 export default function RolesModalUpsert({
@@ -41,6 +42,8 @@ export default function RolesModalUpsert({
   mode,
   role,
   onSubmit,
+  permissionsData,
+  isPermissionsLoading,
 }: RolesModalUpsertProps) {
   const { t } = useTranslation()
 
@@ -48,32 +51,19 @@ export default function RolesModalUpsert({
   const [description, setDescription] = useState("")
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
-  const [permissionsData, setPermissionsData] = useState<PerGetAllResponse['data']>({});
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    const fetchPermissions = async () => {
-      try {
-        const response = await permissionService.getAll();
-        setPermissionsData(response.data);
-      } catch (error) {
-        showToast("Không thể tải danh sách quyền", "error");
-      }
-    };
-    if (open) {
-      fetchPermissions();
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (mode === "edit" && role) {
-      setName(role.name || "")
-      setDescription(role.description || "")
+    if (mode === 'edit' && role) {
+      setName(role.name || '')
+      setDescription(role.description || '')
       setIsActive(role.isActive ?? true)
-      setSelectedPermissionIds(new Set(role.permissionIds?.map(Number) || []))
-    } else if (mode === "add") {
-      setName("")
-      setDescription("")
+      const initialPermissionIds = role.permissions?.map(p => p.id) || []
+      setSelectedPermissionIds(new Set(initialPermissionIds))
+    } else {
+      // Reset fields for "add" mode or when role is not available
+      setName('')
+      setDescription('')
       setIsActive(true)
       setSelectedPermissionIds(new Set())
     }
@@ -82,9 +72,10 @@ export default function RolesModalUpsert({
   const handleMasterSwitchChange = (subject: string, checked: boolean) => {
     const subjectPermissions = permissionsData[subject] || [];
     const subjectPermissionIds = subjectPermissions.map(p => p.id);
+    const initialPermissionIds = role?.permissions?.map(p => p.id) || []
 
     setSelectedPermissionIds(prev => {
-      const newSet = new Set(prev);
+      const newSet = new Set(initialPermissionIds);
       if (checked) {
         subjectPermissionIds.forEach(id => newSet.add(id));
       } else {
@@ -129,7 +120,7 @@ export default function RolesModalUpsert({
         name,
         description,
         isActive,
-        permissionIds: Array.from(selectedPermissionIds).map(String),
+        permissionIds: Array.from(selectedPermissionIds),
       })
       onClose()
     } catch (error) {
@@ -189,44 +180,53 @@ export default function RolesModalUpsert({
                 </p>
               </div>
               <div className="rounded-lg border mt-2">
-                <Accordion type="multiple" className="w-full">
-                  {Object.entries(permissionsData).map(([subject, items]) => {
-                    const allSelected = items.every(item => selectedPermissionIds.has(item.id));
-                    return (
-                      <AccordionItem value={subject} key={subject}>
-                        <AccordionTrigger className="bg-slate-50 hover:bg-slate-100 px-4 data-[state=open]:bg-slate-100 rounded-t-lg">
-                          <div className="flex items-center justify-between w-full">
-                            <span className="font-semibold uppercase tracking-wider">{subject}</span>
-                            <Switch
-                              checked={allSelected}
-                              onCheckedChange={(checked) => handleMasterSwitchChange(subject, checked)}
-                              onClick={(e) => e.stopPropagation()} 
-                            />
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="bg-white p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                            {items.map(item => (
-                              <div key={item.id} className="space-y-1">
-                                <div className="flex items-center justify-between">
-                                  <Label htmlFor={`perm-${item.id}`} className={`uppercase ${getActionColor(item.action)}`}>
-                                    {item.action}
-                                  </Label>
-                                  <Switch
-                                    id={`perm-${item.id}`}
-                                    checked={selectedPermissionIds.has(item.id)}
-                                    onCheckedChange={(checked) => handleChildSwitchChange(item.id, checked)}
-                                  />
+                {isPermissionsLoading ? (
+                  <div className="p-4 space-y-4">
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                  </div>
+                ) : (
+                  <Accordion type="multiple" className="w-full">
+                    {Object.entries(permissionsData || {}).map(([subject, items]) => {
+                      const allSelected = items.every(item => selectedPermissionIds.has(item.id));
+                      return (
+                        <AccordionItem value={subject} key={subject}>
+                          <AccordionTrigger className="bg-slate-50 hover:bg-slate-100 px-4 data-[state=open]:bg-slate-100 rounded-t-lg">
+                            <div className="flex items-center justify-between w-full">
+                              <span className="font-semibold uppercase tracking-wider">{subject}</span>
+                              <Switch
+                                checked={allSelected}
+                                onCheckedChange={(checked) => handleMasterSwitchChange(subject, checked)}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="bg-white p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                              {items.map(item => (
+                                <div key={item.id} className="space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <Label htmlFor={`perm-${item.id}`} className={`uppercase ${getActionColor(item.action)}`}>
+                                      {item.action}
+                                    </Label>
+                                    <Switch
+                                      id={`perm-${item.id}`}
+                                      checked={selectedPermissionIds.has(item.id)}
+                                      onCheckedChange={(checked) => handleChildSwitchChange(item.id, checked)}
+                                    />
+                                  </div>
+                                  <p className="text-sm text-muted-foreground pr-6">{item.description}</p>
                                 </div>
-                                <p className="text-sm text-muted-foreground pr-6">{item.description}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    );
-                  })}
-                </Accordion>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
+                )}
               </div>
             </div>
           </div>
