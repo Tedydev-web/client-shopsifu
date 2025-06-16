@@ -36,7 +36,14 @@ export const API_ENDPOINTS = {
     //GET ABILITY BY ROLE (PERMISSION)
     GET_ABILITY: `${API_BASE}/auth/ui-capabilities`,
   },
-
+  // QUẢN LÝ NGƯỜI DÙNG - USERS
+  USERS:{
+    GETALL: `${API_BASE}/users`,
+    GETBYID: `${API_BASE}/users/:id`,
+    UPDATE: `${API_BASE}/users/:id`,
+    POST: `${API_BASE}/users`,
+    DELETE_BY_ID: `${API_BASE}/users/:id`,
+  },
   // QUẢN LÝ VAI TRÒ - ROLES
   ROLES:{
     GETALL: `${API_BASE}/roles`,

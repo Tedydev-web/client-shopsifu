@@ -570,7 +570,7 @@
       "addTitle": "Thêm quyền",
       "editTitle": "Chỉnh sửa quyền",
       "form": {
-        "name": "Tên quyền",
+        "name": "Tên chức năng",
         "subtitle": "Quản lý tất cả quyền hạn của bạn",
         "description": "Mô tả quyền",
         "path": "Đường dẫn quyền",

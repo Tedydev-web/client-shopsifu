@@ -6,41 +6,28 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/ui/data-table-component/data-table-column-header'
 import { DataTableRowActions, ActionItem } from '@/components/ui/data-table-component/data-table-row-actions'
-import { Edit, Trash2, Eye, UserCog } from 'lucide-react'
+import { Edit, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { format } from 'date-fns'
 
 const getUserActions = (
-  rowUser: User,
   onDelete: (user: User) => void,
   onEdit: (user: User) => void,
   t: (key: string) => string
 ): ActionItem<User>[] => [
   {
     type: 'command',
-    label: t('admin.users.actions.view'),
-    icon: <Eye />,
-  },
-  {
-    type: 'command',
     label: t('admin.users.actions.edit'),
-    icon: <Edit />,
+    icon: <Edit className="w-4 h-4" />,
     onClick: (user) => onEdit(user),
-  },
-  {
-    type: 'command',
-    label: t('admin.users.actions.assignPermissions'),
-    icon: <UserCog />,
-    onClick: (user) => {
-      console.log('Phân quyền user:', user.id)
-    },
   },
   { type: 'separator' },
   {
     type: 'command',
     label: t('admin.users.actions.delete'),
-    icon: <Trash2 />,
+    icon: <Trash2 className="w-4 h-4" />,
     onClick: (user) => onDelete(user),
-    className: 'text-red-600 hover:!text-red-700',
+    className: 'text-red-500 hover:!text-red-500',
   },
 ]
 
@@ -57,7 +44,6 @@ export const userColumns = (
           checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
-          className="translate-y-[2px]"
         />
       ),
       cell: ({ row }) => (
@@ -65,90 +51,55 @@ export const userColumns = (
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="translate-y-[2px]"
         />
       ),
       enableSorting: false,
       enableHiding: false,
     },
     {
-      accessorKey: 'name',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('admin.users.table.name')} />
-      ),
-      cell: ({ row }) => <div>{row.getValue('name')}</div>,
-      enableSorting: true,
-      enableHiding: true,
+      accessorKey: 'userProfile.username',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Họ và tên')} />,
+      cell: ({ row }) => {
+        const name = `${row.original.userProfile?.username || ''}`;
+        return <div className="font-medium">{name.trim() || 'N/A'}</div>;
+      },
     },
     {
       accessorKey: 'email',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('admin.users.table.email')} />
-      ),
-      cell: ({ row }) => <div>{row.getValue('email')}</div>,
-      enableSorting: true,
-      enableHiding: true,
-    },
-    {
-      accessorKey: 'role',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('admin.users.table.role')} />
-      ),
-      cell: ({ row }) => {
-        const role = row.getValue('role') as string
-        const label = t(`admin.users.role.${role}`)
-        return <Badge variant={role === 'admin' ? 'destructive' : 'outline'}>{label}</Badge>
-      },
-      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Email')} />,
     },
     {
       accessorKey: 'status',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('admin.users.table.status')} />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Trạng thái')} />,
       cell: ({ row }) => {
-        const status = row.getValue('status') as string
-        const label = t(`admin.users.status.${status}`)
-
-        let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'secondary'
-        if (status === 'active') variant = 'default'
-        if (status === 'inactive') variant = 'outline'
-        if (status === 'pending') variant = 'secondary'
-
+        const isActive = row.getValue('status') === 'ACTIVE';
         return (
           <Badge
-            variant={variant}
-            className={`capitalize ${
-              status === 'active'
-                ? 'bg-green-100 text-green-700'
-                : status === 'pending'
-                ? 'bg-yellow-100 text-yellow-700'
-                : 'bg-gray-100 text-gray-700'
-            }`}
+            variant="outline"
+            className={isActive
+              ? 'border-green-600 text-green-600 bg-green-50'
+              : 'border-gray-500 text-gray-500 bg-gray-50'}
           >
-            {label}
+            {isActive ? 'Hoạt động' : 'Không hoạt động'}
           </Badge>
-        )
+        );
       },
       filterFn: (row, id, value) => value.includes(row.getValue(id)),
     },
     {
-      accessorKey: 'createdAt',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('admin.users.table.createdAt')} />
-      ),
+      accessorKey: 'updatedAt',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Cập nhật lần cuối')} />,
       cell: ({ row }) => {
-        const date = new Date(row.getValue('createdAt'))
-        return <span>{date.toLocaleDateString('vi-VN')}</span>
+        const date = new Date(row.getValue('updatedAt'));
+        return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
       },
     },
     {
       id: 'actions',
-      header: () => <div className="text-right">{t('admin.users.table.actions')}</div>,
       cell: ({ row }) => (
         <DataTableRowActions
           row={row}
-          actions={getUserActions(row.original, onDelete, onEdit, t)}
+          actions={getUserActions(onDelete, onEdit, t)}
         />
       ),
     },

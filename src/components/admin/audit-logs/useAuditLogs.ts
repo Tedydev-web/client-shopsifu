@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { auditLogsService } from '@/services/auditLogsService';
+import { auditLogsService } from '@/services/admin/auditLogsService';
 import { AuditLogListResponse } from '@/types/admin/auditLogs.interface';
 import { PaginationRequest } from '@/types/base.interface';
 

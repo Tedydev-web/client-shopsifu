@@ -17,7 +17,6 @@ export default function UserTable({ search }: { search: string }) {
     totalRecords,
     loading,
     limit,
-    offset,
     currentPage,
     totalPages,
     deleteOpen,
@@ -70,7 +69,9 @@ export default function UserTable({ search }: { search: string }) {
         title={t('admin.users.deleteConfirm.title')}
         description={
           userToDelete
-            ? t('admin.users.deleteConfirm.description', { name: userToDelete.name })
+            ? t('admin.users.deleteConfirm.description', {
+                name: userToDelete?.userProfile?.username || '',
+              })
             : ''
         }
         confirmText={t('admin.users.deleteConfirm.confirmText')}
@@ -85,7 +86,7 @@ export default function UserTable({ search }: { search: string }) {
         mode="edit"
         user={userToEdit!}
         onSubmit={async (user) => {
-          editUser(user as User)
+          editUser(user)
         }}
       />
     </div>

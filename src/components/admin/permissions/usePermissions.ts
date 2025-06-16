@@ -8,7 +8,7 @@ import {
   PerUpdateRequest,
   PerGetAllResponse,
 } from "@/types/auth/permission.interface";
-import { PaginationRequest } from "@/types/base.interface";
+
 import { Code } from "lucide-react";
 
 export function usePermissions() {
@@ -16,15 +16,12 @@ export function usePermissions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
   const [loading, setLoading] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
-  const [page, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
-  // Get all permissions with pagination
-  const getAllPermissions = async (params?: PaginationRequest) => {
+  // Get all permissions
+  const getAllPermissions = async () => {
     try {
       setLoading(true);
-      const response = await permissionService.getAll(params);
+      const response = await permissionService.getAll();
 
       const flattenedPermissions = Object.entries(response.data).flatMap(([subject, items]) =>
         items.map(item => ({
@@ -40,15 +37,9 @@ export function usePermissions() {
         description: per.description,
         path: per.subject,
         method: per.action,
-        isActive: true,
-        createdAt: '',
-        updatedAt: '',
       }));
 
       setPermissions(mappedPermissions);
-      setTotalItems(response.meta.totalItems || 0);
-      setCurrentPage(response.meta.currentPage || 1);
-      setTotalPages(response.meta.totalPages || 1);
     } catch (error) {
       showToast(parseApiError(error), 'error');
       console.error('Error fetching permissions:', error);
@@ -138,9 +129,6 @@ export function usePermissions() {
 
   return {
     permissions,
-    totalItems,
-    page,
-    totalPages,
     isModalOpen,
     selectedPermission,
     loading,
@@ -153,6 +141,6 @@ export function usePermissions() {
     // UI handlers
     handleOpenModal,
     handleCloseModal,
-    setCurrentPage,
+
   };
 }

@@ -1,118 +1,123 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User } from '@/types/admin/user.interface';
-import { mockUsers } from './users-MockData';
+import { userService } from '@/services/admin/userService';
+import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export function useUsers() {
-  // State users và các state liên quan
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const { t } = useTranslation();
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [data, setData] = useState<User[]>([]);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [limit, setLimit] = useState(10);
-  const [offset, setOffset] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  // Pagination and search state
   const [search, setSearch] = useState('');
+  const [limit, setLimit] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
 
-  // State cho popup xóa
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-
-  // State cho popup edit
-  const [editOpen, setEditOpen] = useState(false);
-  const [userToEdit, setUserToEdit] = useState<User | null>(null);
-
-  // Lấy danh sách users (có thể filter theo search)
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
-    let filtered = users;
-    if (search) {
-      filtered = users.filter(
-        u =>
-          u.name.toLowerCase().includes(search.toLowerCase()) ||
-          u.email.toLowerCase().includes(search.toLowerCase())
-      );
+    setError(null);
+    try {
+      const response = await userService.getAll({});
+      setAllUsers(response.data || []);
+    } catch (err) {
+      setError('Failed to fetch users');
+      toast.error(t('admin.users.toasts.fetchError'));
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    setTotalRecords(filtered.length);
-    setData(filtered.slice(offset, offset + limit));
-    setLoading(false);
-  };
+  }, [t]);
 
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line
-  }, [users, limit, offset, search]);
+  }, [fetchUsers]);
 
-  // Thêm user mới
-  const addUser = (user: Omit<User, 'id' | 'createdAt'>) => {
-    const newUser: User = {
-      ...user,
-      id: (Date.now() + Math.random()).toString(),
-      createdAt: new Date().toISOString(),
-    };
-    setUsers(prev => [newUser, ...prev]);
-    return newUser;
-  };
+  // Client-side filtering and pagination
+  useEffect(() => {
+    const filtered = allUsers.filter(u => {
+      const username = (u.userProfile?.username || '').toLowerCase();
+      const email = u.email.toLowerCase();
+      const searchTerm = search.toLowerCase();
+      return username.includes(searchTerm) || email.includes(searchTerm);
+    });
+    setTotalRecords(filtered.length);
+    const offset = (currentPage - 1) * limit;
+    setData(filtered.slice(offset, offset + limit));
+  }, [allUsers, search, limit, currentPage]);
 
-  // Sửa user
-  const editUser = (user: User) => {
-    setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, ...user } : u)));
-  };
+  // CRUD operations
+  const addUser = (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => { console.log('add', user); };
+  const editUser = (user: User) => { console.log('edit', user); };
 
-  // Xóa user
-  const deleteUser = (id: string) => {
-    setUsers(prev => prev.filter(u => u.id !== id));
-  };
+  // Delete state and handlers
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  // Handle mở popup xóa
   const handleOpenDelete = (user: User) => {
     setUserToDelete(user);
     setDeleteOpen(true);
   };
 
-  // Handle xác nhận xóa
   const handleConfirmDelete = async () => {
-    if (!userToDelete) return;
-    setDeleteLoading(true);
-    await new Promise(r => setTimeout(r, 800)); // giả lập delay
-    deleteUser(userToDelete.id);
-    setDeleteLoading(false);
-    setDeleteOpen(false);
-    setUserToDelete(null);
+    if (userToDelete) {
+      setDeleteLoading(true);
+      try {
+        await userService.delete(userToDelete.id);
+        toast.success(t('admin.users.toasts.deleteSuccess'));
+        fetchUsers(); // Refetch data
+      } catch (error) {
+        toast.error(t('admin.users.toasts.deleteError'));
+        console.error(error);
+      } finally {
+        setDeleteLoading(false);
+        setDeleteOpen(false);
+        setUserToDelete(null);
+      }
+    }
   };
 
-  // Handle mở popup edit
+  const handleCloseDeleteModal = () => setDeleteOpen(false);
+
+  // Edit state and handlers
+  const [editOpen, setEditOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const handleOpenEdit = (user: User) => {
     setUserToEdit(user);
     setEditOpen(true);
   };
 
-  // Handle phân trang
-  const handlePageChange = (newOffset: number) => {
-    setOffset(newOffset);
-  };
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit);
-    setOffset(0);
+  const handleOpenCreate = () => {
+    setUserToEdit(null);
+    setEditOpen(true);
+  }
+
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
-  // Handle đóng popup xóa
-  const handleCloseDeleteModal = () => setDeleteOpen(false);
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setCurrentPage(1); // Reset to first page
+  };
 
   return {
     data,
     totalRecords,
     loading,
+    error,
     limit,
-    offset,
     search,
     setSearch,
-    currentPage: offset / limit + 1,
+    currentPage,
     totalPages: Math.ceil(totalRecords / limit),
-    // CRUD
     addUser,
     editUser,
-    deleteUser,
-    // Modal state & handle
     deleteOpen,
     userToDelete,
     deleteLoading,
@@ -121,10 +126,11 @@ export function useUsers() {
     editOpen,
     userToEdit,
     handleOpenEdit,
+    handleOpenCreate,
     setEditOpen,
-    // Paging
     handlePageChange,
     handleLimitChange,
     handleCloseDeleteModal,
+    refetch: fetchUsers,
   };
 }

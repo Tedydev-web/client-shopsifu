@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Language } from "./languages-Columns"
-import { languagesService } from "@/services/languagesService"
+import { languagesService } from "@/services/admin/languagesService"
 import { showToast } from "@/components/ui/toastify"
 import { parseApiError } from "@/utils/error"
 import { 

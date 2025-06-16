@@ -20,51 +20,88 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from 'lucide-react'
+import { User } from '@/types/admin/user.interface' // Import User type
 
 interface UsersModalUpsertProps {
   open: boolean;
   onClose: () => void;
   mode: 'add' | 'edit';
-  user?: { id?: string; name: string; email: string; role: string; status: string };
-  onSubmit: (user: { id?: string; name: string; email: string; role: string; status: string }) => Promise<void>;
+  user?: User; // Use the correct User type
+  onSubmit: (user: User) => Promise<void>; // Expect a full User object to match the call site
 }
 
 export default function UsersModalUpsert({
   open, onClose, mode, user, onSubmit
 }: UsersModalUpsertProps) {
   const { t } = useTranslation('')
-  const [name, setName] = useState("")
+  // Form state
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
-  const [role, setRole] = useState("user")
-  const [status, setStatus] = useState("active")
+  const [roleId, setRoleId] = useState(1) // Assuming 1 is a default roleId
+  const [status, setStatus] = useState("ACTIVE")
   const [loading, setLoading] = useState(false)
 
+  // These should ideally come from an API or a shared constant
   const ROLE_OPTIONS = [
-    { value: 'user', label: t('admin.users.role.user') },
-    { value: 'admin', label: t('admin.users.role.admin') },
-    { value: 'editor', label: t('admin.users.role.editor') },
+    { value: 1, label: t('admin.users.role.user') },
+    { value: 2, label: t('admin.users.role.admin') },
   ]
   const STATUS_OPTIONS = [
-    { value: 'active', label: t('admin.users.status.active') },
-    { value: 'inactive', label: t('admin.users.status.inactive') },
-    { value: 'pending', label: t('admin.users.status.pending') },
+    { value: 'ACTIVE', label: t('Hoạt động') },
+    { value: 'INACTIVE', label: t('Không hoạt động') },
   ]
 
   useEffect(() => {
     if (mode === 'edit' && user) {
-      setName(user.name || "")
+      setUsername(user.userProfile?.username || `${user.userProfile?.firstName} ${user.userProfile?.lastName}`.trim() || '')
       setEmail(user.email || "")
-      setRole(user.role || "user")
-      setStatus(user.status || "active")
+      setRoleId(user.roleId || 1)
+      setStatus(user.status || "ACTIVE")
     } else if (mode === 'add') {
-      setName(""); setEmail(""); setRole("user"); setStatus("active")
+      // Reset form for adding new user
+      setUsername(""); 
+      setEmail(""); 
+      setRoleId(1); 
+      setStatus("ACTIVE");
     }
   }, [mode, user, open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user && mode === 'edit') return; // Should not happen
+
     setLoading(true)
-    await onSubmit({ id: user?.id, name, email, role, status })
+    // Construct a new user object that matches the `User` type to satisfy the call site in `users-Table.tsx`
+    // This is a temporary solution. Ideally, this should send a UserUpdateRequest.
+    const updatedUser: User = {
+      ...(user || {}),
+      id: user?.id || 0,
+      email: email,
+      status: status,
+      roleId: roleId,
+      isEmailVerified: user?.isEmailVerified || false,
+      createdAt: user?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      userProfile: {
+        ...(user?.userProfile),
+        id: user?.userProfile?.id || 0,
+        username: username,
+        firstName: user?.userProfile?.firstName || '',
+        lastName: user?.userProfile?.lastName || '',
+        phoneNumber: user?.userProfile?.phoneNumber || '',
+        bio: user?.userProfile?.bio || '',
+        avatar: user?.userProfile?.avatar || '',
+        countryCode: user?.userProfile?.countryCode || '',
+        createdAt: user?.userProfile?.createdAt || '',
+        updatedAt: user?.userProfile?.updatedAt || '',
+        deletedAt: user?.userProfile?.deletedAt || null,
+        deletedById: user?.userProfile?.deletedById || null,
+        updatedById: user?.userProfile?.updatedById || null,
+        createdById: user?.userProfile?.createdById || null,
+      },
+    };
+
+    await onSubmit(updatedUser)
     setLoading(false)
     onClose()
   }
@@ -83,12 +120,12 @@ export default function UsersModalUpsert({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">{t('admin.users.modal.name')}</label>
+            <label className="block text-sm font-medium mb-1">{t('Tên người dùng')}</label>
             <Input
-              value={name}
-              onChange={e => setName(e.target.value)}
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               required
-              placeholder={t('admin.users.modal.name')}
+              placeholder={t('Tên người dùng')}
             />
           </div>
           <div>
@@ -108,13 +145,13 @@ export default function UsersModalUpsert({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-full flex justify-between items-center">
-                    {ROLE_OPTIONS.find(opt => opt.value === role)?.label || t('admin.users.modal.role')}
+                    {ROLE_OPTIONS.find(opt => opt.value === roleId)?.label || t('admin.users.modal.role')}
                     <ChevronDown size={16} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-full min-w-[120px]">
                   {ROLE_OPTIONS.map(opt => (
-                    <DropdownMenuItem key={opt.value} onClick={() => setRole(opt.value)}>
+                    <DropdownMenuItem key={opt.value} onClick={() => setRoleId(opt.value)}>
                       {opt.label}
                     </DropdownMenuItem>
                   ))}

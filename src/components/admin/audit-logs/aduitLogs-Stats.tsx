@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { auditLogsService } from '@/services/auditLogsService';
+import { auditLogsService } from '@/services/admin/auditLogsService';
 import { useTranslation } from "react-i18next";
 
 

@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
 import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
 import { Edit, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
@@ -15,10 +16,16 @@ export type Permission = {
   name: string;
   description: string;
   path: string;
-  isActive: boolean;
   method: string;
-  createdAt: string;
-  updatedAt: string;
+};
+
+const methodColorMap: { [key: string]: string } = {
+  READ: "text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100",
+  CREATE: "text-green-600 border-green-200 bg-green-50 hover:bg-green-100",
+  PUT: "text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100",
+  UPDATE: "text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100",
+  DELETE: "text-red-600 border-red-200 bg-red-50 hover:bg-red-100",
+  MANAGE: "text-red-600 border-red-200 bg-red-50 hover:bg-red-100",
 };
 
 const getPermissionActions = (
@@ -78,11 +85,40 @@ export const PermissionsColumns = ({
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "id",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("ID")} />
+      ),
+      cell: ({ row }) => <div className="w-[100px] truncate">{row.getValue("id")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
+      accessorKey: "path",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("admin.permissions.form.name")} />
       ),
-      cell: ({ row }) => <div className="w-[200px] truncate">{row.getValue("name")}</div>,
+      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("path")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
+      accessorKey: "method",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("admin.permissions.form.method")} />
+      ),
+      cell: ({ row }) => {
+        const method = (row.getValue("method") as string).toUpperCase();
+        const colorClass = methodColorMap[method] || "text-gray-600 border-gray-200 bg-gray-50 hover:bg-gray-100";
+        return (
+          <Badge
+            variant="outline"
+            className={`uppercase w-20 justify-center py-1 ${colorClass}`}
+          >
+            {method}
+          </Badge>
+        );
+      },
       enableSorting: true,
       enableHiding: true,
     },
@@ -95,58 +131,14 @@ export const PermissionsColumns = ({
       enableSorting: true,
       enableHiding: true,
     },
-    {
-      accessorKey: "path",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.permissions.form.path")} />
-      ),
-      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("path")}</div>,
-      enableSorting: true,
-      enableHiding: true,
-    },
-    {
-      accessorKey: "method",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.permissions.form.method")} />
-      ),
-      cell: ({ row }) => <div className="w-[120px] uppercase truncate">{row.getValue("method")}</div>,
-      enableSorting: true,
-      enableHiding: true,
-    },
-    {
-      accessorKey: "createdAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.permissions.createdAt")} />
-      ),
-      cell: ({ row }) => (
-        <div className="w-[160px] truncate">
-          {format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm")}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: true,
-    },
-    {
-      accessorKey: "updatedAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.permissions.updatedAt")} />
-      ),
-      cell: ({ row }) => (
-        <div className="w-[160px] truncate">
-          {format(new Date(row.getValue("updatedAt")), "dd/MM/yyyy HH:mm")}
-        </div>
-      ),
-      enableSorting: true,
-      enableHiding: true,
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => (
-        <DataTableRowActions
-          row={row}
-          actions={getPermissionActions(row.original, onDelete, onEdit, t)}
-        />
-      ),
-    },
+    // {
+    //   id: "actions",
+    //   cell: ({ row }) => (
+    //     <DataTableRowActions
+    //       row={row}
+    //       actions={getPermissionActions(row.original, onDelete, onEdit, t)}
+    //     />
+    //   ),
+    // },
   ];
 };
