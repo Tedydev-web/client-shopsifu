@@ -106,6 +106,7 @@ export default function RolesTable() {
           description: values.description,
           isActive: values.isActive,
           permissionIds: values.permissionIds,
+          message: "",
         };
         await updateRole(selectedRole.id, payload);
       } else {
@@ -113,6 +114,7 @@ export default function RolesTable() {
           name: values.name,
           description: values.description,
           permissionIds: values.permissionIds,
+          message: "",
         };
         await createRole(payload);
       }

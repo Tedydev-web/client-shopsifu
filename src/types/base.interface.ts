@@ -3,7 +3,7 @@ export interface BaseResponse {
     success?: boolean;
     statusCode?: number;
     title?: string;
-    message?: string;
+    message: string;
     timestamp?: string;
     requestId?: string;
   }

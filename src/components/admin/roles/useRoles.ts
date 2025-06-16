@@ -84,7 +84,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.create(data)
-      showToast(response.message, "success")
+      showToast(response.message || "Tạo vai trò thành công", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -100,7 +100,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.update(String(id), data)
-      showToast(response.message, "success")
+      showToast(response.message || "Cập nhật vai trò thành công", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -116,7 +116,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.delete(String(id))
-      showToast(response.message, "success")
+      showToast(response.message || "Xóa vai trò thành công", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
