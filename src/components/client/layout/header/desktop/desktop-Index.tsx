@@ -15,8 +15,8 @@ import { TopBar } from './header-TopBar';
 import '../style.css';
 
 function HeaderLayout() {
-  const showHeader = useScrollHeader();
   const { openDropdown } = useDropdown();
+  const showTopElements = useScrollHeader();
 
   // Determine if the overlay should be shown. Exclude 'cart' and 'none'.
   const showOverlay = openDropdown !== 'none' && openDropdown !== 'cart';
@@ -36,12 +36,15 @@ function HeaderLayout() {
 
   return (
     <>
-      <header
-        className={`text-white max-h-[125px] h-[75px] text-[13px] relative z-50 
-          bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg 
-          transition-all duration-500 ease-in-out hidden md:block
-          ${showHeader ? 'translate-y-0' : '-translate-y-full'}`}
-      >
+ {/* Container for TopBar with transition */}
+      <div className={`transition-all duration-300 ease-in-out ${showTopElements ? 'h-[40px]' : 'h-0'} overflow-hidden hidden md:block`}>
+        <TopBar />
+      </div>
+
+
+      {/* Main Header - Always Fixed */}
+      <header className="text-white h-[75px] bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg
+        fixed top-0 left-0 right-0 z-[60] hidden md:block">
         <div className="max-w-[1350px] mx-auto h-full header-container">
           <div className="px-4 h-full flex items-center justify-between gap-4">
             {/* Logo */}
@@ -83,23 +86,22 @@ function HeaderLayout() {
           </div>
         </div>
       </header>
-      <DesktopCommit />
-      
+     
+      {/* Desktop Commit with transition */}
+      <div className={`transition-all duration-300 ease-in-out ${showTopElements ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <DesktopCommit />
+      </div>
+
       {/* Body Overlay controlled by dropdown context */}
-      <div
-        className={`body-overlay ${showOverlay ? 'overlay-active' : ''}`}
-      />
+      <div className={`body-overlay ${showOverlay ? 'overlay-active' : ''}`} />
     </>
   );
 }
 
 export function Header() {
   return (
-    <>
-      <TopBar />
-      <DropdownProvider>
-        <HeaderLayout />
-      </DropdownProvider>
-    </>
+    <DropdownProvider>
+      <HeaderLayout />
+    </DropdownProvider>
   );
 }
