@@ -18,7 +18,7 @@ export function Header() {
     const timer = setTimeout(() => {
       setIsMounted(true);
       setIsLoading(false);
-    }, 800); // Giảm thời gian loading xuống 800ms cho trải nghiệm tốt hơn
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
@@ -26,7 +26,7 @@ export function Header() {
   // Loading state với animation
   if (isLoading) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-gradient-to-r from-red-700 via-red-600 to-red-700">
+      <div className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-gradient-to-r from-red-700 via-red-600 to-red-700">
         <motion.div 
           className="h-full flex items-center justify-center"
           initial={{ opacity: 0 }}
@@ -35,36 +35,35 @@ export function Header() {
         >
           <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
         </motion.div>
-      </header>
+      </div>
     );
   }
 
   // Hydration mismatch prevention
   if (!isMounted) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-gradient-to-r from-red-700 via-red-600 to-red-700" />
+      <div className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-gradient-to-r from-red-700 via-red-600 to-red-700" />
     );
   }
 
   return (
-    <DropdownProvider>
-      <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait">
+      {isMobile ? (
         <motion.div
-          key={isMobile ? 'mobile' : 'desktop'}
+          key="mobile"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
+          className="relative"
         >
-          {/* Header container */}
-          <div className="w-full">
-            {isMobile ? <MobileHeader /> : <DesktopHeader />}
-          </div>
-          
-          {/* Spacer for fixed header on mobile */}
-          {isMobile && <div className="h-[60px]" />}
+          <header className="fixed top-0 left-0 right-0 z-50 w-full bg-gradient-to-r from-red-700 via-red-600 to-red-700" style={{ height: 'auto', minHeight: '60px' }}>
+            <MobileHeader />
+          </header>
         </motion.div>
-      </AnimatePresence>
-    </DropdownProvider>
+      ) : (
+        <DesktopHeader />
+      )}
+    </AnimatePresence>
   );
 }
