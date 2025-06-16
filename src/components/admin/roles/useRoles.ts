@@ -39,6 +39,7 @@ export function useRoles() {
         deletedAt: role.deletedAt,
         createdAt: role.createdAt,
         updatedAt: role.updatedAt,
+        permissionIds: role.permissions.map(p => p.id),
       }))
       setRoles(mappedRoles)
       setTotalItems(response.totalItems)

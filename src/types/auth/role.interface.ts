@@ -30,7 +30,7 @@ export interface RoleResponse {
     description: string;
     role: RoleType;
     isActive: boolean;
-    permissions: Permission[];
+    permissions: Array<Permission>;
     createdAt: number;
     updatedAt: number;
     totalItems: number;
@@ -39,19 +39,32 @@ export interface RoleResponse {
     totalPages: number;
 }
 
-export interface RoleGetAllResponse {
+export interface RoleGetAllResponse extends BaseResponse {
   data: Array<{
     id: number;
     name: string;
     description: string;
     isActive: boolean;
-    permissions: Permission[]; // Nếu biết rõ kiểu thì thay `any` bằng kiểu cụ thể
     createdById: string;
     updatedById: string;
     deletedById: string;
     deletedAt: string;
     createdAt: string;
     updatedAt: string;
+    permissions: Array<{
+        id: number,
+        description: string,
+        createdById: string,
+        updatedById: string,
+        deletedById: string,
+        deletedAt: string,
+        action: string,
+        subject: string,
+        conditions: string,
+        createdAt: string,
+        updatedAt: string,
+        isSystemPermission: boolean
+        }>;
   }>;
   totalItems: number;
   page: number;
@@ -149,4 +162,12 @@ export interface RoleAssignPermissionResponse {
     deletedAt: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface Role {
+  id?: number
+  name: string
+  description?: string
+  isActive: boolean
+  permissionIds?: string[]
 }

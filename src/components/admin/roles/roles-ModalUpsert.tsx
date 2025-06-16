@@ -19,14 +19,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Label } from '@/components/ui/label'
 import { permissionService } from '@/services/permissionService'
 import { PerGetAllResponse } from '@/types/auth/permission.interface'
+import { RoleGetAllResponse, Role } from '@/types/auth/role.interface'
 
-interface Role {
-  id?: number
-  name: string
-  description?: string
-  isActive: boolean
-  permissionIds?: string[]
-}
 
 interface RolesModalUpsertProps {
   open: boolean
