@@ -2,7 +2,7 @@
 import RolesTable from "@/components/admin/roles/roles-Table"
 import { useTranslation } from "react-i18next";
 
-export default function LanguagesPage() {
+export default function RolesPage() {
   const { t } = useTranslation()
   return (
     <div className="space-y-6">

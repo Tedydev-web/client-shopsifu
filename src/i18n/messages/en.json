@@ -1,4 +1,35 @@
 {
+  "schema": {
+    "validation": {
+      "password": {
+        "minLength": "Password must be at least 6 characters long",
+        "maxLength": "Password must not exceed 20 characters",
+        "uppercase": "Password must contain at least one uppercase letter",
+        "lowercase": "Password must contain at least one lowercase letter",
+        "number": "Password must contain at least one number",
+        "specialCharacter": "Password must contain at least one special character",
+        "match": "Passwords do not match",
+        "currentRequired": "Current password is required"
+      },
+      "email": {
+        "invalid": "Invalid email format"
+      },
+      "profile": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "usernameMinLength": "Username must be at least 3 characters long",
+        "phoneMinLength": "Phone number must be at least 10 digits long"
+      },
+      "user": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "usernameMinLength": "Username must be at least 3 characters long",
+        "emailInvalid": "Invalid email format",
+        "phoneMinLength": "Phone number must be at least 10 digits long",
+        "roleRequired": "Role is required"
+      }
+    }
+  },
   "common": {
     "title": "Shopping is easy",
     "subtitle": "Nationwide delivery, flexible payment\nand a money back guarantee if not satisfied."

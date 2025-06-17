@@ -1,15 +1,17 @@
 'use client'
-
 import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table-component/data-table'
 import { Pagination } from '@/components/ui/data-table-component/pagination'
 import { userColumns } from './users-Columns'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
 import UsersModalUpsert from './users-ModalUpsert'
 import { useUsers } from './useUsers'
-import { User } from '@/types/admin/user.interface'
+import SearchInput from '@/components/ui/data-table-component/search-input'
+import { PlusIcon } from 'lucide-react'
+import { User, UserCreateRequest } from '@/types/admin/user.interface'
 
-export default function UserTable({ search }: { search: string }) {
+export default function UserTable() {
   const { t } = useTranslation();
   
   const {
@@ -19,38 +21,64 @@ export default function UserTable({ search }: { search: string }) {
     limit,
     currentPage,
     totalPages,
+    search,
+    handleSearch,
+    handlePageChange,
+    handleLimitChange,
+    
     deleteOpen,
     userToDelete,
     deleteLoading,
     handleOpenDelete,
     handleConfirmDelete,
-    editOpen,
-    userToEdit,
-    handleOpenEdit,
-    setEditOpen,
-    editUser,
-    handlePageChange,
-    handleLimitChange,
     handleCloseDeleteModal,
+
+    upsertOpen,
+    modalMode,
+    userToEdit,
+    handleOpenUpsertModal,
+    handleCloseUpsertModal,
+    addUser,
+    editUser,
+    roles
   } = useUsers();
+
+  const handleSubmit = async (formData: User | UserCreateRequest) => {
+    if (modalMode === 'edit') {
+      await editUser(formData as User);
+    } else {
+      await addUser(formData as UserCreateRequest);
+    }
+  };
 
   return (
     <div className="space-y-4 relative">
-      {/* Loading overlay chỉ che bảng, không che search input */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
-          <span className="text-gray-500 text-sm">
-            {t('admin.users.loading')}
-          </span>
+        <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+          <p>{t('admin.users.loading')}</p>
         </div>
       )}
+       <div className="flex items-center gap-2">
+        <SearchInput
+          value={search}
+          onValueChange={handleSearch}
+          placeholder={t("admin.languages.searchPlaceholder")}
+          className="max-w-sm"
+        />
+        <Button 
+          onClick={() => handleOpenUpsertModal('add')}
+          className="ml-auto"
+        >
+          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
+        </Button>
+      </div>
 
       <DataTable
-        columns={userColumns({ onDelete: handleOpenDelete, onEdit: handleOpenEdit })}
+        columns={userColumns({ onEdit: (user) => handleOpenUpsertModal('edit', user), onDelete: handleOpenDelete })}
         data={data}
       />
 
-      {totalPages > 0 && (
+      {totalPages > 1 && (
         <Pagination
           limit={limit}
           page={currentPage}
@@ -61,10 +89,9 @@ export default function UserTable({ search }: { search: string }) {
         />
       )}
 
-      {/* Xác nhận xóa */}
       <ConfirmDeleteModal
         open={deleteOpen}
-        onClose={() => { if (!deleteLoading) handleCloseDeleteModal() }}
+        onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         title={t('admin.users.deleteConfirm.title')}
         description={
@@ -74,21 +101,20 @@ export default function UserTable({ search }: { search: string }) {
               })
             : ''
         }
-        confirmText={t('admin.users.deleteConfirm.confirmText')}
-        cancelText={t('admin.users.deleteConfirm.cancelText')}
         loading={deleteLoading}
       />
 
-      {/* Modal cập nhật người dùng */}
-      <UsersModalUpsert
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        mode="edit"
-        user={userToEdit!}
-        onSubmit={async (user) => {
-          editUser(user)
-        }}
-      />
+      {/* Add/Edit Modal */}
+      {upsertOpen && (
+        <UsersModalUpsert
+          open={upsertOpen}
+          onClose={handleCloseUpsertModal}
+          roles={roles}
+          mode={modalMode}
+          user={userToEdit}
+          onSubmit={handleSubmit}
+        />
+      )}
     </div>
   )
 }

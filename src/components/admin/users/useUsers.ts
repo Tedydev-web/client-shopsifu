@@ -1,66 +1,101 @@
-import { useState, useEffect, useCallback } from 'react';
-import { User } from '@/types/admin/user.interface';
-import { userService } from '@/services/admin/userService';
-import { toast } from 'sonner';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { userService } from '@/services/admin/userService';
+import { roleService } from '@/services/roleService'; // Import roleService
+import { User, UserCreateRequest } from '@/types/admin/user.interface';
+import { Role } from '@/types/auth/role.interface'; // Import Role type
 
-export function useUsers() {
-  const { t } = useTranslation();
+export const useUsers = () => {
+  const { t } = useTranslation('');
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [data, setData] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Pagination and search state
-  const [search, setSearch] = useState('');
-  const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState('');
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  // Modal states
+  const [upsertOpen, setUpsertOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Roles state
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  const fetchRoles = async () => {
     try {
-      const response = await userService.getAll({});
-      setAllUsers(response.data || []);
+      const response = await roleService.getAll({ "all-records": true });
+      setRoles(response.data);
     } catch (err) {
-      setError('Failed to fetch users');
+      toast.error(t('admin.users.toasts.fetchRolesError', 'Failed to fetch roles'));
+    }
+  };
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await userService.getAll({ page: 1, limit: 1000, "all-records": true }); // Fetch all for client-side pagination
+      setAllUsers(response.data);
+      setError(null);
+    } catch (err) {
+      setError(t('admin.users.toasts.fetchError'));
       toast.error(t('admin.users.toasts.fetchError'));
-      console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  };
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+    fetchRoles();
+  }, []);
 
   // Client-side filtering and pagination
-  useEffect(() => {
-    const filtered = allUsers.filter(u => {
-      const username = (u.userProfile?.username || '').toLowerCase();
-      const email = u.email.toLowerCase();
-      const searchTerm = search.toLowerCase();
-      return username.includes(searchTerm) || email.includes(searchTerm);
-    });
-    setTotalRecords(filtered.length);
-    const offset = (currentPage - 1) * limit;
-    setData(filtered.slice(offset, offset + limit));
-  }, [allUsers, search, limit, currentPage]);
+  const filteredUsers = useMemo(() => {
+    return allUsers.filter(user =>
+      (user.userProfile?.username?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (user.email?.toLowerCase() || '').includes(search.toLowerCase())
+    );
+  }, [allUsers, search]);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * limit;
+    const end = start + limit;
+    return filteredUsers.slice(start, end);
+  }, [filteredUsers, currentPage, limit]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredUsers.length / limit);
+  }, [filteredUsers, limit]);
 
   // CRUD operations
-  const addUser = (user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => { console.log('add', user); };
-  const editUser = (user: User) => { console.log('edit', user); };
+  const addUser = async (user: UserCreateRequest) => {
+    try {
+      await userService.create(user);
+      toast.success(t('admin.users.toasts.createSuccess'));
+      fetchUsers();
+    } catch (error) {
+      toast.error(t('admin.users.toasts.createError'));
+      console.error(error);
+    }
+  };
 
-  // Delete state and handlers
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
-
-  const handleOpenDelete = (user: User) => {
-    setUserToDelete(user);
-    setDeleteOpen(true);
+  const editUser = async (user: User) => {
+    try {
+      await userService.update(user.id, user);
+      toast.success(t('admin.users.toasts.updateSuccess'));
+      fetchUsers();
+    } catch (error) {
+      toast.error(t('admin.users.toasts.updateError'));
+      console.error(error);
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -69,68 +104,80 @@ export function useUsers() {
       try {
         await userService.delete(userToDelete.id);
         toast.success(t('admin.users.toasts.deleteSuccess'));
-        fetchUsers(); // Refetch data
-      } catch (error) {
-        toast.error(t('admin.users.toasts.deleteError'));
-        console.error(error);
-      } finally {
-        setDeleteLoading(false);
+        fetchUsers();
         setDeleteOpen(false);
         setUserToDelete(null);
+      } catch (error) {
+        toast.error(t('admin.users.toasts.deleteError'));
+      } finally {
+        setDeleteLoading(false);
       }
     }
   };
 
-  const handleCloseDeleteModal = () => setDeleteOpen(false);
-
-  // Edit state and handlers
-  const [editOpen, setEditOpen] = useState(false);
-  const [userToEdit, setUserToEdit] = useState<User | null>(null);
-  const handleOpenEdit = (user: User) => {
-    setUserToEdit(user);
-    setEditOpen(true);
+  // Handlers
+  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handleLimitChange = (limit: number) => {
+    setLimit(limit);
+    setCurrentPage(1);
+  };
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setCurrentPage(1);
   };
 
-  const handleOpenCreate = () => {
+  const handleOpenDelete = (user: User) => {
+    setUserToDelete(user);
+    setDeleteOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteOpen(false);
+    setUserToDelete(null);
+  };
+
+  const handleOpenUpsertModal = (mode: 'add' | 'edit', user?: User) => {
+    setModalMode(mode);
+    setUserToEdit(user || null);
+    setUpsertOpen(true);
+  };
+
+  const handleCloseUpsertModal = () => {
+    setUpsertOpen(false);
     setUserToEdit(null);
-    setEditOpen(true);
-  }
-
-  // Pagination handlers
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit);
-    setCurrentPage(1); // Reset to first page
   };
 
   return {
-    data,
-    totalRecords,
+    data: paginatedUsers,
+    totalRecords: filteredUsers.length,
     loading,
     error,
     limit,
-    search,
-    setSearch,
     currentPage,
-    totalPages: Math.ceil(totalRecords / limit),
-    addUser,
-    editUser,
+    totalPages,
+    search,
+    handleSearch,
+    handlePageChange,
+    handleLimitChange,
+    
+    // Delete
     deleteOpen,
     userToDelete,
     deleteLoading,
     handleOpenDelete,
     handleConfirmDelete,
-    editOpen,
-    userToEdit,
-    handleOpenEdit,
-    handleOpenCreate,
-    setEditOpen,
-    handlePageChange,
-    handleLimitChange,
     handleCloseDeleteModal,
-    refetch: fetchUsers,
+
+    // Upsert
+    upsertOpen,
+    modalMode,
+    userToEdit,
+    handleOpenUpsertModal,
+    handleCloseUpsertModal,
+    addUser,
+    editUser,
+
+    // Data for dropdowns
+    roles
   };
-}
+};

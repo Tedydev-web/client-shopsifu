@@ -14,7 +14,7 @@ import { PaginationRequest } from '@/types/base.interface';
 
 export const userService = {
     // Lấy danh sách tất cả người dùng
-    async getAll(params: Partial<PaginationMeta>): Promise<UserGetAllResponse> {
+    async getAll(params: any): Promise<UserGetAllResponse> {
         const response = await privateAxios.get(API_ENDPOINTS.USERS.GETALL, { params });
         return response.data;
     },

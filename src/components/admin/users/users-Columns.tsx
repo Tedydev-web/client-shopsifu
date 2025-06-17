@@ -87,6 +87,14 @@ export const userColumns = (
       filterFn: (row, id, value) => value.includes(row.getValue(id)),
     },
     {
+      accessorKey: 'createdAt',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Tạo lúc')} />,
+      cell: ({ row }) => {
+        const date = new Date(row.getValue('createdAt'));
+        return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
+      },
+    },
+    {
       accessorKey: 'updatedAt',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('Cập nhật lần cuối')} />,
       cell: ({ row }) => {

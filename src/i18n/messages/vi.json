@@ -1,4 +1,35 @@
 {
+  "schema": {
+    "validation": {
+      "password": {
+        "minLength": "Mật khẩu phải có ít nhất 6 ký tự",
+        "maxLength": "Mật khẩu không được vượt quá 20 ký tự",
+        "uppercase": "Mật khẩu phải chứa ít nhất một chữ in hoa",
+        "lowercase": "Mật khẩu phải chứa ít nhất một chữ thường",
+        "number": "Mật khẩu phải chứa ít nhất một số",
+        "specialCharacter": "Mật khẩu phải chứa ít nhất một ký tự đặc biệt",
+        "match": "Mật khẩu không khớp",
+        "currentRequired": "Mật khẩu hiện tại là bắt buộc"
+      },
+      "email": {
+        "invalid": "Địa chỉ email không hợp lệ"
+      },
+      "profile": {
+        "firstNameRequired": "Tên là bắt buộc",
+        "lastNameRequired": "Họ là bắt buộc",
+        "usernameMinLength": "Tên người dùng phải có ít nhất 3 ký tự",
+        "phoneMinLength": "Số điện thoại phải có ít nhất 10 chữ số"
+      },
+      "user": {
+        "firstNameRequired": "Tên là bắt buộc",
+        "lastNameRequired": "Họ là bắt buộc",
+        "usernameMinLength": "Tên người dùng phải có ít nhất 3 ký tự",
+        "emailInvalid": "Địa chỉ email không hợp lệ",
+        "phoneMinLength": "Số điện thoại phải có ít nhất 10 chữ số",
+        "roleRequired": "Vai trò là bắt buộc"
+      }
+    }
+  },
   "common": {
     "title": "Mua sắm dễ dàng",
     "subtitle": "Giao hàng toàn quốc, thanh toán linh hoạt\nvà đảm bảo hoàn tiền nếu không hài lòng."
@@ -665,7 +696,19 @@
         "confirmAdd": "Thêm mới",
         "confirmEdit": "Cập nhật",
         "loadingAdd": "Đang thêm...",
-        "loadingEdit": "Đang cập nhật..."
+        "loadingEdit": "Đang cập nhật...",
+        "firstName": "Tên",
+        "lastName": "Họ",
+        "username": "Tên người dùng",
+        "phoneNumber": "Số điện thoại",
+        "bio": "Giới thiệu",
+        "countryCode": "Mã quốc gia",
+        "roleId": "Vai trò",
+        "password": "Mật khẩu",
+        "confirmPassword": "Xác nhận mật khẩu",
+        "avatar": "Ảnh đại diện",
+        "passwordStepDescription": "Mật khẩu phải chứa ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
+        "confirmPasswordStepDescription": "Xác nhận mật khẩu phải khớp với mật khẩu"
       },
       "deleteConfirm": {
         "title": "Xác nhận xóa người dùng",
