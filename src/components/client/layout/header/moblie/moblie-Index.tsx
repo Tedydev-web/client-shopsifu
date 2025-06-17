@@ -2,7 +2,7 @@
 'use client';
 
 import { CartDropdown } from '../desktop/desktop-Cart';
-import { ProfileDropdown } from '../desktop/desktop-Profile';
+import { ProfileDropdown } from '../moblie/mobile-Profile';
 import { DropdownProvider } from '../dropdown-context';
 import { MobileSearchInput } from './moblie-SearchInput';
 import '../style.css';
