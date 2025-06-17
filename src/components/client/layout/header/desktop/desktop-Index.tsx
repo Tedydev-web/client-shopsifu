@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SearchInput } from './desktop-SearchInput';
 import { CartDropdown } from './desktop-Cart';
 import { Categories } from './desktop-Categories';
@@ -16,10 +16,11 @@ import '../style.css';
 
 function HeaderLayout() {
   const { openDropdown } = useDropdown();
-  const showHeader = useScrollHeader();
-  const [showTopAndCommit, setShowTopAndCommit] = useState(true);
+  const showHeader = useScrollHeader(100);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
 
-  // Determine if the overlay should be shown. Include only search and categories
   const showOverlay = openDropdown === 'search' || openDropdown === 'categories';
 
   useEffect(() => {
@@ -34,35 +35,60 @@ function HeaderLayout() {
     };
   }, [showOverlay]);
 
-  // Effect to handle TopBar and Commit visibility
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
-        setShowTopAndCommit(false);
-      } else {
-        setShowTopAndCommit(true);
+      if (!ticking.current) {
+        requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          setIsAtTop(currentScrollY <= 50);
+          
+          // Cập nhật scale và opacity dựa trên scroll
+          const header = document.querySelector('.header-container') as HTMLElement;
+          if (header) {
+            const scale = Math.max(0.95, 1 - (currentScrollY / 1000));
+            const opacity = Math.max(0.8, 1 - (currentScrollY / 500));
+            header.style.transform = `scale(${scale})`;
+            header.style.opacity = opacity.toString();
+          }
+          
+          lastScrollY.current = currentScrollY;
+          ticking.current = false;
+        });
+        ticking.current = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <>
       {/* TopBar */}
-      <div className={`fixed top-0 left-0 right-0 z-[61] hidden md:block transition-transform duration-300 ease-in-out 
-        ${showTopAndCommit ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div 
+        className={`fixed top-0 left-0 right-0 z-[61] hidden md:block 
+          will-change-[transform,opacity] transform-gpu`}
+        style={{
+          transform: `translate3d(0, ${isAtTop ? '0' : '-100%'}, 0)`,
+          opacity: isAtTop ? 1 : 0,
+          transition: 'all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1)',
+        }}
+      >
         <TopBar />
       </div>
 
       {/* Main Header */}
-      <header className={`text-white h-[75px] bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-lg
-        fixed left-0 right-0 z-[60] hidden md:block transition-all duration-300 ease-in-out
-        ${showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}
-        style={{ top: showTopAndCommit ? '40px' : '0' }}
+      <header 
+        className={`text-white h-[75px] bg-gradient-to-r from-red-700 via-red-600 to-red-700
+          fixed left-0 right-0 z-[60] hidden md:block transform-gpu will-change-[transform,opacity,top]`}
+        style={{ 
+          transform: `translate3d(0, ${showHeader ? '0' : '-100%'}, 0)`,
+          opacity: showHeader ? 1 : 0,
+          top: isAtTop ? '40px' : '0',
+          transition: 'all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1)',
+        }}
       >
-        <div className="max-w-[1350px] mx-auto h-full header-container">
+        <div className="max-w-[1350px] mx-auto h-full header-container duration-200">
           <div className="px-4 h-full flex items-center justify-between gap-4">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 header-logo">
@@ -80,46 +106,61 @@ function HeaderLayout() {
 
             <div className="flex-1 max-w-[1000px] flex flex-col">
               <div className="flex items-center gap-4">
-                <div className="header-item transition-all duration-300 ease-in-out">
+                <div className="header-item">
                   <Categories />
                 </div>
-                <div className="header-item flex-1 transition-all duration-300 ease-in-out">
+                <div className="header-item flex-1">
                   <SearchInput />
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="header-item transition-all duration-300 ease-in-out">
+              <div className="header-item">
                 <ProfileDropdown />
               </div>
-              <div className="header-item transition-all duration-300 ease-in-out">
+              <div className="header-item">
                 <ChangeLangs />
               </div>
-              <div className="header-item transition-all duration-300 ease-in-out">
+              <div className="header-item">
                 <CartDropdown />
               </div>
             </div>
           </div>
         </div>
       </header>
-     
-      {/* Spacer - adjusts based on visibility */}
-      <div className={`transition-all duration-300 ease-in-out hidden md:block`}
-        style={{ height: showTopAndCommit ? '115px' : showHeader ? '75px' : '0' }}
+
+      {/* Spacer */}
+      <div 
+        className="hidden md:block"
+        style={{ 
+          height: isAtTop ? '115px' : '75px',
+          transition: 'height 0.3s ease',
+        }}
       />
 
       {/* Desktop Commit */}
-      <div className={`transition-transform duration-300 ease-in-out fixed left-0 right-0 z-[55] hidden md:block
-        ${showTopAndCommit ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}
-        style={{ top: showTopAndCommit ? '115px' : '75px' }}
+      <div 
+        className={`fixed left-0 right-0 z-[55] hidden md:block transform-gpu will-change-[transform,opacity,top]`}
+        style={{ 
+          transform: `translate3d(0, ${isAtTop ? '0' : '100%'}, 0)`,
+          opacity: isAtTop ? 1 : 0,
+          top: isAtTop ? '115px' : '75px',
+          transition: 'all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1)',
+        }}
       >
         <DesktopCommit />
       </div>
 
       {/* Body Overlay */}
-      <div className={`fixed inset-0 bg-black/20 transition-opacity duration-300 z-[52]
-        ${showOverlay ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} 
+      <div 
+        className={`fixed inset-0 bg-black/20 backdrop-blur-[1px] z-[52]
+          transform-gpu will-change-opacity`}
+        style={{
+          opacity: showOverlay ? 1 : 0,
+          visibility: showOverlay ? 'visible' : 'hidden',
+          transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+        }}
       />
     </>
   );
