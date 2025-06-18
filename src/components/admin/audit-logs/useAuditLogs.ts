@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { auditLogsService } from '@/services/auditLogsService';
-import { AuditLogListResponse } from '@/types/auditLogs.interface';
+import { auditLogsService } from '@/services/admin/auditLogsService';
+import { AuditLogListResponse } from '@/types/admin/auditLogs.interface';
 import { PaginationRequest } from '@/types/base.interface';
 
 export function useAuditLogs() {
@@ -15,10 +15,10 @@ export function useAuditLogs() {
     setLoading(true);
     try {
       const queryParams: any = {
-        page: params?.page || 1,
-        limit: params?.limit || 10,
+        page: params?.meta?.currentPage || 1,
+        limit: params?.meta?.itemsPerPage || 10,
       };
-      if (params?.search) queryParams.search = params.search;
+      if (params?.meta?.search) queryParams.search = params.meta.search;
       const response: AuditLogListResponse = await auditLogsService.getAll(queryParams);
       const data = response.data.map((item) => ({
         id: item.id,

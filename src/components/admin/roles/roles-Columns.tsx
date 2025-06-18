@@ -7,30 +7,9 @@ import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-comp
 import { Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
+import { RoleGetAllResponse } from "@/types/auth/role.interface";
 
-export type RoleType = 'admin' | 'seller' | 'client' | 'editor';
-
-export interface Role {
-  id: number;
-  name: string;
-  description: string;
-  isActive: boolean;
-  createdById: string;
-  updatedById: string;
-  deletedById: string;
-  deletedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface RoleGetAllResponse {
-  data: Role[]; // ✅ một mảng Role, không phải mảng các mảng
-  totalItems: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
+export type Role = RoleGetAllResponse['data'][0];
 
 const getRoleActions = (
   role: Role,

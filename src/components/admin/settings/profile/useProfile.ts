@@ -16,7 +16,7 @@ export const useUpdateProfile = (onSuccess?: () => void) => {
     setLoading(true);
     try {
       const response = await profileService.updateProfile(data);
-      showToast(response.message, 'success');
+      showToast(response.message || "Cập nhật thông tin thành công", 'success');
       
       await fetchProfile();
       onSuccess?.();

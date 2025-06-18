@@ -1,7 +1,7 @@
 import { publicAxios, privateAxios } from '@/lib/api';
 import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
-import { AuditGetALLResponse, AuditLogListResponse, AduitGetStatsResponse } from '@/types/auditLogs.interface';
+import { AuditGetALLResponse, AuditLogListResponse, AduitGetStatsResponse } from '@/types/admin/auditLogs.interface';
 import { PaginationRequest } from '@/types/base.interface';
 
 export const auditLogsService = {

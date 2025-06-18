@@ -8,7 +8,7 @@ import {
     PerCreateRequest,
     PerCreateResponse,
     PerDeleteResponse
-} from '@/types/permission.interface';
+} from '@/types/auth/permission.interface';
 import { PaginationRequest } from '@/types/base.interface';
 
 export const permissionService = {

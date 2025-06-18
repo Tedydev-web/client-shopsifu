@@ -134,7 +134,7 @@ export function CartDropdown() {
         )}
 
         {cart.length > 0 && (
-          <SheetFooter className="p-6 border-t border-gray-200 bg-white">
+          <SheetFooter className="p-6 border-t border-gray-200">
             <div className="w-full space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-md font-semibold text-gray-800">Tổng cộng</span>

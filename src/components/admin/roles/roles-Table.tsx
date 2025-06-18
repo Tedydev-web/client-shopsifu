@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { PlusIcon, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import SearchInput from '@/components/ui/data-table-component/search-input'
 import { DataTable } from '@/components/ui/data-table-component/data-table'
 import { Pagination } from '@/components/ui/data-table-component/pagination'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
@@ -15,6 +14,10 @@ import RolesModalUpsert from './roles-ModalUpsert'
 import { useDebounce } from '@/hooks/useDebounce'
 import { showToast } from '@/components/ui/toastify'
 import { useRoles } from './useRoles'
+import {
+  RoleCreateRequest,
+  RoleUpdateRequest,
+} from "@/types/auth/role.interface"
 
 export default function RolesTable() {
   const { t } = useTranslation()
@@ -26,13 +29,15 @@ export default function RolesTable() {
     loading,
     isModalOpen,
     selectedRole,
-    getAllRoles,
+    fetchRoles,
     handleOpenModal,
     handleCloseModal,
     setCurrentPage,
     deleteRole,
     createRole,
     updateRole,
+    permissionsData,
+    isPermissionsLoading,
   } = useRoles()
 
   const [searchValue, setSearchValue] = useState("");
@@ -48,13 +53,13 @@ export default function RolesTable() {
   const debouncedSearchValue = useDebounce(searchValue, 1000)
 
   useEffect(() => {
-    getAllRoles({ page, limit })
+    fetchRoles({ meta: { currentPage: page, itemsPerPage: limit } })
   }, [page, limit])
 
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setCurrentPage(1)
-      getAllRoles({ page: 1, limit, search: debouncedSearchValue })
+      fetchRoles({ meta: { currentPage: 1, itemsPerPage: limit, search: debouncedSearchValue } })
     }
   }, [debouncedSearchValue, limit])
 
@@ -79,7 +84,7 @@ export default function RolesTable() {
       const success = await deleteRole(roleToDelete.id); // Chuyển id thành string
       if (success) {
         handleCloseDeleteModal();
-        getAllRoles({ page: page, limit}); // Chuyển page và limit thành string
+        fetchRoles({ meta: { currentPage: page, itemsPerPage: limit }}); // Chuyển page và limit thành string
       }
     } catch (error) {
       console.error('Lỗi khi xóa quyền:', error);
@@ -92,25 +97,29 @@ export default function RolesTable() {
     name: string
     description: string
     isActive: boolean
-    permissionIds: string[]
+    permissionIds: number[]
   }) => {
-    const payload = {
-      name: values.name,
-      description: values.description,
-      isActive: values.isActive,
-      permissionIds: [], // Permission assignment done later?
-    }
-
     try {
       if (selectedRole) {
-        await updateRole(selectedRole.id, payload)
-        showToast(t('admin.roles.updatedSuccess'), 'success')
+        const payload: RoleUpdateRequest = {
+          name: values.name,
+          description: values.description,
+          isActive: values.isActive,
+          permissionIds: values.permissionIds,
+          message: "",
+        };
+        await updateRole(selectedRole.id, payload);
       } else {
-        await createRole(payload)
-        showToast(t('admin.roles.createdSuccess'), 'success')
+        const payload: RoleCreateRequest = {
+          name: values.name,
+          description: values.description,
+          permissionIds: values.permissionIds,
+          message: "",
+        };
+        await createRole(payload);
       }
-      handleCloseModal()
-      getAllRoles({ page, limit, search: debouncedSearchValue })
+      handleCloseModal();
+      fetchRoles({ meta: { currentPage: page, itemsPerPage: limit, search: debouncedSearchValue } });
     } catch (err) {
       showToast(
         selectedRole
@@ -126,12 +135,12 @@ export default function RolesTable() {
   }
 
   const handlePageChange = (newPage: number) => {
-    getAllRoles({ page: newPage, limit })
+    fetchRoles({ meta: { currentPage: newPage, itemsPerPage: limit } })
   }
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
-    getAllRoles({ page: 1, limit: newLimit })
+    fetchRoles({ meta: { currentPage: 1, itemsPerPage: newLimit } })
   }
 
   return (
@@ -164,7 +173,7 @@ export default function RolesTable() {
         />
       </div>
 
-      {totalPages > 0 && (
+      {totalPages >= 0 && (
         <Pagination
           limit={limit}
           page={page}
@@ -181,6 +190,8 @@ export default function RolesTable() {
         mode={selectedRole ? "edit" : "add"}
         role={selectedRole}
         onSubmit={handleSubmit}
+        permissionsData={permissionsData}
+        isPermissionsLoading={isPermissionsLoading}
       />
 
       <ConfirmDeleteModal

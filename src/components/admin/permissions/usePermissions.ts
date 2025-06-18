@@ -7,8 +7,8 @@ import {
   PerCreateRequest,
   PerUpdateRequest,
   PerGetAllResponse,
-} from "@/types/permission.interface";
-import { PaginationRequest } from "@/types/base.interface";
+} from "@/types/auth/permission.interface";
+
 import { Code } from "lucide-react";
 
 export function usePermissions() {
@@ -16,30 +16,30 @@ export function usePermissions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
   const [loading, setLoading] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
-  const [page, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
-  // Get all permissions with pagination
-  const getAllPermissions = async (params?: PaginationRequest) => {
+  // Get all permissions
+  const getAllPermissions = async () => {
     try {
       setLoading(true);
-      const response = await permissionService.getAll(params);
-      const mappedPermissions: Permission[] = response.data.map(per => ({
-        id: Number(per.id),
-        code: per.id,
-        name: per.name,
-        description: per.description , // Giá trị mặc định
-        path: per.path || "", // Giá trị mặc định
-        method: per.method, // Giá trị mặc định
-        isActive: true,
-        createdAt: per.createdAt,
-        updatedAt: per.updatedAt,
+      const response = await permissionService.getAll();
+
+      const flattenedPermissions = Object.entries(response.data).flatMap(([subject, items]) =>
+        items.map(item => ({
+          subject: subject,
+          ...item
+        }))
+      );
+
+      const mappedPermissions: Permission[] = flattenedPermissions.map(per => ({
+        id: per.id,
+        code: String(per.id),
+        name: per.description,
+        description: per.description,
+        path: per.subject,
+        method: per.action,
       }));
+
       setPermissions(mappedPermissions);
-      setTotalItems(response.totalItems);
-      setCurrentPage(response.page);
-      setTotalPages(response.totalPages);
     } catch (error) {
       showToast(parseApiError(error), 'error');
       console.error('Error fetching permissions:', error);
@@ -129,9 +129,6 @@ export function usePermissions() {
 
   return {
     permissions,
-    totalItems,
-    page,
-    totalPages,
     isModalOpen,
     selectedPermission,
     loading,
@@ -144,6 +141,6 @@ export function usePermissions() {
     // UI handlers
     handleOpenModal,
     handleCloseModal,
-    setCurrentPage,
+
   };
 }

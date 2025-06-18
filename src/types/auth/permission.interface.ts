@@ -1,3 +1,6 @@
+import { BaseResponse } from "../base.interface";
+
+
 export interface PerCreateRequest {
     name: string;
     description: string;
@@ -15,26 +18,26 @@ export interface PerCreateResponse {
     updatedAt: string;
 }
 
-export interface PerGetAllResponse {
-    data: Array<{
-        id: string;
-        name: string;
-        path: string;
-        description: string;
-        type: string;
-        method: string;
-        createdById: string;
-        updatedById: string;
-        deletedById: string;
-        deletedAt: string;
-        createdAt: string;
-        updatedAt: string;
-    }>;
-    totalItems: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-}
+// export interface PerGetAllResponse {
+//     data: Array<{
+//         id: string;
+//         name: string;
+//         path: string;
+//         description: string;
+//         type: string;
+//         method: string;
+//         createdById: string;
+//         updatedById: string;
+//         deletedById: string;
+//         deletedAt: string;
+//         createdAt: string;
+//         updatedAt: string;
+//     }>;
+//     totalItems: number;
+//     page: number;
+//     limit: number;
+//     totalPages: number;
+// }
 
 export interface PerListResponse {
     data: PerGetAllResponse[];
@@ -86,3 +89,17 @@ export interface PerGetByIdResponse {
     createdAt: string;
     updatedAt: string;
 }
+
+
+
+export interface PermissionItem {
+    id: number;
+    action: string;
+    description: string;
+  }
+
+export interface PerGetAllResponse extends BaseResponse {
+    data: {
+        [key: string]: PermissionItem[];
+    };
+};

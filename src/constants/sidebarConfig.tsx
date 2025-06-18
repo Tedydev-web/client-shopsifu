@@ -30,50 +30,50 @@ export const sidebarConfig: SidebarItem[] = [
     href: '/admin',
     icon: <LayoutDashboard className="w-5 h-5" />,
   },
-  {
-    title: t('admin.sidebar.orders.orders'),
-    href: '/admin/orders',
-    icon: <ShoppingCart className="w-5 h-5" />,
-    subItems: [
-      {
-        title: t('admin.sidebar.orders.allOrders'),
-        href: '/admin/orders',
-        icon: null,
-      },
-      {
-        title: t('admin.sidebar.orders.newOrders'),
-        href: '/admin/orders/new',
-        icon: null,
-      },
-      {
-        title: t('admin.sidebar.orders.processedOrders'),
-        href: '/admin/orders/processed',
-        icon: null,
-      },
-    ],
-  },
-  {
-    title: t('admin.sidebar.products.products'),
-    href: '/admin/products',
-    icon: <Package className="w-5 h-5" />,
-    subItems: [
-      {
-        title: t('admin.sidebar.products.productsList'),
-        href: '/admin/product',
-        icon: null,
-      },
-      {
-        title: t('admin.sidebar.products.addProducts'),
-        href: '/admin/products/add',
-        icon: null,
-      },
-      {
-        title: t('admin.sidebar.categories.categories'),
-        href: '/admin/products/categories',
-        icon: null,
-      },
-    ],
-  },  
+  // {
+  //   title: t('admin.sidebar.orders.orders'),
+  //   href: '/admin/orders',
+  //   icon: <ShoppingCart className="w-5 h-5" />,
+  //   subItems: [
+  //     {
+  //       title: t('admin.sidebar.orders.allOrders'),
+  //       href: '/admin/orders',
+  //       icon: null,
+  //     },
+  //     {
+  //       title: t('admin.sidebar.orders.newOrders'),
+  //       href: '/admin/orders/new',
+  //       icon: null,
+  //     },
+  //     {
+  //       title: t('admin.sidebar.orders.processedOrders'),
+  //       href: '/admin/orders/processed',
+  //       icon: null,
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: t('admin.sidebar.products.products'),
+  //   href: '/admin/products',
+  //   icon: <Package className="w-5 h-5" />,
+  //   subItems: [
+  //     {
+  //       title: t('admin.sidebar.products.productsList'),
+  //       href: '/admin/product',
+  //       icon: null,
+  //     },
+  //     {
+  //       title: t('admin.sidebar.products.addProducts'),
+  //       href: '/admin/products/add',
+  //       icon: null,
+  //     },
+  //     {
+  //       title: t('admin.sidebar.categories.categories'),
+  //       href: '/admin/products/categories',
+  //       icon: null,
+  //     },
+  //   ],
+  // },  
   {
     title: t('admin.sidebar.system.system'),
     href: '/admin/system',

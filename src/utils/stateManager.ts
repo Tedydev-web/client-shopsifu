@@ -32,5 +32,19 @@ export async function clearClientState() {
       Cookies.remove(cookieName, { path: '/' });
     }
   }
-  console.log('Tất cả cookies ngoại trừ XSRF-TOKEN đã được xóa.');
+  console.log('Cookies đã được dọn dẹp (ngoại trừ XSRF-TOKEN).');
+
+  // 4. Dọn dẹp localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.clear();
+    console.log('localStorage đã được dọn dẹp.');
+  }
+
+  // 5. Dọn dẹp sessionStorage
+  if (typeof window !== 'undefined') {
+    sessionStorage.clear();
+    console.log('sessionStorage đã được dọn dẹp.');
+  }
+
+  console.log('Toàn bộ trạng thái client đã được dọn dẹp hoàn tất.');
 }

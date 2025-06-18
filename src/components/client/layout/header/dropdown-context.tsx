@@ -21,10 +21,21 @@ const DropdownContext = createContext<DropdownContextType>({
 export function DropdownProvider({ children }: { children: React.ReactNode }) {
   const [openDropdown, setOpenDropdown] = useState<DropdownType>('none');
 
-  // Thêm event listener để đóng dropdown khi click ngoài
+  // Update overlay visibility without locking scroll
+  useEffect(() => {
+    const overlayElement = document.querySelector('.body-overlay');
+    const shouldShowOverlay = openDropdown !== 'none' && openDropdown !== 'cart';
+    
+    if (shouldShowOverlay) {
+      overlayElement?.classList.add('overlay-active');
+    } else {
+      overlayElement?.classList.remove('overlay-active');
+    }
+  }, [openDropdown]);
+
+  // Handle outside clicks
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Kiểm tra nếu click ngoài các dropdown thì đóng tất cả
       const isOutsideClick = !(
         event.target instanceof Element && 
         (

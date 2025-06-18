@@ -1,16 +1,18 @@
-import { useState } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { roleService } from "@/services/roleService"
+import { permissionService } from "@/services/permissionService"
 import { showToast } from "@/components/ui/toastify"
 import { parseApiError } from "@/utils/error"
 import {
   RoleGetAllResponse,
   RoleCreateRequest,
   RoleUpdateRequest,
-} from "@/types/role.interface"
+} from "@/types/auth/role.interface"
+import { PerGetAllResponse } from "@/types/auth/permission.interface"
 import { PaginationRequest } from "@/types/base.interface"
 import { Role } from "./roles-Columns"
 import { string } from "zod"
-import {t} from "i18next"
+import { t } from "i18next"
 
 export function useRoles() {
   const [roles, setRoles] = useState<Role[]>([])
@@ -21,24 +23,18 @@ export function useRoles() {
   const [page, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  // Lấy danh sách role với phân trang
-  const getAllRoles = async (params?: PaginationRequest) => {
+  const [permissionsData, setPermissionsData] = useState<PerGetAllResponse['data']>({});
+  const [isPermissionsLoading, setIsPermissionsLoading] = useState(true);
+
+  const fetchRoles = useCallback(async (params?: PaginationRequest) => {
     try {
       setLoading(true)
-      const response: RoleGetAllResponse = await roleService.getAll();
-      setRoles(response.data)
-      // response.data là mảng RoleResponse hoặc kiểu tương tự
+      const response: RoleGetAllResponse = await roleService.getAll(params);
       const mappedRoles: Role[] = response.data.map(role => ({
+        ...role,
         id: Number(role.id),
-        name: role.name,
         description: role.description || "",
         isActive: role.isActive ?? true,
-        createdById: role.createdById,
-        updatedById: role.updatedById,
-        deletedById: role.deletedById,
-        deletedAt: role.deletedAt,
-        createdAt: role.createdAt,
-        updatedAt: role.updatedAt,
       }))
       setRoles(mappedRoles)
       setTotalItems(response.totalItems)
@@ -50,7 +46,24 @@ export function useRoles() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  const fetchPermissions = useCallback(async () => {
+    try {
+      setIsPermissionsLoading(true);
+      const response = await permissionService.getAll();
+      setPermissionsData(response.data);
+    } catch (error) {
+      showToast("Không thể tải danh sách quyền", "error");
+    } finally {
+      setIsPermissionsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRoles()
+    fetchPermissions();
+  }, [fetchRoles, fetchPermissions])
 
   // Lấy role theo id
   const getRoleById = async (id: number) => {
@@ -71,7 +84,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.create(data)
-      showToast(t('admin.showToast.role.createSuccessful'), "success")
+      showToast(response.message || "Tạo vai trò thành công", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -87,7 +100,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.update(String(id), data)
-      showToast(t('admin.showToast.role.createSuccessful'), "success")
+      showToast(response.message || "Cập nhật vai trò thành công", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -103,7 +116,7 @@ export function useRoles() {
     try {
       setLoading(true)
       const response = await roleService.delete(String(id))
-      showToast(t('admin.showToast.role.createSuccessful'), "success")
+      showToast(response.message || "Xóa vai trò thành công", "success")
       return response
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -138,7 +151,9 @@ export function useRoles() {
     isModalOpen,
     selectedRole,
     loading,
-    getAllRoles,
+    permissionsData,
+    isPermissionsLoading,
+    fetchRoles,
     getRoleById,
     createRole,
     updateRole,

@@ -1,21 +1,35 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious, 
+  type CarouselApi 
+} from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay";
-import { useState, useEffect, useCallback } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { heroImages, serviceItems } from './landing-Mockdata';
 
 interface HeroSectionProps {
   className?: string;
 }
 
 export function HeroSection({ className }: HeroSectionProps) {
+  const isMobile = useIsMobile();
+  const plugin = useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true })
+  )
+
   const [api, setApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideCount, setSlideCount] = useState(0);
+
   useEffect(() => {
     if (!api) {
       return;
@@ -43,26 +57,21 @@ export function HeroSection({ className }: HeroSectionProps) {
     api?.scrollTo(index);
   }, [api]);
 
-  const heroImages = [
-    '/images/demo/lazada_1.avif',
-    '/images/demo/lazada_2.avif',
-    '/images/demo/lazada_3.avif',
-  ];
   return (
-    <section className={cn("w-full py-8 md:py-16", className)}>
-      <div className="container mx-auto px-4">
+    <section className={cn("w-full bg-white py-6 shadow-sm", className)}>
+      <div className="container mx-auto px-4 justify-start max-w-[1250px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left column - 8 cols */}
           <div className="lg:col-span-8">
-            <div 
-              className="relative w-full h-[350px] rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out"
+            <div  
+              className={cn(
+                "relative rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_0_25px_5px_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out",
+                isMobile ? "h-[220px]" : "h-[350px]"
+              )}
             >
               <Carousel
                 plugins={[
-                  Autoplay({
-                    delay: 3000, // Time in ms before switching to the next image
-                    stopOnInteraction: true, // Autoplay stops on user interaction
-                  }),
+                  plugin.current,
                 ]}
                 opts={{
                   loop: true, // Carousel will loop indefinitely
@@ -86,8 +95,12 @@ export function HeroSection({ className }: HeroSectionProps) {
                   ))}
                 </CarouselContent>
                 {/* Navigation Buttons */}
-                <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
-                <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
+                {!isMobile && (
+                  <>
+                    <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
+                    <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-white bg-black/30 hover:bg-black/50 border-none disabled:bg-black/10 disabled:text-white/50 h-10 w-10" />
+                  </>
+                )}
               </Carousel>
               {/* Dot Indicators */}
               {slideCount > 0 && (
@@ -107,7 +120,7 @@ export function HeroSection({ className }: HeroSectionProps) {
               )}
 
               {/* Overlay content - optional */}
-              <div className="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/60 to-transparent z-10"> {/* Ensure overlay is on top */}
+              <div className={cn("absolute inset-0 flex-col justify-end p-8 bg-gradient-to-t from-black/60 to-transparent z-10", isMobile ? 'hidden' : 'flex')}> {/* Ensure overlay is on top */}
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Bộ sưu tập mới nhất</h2>
                 <p className="text-white mb-4 max-w-lg">Khám phá những xu hướng thời trang mới nhất cho mùa này</p>
                 <Button className="w-fit">Khám phá ngay</Button>
@@ -116,13 +129,13 @@ export function HeroSection({ className }: HeroSectionProps) {
           </div>
 
           {/* Right column - 4 cols */}
-          <div className="lg:col-span-4">
-          <div 
-  className="relative w-full h-[350px] rounded-2xl overflow-hidden 
-             border border-transparent hover:border-[#ccc] 
-             shadow transition-all duration-300 ease-in-out 
-             hover:shadow-[8px_8px_120px_rgba(1,0,0,0.2)]"
->
+          <div className={cn("lg:col-span-4", isMobile ? 'hidden' : 'flex')}>
+            <div 
+              className={cn(
+                "relative w-full rounded-2xl overflow-hidden border border-transparent hover:border-[#ccc] shadow transition-all duration-300 ease-in-out hover:shadow-[8px_8px_120px_rgba(1,0,0,0.2)]",
+                isMobile ? "h-[200px]" : "h-[350px]"
+              )}
+            >
               {/* Placeholder for the secondary image */}
               <div className="absolute inset-0">
                 <Image
@@ -145,6 +158,32 @@ export function HeroSection({ className }: HeroSectionProps) {
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Service Icons Section */}
+        <div className="mt-6">
+          <div className="grid grid-cols-3 sm:grid-cols-6 items-start justify-center gap-x-4 gap-y-2">
+            {serviceItems.map((item) => (
+              <a 
+                href="#" 
+                key={item.label} 
+                className="flex flex-col items-center text-center group"
+              >
+                <div className="flex items-center justify-center w-[52px] h-[52px] bg-white rounded-2xl transition-all duration-300 group-hover:-translate-y-1">
+                  <Image 
+                    src={item.icon} 
+                    alt={item.label} 
+                    width={46} 
+                    height={46}
+                    className="object-contain"
+                  />
+                </div>
+                <p className="text-xs sm:text-[13px] text-gray-800 leading-tight h-10 flex items-center justify-center">
+                  {item.label}
+                </p>
+              </a>
+            ))}
           </div>
         </div>
       </div>

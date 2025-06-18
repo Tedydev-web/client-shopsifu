@@ -1,130 +1,183 @@
-import { useState, useEffect } from 'react';
-import { User } from '@/types/user.interface';
-import { mockUsers } from './users-MockData';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { userService } from '@/services/admin/userService';
+import { roleService } from '@/services/roleService'; // Import roleService
+import { User, UserCreateRequest } from '@/types/admin/user.interface';
+import { Role } from '@/types/auth/role.interface'; // Import Role type
 
-export function useUsers() {
-  // State users và các state liên quan
-  const [users, setUsers] = useState<User[]>(mockUsers);
-  const [data, setData] = useState<User[]>([]);
-  const [totalRecords, setTotalRecords] = useState(0);
+export const useUsers = () => {
+  const { t } = useTranslation('');
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Pagination and search state
+  const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState('');
 
-  // State cho popup xóa
+  // Modal states
+  const [upsertOpen, setUpsertOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // State cho popup edit
-  const [editOpen, setEditOpen] = useState(false);
-  const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  // Roles state
+  const [roles, setRoles] = useState<Role[]>([]);
 
-  // Lấy danh sách users (có thể filter theo search)
-  const fetchUsers = () => {
-    setLoading(true);
-    let filtered = users;
-    if (search) {
-      filtered = users.filter(
-        u =>
-          u.name.toLowerCase().includes(search.toLowerCase()) ||
-          u.email.toLowerCase().includes(search.toLowerCase())
-      );
+  const fetchRoles = async () => {
+    try {
+      const response = await roleService.getAll({ "all-records": true });
+      setRoles(response.data);
+    } catch (err) {
+      toast.error(t('admin.users.toasts.fetchRolesError', 'Failed to fetch roles'));
     }
-    setTotalRecords(filtered.length);
-    setData(filtered.slice(offset, offset + limit));
-    setLoading(false);
+  };
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await userService.getAll({ page: 1, limit: 1000, "all-records": true }); // Fetch all for client-side pagination
+      setAllUsers(response.data);
+      setError(null);
+    } catch (err) {
+      setError(t('admin.users.toasts.fetchError'));
+      toast.error(t('admin.users.toasts.fetchError'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line
-  }, [users, limit, offset, search]);
+    fetchRoles();
+  }, []);
 
-  // Thêm user mới
-  const addUser = (user: Omit<User, 'id' | 'createdAt'>) => {
-    const newUser: User = {
-      ...user,
-      id: (Date.now() + Math.random()).toString(),
-      createdAt: new Date().toISOString(),
-    };
-    setUsers(prev => [newUser, ...prev]);
-    return newUser;
+  // Client-side filtering and pagination
+  const filteredUsers = useMemo(() => {
+    return allUsers.filter(user =>
+      (user.userProfile?.username?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (user.email?.toLowerCase() || '').includes(search.toLowerCase())
+    );
+  }, [allUsers, search]);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * limit;
+    const end = start + limit;
+    return filteredUsers.slice(start, end);
+  }, [filteredUsers, currentPage, limit]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredUsers.length / limit);
+  }, [filteredUsers, limit]);
+
+  // CRUD operations
+  const addUser = async (user: UserCreateRequest) => {
+    try {
+      await userService.create(user);
+      toast.success(t('admin.users.toasts.createSuccess'));
+      fetchUsers();
+    } catch (error) {
+      toast.error(t('admin.users.toasts.createError'));
+      console.error(error);
+    }
   };
 
-  // Sửa user
-  const editUser = (user: User) => {
-    setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, ...user } : u)));
+  const editUser = async (user: User) => {
+    try {
+      await userService.update(user.id, user);
+      toast.success(t('admin.users.toasts.updateSuccess'));
+      fetchUsers();
+    } catch (error) {
+      toast.error(t('admin.users.toasts.updateError'));
+      console.error(error);
+    }
   };
 
-  // Xóa user
-  const deleteUser = (id: string) => {
-    setUsers(prev => prev.filter(u => u.id !== id));
+  const handleConfirmDelete = async () => {
+    if (userToDelete) {
+      setDeleteLoading(true);
+      try {
+        await userService.delete(userToDelete.id);
+        toast.success(t('admin.users.toasts.deleteSuccess'));
+        fetchUsers();
+        setDeleteOpen(false);
+        setUserToDelete(null);
+      } catch (error) {
+        toast.error(t('admin.users.toasts.deleteError'));
+      } finally {
+        setDeleteLoading(false);
+      }
+    }
   };
 
-  // Handle mở popup xóa
+  // Handlers
+  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handleLimitChange = (limit: number) => {
+    setLimit(limit);
+    setCurrentPage(1);
+  };
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setCurrentPage(1);
+  };
+
   const handleOpenDelete = (user: User) => {
     setUserToDelete(user);
     setDeleteOpen(true);
   };
 
-  // Handle xác nhận xóa
-  const handleConfirmDelete = async () => {
-    if (!userToDelete) return;
-    setDeleteLoading(true);
-    await new Promise(r => setTimeout(r, 800)); // giả lập delay
-    deleteUser(userToDelete.id);
-    setDeleteLoading(false);
+  const handleCloseDeleteModal = () => {
     setDeleteOpen(false);
     setUserToDelete(null);
   };
 
-  // Handle mở popup edit
-  const handleOpenEdit = (user: User) => {
-    setUserToEdit(user);
-    setEditOpen(true);
+  const handleOpenUpsertModal = (mode: 'add' | 'edit', user?: User) => {
+    setModalMode(mode);
+    setUserToEdit(user || null);
+    setUpsertOpen(true);
   };
 
-  // Handle phân trang
-  const handlePageChange = (newOffset: number) => {
-    setOffset(newOffset);
+  const handleCloseUpsertModal = () => {
+    setUpsertOpen(false);
+    setUserToEdit(null);
   };
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit);
-    setOffset(0);
-  };
-
-  // Handle đóng popup xóa
-  const handleCloseDeleteModal = () => setDeleteOpen(false);
 
   return {
-    data,
-    totalRecords,
+    data: paginatedUsers,
+    totalRecords: filteredUsers.length,
     loading,
+    error,
     limit,
-    offset,
+    currentPage,
+    totalPages,
     search,
-    setSearch,
-    currentPage: offset / limit + 1,
-    totalPages: Math.ceil(totalRecords / limit),
-    // CRUD
-    addUser,
-    editUser,
-    deleteUser,
-    // Modal state & handle
+    handleSearch,
+    handlePageChange,
+    handleLimitChange,
+    
+    // Delete
     deleteOpen,
     userToDelete,
     deleteLoading,
     handleOpenDelete,
     handleConfirmDelete,
-    editOpen,
-    userToEdit,
-    handleOpenEdit,
-    setEditOpen,
-    // Paging
-    handlePageChange,
-    handleLimitChange,
     handleCloseDeleteModal,
+
+    // Upsert
+    upsertOpen,
+    modalMode,
+    userToEdit,
+    handleOpenUpsertModal,
+    handleCloseUpsertModal,
+    addUser,
+    editUser,
+
+    // Data for dropdowns
+    roles
   };
-}
+};

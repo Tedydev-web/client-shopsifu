@@ -6,5 +6,12 @@ export interface Product {
   price: number
   stock: number
   status: string
-  // Thêm các trường khác nếu cần
+  sold: number
+  tags: string[]
+  createdAt: string
+  updatedAt: string
+  salePrice: number
+  discount: number
+  type: string
+  Isfavorite?: boolean
 }

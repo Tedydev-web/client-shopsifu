@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { Language } from "./languages-Columns"
-import { languagesService } from "@/services/languagesService"
+import { languagesService } from "@/services/admin/languagesService"
 import { showToast } from "@/components/ui/toastify"
 import { parseApiError } from "@/utils/error"
 import { 
   LangCreateRequest, 
   LangUpdateRequest,
   LangGetAllResponse
-} from "@/types/languages.interface"
+} from "@/types/admin/languages.interface"
 import { PaginationRequest } from "@/types/base.interface"
 import { t } from "i18next"
 

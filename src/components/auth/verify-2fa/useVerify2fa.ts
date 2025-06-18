@@ -19,7 +19,8 @@ export function useVerify2FA() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const type = (searchParams.get('type') as TwoFactorType) || 'TOTP'
+  const type = (searchParams.get('type') as TwoFactorType) || 'TOTP';
+  const isChangePasswordFlow = searchParams.get('changePassword') === 'true';
   const { fetchProfile } = useGetProfile()
   const userData = useUserData();
 
@@ -30,7 +31,9 @@ export function useVerify2FA() {
   // Được cập nhật từ kết quả API sau khi xác thực thành công
   const recovery = recoveryCodeSchema(t)
   const otp = otpSchema(t)
-  // Gửi OTP qua email - sử dụng trong phương thức OTP
+
+  
+  // HÀM XỬ LÝ GỬI LẠI OTP
   const handleResendOTP = async () => {
     try {
       setLoading(true)
@@ -44,8 +47,7 @@ export function useVerify2FA() {
       setLoading(false)
     }
   }
-
-  // Hợp nhất logic xác thực và gọi API cho 2FA (TOTP/RECOVERY)
+  // HÀM XỬ LÝ XÁC THỰC 2FA TOTP/RECOVERY
   const handleVerify2FA = async (data: { otp: string }) => {
     try {
       setLoading(true);
@@ -71,11 +73,22 @@ export function useVerify2FA() {
       }) as Verify2faResponse;
 
       if (response.status === 201 && response.data) {
+        showToast(response.message || t('auth.2faVerify.verificationSuccess'), 'success');
+
+
+        // LUỒNG ĐỔI MẬT KHẨU
+        if (isChangePasswordFlow && role === 'Admin' || role === 'Super Admin') {
+          router.push(ROUTES.ADMIN.DASHBOARD);
+          return;
+        }else{
+          router.push(ROUTES.HOME);
+        }
+
+        // LUỒNG XÁC THỰC 2FA ĐỂ ĐĂNG NHẬP
         const isDeviceTrusted = response.data.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
         await authService.getAbility();
-        showToast(response.message || t('auth.2faVerify.verificationSuccess'), 'success');
         if(role === 'Admin' || role === 'Super Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;
         }else{
@@ -95,7 +108,7 @@ export function useVerify2FA() {
     }
   };
 
-  // Hợp nhất logic xác thực và gọi API cho OTP
+  // HÀM XỬ LÝ XÁC THỰC OTP
   const handleVerifyOTP = async (data: { otp:string }) => {
     try {
       setLoading(true);
@@ -105,12 +118,25 @@ export function useVerify2FA() {
         code: data.otp
       }) as VerifyOTPResponse;
 
+
+      // LUỒNG ĐỔI MẬT KHẨU
+      if (isChangePasswordFlow && role === 'Admin' || role === 'Super Admin') {
+        showToast(response.message, 'success');
+        router.push(ROUTES.ADMIN.DASHBOARD);
+        return;
+      }else{
+        showToast(response.message, 'success');
+        router.push(ROUTES.HOME);
+      }
+
       if (response.status === 201 && response.data) {
+        showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
+
+        // LUỒNG XÁC THỰC OTP ĐỂ ĐĂNG NHẬP
         const isDeviceTrusted = response.data.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
         await authService.getAbility();
-        showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
         if(role === 'Admin' || role === 'Super Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;
         }else{
@@ -129,7 +155,7 @@ export function useVerify2FA() {
       setLoading(false);
     }
   };
-  // Chỉ cho phép chuyển đổi giữa TOTP và RECOVERY
+  // HÀM XỬ LÝ CHUYỂN ĐỔI GIỮA TOTP VÀ RECOVERY
   const switchToRecovery = () => {
     router.replace(`?type=RECOVERY`)
   }

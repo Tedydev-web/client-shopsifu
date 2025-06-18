@@ -8,7 +8,7 @@ import {
     LangUpdateResponse,
     LangDeleteResponse,
     LangGetByIdResponse,
- } from '@/types/languages.interface';
+ } from '@/types/admin/languages.interface';
 import { PaginationRequest } from '@/types/base.interface';
 
 class LanguagesService {

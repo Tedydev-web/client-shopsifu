@@ -1,3 +1,5 @@
+import { BaseResponse, PaginationRequest } from "../base.interface";
+
 
 export interface Permission {
     id: string;
@@ -28,7 +30,7 @@ export interface RoleResponse {
     description: string;
     role: RoleType;
     isActive: boolean;
-    permissions: Permission[];
+    permissions: Array<Permission>;
     createdAt: number;
     updatedAt: number;
     totalItems: number;
@@ -37,19 +39,32 @@ export interface RoleResponse {
     totalPages: number;
 }
 
-export interface RoleGetAllResponse {
+export interface RoleGetAllResponse extends BaseResponse {
   data: Array<{
     id: number;
     name: string;
     description: string;
     isActive: boolean;
-    permissions: Permission[]; // Nếu biết rõ kiểu thì thay `any` bằng kiểu cụ thể
     createdById: string;
     updatedById: string;
     deletedById: string;
     deletedAt: string;
     createdAt: string;
     updatedAt: string;
+    permissions: Array<{
+        id: number,
+        description: string,
+        createdById: string,
+        updatedById: string,
+        deletedById: string,
+        deletedAt: string,
+        action: string,
+        subject: string,
+        conditions: string,
+        createdAt: string,
+        updatedAt: string,
+        isSystemPermission: boolean
+        }>;
   }>;
   totalItems: number;
   page: number;
@@ -72,30 +87,42 @@ export interface RoleGetByIdResponse {
     updatedAt: string;
 }
 
-export interface RoleCreateRequest {
+export interface RoleCreateRequest extends BaseResponse {
     name: string;
-    description: string;
-    isActive: boolean;
-    permissionIds: string[];
+    description?: string;
+    isSystemRole?: boolean;
+    isSuperAdmin?: boolean;
+    permissionIds?: number[];
 }
 
-export interface RoleCreateResponse {
-    name: string;
-    description: string;
-    role: RoleType;
-    isActive: boolean;
-    createdAt: string;
-    permissionIds: string[];
+export interface RoleCreateResponse extends BaseResponse {
+    data:{
+        id: number,
+        name: string,
+        description: string,
+        createdById: string,
+        updatedById: string,
+        deletedById: string,
+        deletedAt: string,
+        createdAt: string,
+        updatedAt: string,
+        isSystemRole: boolean,
+        isSuperAdmin: boolean,
+        permissions: Permission[]
+    }
+   
 }
 
-export interface RoleUpdateRequest {
-    name: string;
-    description: string;
-    isActive: boolean;
-    permissionIds: string[];
+export interface RoleUpdateRequest extends BaseResponse {
+    name?: string;
+    description?: string;
+    isActive?: boolean;
+    isSystemRole?: boolean;
+    isSuperAdmin?: boolean;
+    permissionIds?: number[];
 }
 
-export interface RoleUpdateResponse {
+export interface RoleUpdateResponse extends BaseResponse {
     id: string;
     name: string;
     description: string;
@@ -135,4 +162,12 @@ export interface RoleAssignPermissionResponse {
     deletedAt: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface Role {
+  id?: number
+  name: string
+  description?: string
+  isActive: boolean
+  permissionIds?: string[]
 }

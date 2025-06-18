@@ -7,19 +7,16 @@ import PermissionsModalUpsert from "./permissions-ModalUpsert"
 import { PlusIcon, Loader2 } from "lucide-react"
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
 import { DataTable } from "@/components/ui/data-table-component/data-table"
-import { Pagination } from "@/components/ui/data-table-component/pagination"
+
 import { Button } from "@/components/ui/button"
 import { usePermissions } from "./usePermissions"
-import { useDebounce } from "@/hooks/useDebounce"
 import { useTranslation } from "react-i18next"
 
 export function PermissionsTable() {
   const { t } = useTranslation()
   const {
     permissions,
-    totalItems,
-    page,
-    totalPages,
+
     loading,
     isModalOpen,
     selectedPermission,
@@ -35,26 +32,13 @@ export function PermissionsTable() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [permissionToDelete, setPermissionToDelete] = useState<Permission | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
-  const [isSearching, setIsSearching] = useState(false)
 
-  const [limit, setLimit] = useState(10)
-  const [offset, setOffset] = useState(0)
-
-  const debouncedSearchValue = useDebounce(searchValue, 1000)
 
   useEffect(() => {
     getAllPermissions()
   }, [])
 
-  useEffect(() => {
-    if (debouncedSearchValue !== undefined) {
-      setIsSearching(true)
-      getAllPermissions({ page: 1, limit, search: debouncedSearchValue })
-      .finally(() => {
-        setIsSearching(false)
-      })
-    }
-  }, [debouncedSearchValue, limit])
+
 
   const handleEdit = (permission: Permission) => {
     handleOpenModal(permission)
@@ -77,7 +61,7 @@ export function PermissionsTable() {
       const success = await deletePermission(permissionToDelete.id.toString()); // Chuyển id thành string
       if (success) {
         handleCloseDeleteModal();
-        getAllPermissions({ page: page, limit}); // Chuyển page và limit thành string
+        getAllPermissions(); // Chuyển page và limit thành string
       }
     } catch (error) {
       console.error('Lỗi khi xóa quyền:', error);
@@ -107,7 +91,7 @@ export function PermissionsTable() {
   
         if (response) {
           handleCloseModal();
-          getAllPermissions({ page, limit });
+          getAllPermissions();
         }
       } else {
         // Tạo mới
@@ -120,7 +104,7 @@ export function PermissionsTable() {
   
         if (response) {
           handleCloseModal();
-          getAllPermissions({ page, limit });
+          getAllPermissions();
         }
       }
     } catch (error) {
@@ -132,14 +116,12 @@ export function PermissionsTable() {
     setSearchValue(value)
   }
 
-  const handlePageChange = (newPage: number) => {
-    getAllPermissions({ page: newPage, limit })
-  }
-
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit)
-    getAllPermissions({ page: 1, limit: newLimit })
-  }
+  const filteredPermissions = permissions.filter(
+    (permission) =>
+      permission.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      permission.description.toLowerCase().includes(searchValue.toLowerCase()) ||
+      permission.path.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   return (
     <div className="w-full space-y-4">
@@ -150,40 +132,31 @@ export function PermissionsTable() {
           placeholder={t("admin.permissions.searchPlaceholder")}
           className="max-w-sm"
         />
-        <Button onClick={() => handleOpenModal()} className="ml-auto">
+        {/* <Button onClick={() => handleOpenModal()} className="ml-auto">
           <PlusIcon className="w-4 h-4 mr-2" />{t("admin.permissions.addAction")}
-        </Button>
+        </Button> */}
       </div>
 
       <div className="relative">
-        {(loading || isSearching) && (
+        {loading && (
           <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         )}
         <DataTable
           columns={PermissionsColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
-          data={permissions}
+          data={filteredPermissions}
         />
       </div>
 
-      {totalPages > 0 && (
-        <Pagination
-          limit={limit}
-          page={page}
-          totalPages={totalPages}
-          totalRecords={totalItems}
-          onPageChange={handlePageChange}
-          onLimitChange={handleLimitChange}
-        />
-      )}
+
 
       <PermissionsModalUpsert
         open={isModalOpen}
         onClose={handleCloseModal}
         mode={selectedPermission ? "edit" : "add"}
-        permission={selectedPermission}
-        onSubmit={handleSubmit}
+        // permission={selectedPermission}
+        // onSubmit={handleSubmit}
       />
 
       <ConfirmDeleteModal

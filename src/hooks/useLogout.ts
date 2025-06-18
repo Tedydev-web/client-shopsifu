@@ -1,51 +1,39 @@
 import { useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
 import { useState } from 'react';
-import { removeToken } from '@/lib/auth';
 import { showToast } from '@/components/ui/toastify';
 import { ROUTES } from '@/constants/route';
-import { logOut } from '@/store/features/auth/authSlide';
-import { clearProfile } from '@/store/features/auth/profileSlide';
-import { AppDispatch, getStore } from '@/store/store';
 import { authService } from '@/services/auth/authService';
+import { clearClientState } from '@/utils/stateManager';
 
 export function useLogout() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
+      // 1. Gọi API logout ở phía server trước
+      await authService.logout({});
+    } catch (error) {
+      // Ghi lại lỗi API nhưng không dừng quá trình đăng xuất phía client
+      console.error('API logout failed, proceeding with client-side cleanup:', error);
+    } finally {
+      // 2. Dọn dẹp toàn bộ trạng thái phía client bất kể API thành công hay thất bại
+      await clearClientState();
 
-      // Gọi API logout
-      await authService.logout({
-      });
+      // 3. Lấy CSRF token mới để chuẩn bị cho lần đăng nhập tiếp theo
+      try {
+        await authService.getCsrfToken();
+      } catch (error) {
+        console.error('Failed to fetch new CSRF token after logout:', error);
+      }
 
-      // Xoá token local
-      removeToken();
-
-      // Cập nhật Redux
-      dispatch(logOut());
-      dispatch(clearProfile());
-
-      // Xóa Redux Persist
-      const { persistor } = getStore();
-      await persistor.purge();
-
-      // Lấy CSRF token mới
-      await authService.getCsrfToken();
-
-      // Hiển thị thông báo
+      // 4. Hiển thị thông báo thành công và điều hướng
       showToast('Đăng xuất thành công!', 'success');
 
-      // Điều hướng
-      router.push(ROUTES.BUYER.SIGNIN);
-    } catch (error) {
-      console.error('Logout failed:', error);
-      showToast('Đăng xuất thất bại. Vui lòng thử lại.', 'error');
-    } finally {
-      setLoading(false);
+      // 5. Điều hướng về trang đăng nhập bằng cách tải lại trang
+      // Điều này đảm bảo dọn dẹp triệt để mọi trạng thái còn sót lại trong bộ nhớ
+      window.location.href = ROUTES.BUYER.SIGNIN;
     }
   };
 
