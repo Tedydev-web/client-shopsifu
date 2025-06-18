@@ -1,7 +1,6 @@
+
 'use client';
-
 import Link from 'next/link';
-
 import { User, LogOut, ShoppingCart, LucideIcon, LayoutDashboard } from 'lucide-react';
 import React, { useRef } from 'react';
 import { useLogout } from '@/hooks/useLogout';
@@ -11,14 +10,12 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDropdown } from '../dropdown-context';
 import { useUserData } from '@/hooks/useGetData-UserLogin';
-
 interface MenuItemProps {
   icon: LucideIcon;
   label: string;
   onClick: () => void;
   requireDivider?: boolean;
 }
-
 export function ProfileDropdown() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { handleLogout, loading: logoutLoading } = useLogout();
@@ -46,7 +43,6 @@ export function ProfileDropdown() {
     }
   ];
   
-
   if (!user) {
     return (
       <span
@@ -57,7 +53,6 @@ export function ProfileDropdown() {
       </span>
     );
   }
-
   const name = user.username;
   const role = user.role;
   const email = user.email;
