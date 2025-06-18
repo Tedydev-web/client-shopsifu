@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-
 import { User, LogOut, ShoppingCart, LucideIcon, LayoutDashboard } from 'lucide-react';
-import React, { useRef } from 'react';
+import React, { useRef, type FC, type MouseEvent } from 'react';
 import { useLogout } from '@/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/route';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useDropdown } from '../dropdown-context';
 import { useUserData } from '@/hooks/useGetData-UserLogin';
@@ -19,6 +18,20 @@ interface MenuItemProps {
   onClick: () => void;
   requireDivider?: boolean;
 }
+
+const MenuItem: FC<MenuItemProps> = ({ icon: Icon, label, onClick, requireDivider }) => (
+  <>
+    <motion.button
+      whileTap={{ scale: 0.95 }}
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 text-sm font-medium"
+    >
+      <Icon className="h-4 w-4" />
+      {label}
+    </motion.button>
+    {requireDivider && <hr className="border-gray-200" />}
+  </>
+);
 
 export function ProfileDropdown() {
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -43,183 +56,90 @@ export function ProfileDropdown() {
     {
       icon: LogOut,
       label: logoutLoading ? 'Đang xử lý...' : 'Đăng xuất',
-      onClick: handleLogout
+      onClick: () => handleLogout()
     }
   ];
-  
 
   if (!user) {
     return (
-      <span
+      <button
         onClick={() => router.push(ROUTES.BUYER.SIGNIN)}
-        className="cursor-pointer inline-flex items-center justify-center px-4 py-3 text-white font-semibold text-[13px]"
+        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-transparent text-white"
       >
-        Đăng nhập
-      </span>
+        <User className="w-5 h-5" />
+      </button>
     );
   }
 
   const name = user.username;
-  const role = user.role;
-  const email = user.email;
-  const avatar = user.avatar;
-  // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
   const avatarText = name ? name[0].toUpperCase() : 'U';
-  return (
-    <div 
-      className="relative group profile-container" 
-      ref={dropdownRef}
-    >
-      {/* Trigger Button */}
-      <div 
-        className="cursor-pointer relative whitespace-nowrap inline-flex items-center gap-2 px-4 py-3 text-white font-semibold text-sm"
-        onClick={() => setOpenDropdown(isOpen ? 'none' : 'profile')}
-        onMouseEnter={() => setOpenDropdown('profile')}
-      >
-        {/* Backdrop blur effect */}
-        <motion.div
-          className="absolute inset-0 rounded-full backdrop-blur-sm"
-          initial={{ 
-            backgroundColor: "rgba(233, 233, 233, 0)", 
-            scaleX: 0.5,
-            scaleY: 0.8
-          }}
-          animate={{
-            backgroundColor: isOpen ? "rgba(233, 233, 233, 0.4)" : "rgba(233, 233, 233, 0)", 
-            boxShadow: isOpen
-              ? "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
-              : "none",
-            scaleX: isOpen ? 1 : 0.5,
-            scaleY: isOpen ? 1 : 0.8
-          }}
-          whileHover={{
-            backgroundColor: "rgba(233, 233, 233, 0.4)",
-            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-            scaleX: [0.8, 1.1, 1], 
-            scaleY: [0.9, 1.05, 1],
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 350, 
-            damping: 12, 
-            backgroundColor: { duration: 0.15 }, 
-            boxShadow: { duration: 0.15 }, 
-            scaleX: { duration: 0.35, ease: "easeOut" }, 
-            scaleY: { duration: 0.25, ease: "easeOut" },
-          }}
-        />
-        
-        {/* Content layer */}
-        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold flex-shrink-0 text-black z-10">
-          {avatarText}
-        </div>
-        <span className="text-[13px] z-10 relative">Hello, {name}</span>
-      </div>
-      
-      {/* Invisible gap to prevent dropdown from closing when moving cursor to dropdown */}
-      <div className="absolute h-2 w-full top-full"></div>
-      
-      {/* Dropdown Menu */}
-      <motion.div
-        className={cn(
-          "absolute top-[calc(100%+3px)] right-0 w-72 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50",
-          isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-        )}
-        onMouseEnter={() => setOpenDropdown('profile')}
-        onMouseLeave={() => setOpenDropdown('none')}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ 
-          opacity: isOpen ? 1 : 0, 
-          y: isOpen ? 0 : -10,
-          transition: {
-            duration: 0.2,
-            ease: "easeOut"
-          }
-        }}
-      >
-        {/* Bubble arrow pointing to the title */}
-        <div className="absolute right-4 top-[-7px] w-3 h-3 bg-white transform rotate-45 border-t-1 border-l-1 border-gray-200 z-1"></div>
-        
-        {/* Header with avatar and user info */}
-        <div className="flex items-center justify-center pt-6 pb-4 w-full">
-          <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-lg font-semibold mr-3 flex-shrink-0 text-gray-700">
-            {avatarText}
-          </div>
-          <div className="flex flex-col max-w-[175px]">
-            <div className="font-medium text-[16px] text-gray-900 truncate">{name}</div>
-            <div className="text-[11px] text-gray-500 truncate">{email}</div>
-          </div>
-        </div>
-          {/* Divider */}
-        <div className="h-px bg-gray-200 mx-6 my-1"></div>
-          {/* Menu Items */}
-        <div>
-          {role === 'Admin' || role === 'Super Admin' && (
-            <>
-              <Link href={ROUTES.ADMIN.DASHBOARD} className="flex items-center px-5 py-2 hover:bg-gray-50 cursor-pointer text-[14px] text-gray-800">
-                <LayoutDashboard className="w-4.5 h-4.5 mr-2 text-gray-800" />
-                Trang quản trị
-              </Link>
-              <div className="h-px bg-gray-200 mx-6 my-1"></div>
-            </>
-          )}
-          {menuItems.map((item, index) => (
-            <React.Fragment key={index}>
-              <div 
-                className="flex items-center px-5 py-2 hover:bg-gray-50 cursor-pointer text-[14px] text-gray-800"
-                onClick={item.onClick}
-              >
-                <item.icon className="w-4.5 h-4.5 mr-2 text-gray-800" />
-                {item.label}
-              </div>
-                {item.requireDivider && (
-                <div className="h-px bg-gray-200 mx-6 my-1"></div>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </motion.div>
-    </div>
-  );
-}
 
-export function MobileProfile() {
-  const router = useRouter();
-  const user = useUserData();
-
-  const handleProfileClick = () => {
-    if (user) {
-      router.push(ROUTES.BUYER.MY_ACCOUNT);
-    } else {
-      router.push(ROUTES.BUYER.SIGNIN);
-    }
+  const handleClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    setOpenDropdown(isOpen ? 'none' : 'profile');
   };
 
-  if (!user) {
-    return null; // Không hiển thị gì khi chưa đăng nhập
-  }
-
+  const handleBackdropClick = () => {
+    setOpenDropdown('none');
+  };
+  
   return (
-    <div 
-      className="relative cursor-pointer"
-      onClick={handleProfileClick}
-    >
-      <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20">
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={handleClick}
+        className="relative inline-flex items-center justify-center w-8 h-8 rounded-full bg-white text-primary shadow-sm"
+      >
         {user.avatar ? (
           <Image
             src={user.avatar}
-            alt="User avatar"
+            alt={name || 'Profile'}
             width={32}
             height={32}
-            className="object-cover w-full h-full"
+            className="w-full h-full object-cover rounded-full"
           />
         ) : (
-          // Fallback avatar nếu không có ảnh
-          <div className="w-full h-full bg-red-600 flex items-center justify-center text-white text-sm font-medium">
-            {(user.firstName?.[0] || user.email[0]).toUpperCase()}
-          </div>
+          <span className="text-sm font-semibold">{avatarText}</span>
         )}
-      </div>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop for mobile */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleBackdropClick}
+              className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+            />
+            
+            {/* Dropdown Menu */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden z-50"
+            >
+              {/* User Info Section */}
+              <div className="px-4 py-3 border-b border-gray-200">
+                <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+                {user.email && (
+                  <p className="text-xs text-gray-500 truncate mt-1">{user.email}</p>
+                )}
+              </div>
+              
+              {/* Menu Items */}
+              <div className="py-1">
+                {menuItems.map((item, index) => (
+                  <MenuItem key={index} {...item} />
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

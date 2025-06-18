@@ -2,7 +2,7 @@
 'use client';
 
 import { CartDropdown } from '../desktop/desktop-Cart';
-import { ProfileDropdown } from '../moblie/mobile-Profile';
+import { ProfileDropdown } from './mobile-Profile';
 import { DropdownProvider } from '../dropdown-context';
 import { MobileSearchInput } from './moblie-SearchInput';
 import '../style.css';
@@ -28,9 +28,7 @@ export function MobileHeader() {
               {/* Cart Dropdown */}
               <div className="relative">
                 <CartDropdown />
-              </div>
-
-              {/* Profile Dropdown */}
+              </div>              {/* Profile Avatar */}
               <div className="relative">
                 <ProfileDropdown />
               </div>
