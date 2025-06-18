@@ -10,7 +10,7 @@ export interface BaseResponse {
 
 
 export interface PaginationRequest {
-    meta?:{
+    metadata?:{
       totalItems: number,
       page: number,
       limit: number,
