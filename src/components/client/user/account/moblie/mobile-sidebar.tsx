@@ -1,12 +1,14 @@
-'use client'
+"use client";
 
-import { settingsMockData } from './mobile-MockData'
-import Link from 'next/link'
-import { ChevronRight, Home } from 'lucide-react'
-import MobileHeader from './moblie-Header'
+import { useSettingsMockData } from "./mobile-MockData";
+import Link from "next/link";
+import { ChevronRight, Home } from "lucide-react";
+import MobileHeader from "./moblie-Header";
+import { useLogout } from "@/hooks/useLogout";
 
 export default function MobileSettings() {
-  const { header, sections, signOut } = settingsMockData
+  const { header, sections, signOut } = useSettingsMockData();
+  const { handleLogout, loading: logoutLoading } = useLogout();
 
   return (
     <div className="fixed inset-0 bg-white">
@@ -26,10 +28,13 @@ export default function MobileSettings() {
                 <Link
                   key={idx}
                   href={item.href}
-                  className="flex items-center gap-2 p-3 bg-gray-100 rounded-md text-sm font-medium"
+                  className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-md text-sm font-medium"
                 >
                   <span className="text-green-600">{item.icon}</span>
-                  {item.label}
+                  <span className="text-sm font-medium text-gray-900 leading-tight whitespace-nowrap">
+                    {item.label}
+                  </span>
+
                   <ChevronRight className="w-4 h-4 ml-auto text-gray-400" />
                 </Link>
               ))}
@@ -46,7 +51,9 @@ export default function MobileSettings() {
               >
                 <span>{item.label}</span>
                 <div className="flex items-center gap-2 text-gray-400">
-                  {item.value && <span className="text-gray-500">{item.value}</span>}
+                  {item.value && (
+                    <span className="text-gray-500">{item.value}</span>
+                  )}
                   <ChevronRight className="w-4 h-4" />
                 </div>
               </Link>
@@ -56,24 +63,35 @@ export default function MobileSettings() {
 
         {/* Footer - Fixed at bottom */}
         <div className="sticky bottom-0 bg-white border-t border-gray-200">
-          <Link
-            href={signOut.href}
-            className="block text-center text-red-600 py-4 text-sm font-semibold hover:bg-gray-50 active:bg-gray-100"
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              if (!logoutLoading) {
+                handleLogout();
+              }
+            }}
+            disabled={logoutLoading}
+            className={`w-full text-center text-red-600 py-4 text-sm font-semibold
+      ${
+        logoutLoading
+          ? "opacity-50 cursor-not-allowed"
+          : "hover:bg-gray-50 active:bg-gray-100"
+      }`}
           >
             {signOut.label}
-          </Link>
+          </button>
         </div>
 
         {/* Floating home icon */}
-        <div className="fixed bottom-6 right-4">
-          <Link 
-            href="/" 
-            className="bg-white shadow-lg rounded-full p-3 hover:shadow-xl active:scale-95 transition-all"
+        <div className="fixed bottom-6 right-4 z-50">
+          <Link
+            href="/"
+            className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all"
           >
             <Home className="w-5 h-5 text-black" />
           </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }

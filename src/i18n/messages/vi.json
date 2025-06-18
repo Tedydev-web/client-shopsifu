@@ -46,7 +46,7 @@
     "common": {
       "full name": "Họ và tên",
       "email": "Email",
-      "phonenumber": "Số điện thoại",
+      "phone number": "Số điện thoại",
       "password": "Mật khẩu",
       "confirm password": "Xác nhận mật khẩu",
       "logout": "Đăng xuất",
@@ -336,6 +336,17 @@
         "saveChanges": "Lưu thay đổi",
         "revokeOtherSessions": "Hủy các phiên đăng nhập khác",
         "passwordPolicy": "Mật khẩu phải chứa ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+      },
+      "password": {
+        "validation": {
+          "currentPasswordRequired": "Yêu cầu mật khẩu hiện tại",
+          "newPasswordMinLength": "Mật khẩu mới phải có ít nhất 6 ký tự",
+          "newPasswordDigit": "Mật khẩu phải chứa ít nhất một chữ số",
+          "newPasswordLetter": "Password must contain at least one letter",
+          "newPasswordSpecialChar": "Password must contain at least one special character (!$@%)",
+          "confirmPasswordRequired": "Confirm password is required",
+          "passwordsDoNotMatch": "Passwords do not match"
+        }
       },
       "regenerateCodesTitle": "Tạo lại mã khôi phục",
       "regenerateCodesDescription": "Nhập mã 6 chữ số từ ứng dụng xác thực để tạo lại mã khôi phục.",
@@ -829,7 +840,15 @@
         "delete": "Xóa tài khoản",
         "deleteAccount": "Xóa tài khoản",
         "confirmDelete": "Xác nhận xóa",
-        "accountTermination": "Xóa tài khoản"
+        "accountTermination": "Xóa tài khoản",
+
+        "name": "Tên",
+        "firstName": "Tên",
+        "lastName": "Họ",
+        "username": "Tên tài khoản",
+        "phone": "Số điện thoại",
+        "updateProfile": "Thông tin người dùng",
+        "clickToChange": "Tải lên ảnh đại diện"
       },
 
       "password": {

@@ -1,10 +1,6 @@
 import { z } from "zod"
 import { TFunction } from 'i18next'
 
-
-
-
-
 export const passwordSchema = (t: (key: string) => string) => z.object({
   currentPassword: z.string().min(1, { message: t('admin.profileSettings.password.validation.currentPasswordRequired') }),
   newPassword: z

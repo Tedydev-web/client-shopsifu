@@ -207,7 +207,7 @@ export function SignupForm({ email, className }: SignupFormProps) {
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={loading}
               >
-                {loading ? t('auth.register.registering...') : t('auth.register.register')}
+                {loading ? t('auth.register.registering') : t('auth.register.register')}
               </AnimatedButton>
 
               {/* OAuth Form */}

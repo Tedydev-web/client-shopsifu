@@ -130,7 +130,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={loading}
               >
-                {loading ? t('auth.verifyEmail.Processing...') : content.buttonText}
+                {loading ? t('auth.verifyEmail.Processing') : content.buttonText}
               </AnimatedButton>
             </div>
             {/* OAuth Form */}

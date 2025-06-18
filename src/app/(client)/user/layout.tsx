@@ -5,14 +5,21 @@ import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import { Sidebar } from '@/components/client/user/layout/user-Sidebar'
 import MobileHeader from '@/components/client/user/account/moblie/moblie-Header'
+import { useTranslation } from 'react-i18next'
 
 interface AccountLayoutProps {
   children: React.ReactNode
   title?: string
+  showSidebar?: boolean
 }
 
-export default function AccountLayout({ children, title = '' }: AccountLayoutProps) {
+export default function AccountLayout({ 
+  children, 
+  title = '',
+  showSidebar = true 
+}: AccountLayoutProps) {
   const { isMobile } = useResponsive()
+  const { t } = useTranslation()
 
   if (isMobile) {
     return (
@@ -30,9 +37,11 @@ export default function AccountLayout({ children, title = '' }: AccountLayoutPro
   return (
     <div className="min-h-screen bg-background text-foreground max-w-7xl mx-auto">
       <div className="flex">
-        <aside className="w-64 h-screen sticky top-0">
-          <Sidebar />
-        </aside>
+        {showSidebar && (
+          <aside className="w-64 h-screen sticky top-0">
+            <Sidebar />
+          </aside>
+        )}
 
         <main className="flex-1 p-4 pl-0">
           <div className="max-w-4xl mx-auto w-full">
