@@ -38,15 +38,13 @@ export function Categories() {
   // Xem file header-styles.css
   return (
     <>
-      {/* Background overlay when dropdown is open - positioned below header */}
-      <div 
+      {/* Background overlay when dropdown is open - positioned below header */}      <div 
         className={cn(
-          "fixed top-[75px] left-0 right-0 bottom-0 bg-black transition-all duration-300 category-backdrop",
+          "fixed top-[75px] left-0 right-0 bottom-0 bg-black transition-all duration-300 category-backdrop pointer-events-none",
           open 
             ? "opacity-50 visible z-40" 
             : "opacity-0 invisible"
         )}
-        onClick={handleMouseLeave}
         aria-hidden="true"
       />
         {/* Sử dụng kỹ thuật Slot cho container để giảm re-render */}

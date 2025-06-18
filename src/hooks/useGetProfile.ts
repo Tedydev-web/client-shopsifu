@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { profileService } from '@/services/auth/profileService';
-import { setProfile } from '@/store/features/auth/profileSlide';
+import { setProfile, clearProfile } from '@/store/features/auth/profileSlide';
 import { UserProfile, UserProfileResponse } from '@/types/auth/profile.interface';
 import { toast } from 'react-toastify';
 
@@ -16,30 +16,46 @@ export const useGetProfile = () => {
     try {
       const response: UserProfileResponse = await profileService.getProfile();
 
-      // Làm phẳng dữ liệu từ API response
+      // Validate response data
+      if (!response?.data) {
+        throw new Error('Invalid profile data received');
+      }
+
+      // Safely extract and flatten profile data with optional chaining
       const flattenedProfile: UserProfile = {
-        id: response.data.id,
-        email: response.data.email,
-        role: response.data.role,
-        status: response.data.status,
-        twoFactorEnabled: response.data.twoFactorEnabled,
-        googleId: response.data.googleId,
-        createdAt: response.data.createdAt,
-        updatedAt: response.data.updatedAt,
-        firstName: response.data.userProfile?.firstName || '',
-        lastName: response.data.userProfile?.lastName || '',
-        username: response.data.userProfile?.username || '',
-        phoneNumber: response.data.userProfile?.phoneNumber || '',
-        avatar: response.data.userProfile?.avatar || '',
+        id: response.data?.id,
+        email: response.data?.email,
+        role: response.data?.role,
+        status: response.data?.status,
+        twoFactorEnabled: response.data?.twoFactorEnabled ?? false,
+        googleId: response.data?.googleId ?? null,
+        createdAt: response.data?.createdAt,
+        updatedAt: response.data?.updatedAt,
+        firstName: response.data?.userProfile?.firstName ?? '',
+        lastName: response.data?.userProfile?.lastName ?? '',
+        username: response.data?.userProfile?.username ?? '',
+        phoneNumber: response.data?.userProfile?.phoneNumber ?? null,
+        avatar: response.data?.userProfile?.avatar ?? null,
       };
 
+      // Validate required fields
+      if (!flattenedProfile.id || !flattenedProfile.email) {
+        throw new Error('Missing required profile data');
+      }
+
       dispatch(setProfile(flattenedProfile));
-      return flattenedProfile; // Trả về dữ liệu profile đã được làm phẳng
+      return flattenedProfile;
     } catch (err: any) {
-      const errorMessage = err.response?.message || 'Failed to fetch profile';
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch profile';
       setError(errorMessage);
       toast.error(errorMessage);
-      return null; // Trả về null khi có lỗi
+      
+      // Clear profile on critical errors
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        dispatch(clearProfile());
+      }
+      
+      return null;
     } finally {
       setLoading(false);
     }

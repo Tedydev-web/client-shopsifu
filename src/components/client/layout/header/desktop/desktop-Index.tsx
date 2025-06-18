@@ -1,5 +1,4 @@
 'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect } from 'react';
@@ -13,26 +12,21 @@ import DesktopCommit from "./desktop-Commit";
 import { useScrollHeader } from '@/hooks/useScrollHeader';
 import { TopBar } from './header-TopBar';
 import '../style.css';
-
 function HeaderLayout() {
   const showHeader = useScrollHeader();
-  const { openDropdown } = useDropdown();
-
+  const { openDropdown, setOpenDropdown } = useDropdown();
   // Determine if the overlay should be shown. Exclude 'cart' and 'none'.
   const showOverlay = openDropdown !== 'none' && openDropdown !== 'cart';
 
-  // Handle scroll locking when overlay is active
+  // Close all dropdowns when header is hidden
   useEffect(() => {
-    if (showOverlay) {
-      document.body.classList.add('scroll-locked');
-    } else {
-      document.body.classList.remove('scroll-locked');
+    if (!showHeader && openDropdown !== 'none') {
+      setOpenDropdown('none');
     }
-
-    return () => {
-      document.body.classList.remove('scroll-locked');
-    };
-  }, [showOverlay]);
+  }, [showHeader, openDropdown, setOpenDropdown]);// Remove scroll-locking effect
+  useEffect(() => {
+    document.body.style.overflow = ''; // Always ensure scrolling is enabled
+  }, []);
 
   return (
     <>
@@ -57,7 +51,6 @@ function HeaderLayout() {
                 />
               </div>
             </Link>
-
             <div className="flex-1 max-w-[1000px] flex flex-col">
               <div className="flex items-center gap-4">
                 <div className="header-item transition-all duration-300 ease-in-out">
@@ -68,7 +61,6 @@ function HeaderLayout() {
                 </div>
               </div>
             </div>
-
             <div className="flex items-center gap-4">
               <div className="header-item transition-all duration-300 ease-in-out">
                 <ProfileDropdown />
@@ -84,15 +76,10 @@ function HeaderLayout() {
         </div>
       </header>
       <DesktopCommit />
-      
-      {/* Body Overlay controlled by dropdown context */}
-      <div
-        className={`body-overlay ${showOverlay ? 'overlay-active' : ''}`}
-      />
+      <div className="body-overlay" />
     </>
   );
 }
-
 export function Header() {
   return (
     <>
