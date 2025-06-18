@@ -1,36 +1,40 @@
-import { BaseResponse } from "../base.interface"
+import { BaseResponse, PaginationRequest } from "../base.interface"
 
-export interface SessionGetALLResponse  extends BaseResponse {
+export interface SessionGetALLResponse  extends BaseResponse, PaginationRequest{
     data: {
         devices: {
-            deviceId: string
-            deviceName: string
-            deviceType: string
-            os: string
-            osVersion: string
-            browser: string
-            browserVersion: string
-            isDeviceTrusted: boolean
-            deviceTrustExpiration: string | null
-            lastActive: string
-            location: string
-            activeSessionsCount: number
-            isCurrentDevice: boolean
+            deviceId: number,
+            name: string,
+            type: string,
+            os: string,
+            osVer: string,
+            browser: string,
+            browserVer: string,
+            trusted: boolean,
+            trustExp: string | null,
+            lastActive: string,
+            location: string,
+            activeSessions: number,
+            totalSessions: number,
+            isCurrent: boolean,
+            status: string,
+            riskLevel: string,
+            daysSinceLastUse: number,
             sessions: { 
-                id: string
-                createdAt: string
-                lastActive: string
-                ipAddress: string
-                location: string
-                browser: string
-                browserVersion: string
-                app: string
-                os: string
-                osVersion: string
-                deviceType: string
-                isActive: boolean
-                inactiveDuration: string
-                isCurrentSession: boolean
+               id: string,
+               createdAt: string,
+               lastActive: string,
+               ip: string,
+               location: string,
+               browser: string,
+               browserVer: string,
+               app: string,
+               os: string,
+               osVer: string,
+               type: string,
+               active: boolean,
+               inactiveDuration: string,
+               isCurrent: boolean
             }
         }    
     },
@@ -38,19 +42,19 @@ export interface SessionGetALLResponse  extends BaseResponse {
 
 
 export interface SessionRevokeAllRequest extends BaseResponse{ 
-    excludeCurrentSession: string
+    excludeCurrentSession?: string
 }
 
 export interface SessionRevokeAllResponse extends BaseResponse{
-    excludeCurrentSession: string
+    excludeCurrentSession?: string
 }
 
 export interface SessionRevokeRequest extends BaseResponse{
-    sessionIds:[]
-    deviceIds:[]
-    excludeCurrentSession: string
+    sessionIds?:string[]
+    deviceIds?:number[]
+    excludeCurrentSession?: string
 }
 
 export interface SessionRevokeResponse extends BaseResponse {
-    excludeCurrentSession: string
+    excludeCurrentSession?: string
 }

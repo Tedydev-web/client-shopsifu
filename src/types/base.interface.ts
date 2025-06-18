@@ -11,11 +11,10 @@ export interface BaseResponse {
 
 export interface PaginationRequest {
     meta?:{
-      currentPage?: number;
-      itemsPerPage?: number;
-      totalItems?: number;
-      totalPages?: number;
-      search?: string;
+      totalItems: number,
+      page: number,
+      limit: number,
+      totalPages: number
     };
     page?: number;
     limit?: number;

@@ -7,11 +7,12 @@ import {
     SessionRevokeResponse
 } from '@/types/auth/session.interface';
 import { API_ENDPOINTS } from '@/constants/api';
+import { PaginationRequest } from '@/types/base.interface';
 
 export const sessionService = {
     // Lấy danh sách phiên đăng nhập
-    getAll: async (): Promise<SessionGetALLResponse> => {
-        const response = await privateAxios.get<SessionGetALLResponse>(API_ENDPOINTS.SESSIONS.GETALL);
+    getAll: async (params?: PaginationRequest): Promise<SessionGetALLResponse> => {
+        const response = await privateAxios.get<SessionGetALLResponse>(API_ENDPOINTS.SESSIONS.GETALL, { params });
         return response.data;
     },
 
