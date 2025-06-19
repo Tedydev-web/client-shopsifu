@@ -2,7 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { sessionService } from '@/services/auth/sessionService'
-import { SessionGetALLResponse, Device } from '@/types/auth/session.interface'
+import { SessionGetALLResponse, Device, SessionRevokeRequest } from '@/types/auth/session.interface'
+import { toast } from 'sonner'
+import { showToast } from '@/components/ui/toastify';
+import { parseApiError } from '@/utils/error';
+import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/constants/route';
 
 export interface GroupedDevice {
   os: string
@@ -20,6 +25,10 @@ export const usePasswordSecuritySession = () => {
   const [limit, setLimit] = useState(10) // Default limit
   const [totalPages, setTotalPages] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
+  const [isRevoking, setIsRevoking] = useState(false)
+  const [selectedSessionIds, setSelectedSessionIds] = useState<string[]>([])
+  const [selectedDeviceIds, setSelectedDeviceIds] = useState<number[]>([])
+  const router = useRouter();
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -69,9 +78,90 @@ export const usePasswordSecuritySession = () => {
   }
 
   const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit);
-    setPage(1); // Reset to page 1 when limit changes
-  };
+    setLimit(newLimit)
+    setPage(1) // Reset to page 1 when limit changes
+  }
 
-  return { groupedDevices, loading, error, page, limit, totalPages, totalItems, handlePageChange, handleLimitChange }
+  const toggleSessionSelection = (sessionId: string) => {
+    setSelectedSessionIds(prev =>
+      prev.includes(sessionId) ? prev.filter(id => id !== sessionId) : [...prev, sessionId]
+    )
+  }
+
+  const toggleDeviceSelection = (device: Device) => {
+    const deviceId = device.deviceId
+    const sessionIds = device.sessions.map(s => s.id)
+    const isDeviceSelected = selectedDeviceIds.includes(deviceId)
+
+    setSelectedDeviceIds(prev =>
+      isDeviceSelected ? prev.filter(id => id !== deviceId) : [...prev, deviceId]
+    )
+
+    // When selecting a device, select all its sessions. When deselecting, deselect them.
+    setSelectedSessionIds(prev => {
+      const otherSessionIds = prev.filter(id => !sessionIds.includes(id))
+      return isDeviceSelected ? otherSessionIds : [...otherSessionIds, ...sessionIds]
+    })
+  }
+
+  const handleRevoke = async (params: SessionRevokeRequest) => {
+    setIsRevoking(true)
+    try {
+      const response = await sessionService.revoke(params)
+      toast.success(response.message || 'Successfully revoked selected items.')
+      // Clear selections and refetch
+      setSelectedSessionIds([])
+      setSelectedDeviceIds([])
+      await fetchSessions()
+    } catch (error: any) {
+      const errorMessage = parseApiError(error)
+      toast.error(errorMessage)
+    } finally {
+      setIsRevoking(false)
+    }
+  }
+
+  async function handleRevokeAllSessions(excludeCurrent: boolean) {
+    setIsRevoking(true)
+    try {
+      const response = await sessionService.revokeAll({ excludeCurrentSession: excludeCurrent })
+      if (response.verificationType === 'OTP') {
+        router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP&revokeAll=true`)
+        showToast(response.message, 'info')
+        return
+      }
+      if (response.verificationType === '2FA') {
+        router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP&revokeAll=true`)
+        showToast(response.message, 'info')
+        return
+      }
+
+      await fetchSessions()
+    } catch (error: any) {
+      const errorMessage = parseApiError(error)
+      toast.error(errorMessage)
+    } finally {
+      setIsRevoking(false)
+    }
+  }
+
+  return {
+    groupedDevices,
+    loading,
+    error,
+    page,
+    limit,
+    totalPages,
+    totalItems,
+    handlePageChange,
+    handleLimitChange,
+    isRevoking,
+    handleRevokeAllSessions,
+    // Selections
+    selectedSessionIds,
+    selectedDeviceIds,
+    toggleSessionSelection,
+    toggleDeviceSelection,
+    handleRevoke,
+  }
 }

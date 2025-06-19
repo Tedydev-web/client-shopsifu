@@ -21,6 +21,7 @@ export function useVerify2FA() {
   const searchParams = useSearchParams()
   const type = (searchParams.get('type') as TwoFactorType) || 'TOTP';
   const isChangePasswordFlow = searchParams.get('changePassword') === 'true';
+  const isRevokeAllFlow = searchParams.get('revokeAll') === 'true';
   const { fetchProfile } = useGetProfile()
   const userData = useUserData();
 
@@ -77,7 +78,7 @@ export function useVerify2FA() {
 
 
         // LUỒNG ĐỔI MẬT KHẨU
-        if (isChangePasswordFlow && role === 'Admin' || role === 'Super Admin') {
+        if (isChangePasswordFlow && isRevokeAllFlow && role === 'Admin' || role === 'Super Admin') {
           router.push(ROUTES.ADMIN.DASHBOARD);
           return;
         }else{
@@ -120,7 +121,7 @@ export function useVerify2FA() {
 
 
       // LUỒNG ĐỔI MẬT KHẨU
-      if (isChangePasswordFlow && role === 'Admin' || role === 'Super Admin') {
+      if (isChangePasswordFlow && isRevokeAllFlow && role === 'Admin' || role === 'Super Admin') {
         showToast(response.message, 'success');
         router.push(ROUTES.ADMIN.DASHBOARD);
         return;

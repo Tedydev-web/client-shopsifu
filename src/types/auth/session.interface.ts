@@ -46,20 +46,18 @@ export interface SessionGetALLResponse extends BaseResponse, PaginationRequest {
 }
 
 // Interfaces for revoking sessions
-export interface SessionRevokeAllRequest extends BaseResponse {
-  excludeCurrentSession?: string
+export interface SessionRevokeAllRequest {
+  excludeCurrentSession?: boolean
 }
 
 export interface SessionRevokeAllResponse extends BaseResponse {
-  excludeCurrentSession?: string
+    verificationType: string;
 }
 
-export interface SessionRevokeRequest extends BaseResponse {
+export interface SessionRevokeRequest {
   sessionIds?: string[]
   deviceIds?: number[]
   excludeCurrentSession?: string
 }
 
-export interface SessionRevokeResponse extends BaseResponse {
-  excludeCurrentSession?: string
-}
+export interface SessionRevokeResponse extends BaseResponse {}
