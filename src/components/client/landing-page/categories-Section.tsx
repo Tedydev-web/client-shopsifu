@@ -90,27 +90,27 @@ export function CategoriesSection() {
 
 	const slideVariants: Variants = {
 		enter: (direction: number) => ({
-			x: direction > 0 ? '100%' : '-100%',
+			y: direction > 0 ? '100%' : '-100%',
 			opacity: 0,
 			scale: 0.8,
 			filter: 'blur(16px) brightness(1.2) contrast(1.2)',
-			rotateY: direction > 0 ? 25 : -25,
+			rotateX: direction > 0 ? 25 : -25,
 		}),
 		center: {
 			zIndex: 1,
-			x: 0,
+			y: 0,
 			opacity: 1,
 			scale: 1,
 			filter: 'blur(0px) brightness(1) contrast(1)',
-			rotateY: 0,
+			rotateX: 0,
 		},
 		exit: (direction: number) => ({
 			zIndex: 0,
-			x: direction < 0 ? '100%' : '-100%',
+			y: direction < 0 ? '100%' : '-100%',
 			opacity: 0,
 			scale: 0.8,
 			filter: 'blur(16px) brightness(1.2) contrast(1.2)',
-			rotateY: direction < 0 ? 25 : -25,
+			rotateX: direction < 0 ? 25 : -25,
 		}),
 	};
 
@@ -203,7 +203,7 @@ export function CategoriesSection() {
 									animate="center"
 									exit="exit"
 									transition={{
-										x: { 
+										y: { 
 											type: "spring", 
 											stiffness: 120, 
 											damping: 25, 
@@ -212,7 +212,7 @@ export function CategoriesSection() {
 										opacity: { duration: 1 },
 										scale: { duration: 1 },
 										filter: { duration: 1 },
-										rotateY: { 
+										rotateX: { 
 											type: "spring",
 											stiffness: 80,
 											damping: 15,
