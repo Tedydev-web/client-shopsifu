@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import BundleAnalyzer from "@next/bundle-analyzer";
 
 const nextConfig: NextConfig = {
   eslint: {
@@ -7,4 +8,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
 };
 
-export default nextConfig;
+const config = BundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+export default config(nextConfig);
