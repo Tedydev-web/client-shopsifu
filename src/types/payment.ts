@@ -3,8 +3,7 @@ export type PaymentType =
   | 'mastercard'
   | 'jcb'
   | 'unionpay'
-  | 'momo'
-  | 'zalopay';
+  | 'momo';
 
 export interface PaymentMethod {
   type: PaymentType;
@@ -16,6 +15,5 @@ export const PAYMENT_TYPES: Record<string, PaymentType> = {
   MASTERCARD: 'mastercard',
   JCB: 'jcb',
   UNIONPAY: 'unionpay',
-  MOMO: 'momo',
-  ZALOPAY: 'zalopay'
+  MOMO: 'momo'
 };
