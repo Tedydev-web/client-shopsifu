@@ -888,7 +888,11 @@
         "username": "User name",
         "phone": "Phone Number",
         "updateProfile": "Uses Information",
-        "clickToChange": "Change profile picture"
+        "clickToChange": "Change profile picture",
+
+        "on": "On",
+        "off": "Off",
+        "turnOff": "Turn Off"
       },
 
       "password": {

@@ -33,6 +33,7 @@ export const UpdateProfileSchema = (t: TFunction) =>
     lastName: z.string().min(1, { message: t('schema.validation.profile.lastNameRequired') }),
     username: z.string().min(3, { message: t('schema.validation.profile.usernameMinLength') }),
     phoneNumber: z.string().min(10, { message: t('schema.validation.profile.phoneMinLength') }),
+    avatar: z.string().optional(),
   });
 
 // Schema for Step 1 of the user creation modal

@@ -2,18 +2,24 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useRef, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { Camera, User, X } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import Image from "next/image";
+import { UpdateProfileSchema } from "@/utils/schema";
+import { z } from "zod";
+import { showToast } from "@/components/ui/toastify";
+import { useUserData } from "@/hooks/useGetData-UserLogin";
+import { useUpdateProfile } from "./../../profile/useProfile-Update";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
@@ -32,19 +38,40 @@ export function ProfileUpdateSheet({
   onOpenChange,
   initialData,
 }: ProfileUpdateSheetProps) {
-  const [firstName, setFirstName] = useState(initialData.firstName);
-  const [lastName, setLastName] = useState(initialData.lastName);
-  const [userName, setUserName] = useState(initialData.username);
-  const [phoneNumber, setPhoneNumber] = useState(initialData.phoneNumber);
   const [avatar, setAvatar] = useState(initialData.avatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+  const userData = useUserData();
+  const formSchema = UpdateProfileSchema(t);
+  const { updateProfile, loading } = useUpdateProfile(() =>
+    onOpenChange(false)
+  );
 
-  const handleSubmit = () => {
-    // handle save here
-    onOpenChange(false);
-  };
+  type ProfileFormData = z.infer<typeof formSchema>;
 
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      username: "",
+      phoneNumber: "",
+    },
+  });
+
+  // Reset form khi mở hoặc initialData thay đổi
+  useEffect(() => {
+    if (open && initialData) {
+      form.reset({
+        firstName: initialData.firstName || "",
+        lastName: initialData.lastName || "",
+        username: initialData.username || "",
+        phoneNumber: initialData.phoneNumber || "",
+      });
+    }
+  }, [open, initialData, form]);
+
+  // Xử lý chọn avatar
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
@@ -59,18 +86,39 @@ export function ProfileUpdateSheet({
       reader.readAsDataURL(file);
     }
   };
-  const avatarText = userName ? userName[0].toUpperCase() : "U";
+
+  // Submit chỉ gửi trường thay đổi
+  const onSubmit = (data: ProfileFormData) => {
+    const dirtyFields = form.formState.dirtyFields;
+    const changedData: Partial<ProfileFormData> = {};
+
+    // Lặp qua các trường đã bị thay đổi và thêm chúng vào đối tượng changedData
+    (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach(
+      (key) => {
+        changedData[key] = data[key];
+      }
+    );
+
+    // Nếu không có gì thay đổi, hiển thị thông báo và không làm gì cả
+    if (Object.keys(changedData).length === 0) {
+      showToast("Không có thay đổi nào để lưu.", "info");
+      return;
+    }
+    // Chỉ gửi những dữ liệu đã thay đổi
+    updateProfile(changedData);
+  };
+
+  const username = form.watch("username");
+  const avatarText = username ? username[0].toUpperCase() : "U";
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <div className="h-[100vh] mx-auto w-full max-w-sm">
           <DrawerHeader className="relative">
-            <div className="flex items-center gap-2">
-              <DrawerTitle className="text-xl font-semibold">
-                {t("user.account.profile.updateProfile")}
-              </DrawerTitle>
-            </div>
+            <DrawerTitle className="text-xl font-semibold">
+              {t("user.account.profile.title")}
+            </DrawerTitle>
             <button
               onClick={() => onOpenChange(false)}
               className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full"
@@ -78,7 +126,6 @@ export function ProfileUpdateSheet({
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </DrawerHeader>
-
           <div className="p-4 space-y-6">
             {/* Avatar Section */}
             <div className="flex flex-col items-center space-y-3">
@@ -88,8 +135,6 @@ export function ProfileUpdateSheet({
               >
                 {avatar ? (
                   <div className="relative w-24 h-24 rounded-full overflow-hidden">
-                    {" "}
-                    {/* Increased from w-20 h-20 */}
                     <Image
                       src={avatar}
                       alt="Profile"
@@ -99,26 +144,28 @@ export function ProfileUpdateSheet({
                   </div>
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-                    {" "}
-                    {/* Increased from w-20 h-20 */}
                     <span className="text-3xl font-semibold text-gray-600">
-                      {" "}
-                      {/* Increased from text-2xl */}
                       {avatarText}
                     </span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-6 h-6 text-white" />
-                </div>
+                {/* Camera icon button */}
+                <label
+                  htmlFor="avatar-upload"
+                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow hover:bg-gray-100 transition cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Camera className="w-4 h-4 text-gray-600" />
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                </label>
               </div>
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
               <button
                 type="button"
                 onClick={handleAvatarClick}
@@ -127,7 +174,7 @@ export function ProfileUpdateSheet({
                 {t("user.account.profile.clickToChange")}
               </button>
             </div>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
               <div>
                 <label
                   htmlFor="firstName"
@@ -137,13 +184,11 @@ export function ProfileUpdateSheet({
                 </label>
                 <Input
                   id="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  {...form.register("firstName")}
                   autoFocus
                   className="w-full"
                 />
               </div>
-
               <div>
                 <label
                   htmlFor="lastName"
@@ -153,12 +198,10 @@ export function ProfileUpdateSheet({
                 </label>
                 <Input
                   id="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  {...form.register("lastName")}
                   className="w-full"
                 />
               </div>
-
               <div>
                 <label
                   htmlFor="userName"
@@ -168,12 +211,10 @@ export function ProfileUpdateSheet({
                 </label>
                 <Input
                   id="userName"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
+                  {...form.register("username")}
                   className="w-full"
                 />
               </div>
-
               <div>
                 <label
                   htmlFor="phoneNumber"
@@ -183,25 +224,20 @@ export function ProfileUpdateSheet({
                 </label>
                 <Input
                   id="phoneNumber"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  {...form.register("phoneNumber")}
                   type="tel"
                   className="w-full"
                 />
               </div>
+              <Button
+                className="bg-red-600 text-white w-full mt-4"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? t("common.saving") : t("user.account.profile.save")}
+              </Button>
             </form>
           </div>
-
-          <DrawerFooter className="border-t">
-            <div className="flex justify-end">
-              <Button
-                className="bg-red-600 text-white w-full"
-                onClick={handleSubmit}
-              >
-                {t("user.account.profile.save")}
-              </Button>
-            </div>
-          </DrawerFooter>
         </div>
       </DrawerContent>
     </Drawer>

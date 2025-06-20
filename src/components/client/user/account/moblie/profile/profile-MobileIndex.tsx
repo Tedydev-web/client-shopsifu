@@ -174,7 +174,7 @@ export default function ProfileMobileIndex({}: ProfileMobileIndexProps) {
             <p className="text-black font-medium">
               {t("user.account.profile.twoFactor")}:{" "}
               <span className="font-normal">
-                {user.twoFactorEnabled ? "On" : "Off"}
+                {t(`user.account.profile.${user.twoFactorEnabled ? "on" : "off"}`)}
               </span>
             </p>
             <p className="text-sm text-gray-600 mt-1">

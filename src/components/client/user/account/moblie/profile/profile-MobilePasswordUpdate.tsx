@@ -23,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Info, Lock, X } from "lucide-react";
+import { Info, Lock, X, Camera } from "lucide-react";
 import { t } from "i18next";
 import { z } from "zod";
 

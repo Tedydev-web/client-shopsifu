@@ -891,7 +891,11 @@
         "username": "Tên tài khoản",
         "phone": "Số điện thoại",
         "updateProfile": "Thông tin người dùng",
-        "clickToChange": "Tải lên ảnh đại diện"
+        "clickToChange": "Tải lên ảnh đại diện",
+
+        "on": "Đã bật",
+        "off": "Chưa bật",
+        "turnOff": "Tắt"
       },
 
       "password": {

@@ -157,7 +157,7 @@ export default function ProfileDesktopIndex() {
               <p className="font-medium text-gray-900">
                 {t("user.account.profile.twoFactor")}:{" "}
                 <span className="font-normal">
-                  {user.twoFactorEnabled ? "On" : "Off"}
+                  {t(`user.account.profile.${user.twoFactorEnabled ? "on" : "off"}`)}
                 </span>
               </p>
               <p className="text-sm text-gray-600">
@@ -172,11 +172,7 @@ export default function ProfileDesktopIndex() {
               }}
               className="bg-red-600 text-white rounded-full px-4 py-2 w-24 h-10"
             >
-              {t(
-                `user.account.profile.${
-                  user.twoFactorEnabled ? "turnOff" : "turnOn"
-                }`
-              )}
+              {t(`user.account.profile.${user.twoFactorEnabled ? "turnOff" : "turnOn"}`)}
             </Button>
           </div>
         </div>

@@ -67,7 +67,116 @@ export function TwoFactorAuthModal({
   setShowRegenerateConfirm,
   handleRegenerateRecoveryCodes,
 }: TwoFactorAuthModalProps) {
-  // QR Code View
+  // Regenerate Recovery Codes Drawer
+  if (showRegenerateConfirm) {
+    return (
+      <Drawer open={showRegenerateConfirm} onOpenChange={setShowRegenerateConfirm}>
+        <DrawerContent>
+          <div className="h-[100vh] mx-auto w-full max-w-sm">
+            <DrawerHeader className="relative">
+              <DrawerTitle className="text-xl font-semibold">
+                {t("admin.profileSettings.regenerateCodesTitle")}
+              </DrawerTitle>
+              <button
+                onClick={() => setShowRegenerateConfirm(false)}
+                className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+              <div className="text-gray-600 mt-2">
+                {t("admin.profileSettings.regenerateCodesDescription")}
+              </div>
+            </DrawerHeader>
+            <div className="px-4 pb-4">
+              <Label htmlFor="regenerate-2fa-code" className="block mb-1">
+                {t("admin.profileSettings.QrCode.6code")}
+              </Label>
+              <Input
+                id="regenerate-2fa-code"
+                className="border-gray-300 font-mono text-lg w-full mb-4"
+                maxLength={6}
+                value={Code}
+                onChange={e => setCode(e.target.value)}
+                placeholder="000000"
+              />
+              <Button
+                onClick={() => handleRegenerateRecoveryCodes(Code)}
+                className="w-full bg-red-600 hover:bg-red-700"
+                disabled={loading || Code.length !== 6}
+              >
+                {loading
+                  ? t("admin.profileSettings.processing")
+                  : t("admin.profileSettings.confirm")}
+              </Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  // Main 2FA Drawer
+  if (show2FADialog) {
+    return (
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent>
+          <div className="h-[100vh] mx-auto w-full max-w-sm">
+            <DrawerHeader className="relative">
+              <DrawerTitle className="text-xl font-semibold">
+                {is2FAEnabled
+                  ? t("admin.profileSettings.disable2FATitle")
+                  : t("admin.profileSettings.enable2FATitle")}
+              </DrawerTitle>
+              <button
+                onClick={() => {
+                  setShow2FADialog(false);
+                  onOpenChange(false);
+                }}
+                className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </DrawerHeader>
+            <div className="px-4 pb-4">
+              <div className="text-gray-600 mb-4">
+                {is2FAEnabled
+                  ? t("admin.profileSettings.disable2FADescription")
+                  : t("admin.profileSettings.enable2FADescription")}
+              </div>
+              {is2FAEnabled && (
+                <div className="mb-4">
+                  <Label htmlFor="2fa-code" className="block mb-1">
+                    {t("admin.profileSettings.QrCode.6code")}
+                  </Label>
+                  <Input
+                    id="2fa-code"
+                    className="border-gray-300 font-mono text-lg w-full"
+                    maxLength={6}
+                    value={Code}
+                    onChange={e => setCode(e.target.value)}
+                    placeholder="000000"
+                  />
+                </div>
+              )}
+              <Button
+                onClick={onConfirm2FA}
+                className="w-full bg-red-600 hover:bg-red-700"
+                disabled={loading || (is2FAEnabled && Code.length !== 6)}
+              >
+                {loading
+                  ? t("admin.profileSettings.processing")
+                  : is2FAEnabled
+                  ? t("admin.profileSettings.disable")
+                  : t("admin.profileSettings.enable")}
+              </Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  // QR Code Drawer
   if (showQRDialog) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
@@ -78,7 +187,7 @@ export function TwoFactorAuthModal({
                 {t("admin.profileSettings.QrCode.title2fa")}
               </DrawerTitle>
               <button
-                onClick={() => onOpenChange(false)}
+                onClick={() => setShowQRDialog(false)}
                 className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full"
               >
                 <X className="w-5 h-5 text-gray-500" />
@@ -87,7 +196,6 @@ export function TwoFactorAuthModal({
                 {t("admin.profileSettings.QrCode.description2fa")}
               </p>
             </DrawerHeader>
-
             <div className="p-4 space-y-6">
               {/* Step 1: Download App */}
               <div className="flex items-center gap-3">
@@ -115,7 +223,6 @@ export function TwoFactorAuthModal({
                   </div>
                 </div>
               </div>
-
               {/* Step 2: QR Code */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">
@@ -134,7 +241,6 @@ export function TwoFactorAuthModal({
                   )}
                 </div>
               </div>
-
               {/* Step 3: Secret Key */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">
@@ -144,7 +250,6 @@ export function TwoFactorAuthModal({
                   {secret}
                 </div>
               </div>
-
               {/* Verification Code */}
               <div>
                 <Label className="text-sm font-medium text-gray-700">
@@ -155,7 +260,7 @@ export function TwoFactorAuthModal({
                     className="border-gray-300 font-mono"
                     maxLength={6}
                     value={Code}
-                    onChange={(e) => setCode(e.target.value)}
+                    onChange={e => setCode(e.target.value)}
                     placeholder="000000"
                   />
                   <Button
@@ -170,22 +275,13 @@ export function TwoFactorAuthModal({
                 </div>
               </div>
             </div>
-
-            <DrawerFooter className="border-t">
-              <Button
-                className="w-full bg-red-600 text-white"
-                onClick={onConfirmSetup}
-              >
-                {t("admin.profileSettings.confirm")}
-              </Button>
-            </DrawerFooter>
           </div>
         </DrawerContent>
       </Drawer>
     );
   }
 
-  // Recovery Codes View
+  // Recovery Codes Drawer
   if (showRecoveryCodesDialog) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
@@ -196,7 +292,7 @@ export function TwoFactorAuthModal({
                 {t("admin.profileSettings.QrCode.title")}
               </DrawerTitle>
               <button
-                onClick={() => onOpenChange(false)}
+                onClick={() => setShowRecoveryCodesDialog(false)}
                 className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full"
               >
                 <X className="w-5 h-5 text-gray-500" />
@@ -205,7 +301,6 @@ export function TwoFactorAuthModal({
                 {t("admin.profileSettings.QrCode.description")}
               </p>
             </DrawerHeader>
-
             <div className="p-4 space-y-4">
               <div className="grid grid-cols-1 gap-2">
                 {recoveryCodes?.map((code, idx) => (
@@ -217,11 +312,9 @@ export function TwoFactorAuthModal({
                   </div>
                 ))}
               </div>
-
               <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-600">
                 <p>{t("admin.profileSettings.QrCode.email")}</p>
               </div>
-
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -239,7 +332,6 @@ export function TwoFactorAuthModal({
                 </Button>
               </div>
             </div>
-
             <DrawerFooter className="border-t">
               <Button
                 className="w-full bg-red-600 text-white"
@@ -254,64 +346,6 @@ export function TwoFactorAuthModal({
     );
   }
 
-  // Main 2FA View
-  return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
-        <div className="h-[100vh] mx-auto w-full max-w-sm">
-          <DrawerHeader className="relative">
-            <DrawerTitle className="text-xl font-semibold">
-              {is2FAEnabled
-                ? t("admin.profileSettings.disable2FATitle")
-                : t("admin.profileSettings.enable2FATitle")}
-            </DrawerTitle>
-            <button
-              onClick={() => onOpenChange(false)}
-              className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full"
-            >
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </DrawerHeader>
-
-          <div className="p-4 space-y-4">
-            <p className="text-gray-600">
-              {is2FAEnabled ? (
-                <>
-                  <p>{t("admin.profileSettings.disable2FADescription")}</p>
-                  <div className="mt-3">
-                    <Label className="text-sm font-medium text-gray-700">
-                      {t("admin.profileSettings.QrCode.6code")}
-                    </Label>
-                    <Input
-                      className="border-gray-300 mt-1"
-                      maxLength={6}
-                      value={Code}
-                      onChange={(e) => setCode(e.target.value)}
-                      placeholder="000000"
-                    />
-                  </div>
-                </>
-              ) : (
-                t("admin.profileSettings.enable2FADescription")
-              )}
-            </p>
-          </div>
-
-          <DrawerFooter className="border-t">
-            <Button
-              className="w-full bg-red-600 text-white"
-              onClick={onConfirm2FA}
-              disabled={loading || (is2FAEnabled && Code.length !== 6)}
-            >
-              {loading
-                ? t("admin.profileSettings.processing")
-                : is2FAEnabled
-                ? t("admin.profileSettings.disable")
-                : t("admin.profileSettings.enable")}
-            </Button>
-          </DrawerFooter>
-        </div>
-      </DrawerContent>
-    </Drawer>
-  );
+  // fallback (should not render)
+  return null;
 }
