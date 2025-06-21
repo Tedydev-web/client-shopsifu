@@ -914,7 +914,8 @@
         "processing": "Đang xử lý...",
         "passwordChanged": "Mật khẩu đã được thay đổi thành công!",
 
-        "minLength": "Mật khẩu phải có ít nhất 6 ký tự"
+        "minLength": "Mật khẩu phải có ít nhất 6 ký tự",
+        "revokeOtherSessions": "Hủy các phiên đăng nhập khác"
       },
 
       "address": {

@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { QRCodeSVG } from "qrcode.react";
 import { Smartphone } from "lucide-react";
 import Link from "next/link";
-import { usePasswordSecurity } from "./useProfile-2FA";
 
 interface TwoFactorAuthModalProps {
   open: boolean;

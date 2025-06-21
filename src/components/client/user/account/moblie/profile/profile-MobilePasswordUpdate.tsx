@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { passwordSchema } from "@/utils/schema";
 import { useForm } from "react-hook-form";
@@ -23,52 +24,52 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Info, Lock, X, Camera } from "lucide-react";
+import { Info, Lock, X, Camera, Eye, EyeOff } from "lucide-react";
 import { t } from "i18next";
 import { z } from "zod";
+import { useUserData } from "@/hooks/useGetData-UserLogin";
+import { usePasswordChangePassword } from "../../profile/useProfile-ChangePassword";
 
 interface ChangePasswordModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  fisrtName: string;
+  firstName: string;
   lastName: string;
   username: string;
+  revokeOtherSessions: boolean;
 }
 
-type PasswordFormData = z.infer<ReturnType<typeof passwordSchema>>;
+type PasswordFormData = z.infer<ReturnType<typeof passwordSchema>> & {
+  revokeOtherSessions: boolean;
+};
 
 export function ChangePasswordModal({
   open,
   onOpenChange,
-  fisrtName,
+  firstName,
   lastName,
   username,
 }: ChangePasswordModalProps) {
-  const [loading, setLoading] = useState(false);
+  const { loading, handleChangePassword } = usePasswordChangePassword();
+  const user = useUserData();
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
   const getFullName = () => {
-    return [fisrtName, lastName].filter(Boolean).join(" ");
+    return [firstName, lastName].filter(Boolean).join(" ");
   };
+  const currentPasswordSchema = passwordSchema(t);
+  type PasswordFormData = z.infer<typeof currentPasswordSchema>;
 
   const form = useForm<PasswordFormData>({
-    resolver: zodResolver(passwordSchema(t)),
+    resolver: zodResolver(currentPasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     },
   });
-
-  const onSubmit = async (data: PasswordFormData) => {
-    setLoading(true);
-    try {
-      // TODO: Call API to change password
-      onOpenChange(false);
-    } catch (error) {
-      // Handle error
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -107,7 +108,22 @@ export function ChangePasswordModal({
 
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(async (data: PasswordFormData) => {
+                  if (!user) return;
+
+                  const result = await handleChangePassword({
+                    currentPassword: data.currentPassword,
+                    newPassword: data.newPassword,
+                    confirmPassword: data.confirmPassword,
+                    revokeOtherSessions: revokeOtherSessions,
+                  });
+
+                  if (result) {
+                    form.reset();
+                    setRevokeOtherSessions(false);
+                    onOpenChange(false);
+                  }
+                })}
                 className="space-y-4"
               >
                 <FormField
@@ -127,14 +143,28 @@ export function ChangePasswordModal({
                         </a>
                       </div>
                       <FormControl>
-                        <Input
-                          type="password"
-                          className="text-sm"
-                          placeholder={t(
-                            "user.account.password.currentPasswordPlaceholder"
-                          )}
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showCurrentPassword ? "text" : "password"}
+                            className="text-sm"
+                            placeholder={t(
+                              "user.account.password.currentPasswordPlaceholder"
+                            )}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowCurrentPassword((v) => !v)}
+                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                            tabIndex={-1}
+                          >
+                            {showCurrentPassword ? (
+                              <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage className="text-xs" />
                     </FormItem>
@@ -150,14 +180,28 @@ export function ChangePasswordModal({
                         {t("user.account.password.newPassword")}
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          className="text-sm"
-                          placeholder={t(
-                            "user.account.password.newPasswordPlaceholder"
-                          )}
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showNewPassword ? "text" : "password"}
+                            className="text-sm"
+                            placeholder={t(
+                              "user.account.password.newPasswordPlaceholder"
+                            )}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword((v) => !v)}
+                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                            tabIndex={-1}
+                          >
+                            {showNewPassword ? (
+                              <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <p className="text-xs text-gray-500">
                         {t("user.account.password.minLength")}
@@ -176,36 +220,67 @@ export function ChangePasswordModal({
                         {t("user.account.password.confirmPassword")}
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          className="text-sm"
-                          placeholder={t(
-                            "user.account.password.newPasswordPlaceholder"
-                          )}
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            className="text-sm"
+                            placeholder={t(
+                              "user.account.password.newPasswordPlaceholder"
+                            )}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword((v) => !v)}
+                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                            tabIndex={-1}
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
+
+                {/* Revoke other sessions checkbox */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="revokeOtherSessions"
+                    checked={revokeOtherSessions}
+                    onCheckedChange={(checked) =>
+                      setRevokeOtherSessions(checked === true)
+                    }
+                  />
+                  <label
+                    htmlFor="revokeOtherSessions"
+                    className="text-sm text-gray-600 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {t("user.account.password.revokeOtherSessions")}
+                  </label>
+                </div>
+
+                <DrawerFooter className="border-t">
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      className="bg-red-600 text-white w-full"
+                      disabled={loading}
+                    >
+                      {loading
+                        ? t("user.account.password.processing")
+                        : t("user.account.password.changePassword")}
+                    </Button>
+                  </div>
+                </DrawerFooter>
               </form>
             </Form>
           </div>
-
-          <DrawerFooter className="border-t">
-          <div className="flex justify-end">
-            <Button
-              onClick={form.handleSubmit(onSubmit)}
-              className="bg-red-600 text-white w-full"
-              disabled={loading}
-            >
-              {loading
-                ? t("user.account.password.processing")
-                : t("user.account.password.changePassword")}
-            </Button>
-          </div>
-        </DrawerFooter>
         </div>
       </DrawerContent>
     </Drawer>

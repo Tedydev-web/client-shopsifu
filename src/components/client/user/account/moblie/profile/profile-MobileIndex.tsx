@@ -11,7 +11,7 @@ import AccountLayout from "@/app/(client)/user/layout";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/constants/route";
-import { usePasswordSecurity } from "./useProfile-2FA";
+import { usePasswordSecurity } from "../../profile/useProfile-2FA";
 
 interface ProfileMobileIndexProps {
   title?: string;
@@ -174,7 +174,9 @@ export default function ProfileMobileIndex({}: ProfileMobileIndexProps) {
             <p className="text-black font-medium">
               {t("user.account.profile.twoFactor")}:{" "}
               <span className="font-normal">
-                {t(`user.account.profile.${user.twoFactorEnabled ? "on" : "off"}`)}
+                {t(
+                  `user.account.profile.${user.twoFactorEnabled ? "on" : "off"}`
+                )}
               </span>
             </p>
             <p className="text-sm text-gray-600 mt-1">
@@ -185,7 +187,11 @@ export default function ProfileMobileIndex({}: ProfileMobileIndexProps) {
             onClick={() => setIs2FAModalOpen(true)}
             className="bg-red-600 rounded-full px-4 py-1 h-7 text-xs text-white"
           >
-            {t(`user.account.profile.${user.twoFactorEnabled ? "turnOff" : "turnOn"}`)}
+            {t(
+              `user.account.profile.${
+                user.twoFactorEnabled ? "turnOff" : "turnOn"
+              }`
+            )}
           </Button>
         </div>
 
@@ -261,9 +267,10 @@ export default function ProfileMobileIndex({}: ProfileMobileIndexProps) {
         <ChangePasswordModal
           open={isPasswordModalOpen}
           onOpenChange={setIsPasswordModalOpen}
-          fisrtName={firstName || ""} // Match the typo in the interface
+          firstName={firstName || ""} // Match the typo in the interface
           lastName={lastName || ""}
           username={name || ""}
+          revokeOtherSessions={false} // Default value, can be changed in the modal
         />
 
         <TwoFactorAuthModal

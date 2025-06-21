@@ -1,5 +1,5 @@
 "use client";
-import { PasswordSecuritySession } from '@/components/client/user/account/security/security-Session';
+import { PasswordSecuritySession } from '@/components/client/user/account/desktop/security/security-Session';
 import { useTranslation } from 'react-i18next';
 
 export default function ProfilePage() {

@@ -11,7 +11,7 @@ import AccountLayout from "@/app/(client)/user/layout";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/constants/route";
-import { usePasswordSecurity } from "./useProfile-2FA";
+import { usePasswordSecurity } from "../../profile/useProfile-2FA";
 
 export default function ProfileDesktopIndex() {
   const [profileSheetOpen, setProfileSheetOpen] = useState(false);

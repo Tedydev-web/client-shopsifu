@@ -911,7 +911,8 @@
         "processing": "Processing...",
         "passwordChanged": "Your password has been changed successfully!",
 
-        "minLength": "Password must be at least 6 characters long"
+        "minLength": "Password must be at least 6 characters long",
+        "revokeOtherSessions": "Revoke other sessions"
       },
 
       "address": {

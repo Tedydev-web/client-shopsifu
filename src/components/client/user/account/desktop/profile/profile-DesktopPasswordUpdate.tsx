@@ -24,7 +24,7 @@ import { EyeOff, Info, Eye } from "lucide-react";
 import { t } from "i18next";
 import { z } from "zod";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
-import { usePasswordChangePassword } from "./useProfile-ChangePassword";
+import { usePasswordChangePassword } from "../../profile/useProfile-ChangePassword";
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -40,13 +40,13 @@ type PasswordFormData = z.infer<ReturnType<typeof passwordSchema>> & {
 };
 
 export function ChangePasswordModal({
-  open, 
-  onOpenChange, 
-  firstName, 
-  lastName, 
-  username 
+  open,
+  onOpenChange,
+  firstName,
+  lastName,
+  username,
 }: ChangePasswordModalProps) {
-  const {loading, handleChangePassword} = usePasswordChangePassword();
+  const { loading, handleChangePassword } = usePasswordChangePassword();
   const user = useUserData();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -90,22 +90,26 @@ export function ChangePasswordModal({
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(async (data: PasswordFormData) => {
-              if (!user) return;
+            <form
+              onSubmit={form.handleSubmit(async (data: PasswordFormData) => {
+                if (!user) return;
 
-              const result = await handleChangePassword({
-                currentPassword: data.currentPassword,
-                newPassword: data.newPassword,
-                confirmPassword: data.confirmPassword,
-                revokeOtherSessions: revokeOtherSessions,
-              });
+                const result = await handleChangePassword({
+                  currentPassword: data.currentPassword,
+                  newPassword: data.newPassword,
+                  confirmPassword: data.confirmPassword,
+                  revokeOtherSessions: revokeOtherSessions,
+                });
 
-              if (result) {
-                form.reset();
-                setRevokeOtherSessions(false);
-                onOpenChange(false);
-              }
-            })} className="space-y-4"><FormField
+                if (result) {
+                  form.reset();
+                  setRevokeOtherSessions(false);
+                  onOpenChange(false);
+                }
+              })}
+              className="space-y-4"
+            >
+              <FormField
                 control={form.control}
                 name="currentPassword"
                 render={({ field }) => (
@@ -219,7 +223,9 @@ export function ChangePasswordModal({
                 <Checkbox
                   id="revokeOtherSessions"
                   checked={revokeOtherSessions}
-                  onCheckedChange={(checked) => setRevokeOtherSessions(checked === true)}
+                  onCheckedChange={(checked) =>
+                    setRevokeOtherSessions(checked === true)
+                  }
                 />
                 <label
                   htmlFor="revokeOtherSessions"
