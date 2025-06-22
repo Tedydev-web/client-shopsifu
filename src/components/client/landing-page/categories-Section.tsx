@@ -270,8 +270,7 @@ export function CategoriesSection() {
 			},
 		},
 	};
-
-	return (		<section className="w-full py-4">
+	return (		<section className="w-full py-2">
 			<div className="container mx-auto px-4">
 				<div ref={containerRef}
 					className="relative h-[150px] md:h-[175px] overflow-hidden rounded-xl group perspective-[2000px] hover:shadow-2xl hover:shadow-black/20 transition-all duration-500"
@@ -474,13 +473,16 @@ export function CategoriesSection() {
 					</AnimatePresence>
 
 					<Particles className="opacity-50" />
-					</motion.div>
-				</div>				{/* Categories Grid */}				<div className="mt-3">
-					<h2 className="text-sm font-bold tracking-wide uppercase text-gray-800 mb-2.5 px-0.5">Khám phá danh mục</h2>
+					</motion.div>						</div>
+				{/* Categories Grid */}
+				<div className="mt-5">							
+				<h2 className="text-lg font-bold text-gray-800 mb-3.5 flex items-center justify-center gap-1.5">
+						<span className="tracking-tight relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-red-500/20">KHÁM PHÁ DANH MỤC</span>
+					</h2>
 					<div className="relative group">
 						<div 
 							ref={categoriesRef}
-							className="flex items-center gap-1.5 overflow-x-hidden scroll-smooth transition-transform duration-500 ease-out py-0.5 px-2 -mx-2"
+							className="flex items-center gap-2 overflow-x-hidden scroll-smooth transition-transform duration-500 ease-out py-1 px-2 -mx-2"
 						>
 							{categories.map((category, index) => (
 								<Link
@@ -490,10 +492,9 @@ export function CategoriesSection() {
 								>
 									<motion.div
 										initial={{ scale: 1 }}
-										whileHover={{ scale: 1.03 }}
-										className="px-3 py-1.5 rounded-full bg-white/95 border border-gray-200/80 hover:border-red-500 hover:bg-white hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)] transition-all duration-300 backdrop-blur-[2px]"
+										whileHover={{ scale: 1.03 }}										className="px-4 py-2 rounded-full bg-white/95 border border-gray-200/80 hover:border-red-500 hover:bg-white hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)] transition-all duration-300 backdrop-blur-[2px]"
 									>
-										<span className="text-xs font-medium text-gray-600 whitespace-nowrap group-hover/item:text-red-500 transition-colors duration-300 tracking-wide">
+										<span className="text-sm font-medium text-gray-600 whitespace-nowrap group-hover/item:text-red-500 transition-colors duration-300 tracking-wide">
 											{category.title}
 										</span>
 									</motion.div>
@@ -513,10 +514,10 @@ export function CategoriesSection() {
 								ease: "easeOut"
 							}}
 							onClick={() => scrollCategories('left')}
-							className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/95 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] backdrop-blur-[2px] flex items-center justify-center hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
+							className="absolute left-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] backdrop-blur-[2px] flex items-center justify-center hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
 							disabled={!canScrollLeft}
 						>
-							<ArrowRight className="w-3 h-3 text-gray-600 rotate-180" />
+							<ArrowRight className="w-4 h-4 text-gray-600 rotate-180" />
 						</motion.button>
 
 						<motion.button
@@ -530,10 +531,10 @@ export function CategoriesSection() {
 								ease: "easeOut"
 							}}
 							onClick={() => scrollCategories('right')}
-							className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/95 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] backdrop-blur-[2px] flex items-center justify-center hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
+							className="absolute right-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] backdrop-blur-[2px] flex items-center justify-center hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
 							disabled={!canScrollRight}
 						>
-							<ArrowRight className="w-3 h-3 text-gray-600" />
+							<ArrowRight className="w-4 h-4 text-gray-600" />
 						</motion.button>
 					</div>
 				</div>
