@@ -270,8 +270,9 @@ export function CategoriesSection() {
 			},
 		},
 	};
-	return (		<section className="w-full py-2">
-			<div className="container mx-auto px-4">
+	return (		
+	<section className="w-full py-2">
+			<div className="container mx-auto">
 				<div ref={containerRef}
 					className="relative h-[150px] md:h-[175px] overflow-hidden rounded-xl group perspective-[2000px] hover:shadow-2xl hover:shadow-black/20 transition-all duration-500"
 				>
@@ -492,7 +493,8 @@ export function CategoriesSection() {
 								>
 									<motion.div
 										initial={{ scale: 1 }}
-										whileHover={{ scale: 1.03 }}										className="px-4 py-2 rounded-full bg-white/95 border border-gray-200/80 hover:border-red-500 hover:bg-white hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)] transition-all duration-300 backdrop-blur-[2px]"
+										whileHover={{ scale: 1.03 }}										
+										className="px-4 py-2 rounded-full border border-gray-200/80 hover:border-red-500 hover:bg-white hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)] transition-all duration-300 backdrop-blur-[2px]"
 									>
 										<span className="text-sm font-medium text-gray-600 whitespace-nowrap group-hover/item:text-red-500 transition-colors duration-300 tracking-wide">
 											{category.title}
