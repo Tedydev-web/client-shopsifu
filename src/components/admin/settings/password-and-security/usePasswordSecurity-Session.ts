@@ -56,8 +56,8 @@ export const usePasswordSecuritySession = () => {
       setGroupedDevices(Object.values(groups))
 
       if (response.metadata) {
-        setTotalPages(response.metadata.totalPages)
-        setTotalItems(response.metadata.totalItems)
+        setTotalPages(response.metadata.totalPages || 0)
+        setTotalItems(response.metadata.totalItems || 0)
       }
     } catch (err) {
       setError('Failed to fetch session data.')

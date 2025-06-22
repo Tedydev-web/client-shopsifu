@@ -1,6 +1,12 @@
 import { metadataConfig } from '@/lib/metadata'
 import type { Metadata } from 'next'
 import { Card } from '@/components/ui/card'
+
+
+
+
+
+
 import { 
   ShoppingCart, 
   Users, 

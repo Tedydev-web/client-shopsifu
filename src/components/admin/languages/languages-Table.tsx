@@ -52,7 +52,7 @@ export function LanguagesTable() {
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setIsSearching(true)
-      getAllLanguages({ meta: { currentPage: 1, itemsPerPage: limit, search: debouncedSearchValue } })
+      getAllLanguages({ metadata: { page: 1, limit: limit } })
         .finally(() => {
           setIsSearching(false)
         })
@@ -80,7 +80,7 @@ export function LanguagesTable() {
       const success = await deleteLanguage(languageToDelete.code)
       if (success) {
         handleCloseDeleteModal()
-        getAllLanguages({ meta: { currentPage: page, itemsPerPage: limit } })
+        getAllLanguages({ metadata: { page: page, limit: limit } })
       }
     } catch (error) {
       console.error('Error deleting language:', error)
@@ -96,14 +96,14 @@ export function LanguagesTable() {
         const response = await updateLanguage(selectedLanguage.code, { name: values.name })
         if (response) {
           handleCloseModal()
-          getAllLanguages({ meta: { currentPage: page, itemsPerPage: limit } })
+          getAllLanguages({ metadata: { page: page, limit: limit } })
         }
       } else {
         // Create
         const response = await createLanguage({ id: values.code, name: values.name })
         if (response) {
           handleCloseModal()
-          getAllLanguages({ meta: { currentPage: page, itemsPerPage: limit } })
+          getAllLanguages({ metadata: { page: page, limit: limit } })
         }
       }
     } catch (error) {
@@ -116,12 +116,12 @@ export function LanguagesTable() {
   }
 
   const handlePageChange = (newPage: number) => {
-    getAllLanguages({ meta: { currentPage: newPage, itemsPerPage: limit } })
+    getAllLanguages({ metadata: { page: newPage, limit: limit } })
   }
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
-    getAllLanguages({ meta: { currentPage: 1, itemsPerPage: newLimit } })
+    getAllLanguages({ metadata: { page: 1, limit: newLimit } })
   }
 
   return (

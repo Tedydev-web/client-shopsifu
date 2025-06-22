@@ -15,10 +15,10 @@ export function useAuditLogs() {
     setLoading(true);
     try {
       const queryParams: any = {
-        page: params?.meta?.currentPage || 1,
-        limit: params?.meta?.itemsPerPage || 10,
+        page: params?.metadata?.page || 1,
+        limit: params?.metadata?.limit || 10,
       };
-      if (params?.meta?.search) queryParams.search = params.meta.search;
+      if (params?.metadata?.search) queryParams.search = params.metadata.search;
       const response: AuditLogListResponse = await auditLogsService.getAll(queryParams);
       const data = response.data.map((item) => ({
         id: item.id,
