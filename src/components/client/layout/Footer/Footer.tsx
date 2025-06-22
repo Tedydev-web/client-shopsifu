@@ -135,16 +135,13 @@ export function Footer() {
 				</div>
 			</div>
 
-			{/* Main Footer Content */}
-			<div className="container mx-auto px-4 py-8">
-				<div className="max-w-5xl mx-auto">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 xl:gap-x-8 gap-y-6">
+			{/* Main Footer Content */}			<div className="container mx-auto px-4 py-6">				<div className="max-w-6xl mx-auto">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 xl:gap-x-8 gap-y-6 justify-between">
 						{footerLinks.map((section) => (
-							<div key={section.title}>
+							<div key={section.title} className="flex-1 min-w-[200px]">
 								{/* Desktop View */}
-								<div className="hidden md:block">
-									<h3 className="font-medium mb-3 text-gray-900">{section.title}</h3>
-									<ul className="space-y-2">
+								<div className="hidden md:block">									<h3 className="font-medium mb-4 text-gray-900">{section.title}</h3>
+									<ul className="space-y-2.5">
 										{section.links.map((link) => (
 											<li key={link.text}>
 												<Link
@@ -197,12 +194,11 @@ export function Footer() {
 					</div>
 				</div>
 
-				{/* Payment Methods & Social Links */}
-				<div className="mt-6 pt-8 border-t bg-gray-50/50">
-					<div className="flex flex-col sm:flex-row justify-between items-center gap-8 max-w-5xl mx-auto px-4">						{/* Payment Methods */}
+				{/* Payment Methods & Social Links */}				<div className="mt-6 pt-6 border-t bg-gray-50/50">
+					<div className="flex flex-col sm:flex-row justify-between items-center gap-6 max-w-6xl mx-auto px-4">{/* Payment Methods */}
 						<div className="text-center sm:text-left sm:flex-1">
 							<h3 className="font-medium mb-4 text-gray-900 text-base">Phương thức thanh toán</h3>
-							<div className="inline-flex flex-wrap justify-center sm:justify-start gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">							{paymentTypes.map((type) => (
+							<div className="inline-flex flex-wrap justify-center sm:justify-start gap-3">							{paymentTypes.map((type) => (
 									<ModernPaymentIcon
 										key={type}
 										type={type}
@@ -215,7 +211,7 @@ export function Footer() {
 						</div>						{/* Social Links */}
 						<div className="text-center sm:text-left">
 							<h3 className="font-medium mb-4 text-gray-900 text-base">Kết nối với chúng tôi</h3>
-							<div className="inline-flex items-center justify-center sm:justify-start gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
+							<div className="inline-flex items-center justify-center sm:justify-start gap-3">
 								<a
 									href="#"
 									target="_blank"
@@ -256,7 +252,7 @@ export function Footer() {
 					</div>
 
 					{/* Copyright */}
-					<div className="mt-8 pt-6 border-t text-xs text-gray-500 text-center">
+					<div className="mt-6 pt-4 border-t text-xs text-gray-500 text-center">
 						© {new Date().getFullYear()} ShopSiFu. Tất cả các quyền được bảo lưu.
 						<br />
 						<span className="mt-1 block">

@@ -77,13 +77,16 @@ export function ModernPaymentIcon({ type, size = 32, className }: PaymentIconPro
             transition={{ type: "spring", stiffness: 300, damping: 10 }}
           >
             {config.icon === 'custom:momo' ? (
-              <Image
-                src="/payment-logos/momo.png"
-                alt="MoMo"
-                width={size * 1.5}
-                height={size}
-                className="object-contain my-auto relative z-10"
-              />
+              <div className="flex items-center justify-center w-full h-full">
+                <Image
+                  src="/payment-logos/momo.png"
+                  alt="MoMo"
+                  width={size * 0.95}
+                  height={size * 0.95}
+                  className="object-contain rounded-md bg-white p-1"
+                  style={{ display: 'block', margin: '0 auto' }}
+                />
+              </div>
             ) : (
               <Icon icon={config.icon} width={size} height={size} className="object-contain my-auto relative z-10" />
             )}
