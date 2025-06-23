@@ -9,16 +9,16 @@ import { parseApiError } from '@/utils/error'
 import { useTranslation } from 'react-i18next'
 import { useGetProfile } from '@/hooks/useGetProfile'
 import { useUserData } from '@/hooks/useGetData-UserLogin'
-
+import { useGetAbility } from '@/hooks/useGetAbility'
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { fetchProfile } = useGetProfile()
+  const { fetchAbility } = useGetAbility();
   const { t } = useTranslation()
   const Schema = LoginSchema(t)  
   const userData = useUserData();
-  
 
   const handleSignin = async (data: z.infer<typeof Schema>) => {
     try {
@@ -38,7 +38,7 @@ export function useSignin() {
           return;
         }
         await fetchProfile();
-        await authService.getAbility();
+        await fetchAbility();
         const role = userData?.role;
         showToast(response.message || t('admin.showToast.auth.success'), 'success');
         if (role === 'Admin' || role === 'Super Admin') {
