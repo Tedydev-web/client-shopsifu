@@ -177,10 +177,8 @@ export function CategoriesSection() {
             <span className="tracking-tight relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-red-500/20">
               KHÁM PHÁ DANH MỤC
             </span>
-          </h2>
-
-          <div className="relative">
-            <div className="categories-container flex items-center gap-2 overflow-x-hidden scroll-smooth transition-transform duration-500 ease-out py-1 px-2 -mx-2">
+          </h2>          <div className="relative px-12">
+            <div className="categories-container flex items-center gap-3 overflow-x-hidden scroll-smooth transition-transform duration-500 ease-out py-2">
               {categories.map((category) => (
                 <Link
                   key={category.title}
@@ -188,10 +186,11 @@ export function CategoriesSection() {
                   className="flex-shrink-0"
                 >
                   <motion.div
-                    whileHover={{ scale: 1.03 }}
-                    className="px-4 py-2 rounded-full border border-gray-200/80 hover:border-red-500 hover:bg-white hover:shadow-md transition-all duration-300 backdrop-blur-[2px]"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-5 py-2.5 rounded-full border-2 border-gray-200/80 hover:border-red-500/80 bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 backdrop-blur-[2px]"
                   >
-                    <span className="text-sm font-medium text-gray-600 whitespace-nowrap hover:text-red-500 transition-colors duration-300 tracking-wide">
+                    <span className="text-[15px] font-semibold text-gray-700 whitespace-nowrap hover:text-red-500 transition-colors duration-300 tracking-wide">
                       {category.title}
                     </span>
                   </motion.div>
@@ -203,24 +202,26 @@ export function CategoriesSection() {
               variant="ghost"
               size="icon"
               className={cn(
-                "absolute left-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95",
-                !canScrollLeft && "opacity-0 pointer-events-none"
+                "absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-lg hover:shadow-xl border-2 border-gray-100 hover:border-red-500/50 hover:bg-red-50/50",
+                !canScrollLeft && "opacity-0 pointer-events-none",
+                "transition-all duration-300"
               )}
               onClick={() => scrollCategories('left')}
             >
-              <ArrowRight className="w-4 h-4 rotate-180" />
+              <ArrowRight className="w-5 h-5 text-gray-700 rotate-180" />
             </Button>
 
             <Button
               variant="ghost"
               size="icon"
               className={cn(
-                "absolute right-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/95",
-                !canScrollRight && "opacity-0 pointer-events-none"
+                "absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-lg hover:shadow-xl border-2 border-gray-100 hover:border-red-500/50 hover:bg-red-50/50",
+                !canScrollRight && "opacity-0 pointer-events-none",
+                "transition-all duration-300"
               )}
               onClick={() => scrollCategories('right')}
             >
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-5 h-5 text-gray-700" />
             </Button>
           </div>
         </div>
