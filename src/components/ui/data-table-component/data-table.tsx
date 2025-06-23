@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table' // Sử dụng table components của bạn
-
+import DataTableViewOption from './data-table-view-option'
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -68,6 +68,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {/* TODO: Có thể thêm DataTableToolbar ở đây (ví dụ: filter, ẩn/hiện cột) */}
+      <DataTableViewOption table={table} />
       <div className="rounded-md border">
         <Table> {/* Sử dụng Table component của bạn */}
           <TableHeader>

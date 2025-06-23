@@ -254,7 +254,9 @@
       "category": "Danh mục",
       "price": "Giá",
       "stock": "Tồn kho",
-      "status": "Trạng thái"
+      "status": "Trạng thái",
+      "view": "Xem",
+      "toggle_columns": "Bật/tắt cột"
     },
     "dataTableExport": {
       "export": "Xuất tệp",
