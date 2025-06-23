@@ -1,5 +1,5 @@
 'use client'
-import UserTable from "@/components/admin/users/users-Table";
+import UserTableWrapper from "@/components/admin/users/users-Wrapper";
 import { useTranslation } from "react-i18next";
 
 export default function UsersPage() {
@@ -13,7 +13,7 @@ export default function UsersPage() {
              {t("admin.users.subtitle")}
            </p>
          </div>
-         <UserTable />
+         <UserTableWrapper />  
        </div>
   )
 }

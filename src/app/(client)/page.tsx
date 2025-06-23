@@ -6,8 +6,8 @@ export default function HomePage() {
   return (
     <>
       <main className="flex flex-col min-h-screen">
-      <CategoriesSection />
       <FlashSaleSectionWrapper />
+      <CategoriesSection />
       <SuggestSectionWrapper />
       </main>
 

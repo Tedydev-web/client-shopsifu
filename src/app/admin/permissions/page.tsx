@@ -1,5 +1,5 @@
 'use client'
-import { PermissionsTable } from "@/components/admin/permissions/permissions-Table";
+import PermissionsTableWrapper from "@/components/admin/permissions/permissions-Wrapper";
 import { useTranslation } from "react-i18next";
 
 export default function PermissionsPage() {
@@ -12,7 +12,7 @@ export default function PermissionsPage() {
           {t("admin.permissions.subtitle")}
         </p>
       </div>
-      <PermissionsTable />
+      <PermissionsTableWrapper />
     </div>
   )
 }

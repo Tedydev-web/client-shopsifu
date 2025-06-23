@@ -1,5 +1,5 @@
 "use client";
-import { AuditLogsTable } from "@/components/admin/audit-logs/auditLogs-Table";
+import AuditLogsTableWrapper from "@/components/admin/audit-logs/auditLogs-Wrapper";
 import { useTranslation } from 'react-i18next';
 
 export default function AuditLogsPage() {
@@ -12,7 +12,7 @@ export default function AuditLogsPage() {
           {t('admin.auditLogs.subtitle')}
         </p>
       </div>
-      <AuditLogsTable />
+      <AuditLogsTableWrapper />
     </div>
   );
 }

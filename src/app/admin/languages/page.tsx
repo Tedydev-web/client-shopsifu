@@ -1,5 +1,5 @@
 'use client'
-import { LanguagesTable } from "@/components/admin/languages/languages-Table";
+import LanguagesTableWrapper from "@/components/admin/languages/languages-Wrapper";
 import { useTranslation } from "react-i18next";
 
 export default function LanguagesPage() {
@@ -12,7 +12,7 @@ export default function LanguagesPage() {
           {t("admin.languages.subtitle")}
         </p>
       </div>
-      <LanguagesTable />
+      <LanguagesTableWrapper />
     </div>
   )
 }
