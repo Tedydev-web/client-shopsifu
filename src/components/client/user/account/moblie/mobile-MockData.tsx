@@ -16,7 +16,9 @@ import {
 import { useTranslation } from 'react-i18next' // Add this import
 
 export const useSettingsMockData = () => { // Convert to a hook
-  const { t } = useTranslation() // Add translation hook
+  const { t, i18n } = useTranslation() // Add translation hook
+
+  const langLabel = i18n.language === "vi" ? "Tiếng Việt" : "English";
 
   return {
     header: {
@@ -61,7 +63,7 @@ export const useSettingsMockData = () => { // Convert to a hook
       { 
         label: t('user.settings.section.language'), 
         href: '/user/language', 
-        value: 'English', 
+        value: langLabel, 
         icon: <Languages className="w-4 h-4" /> 
       },
       { 

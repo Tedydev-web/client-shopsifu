@@ -31,7 +31,7 @@ export default function MobileSettings() {
                   className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-md text-sm font-medium"
                 >
                   <span className="text-green-600">{item.icon}</span>
-                  <span className="text-sm font-medium text-gray-900 leading-tight whitespace-nowrap">
+                  <span className="text-green-600 text-xs font-medium text-gray-900 leading-tight whitespace-nowrap">
                     {item.label}
                   </span>
 

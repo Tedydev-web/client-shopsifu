@@ -6,7 +6,7 @@ export const ROUTES = {
     VERIFY_CODE: '/verify-code',
     RESET_PASSWORD: '/reset-password',
     VERIFY_2FA: '/verify-2fa',
-    MY_ACCOUNT: '/my-account',
+    MY_ACCOUNT: '/user',
     MY_ORDERS: '/my-account/orders'
   },
   ADMIN: {
