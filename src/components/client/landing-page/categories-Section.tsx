@@ -7,83 +7,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const banners = [
-	{
-		title: 'Thời Trang Nam',
-		description: 'Khám phá phong cách thời thượng cho phái mạnh',
-		image: '/images/demo/Thoitrangnam.webp',
-		link: '/category/men',
-		gradient: 'to-blue-950/60',
-	},
-	{
-		title: 'Thời Trang Nữ',
-		description: 'Xu hướng thời trang mới nhất cho phái đẹp',
-		image: '/images/demo/Thoitrangnu.webp',
-		link: '/category/women',
-		gradient: 'to-rose-950/60',
-	},
-	{
-		title: 'Phụ Kiện',
-		description: 'Điểm nhấn hoàn hảo cho set đồ của bạn',
-		image: '/images/demo/Phukien.jpg',
-		link: '/category/accessories',
-		gradient: 'to-purple-950/60',
-	},
-];
-
-const categories = [
-	{
-		title: 'Đề xuất',
-		icon: '🌟',
-		link: '/recommended'
-	},
-	{
-		title: 'Làm đẹp & Sức khỏe',
-		icon: '💄',
-		link: '/beauty-health'
-	},
-	{
-		title: 'Thời trang Nữ',
-		icon: '👗',
-		link: '/women-clothing'
-	},
-	{
-		title: 'Gia dụng & Bếp',
-		icon: '🏠',
-		link: '/home-kitchen'
-	},
-	{
-		title: 'Thời trang Nam',
-		icon: '👔',
-		link: '/men-clothing'
-	},
-	{
-		title: 'Giày Nữ',
-		icon: '👠',
-		link: '/women-shoes'
-	},
-	{
-		title: 'Đồ lót Nam',
-		icon: '🩲',
-		link: '/men-underwear'
-	},
-	{
-		title: 'Thể thao & Ngoài trời',
-		icon: '⚽',
-		link: '/sports-outdoors'
-	},
-	{
-		title: 'Phụ kiện',
-		icon: '👜',
-		link: '/accessories'
-	},
-	{
-		title: 'Điện tử',
-		icon: '📱',
-		link: '/electronics'
-	}
-];
+import { banners, categories } from './landing-Mockdata';
 
 function Particles({ className = "" }: { className?: string }) {
 	return (
@@ -269,24 +193,11 @@ export function CategoriesSection() {
 				ease: [0.6, 0, 0.4, 1],
 			},
 		},
-	};
-	return (		
-	<section className="w-full py-2">
-			<div className="container mx-auto">
-				<div ref={containerRef}
-					className="relative h-[150px] md:h-[175px] overflow-hidden rounded-xl group perspective-[2000px] hover:shadow-2xl hover:shadow-black/20 transition-all duration-500"
-				>
-					<motion.div
-						initial={{ scale: 1 }}
-						animate={{ 
-							scale: [1, 1.02, 1],
-						}}
-						transition={{
-							repeat: Infinity,
-							duration: 8,
-							ease: "easeInOut",
-							times: [0, 0.5, 1],
-						}}
+	};	return (			<section className="w-full mt-6">
+			<div className="max-w-[1550px] mx-auto">				
+        <div ref={containerRef}
+					className="relative h-[150px] md:h-[200px] overflow-hidden rounded-xl"
+				><motion.div
 						className="absolute inset-0"
 					>
 					<AnimatePresence
@@ -298,7 +209,7 @@ export function CategoriesSection() {
 						{banners.map((banner, index) => (
 							index === currentBanner && (
 								<motion.div
-									key={banner.title}
+									key={index}
 									className="absolute inset-0"
 									custom={direction}
 									variants={slideVariants}
@@ -332,7 +243,7 @@ export function CategoriesSection() {
 									>
 										<Image
 											src={banner.image}
-											alt={banner.title}
+											alt={`Banner ${index + 1}`}
 											fill
 											className="object-cover object-center will-change-transform"
 											priority={index === 0}
@@ -355,119 +266,6 @@ export function CategoriesSection() {
 											`${banner.gradient} after:absolute after:inset-0 after:bg-gradient-to-t after:from-black/20 after:via-transparent after:to-black/10`
 										)}
 									/>
-
-									<div className="absolute inset-0 flex items-center">
-										<div className="w-full md:w-3/5 px-6 md:px-10 space-y-2.5">
-											<motion.div
-												variants={titleVariants}
-												initial="hidden"
-												animate="visible"
-												exit="exit"
-												custom={0}
-												className="text-2xl md:text-3xl font-bold text-white tracking-tight overflow-hidden perspective-[1000px] will-change-transform"
-											>
-												{Array.from(banner.title).map((char, i) => (
-													<motion.span
-														key={i}
-														variants={letterVariants}
-														style={{ 
-															display: 'inline-block',
-															transformStyle: 'preserve-3d',
-															backfaceVisibility: 'hidden',
-														}}
-														className={cn(
-															"relative",
-															char === ' ' ? 'mr-1.5' : '',
-															"after:absolute after:inset-0 after:bg-gradient-to-b after:from-white/20 after:to-transparent after:opacity-0 after:hover:opacity-100 after:transition-opacity after:duration-300"
-														)}
-													>
-														{char}
-													</motion.span>
-												))}
-											</motion.div>
-											<motion.div
-												variants={titleVariants}
-												initial="hidden"
-												animate="visible"
-												exit="exit"
-												custom={1}
-												className="text-sm text-white/90 font-medium max-w-[280px] md:max-w-[320px] overflow-hidden perspective-[1000px] will-change-transform"
-											>
-												{Array.from(banner.description).map((char, i) => (
-													<motion.span
-														key={i}
-														variants={letterVariants}
-														style={{ 
-															display: 'inline-block',
-															transformStyle: 'preserve-3d',
-															backfaceVisibility: 'hidden',
-														}}
-														className={char === ' ' ? 'mr-0.5' : ''}
-													>
-														{char}
-													</motion.span>
-												))}
-											</motion.div>
-											<motion.div
-												initial={{ opacity: 0, y: 15, scale: 0.9 }}
-												animate={{ 
-													opacity: 1, 
-													y: 0,
-													scale: 1,
-													transition: {
-														delay: 0.5,
-														duration: 0.8,
-														ease: [0.25, 1, 0.5, 1],
-													}
-												}}
-												exit={{ 
-													opacity: 0, 
-													y: -15,
-													scale: 0.9,
-													transition: {
-														duration: 0.4,
-														ease: [0.6, 0, 0.4, 1],
-													}
-												}}
-											>
-												<Button
-													asChild
-													size="sm"
-													variant="destructive"
-													className="relative rounded-md bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-red-600 hover:via-red-500 hover:to-red-600 text-white hover:shadow-xl hover:shadow-red-500/30 hover:scale-105 transition-all duration-500 overflow-hidden group/btn"
-												>
-													<Link href={banner.link} className="inline-flex items-center gap-1.5">
-														<span className="relative z-10 font-medium">Khám phá</span>
-														<motion.span
-															className="relative z-10"
-															animate={{ 
-																x: [0, 5, 0],
-																opacity: [1, 0.8, 1],
-																transition: {
-																	repeat: Infinity,
-																	duration: 1.5,
-																	ease: "easeInOut",
-																}
-															}}
-														>
-															<ArrowRight className="h-3.5 w-3.5" />
-														</motion.span>
-														<motion.div
-															className="absolute inset-0 bg-gradient-to-r from-red-600/0 via-red-400/40 to-red-600/0"
-															animate={{
-																x: ['-200%', '200%'],
-																transition: {
-																	repeat: Infinity,
-																	duration: 2.5,
-																	ease: "easeInOut",
-																}
-															}}
-														/>
-													</Link>
-												</Button>
-											</motion.div>
-										</div>
-									</div>
 								</motion.div>
 							)
 						))}

@@ -44,3 +44,61 @@ export const mockProductsItem: Product[] = [
   { id: '11', image: '/images/image-placeholder.jpg', name: 'Balo Laptop Chống Nước, Chống Sốc Cao Cấp', category: 'Phụ kiện', price: 600000, salePrice: 450000, stock: 100, status: 'Active', sold: 1500, tags: ['bestseller'], createdAt: '', updatedAt: '', discount: 25, type: 'Physical' },
   { id: '12', image: '/images/image-placeholder.jpg', name: 'Tai Nghe Bluetooth Không Dây Âm Thanh Cực Hay', category: 'Điện tử', price: 800000, salePrice: 599000, stock: 100, status: 'Active', sold: 4200, tags: ['new'], createdAt: '', updatedAt: '', discount: 25, type: 'Physical', Isfavorite: true },
 ];
+
+export const banners = [
+    {
+        image: '/images/demo/Thoitrangnam.webp',
+        gradient: 'to-blue-950/60',
+    },
+    {
+        image: '/images/demo/Thoitrangnu.webp',
+        gradient: 'to-rose-950/60',
+    },
+    {
+        image: '/images/demo/Phukien.jpg',
+        gradient: 'to-purple-950/60',
+    },
+];
+
+export const categories = [
+    {
+        title: 'Đề xuất',
+        link: '/recommended'
+    },
+    {
+        title: 'Làm đẹp & Sức khỏe',
+        link: '/beauty-health'
+    },
+    {
+        title: 'Thời trang Nữ',
+        link: '/women-clothing'
+    },
+    {
+        title: 'Gia dụng & Bếp',
+        link: '/home-kitchen'
+    },
+    {
+        title: 'Thời trang Nam',
+        link: '/men-clothing'
+    },
+    {
+        title: 'Giày Nữ',
+        link: '/women-shoes'
+    },
+    {
+        title: 'Đồ lót Nam',
+        link: '/men-underwear'
+    },
+    {
+        title: 'Thể thao & Ngoài trời',
+        link: '/sports-outdoors'
+    },
+    {
+        title: 'Phụ kiện',
+        link: '/accessories'
+    },
+    {
+        title: 'Điện tử',
+        link: '/electronics'
+    }
+];
