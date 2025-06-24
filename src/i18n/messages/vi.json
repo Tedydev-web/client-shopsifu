@@ -924,17 +924,36 @@
         "addNewAddress": "Thêm địa chỉ mới",
         "noAddress": "Bạn chưa có địa chỉ nào.",
         "processing": "Đang xử lý...",
-        "changePassword": "Đổi mật khẩu"
+        "changePassword": "Đổi mật khẩu",
+        "encryptedNote": "Tất cả dữ liệu bạn đã thêm sẽ được mã hóa"
       },
 
       "payment": {
         "payment": "Thanh toán",
-        "creditDebitCard": "Thẻ tín dụng / ghi nợ",
-        "addNewCard": "Thêm thẻ mới",
-        "noCardLinked": "Bạn chưa liên kết thẻ nào.",
-        "bankAccount": "Tài khoản ngân hàng",
+        "creditDebitCard": "Thẻ tín dụng / Thẻ ghi nợ",
+        "noCardLinked": "Bạn chưa có thẻ nào.",
+        "bankAccount": "Tài khoản ngân hàng của tôi",
         "addBankLink": "Thêm tài khoản ngân hàng mới",
-        "noBankLinked": "Bạn chưa có tài khoản ngân hàng nào."
+        "noBankLinked": "Bạn chưa có tài khoản ngân hàng nào.",
+        "title": "Phương thức thanh toán của bạn",
+        "encrypted": "Tất cả dữ liệu đều được mã hóa",
+        "fastCheckout": "Lưu thẻ để thanh toán nhanh hơn",
+        "secure": "Thanh toán an toàn",
+        "convenient": "Thanh toán tiện lợi",
+        "addNewCard": "Thêm thẻ tín dụng hoặc thẻ ghi nợ",
+        "cardSecurityTitle": "Shopsifu bảo vệ thông tin thẻ của bạn",
+        "compliesPCI": "Shopsifu tuân thủ Tiêu chuẩn bảo mật dữ liệu ngành thẻ thanh toán (PCI DSS) khi xử lý dữ liệu thẻ",
+        "secureInfo": "Thông tin thẻ được bảo mật và không bị xâm phạm",
+        "encryptedAgain": "Tất cả dữ liệu đều được mã hóa",
+        "noSellInfo": "Shopsifu không bao giờ bán thông tin thẻ của bạn",
+        "secureTrustedTitle": "An toàn & đáng tin cậy",
+        "secureTrustedDesc": "Bảo mật của bạn là ưu tiên hàng đầu của chúng tôi. Để đảm bảo an toàn, chúng tôi sử dụng hệ thống phòng chống rủi ro và gian lận hàng đầu cho mọi giao dịch.",
+        "needHelp": "Cần hỗ trợ về vấn đề bảo mật?",
+        "contactUs": "Liên hệ chúng tôi",
+        "supportTitle": "Hỗ trợ khách hàng",
+        "supportDesc": "Bộ phận hỗ trợ khách hàng sẽ giải đáp các thắc mắc về thanh toán của bạn.",
+        "doubt": "Bạn có thắc mắc về giao dịch?",
+        "faq": "Câu hỏi thường gặp về thanh toán"
       },
 
       "security": {

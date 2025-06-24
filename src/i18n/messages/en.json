@@ -921,17 +921,36 @@
         "addNewAddress": "Add New Address",
         "noAddress": "You don’t have any addresses yet.",
         "processing": "Processing...",
-        "changePassword": "Change password"
+        "changePassword": "Change password",
+        "encryptedNote": "All data you added will be encrypted"
       },
 
       "payment": {
         "payment": "Payment",
         "creditDebitCard": "Credit / Debit Card",
-        "addNewCard": "Add New Card",
         "noCardLinked": "You don't have cards yet.",
         "bankAccount": "My Bank Account",
         "addBankLink": "Add New Bank Account",
-        "noBankLinked": "You don’t have bank accounts yet."
+        "noBankLinked": "You don’t have bank accounts yet.",
+        "title": "Your payment methods",
+        "encrypted": "All data is encrypted",
+        "fastCheckout": "Save cards for a faster checkout",
+        "secure": "Secure payment",
+        "convenient": "Convenient payment",
+        "addNewCard": "Add a credit or debit card",
+        "cardSecurityTitle": "Shopsifu protects your card information",
+        "compliesPCI": "Shopsifu follows the Payment Card Industry Data Security Standard (PCI DSS) when handling card data",
+        "secureInfo": "Card information is secure and uncompromised",
+        "encryptedAgain": "All data is encrypted",
+        "noSellInfo": "Shopsifu never sells your card information",
+        "secureTrustedTitle": "Secure & trusted",
+        "secureTrustedDesc": "Your security is our top priority. To keep you safe, we use a market-leading risk and fraud protection system for every transaction.",
+        "needHelp": "Need help with a security issue?",
+        "contactUs": "Contact us",
+        "supportTitle": "Customer support",
+        "supportDesc": "The customer support has answers to payment questions you may have.",
+        "doubt": "Have doubts about your transactions?",
+        "faq": "Payment FAQs"
       },
 
       "security": {

@@ -7,7 +7,7 @@ import {
 
 export const sidebarItems = [
   {
-    labelKey: 'user.account.notifications.notifications',
+    labelKey: 'user.settings.section.notifications',
     href: '/user/notifications',
     icon: <BellDot className="w-5 h-5 mr-2 text-gray-900" />,
   },
@@ -17,14 +17,20 @@ export const sidebarItems = [
     icon: <User className="w-5 h-5 mr-2 text-gray-900" />,
     subItems: [
       { labelKey: 'user.account.profile.profile', href: '/user/profile' },
-      { labelKey: 'user.account.address.address', href: '/user/address' },
-      { labelKey: 'user.account.payment.payment', href: '/user/payment' },
-      { labelKey: 'user.account.security.security', href: '/user/security' },
+      { labelKey: 'user.account.address.address', href: '/user/profile/address' },
+      { labelKey: 'user.account.payment.payment', href: '/user/profile/payment' },
+      { labelKey: 'user.account.security.security', href: '/user/profile/security' },
     ],
   },
   {
     labelKey: 'user.account.myPurchase.myPurchase',
     href: '/user/purchase',
     icon: <NotepadText className="w-5 h-5 mr-2 text-gray-900" />,
+    subItems: [
+      { labelKey: 'user.account.profile.profile', href: '/user/profile' },
+      { labelKey: 'user.account.address.address', href: '/user/profile/address' },
+      { labelKey: 'user.account.payment.payment', href: '/user/profile/payment' },
+      { labelKey: 'user.account.security.security', href: '/user/profile/security' },
+    ],
   },
 ]
