@@ -10,6 +10,7 @@ import { Verify2faResponse, VerifyOTPResponse } from '@/types/auth/auth.interfac
 import { useTranslation } from 'react-i18next'
 import { useGetProfile } from '@/hooks/useGetProfile'
 import { useUserData } from '@/hooks/useGetData-UserLogin'
+import { useGetAbility } from '@/hooks/useGetAbility'
 
 const TRUST_DEVICE_KEY = 'askToTrustDevice'
 
@@ -21,7 +22,9 @@ export function useVerify2FA() {
   const searchParams = useSearchParams()
   const type = (searchParams.get('type') as TwoFactorType) || 'TOTP';
   const isChangePasswordFlow = searchParams.get('changePassword') === 'true';
+  const isRevokeAllFlow = searchParams.get('revokeAll') === 'true';
   const { fetchProfile } = useGetProfile()
+  const { fetchAbility } = useGetAbility();
   const userData = useUserData();
 
   const role = userData?.role;
@@ -77,7 +80,7 @@ export function useVerify2FA() {
 
 
         // LUỒNG ĐỔI MẬT KHẨU
-        if (isChangePasswordFlow && role === 'Admin' || role === 'Super Admin') {
+        if (isChangePasswordFlow && isRevokeAllFlow && role === 'Admin' || role === 'Super Admin') {
           router.push(ROUTES.ADMIN.DASHBOARD);
           return;
         }else{
@@ -88,7 +91,7 @@ export function useVerify2FA() {
         const isDeviceTrusted = response.data.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
-        await authService.getAbility();
+        await fetchAbility();
         if(role === 'Admin' || role === 'Super Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;
         }else{
@@ -120,7 +123,7 @@ export function useVerify2FA() {
 
 
       // LUỒNG ĐỔI MẬT KHẨU
-      if (isChangePasswordFlow && role === 'Admin' || role === 'Super Admin') {
+      if (isChangePasswordFlow && isRevokeAllFlow && role === 'Admin' || role === 'Super Admin') {
         showToast(response.message, 'success');
         router.push(ROUTES.ADMIN.DASHBOARD);
         return;
@@ -136,7 +139,7 @@ export function useVerify2FA() {
         const isDeviceTrusted = response.data.isDeviceTrustedInSession;
         sessionStorage.setItem(TRUST_DEVICE_KEY, String(isDeviceTrusted));
         await fetchProfile();
-        await authService.getAbility();
+        await fetchAbility();
         if(role === 'Admin' || role === 'Super Admin'){
           window.location.href = ROUTES.ADMIN.DASHBOARD;
         }else{

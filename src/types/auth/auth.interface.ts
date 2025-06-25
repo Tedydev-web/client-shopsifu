@@ -2,6 +2,34 @@ import { BaseResponse } from "../base.interface";
 import { UserProfile } from "./profile.interface";
 
 
+
+
+
+// A generic type for actions within a permission subject
+type PermissionActions = { [action: string]: boolean };
+
+// The structure for all permissions, based on the API response
+export interface Permissions {
+  User?: PermissionActions;
+  Role?: PermissionActions;
+  Permission?: PermissionActions;
+  Profile?: PermissionActions;
+  TwoFactor?: PermissionActions;
+  Password?: PermissionActions;
+  Session?: PermissionActions;
+  all?: PermissionActions;
+  // Allow for other potential keys not explicitly defined
+  [key: string]: PermissionActions | undefined;
+}
+
+// LẤY DANH SÁCH QUYỀN HẠN - GET ABILITY
+export interface GetAbilityResponse extends BaseResponse {
+    data: {
+        permissions: Permissions;
+    }
+}
+
+
 export interface oAuthLoginResponse {
   url: string
 }

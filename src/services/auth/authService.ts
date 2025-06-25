@@ -22,14 +22,15 @@ import {
   Confirm2faResponse,
   RefreshTokenResponse,
   ResetPasswordSendRequest,
+  GetAbilityResponse,
 } from '@/types/auth/auth.interface';
 import { API_ENDPOINTS } from '@/constants/api';
 import { AxiosError } from "axios";
 
 export const authService = {
   //GET ABILITY BY ROLE (PERMISSION)
-  getAbility: async (): Promise<any> => {
-    const response = await privateAxios.get(API_ENDPOINTS.AUTH.GET_ABILITY);
+  getAbility: async (): Promise<GetAbilityResponse> => {
+    const response = await privateAxios.get<GetAbilityResponse>(API_ENDPOINTS.AUTH.GET_ABILITY);
     return response.data;
   },
 

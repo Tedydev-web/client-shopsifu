@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
-import { Header } from "@/components/client/layout/header/header-Main";
-import { Footer } from "@/components/client/layout/Footer";
 import { ScrollLock } from "@/components/client/layout/ScrollLock";
-import { HeroSection } from "@/components/client/landing-page/hero-Section";
+import { Footer } from "@/components/client/layout/Footer/Footer";
+import HeroSectionWrapper from "@/components/client/landing-page/wrapper/hero-Wrapper";
+import HeaderWrapper from "@/components/client/layout/header/header-Wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +21,9 @@ export default function ClientLayout({
   return (
     <div className="min-h-screen w-full flex flex-col">
       <ScrollLock />
-      <Header />
+      <HeaderWrapper   />
       <main className="flex-grow bg-[#F5F5FA]">
-      <HeroSection/>
+      <HeroSectionWrapper/>
         <div className="max-w-[1250px] w-full mx-auto px-4 sm:px-6">
           {children}
         </div>

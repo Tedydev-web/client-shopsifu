@@ -87,9 +87,9 @@ export const API_ENDPOINTS = {
   },
   // QUẢN LÝ SESSION - SESSIONS
   SESSIONS: {
-    GETALL: `${API_BASE}/auth/sessions`,
-    REVOKE: `${API_BASE}/auth/sessions/revoke`,
-    REVOKE_ALL: `${API_BASE}/auth/sessions/revoke-all`
+    GETALL: `${API_BASE}/sessions`,
+    REVOKE: `${API_BASE}/sessions/revoke`,
+    REVOKE_ALL: `${API_BASE}/sessions/revoke-all`
   },
   // ... các endpoints khác
 }

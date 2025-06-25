@@ -89,7 +89,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                         style={{ objectFit: 'cover' }}
                         className="z-0" // Ensure image is at a lower stacking context
                         sizes="100vw" // Added sizes prop
-                        priority={index === 0}
+                        priority
                       />
                     </CarouselItem>
                   ))}

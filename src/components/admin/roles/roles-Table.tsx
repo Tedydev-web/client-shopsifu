@@ -53,13 +53,13 @@ export default function RolesTable() {
   const debouncedSearchValue = useDebounce(searchValue, 1000)
 
   useEffect(() => {
-    fetchRoles({ meta: { currentPage: page, itemsPerPage: limit } })
+    fetchRoles({ metadata: { page: page, limit: limit } })
   }, [page, limit])
 
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setCurrentPage(1)
-      fetchRoles({ meta: { currentPage: 1, itemsPerPage: limit, search: debouncedSearchValue } })
+      fetchRoles({ metadata: { page: 1, limit: limit, search: debouncedSearchValue } })
     }
   }, [debouncedSearchValue, limit])
 
@@ -84,7 +84,7 @@ export default function RolesTable() {
       const success = await deleteRole(roleToDelete.id); // Chuyển id thành string
       if (success) {
         handleCloseDeleteModal();
-        fetchRoles({ meta: { currentPage: page, itemsPerPage: limit }}); // Chuyển page và limit thành string
+        fetchRoles({ metadata: { page: page, limit: limit }}); // Chuyển page và limit thành string
       }
     } catch (error) {
       console.error('Lỗi khi xóa quyền:', error);
@@ -119,7 +119,7 @@ export default function RolesTable() {
         await createRole(payload);
       }
       handleCloseModal();
-      fetchRoles({ meta: { currentPage: page, itemsPerPage: limit, search: debouncedSearchValue } });
+      fetchRoles({ metadata: { page: page, limit: limit, search: debouncedSearchValue } });
     } catch (err) {
       showToast(
         selectedRole
@@ -135,12 +135,12 @@ export default function RolesTable() {
   }
 
   const handlePageChange = (newPage: number) => {
-    fetchRoles({ meta: { currentPage: newPage, itemsPerPage: limit } })
+    fetchRoles({ metadata: { page: newPage, limit: limit } })
   }
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
-    fetchRoles({ meta: { currentPage: 1, itemsPerPage: newLimit } })
+    fetchRoles({ metadata: { page: 1, limit: newLimit } })
   }
 
   return (

@@ -1,5 +1,5 @@
 'use client'
-import RolesTable from "@/components/admin/roles/roles-Table"
+import RolesTableWrapper from "@/components/admin/roles/roles-Wrapper"
 import { useTranslation } from "react-i18next";
 
 export default function RolesPage() {
@@ -12,7 +12,7 @@ export default function RolesPage() {
           {t("admin.roles.subtitle")}
         </p>
       </div>
-      <RolesTable />
+      <RolesTableWrapper />
     </div>
   )
 }

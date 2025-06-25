@@ -3,15 +3,16 @@
 import { SettingTable, SettingTableColumn } from '@/components/ui/settings-component/settings-table'
 import { ChevronRight, Lock, Shield, Clock, KeyRound } from 'lucide-react'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ChangePasswordModal } from './passwordSecurity-ChangePassword'
 import { Profile2FAModal } from './passwordSecurity-2faModal'
 import { usePasswordSecurity } from './usePasswordSecurity-2fa'
-import { PasswordSecuritySession } from './passwordSecurity-Session'
 import { useUserData } from '@/hooks/useGetData-UserLogin'
 
+
 export function PasswordSecurityTable() {
+  const router = useRouter()
   const [showChangePassword, setShowChangePassword] = useState(false)
-  const [currentView, setCurrentView] = useState('table') // 'table' or 'sessions'
   const user = useUserData();
   const {
     is2FAEnabled,
@@ -65,7 +66,7 @@ export function PasswordSecurityTable() {
       value: "2 thiết bị đang hoạt động", // You might want to update this with actual count
       startIcon: <Clock />,
       endIcon: <ChevronRight />,
-      onClick: () => setCurrentView('sessions')
+      onClick: () => router.push('/admin/settings/session')
     },    {
       label: "Tạo lại mã khôi phục",
       value: (
@@ -79,10 +80,7 @@ export function PasswordSecurityTable() {
     }
   ]
 
-  // Render based on currentView state
-  if (currentView === 'sessions') {
-    return <PasswordSecuritySession onBack={() => setCurrentView('table')} />;
-  }
+
 
   return (
     <>

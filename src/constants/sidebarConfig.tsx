@@ -118,11 +118,6 @@ export const sidebarConfig: SidebarItem[] = [
       },
     ],
   },
-  {
-    title: t('admin.sidebar.settings.settings'),
-    href: '/admin/settings',
-    icon: <Settings className="w-5 h-5" />,
-  },
 ]
 
 export const settingsSidebarConfig: SidebarItem[] = [

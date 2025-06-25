@@ -259,7 +259,9 @@
       "category": "Category",
       "price": "Price",
       "stock": "Stock",
-      "status": "Status"
+      "status": "Status",
+      "view": "View",
+      "toggle_columns": "Toggle columns"
     },
     "dataTableExport": {
       "export": "Export file",
