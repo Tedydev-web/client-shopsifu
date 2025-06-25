@@ -12,7 +12,8 @@ import {
   HelpCircle,
   MonitorCog,
   FolderClosed,
-  Undo 
+  Undo,
+  Tags // Thêm icon cho Brand
 } from 'lucide-react'
 import { t } from "i18next"
 
@@ -104,6 +105,11 @@ export const sidebarConfig: SidebarItem[] = [
         href: '/admin/device',
         icon: null,
       },
+      {
+        title: t('admin.sidebar.system.brandManager', 'Quản lý thương hiệu'),
+        href: '/admin/brand',
+        icon: <Tags className="w-4 h-4" />,
+      }
     ],
   },  
   {

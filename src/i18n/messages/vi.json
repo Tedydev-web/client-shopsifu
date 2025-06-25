@@ -808,6 +808,21 @@
       "emptyDesc": "Hiện tại bạn chưa có thông báo nào, nhưng khi có chúng sẽ hiển thị tại đây.",
       "esc": "thoát",
       "close": "Đóng"
+    },
+    "brand": {
+      "title": "Quản lý thương hiệu",
+      "subtitle": "Quản lý danh sách thương hiệu trong hệ thống.",
+      "searchPlaceholder": "Tìm kiếm thương hiệu...",
+      "addAction": "Thêm thương hiệu",
+      "editAction": "Sửa thương hiệu",
+      "deleteAction": "Xóa thương hiệu",
+      "code": "Mã thương hiệu",
+      "name": "Tên thương hiệu",
+      "actions": "Thao tác",
+      "confirmDelete": "Bạn có chắc chắn muốn xóa thương hiệu này?",
+      "addSuccess": "Thêm thương hiệu thành công",
+      "editSuccess": "Cập nhật thương hiệu thành công",
+      "deleteSuccess": "Xóa thương hiệu thành công"
     }
   },
   "user": {

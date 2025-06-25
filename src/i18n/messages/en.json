@@ -807,6 +807,21 @@
       "emptyDesc": "You don't have any notifications at the moment, but once you do they will live here.",
       "esc": "esc",
       "close": "Close"
+    },
+    "brand": {
+      "title": "Brand Management",
+      "subtitle": "Manage the list of brands in the system.",
+      "searchPlaceholder": "Search brands...",
+      "addAction": "Add Brand",
+      "editAction": "Edit Brand",
+      "deleteAction": "Delete Brand",
+      "code": "Brand Code",
+      "name": "Brand Name",
+      "actions": "Actions",
+      "confirmDelete": "Are you sure you want to delete this brand?",
+      "addSuccess": "Brand added successfully",
+      "editSuccess": "Brand updated successfully",
+      "deleteSuccess": "Brand deleted successfully"
     }
   },
   "user": {
