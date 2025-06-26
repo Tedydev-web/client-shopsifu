@@ -87,7 +87,7 @@ export const BrandColumns = ({
     cell: ({ row }) => {
       const brand = row.original
       return (
-        <div className="w-[60px]">
+        <div className="w-[200px] flex justify-center">
           <Avatar className="h-10 w-10">
             <AvatarImage src={brand.logo} alt={brand.name} />
             <AvatarFallback>
@@ -105,7 +105,7 @@ export const BrandColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Mã" />
     ),
-    cell: ({ row }) => <div className="w-[100px] font-medium">{row.getValue("code")}</div>,
+    cell: ({ row }) => <div className="w-[200px] font-medium">{row.getValue("code")}</div>,
     enableSorting: true,
     enableHiding: true,
   },
@@ -114,7 +114,7 @@ export const BrandColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên thương hiệu" />
     ),
-    cell: ({ row }) => <div className="w-[180px] font-medium">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="w-[200px] font-medium">{row.getValue("name")}</div>,
     enableSorting: true,
     enableHiding: true,
   },
@@ -142,7 +142,7 @@ export const BrandColumns = ({
     ),
     cell: ({ row }) => {
       const country = row.getValue("country") as string
-      return <div className="w-[120px]">{country || <span className="text-gray-500">-</span>}</div>
+      return <div className="w-[200px]">{country || <span className="text-gray-500">-</span>}</div>
     },
     enableSorting: true,
     enableHiding: true,
@@ -154,9 +154,9 @@ export const BrandColumns = ({
     ),
     cell: ({ row }) => {
       const website = row.getValue("website") as string
-      if (!website) return <div className="w-[160px] text-gray-500">-</div>
+      if (!website) return <div className="w-[200px] text-gray-500">-</div>
       return (
-        <div className="w-[160px]">
+        <div className="w-[200px]">
           <a 
             href={website} 
             target="_blank" 
@@ -180,7 +180,7 @@ export const BrandColumns = ({
     cell: ({ row }) => {
       const status = row.getValue("status") as string
       return (
-        <div className="w-[120px]">
+        <div className="w-[150px]">
           <Badge variant={status === "active" ? "default" : "secondary"}>
             {status === "active" ? "Hoạt động" : "Không hoạt động"}
           </Badge>
@@ -197,9 +197,9 @@ export const BrandColumns = ({
     ),
     cell: ({ row }) => {
       const date = row.getValue("createdAt") as string
-      if (!date) return <div className="w-[140px] text-gray-500">-</div>
+      if (!date) return <div className="w-[150px] text-gray-500">-</div>
       return (
-        <div className="w-[140px]">
+        <div className="w-[200px]">
           {format(new Date(date), "dd/MM/yyyy HH:mm")}
         </div>
       )
