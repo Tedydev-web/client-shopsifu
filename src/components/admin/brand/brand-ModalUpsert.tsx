@@ -122,103 +122,101 @@ export default function BrandModalUpsert({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{mode === "add" ? "Thêm" : "Sửa"} thương hiệu</DialogTitle>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            {mode === "add" ? "Thêm mới thương hiệu" : "Chỉnh sửa thương hiệu"}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mã thương hiệu</FormLabel>
-                  <FormControl>
-                    <Input {...field} disabled={mode === "edit"} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tên thương hiệu</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mô tả</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} placeholder="Nhập mô tả thương hiệu..." />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            {/* Row 1: Code and Name */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Mã thương hiệu <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={mode === "edit"} placeholder="VD: APPLE" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Tên thương hiệu <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="VD: Apple Inc." />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Row 2: Logo Upload */}
             <FormField
               control={form.control}
               name="logo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Logo thương hiệu</FormLabel>
+                  <FormLabel className="text-sm font-medium">Logo thương hiệu</FormLabel>
                   <FormControl>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
+                    <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50/50">
+                      {/* Avatar hiển thị luôn */}
+                      <div className="relative flex-shrink-0">
+                        <Avatar className="h-16 w-16 border-2 border-gray-200 bg-white">
+                          {logoPreview ? (
+                            <AvatarImage 
+                              src={logoPreview} 
+                              alt="Logo preview" 
+                              className="object-contain p-2" 
+                            />
+                          ) : (
+                            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                              <Upload className="h-6 w-6" />
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
                         {logoPreview && (
-                          <div className="relative">
-                            <Avatar className="h-16 w-16 border-2 border-gray-200">
-                              <AvatarImage 
-                                src={logoPreview} 
-                                alt="Logo preview" 
-                                className="object-contain p-2" 
-                              />
-                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                                <Upload className="h-6 w-6" />
-                              </AvatarFallback>
-                            </Avatar>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 hover:bg-red-600 border-white border-2 text-white shadow-sm"
-                              onClick={handleRemoveLogo}
-                            >
-                              <X className="h-2.5 w-2.5" />
-                            </Button>
-                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 hover:bg-red-600 border-white border-2 text-white shadow-sm"
+                            onClick={handleRemoveLogo}
+                          >
+                            <X className="h-2.5 w-2.5" />
+                          </Button>
                         )}
-                        <div className="flex-1 space-y-2">
-                          <label htmlFor="logo-upload" className="cursor-pointer">
-                            <div className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-                              <Upload className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm text-gray-600">
-                                {selectedFile ? selectedFile.name : "Chọn logo thương hiệu"}
-                              </span>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <label htmlFor="logo-upload" className="cursor-pointer block">
+                          <div className="flex items-center gap-3 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all">
+                            <Upload className="h-5 w-5 text-gray-500" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-700">
+                                {selectedFile ? selectedFile.name : "Chọn hoặc kéo thả logo vào đây"}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                PNG, JPG, GIF tối đa 5MB
+                              </p>
                             </div>
-                          </label>
-                          <input
-                            id="logo-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                          />
-                          {/* <p className="text-xs text-muted-foreground">
-                            Định dạng: PNG, JPG, GIF • Tối đa 5MB
-                          </p> */}
-                        </div>
+                          </div>
+                        </label>
+                        <input
+                          id="logo-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="hidden"
+                        />
                       </div>
                     </div>
                   </FormControl>
@@ -226,42 +224,68 @@ export default function BrandModalUpsert({
                 </FormItem>
               )}
             />
+
+            {/* Row 3: Description */}
             <FormField
               control={form.control}
-              name="website"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Website</FormLabel>
+                  <FormLabel className="text-sm font-medium">Mô tả thương hiệu</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="https://example.com" />
+                    <Textarea 
+                      {...field} 
+                      rows={3} 
+                      placeholder="Nhập mô tả chi tiết về thương hiệu..." 
+                      className="resize-none"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quốc gia</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Việt Nam" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+            {/* Row 4: Website and Country */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Website</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="https://example.com" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Quốc gia</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="VD: Việt Nam" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Row 5: Status */}
             <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Trạng thái</FormLabel>
+                  <FormLabel className="text-sm font-medium">Trạng thái <span className="text-red-500">*</span></FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Chọn trạng thái" />
+                        <SelectValue placeholder="Chọn trạng thái hoạt động" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -273,12 +297,14 @@ export default function BrandModalUpsert({
                 </FormItem>
               )}
             />
-            <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Hủy
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <Button type="button" variant="outline" onClick={onClose} className="px-6">
+                Hủy bỏ
               </Button>
-              <Button type="submit">
-                {mode === "add" ? "Thêm" : "Lưu"}
+              <Button type="submit" className="px-6 bg-red-600 hover:bg-red-700">
+                {mode === "add" ? "Thêm mới" : "Cập nhật"}
               </Button>
             </div>
           </form>
