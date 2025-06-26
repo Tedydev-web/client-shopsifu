@@ -312,7 +312,7 @@ export default function BrandModalUpsert({
           </Button>
           <Button 
             type="submit" 
-            className="px-6 bg-blue-600 hover:bg-blue-700"
+            className="px-6 bg-red-600 hover:bg-red-700"
             onClick={form.handleSubmit(handleSubmit)}
           >
             Thêm mới
