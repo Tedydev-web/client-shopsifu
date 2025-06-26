@@ -47,22 +47,51 @@ export default function BrandModalUpsert({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      code: brand?.code || "",
-      name: brand?.name || "",
-      description: brand?.description || "",
-      logo: brand?.logo || "",
-      website: brand?.website || "",
-      country: brand?.country || "",
-      status: brand?.status || "active",
+      code: "",
+      name: "",
+      description: "",
+      logo: "",
+      website: "",
+      country: "",
+      status: "active",
     },
   })
+
+  // Reset form when brand changes
+  useEffect(() => {
+    if (brand) {
+      form.reset({
+        code: brand.code || "",
+        name: brand.name || "",
+        description: brand.description || "",
+        logo: brand.logo || "",
+        website: brand.website || "",
+        country: brand.country || "",
+        status: brand.status || "active",
+      })
+    } else {
+      form.reset({
+        code: "",
+        name: "",
+        description: "",
+        logo: "",
+        website: "",
+        country: "",
+        status: "active",
+      })
+    }
+  }, [brand, form])
 
   // Set logo preview when brand data changes
   useEffect(() => {
     if (brand?.logo) {
       setLogoPreview(brand.logo)
+      form.setValue("logo", brand.logo)
+    } else {
+      setLogoPreview("")
+      form.setValue("logo", "")
     }
-  }, [brand])
+  }, [brand, form])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -149,20 +178,24 @@ export default function BrandModalUpsert({
                       <div className="flex items-center gap-4">
                         {logoPreview && (
                           <div className="relative">
-                            <Avatar className="h-16 w-16">
-                              <AvatarImage src={logoPreview} alt="Logo preview" />
-                              <AvatarFallback>
+                            <Avatar className="h-16 w-16 border-2 border-gray-200">
+                              <AvatarImage 
+                                src={logoPreview} 
+                                alt="Logo preview" 
+                                className="object-contain p-2" 
+                              />
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                                 <Upload className="h-6 w-6" />
                               </AvatarFallback>
                             </Avatar>
                             <Button
                               type="button"
-                              variant="destructive"
+                              variant="outline"
                               size="icon"
-                              className="absolute -top-2 -right-2 h-6 w-6"
+                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 hover:bg-red-600 border-white border-2 text-white shadow-sm"
                               onClick={handleRemoveLogo}
                             >
-                              <X className="h-3 w-3" />
+                              <X className="h-2.5 w-2.5" />
                             </Button>
                           </div>
                         )}
