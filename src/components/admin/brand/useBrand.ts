@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Brand } from "./brand-Columns"
+import { mockBrandData, searchBrands } from "./brand-MockData"
 
 export const useBrand = () => {
   const [brands, setBrands] = useState<Brand[]>([])
@@ -11,18 +12,36 @@ export const useBrand = () => {
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null)
+  const [currentSearchQuery, setCurrentSearchQuery] = useState("")
 
   const getAllBrands = async ({ metadata }: { metadata: { page: number; limit: number } }) => {
     try {
       setLoading(true)
-      // TODO: Implement API call here
-      // const response = await api.get('/brands', { params: metadata })
-      // setBrands(response.data.items)
-      // setTotalItems(response.data.totalItems)
-      // setTotalPages(response.data.totalPages)
-      // setPage(response.data.currentPage)
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Get filtered data based on search query
+      let filteredData = currentSearchQuery 
+        ? searchBrands(currentSearchQuery)
+        : mockBrandData
+      
+      // Paginate the data
+      const startIndex = (metadata.page - 1) * metadata.limit
+      const endIndex = startIndex + metadata.limit
+      const paginatedData = filteredData.slice(startIndex, endIndex)
+      
+      // Update state
+      setBrands(paginatedData)
+      setTotalItems(filteredData.length)
+      setTotalPages(Math.ceil(filteredData.length / metadata.limit))
+      setPage(metadata.page)
+      
     } catch (error) {
       console.error('Error fetching brands:', error)
+      setBrands([])
+      setTotalItems(0)
+      setTotalPages(0)
     } finally {
       setLoading(false)
     }
@@ -30,8 +49,15 @@ export const useBrand = () => {
 
   const deleteBrand = async (code: string) => {
     try {
-      // TODO: Implement API call here
-      // await api.delete(`/brands/${code}`)
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      // Remove from mock data
+      const index = mockBrandData.findIndex(brand => brand.code === code)
+      if (index > -1) {
+        mockBrandData.splice(index, 1)
+      }
+      
       return true
     } catch (error) {
       console.error('Error deleting brand:', error)
@@ -39,10 +65,36 @@ export const useBrand = () => {
     }
   }
 
-  const createBrand = async (brand: { id: string; name: string }) => {
+  const createBrand = async (brandData: { 
+    code: string; 
+    name: string; 
+    description?: string;
+    logo?: string;
+    website?: string;
+    country?: string;
+    status?: "active" | "inactive";
+  }) => {
     try {
-      // TODO: Implement API call here
-      // await api.post('/brands', brand)
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      // Create new brand object
+      const newBrand: Brand = {
+        id: mockBrandData.length + 1,
+        code: brandData.code,
+        name: brandData.name,
+        description: brandData.description || "",
+        logo: brandData.logo || "",
+        website: brandData.website || "",
+        country: brandData.country || "",
+        status: brandData.status || "active",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      
+      // Add to mock data
+      mockBrandData.push(newBrand)
+      
       return true
     } catch (error) {
       console.error('Error creating brand:', error)
@@ -50,10 +102,28 @@ export const useBrand = () => {
     }
   }
 
-  const updateBrand = async (code: string, data: { name: string }) => {
+  const updateBrand = async (code: string, brandData: { 
+    name?: string;
+    description?: string;
+    logo?: string;
+    website?: string;
+    country?: string;
+    status?: "active" | "inactive";
+  }) => {
     try {
-      // TODO: Implement API call here
-      // await api.put(`/brands/${code}`, data)
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      // Find and update brand in mock data
+      const brandIndex = mockBrandData.findIndex(brand => brand.code === code)
+      if (brandIndex > -1) {
+        mockBrandData[brandIndex] = {
+          ...mockBrandData[brandIndex],
+          ...brandData,
+          updatedAt: new Date().toISOString()
+        }
+      }
+      
       return true
     } catch (error) {
       console.error('Error updating brand:', error)
@@ -71,6 +141,10 @@ export const useBrand = () => {
     setSelectedBrand(null)
   }
 
+  const handleSearch = (query: string) => {
+    setCurrentSearchQuery(query)
+  }
+
   return {
     brands,
     totalItems,
@@ -85,5 +159,6 @@ export const useBrand = () => {
     updateBrand,
     handleOpenModal,
     handleCloseModal,
+    handleSearch,
   }
 }

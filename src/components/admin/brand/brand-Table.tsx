@@ -12,9 +12,8 @@ import { Button } from "@/components/ui/button"
 import { useBrand } from "./useBrand"
 import { useDebounce } from "@/hooks/useDebounce"
 import { Loader2 } from "lucide-react"
-import { useTranslation } from "react-i18next"
+
 export function BrandTable() {
-  const { t } = useTranslation()
   const {
     brands,
     totalItems,
@@ -28,7 +27,8 @@ export function BrandTable() {
     createBrand,
     updateBrand,
     handleOpenModal,
-    handleCloseModal
+    handleCloseModal,
+    handleSearch: searchBrands
   } = useBrand()
 
   const [searchValue, setSearchValue] = useState("")
@@ -52,6 +52,7 @@ export function BrandTable() {
   useEffect(() => {
     if (debouncedSearchValue !== undefined) {
       setIsSearching(true)
+      searchBrands(debouncedSearchValue)
       getAllBrands({ metadata: { page: 1, limit: limit } })
         .finally(() => {
           setIsSearching(false)
@@ -89,18 +90,41 @@ export function BrandTable() {
     }
   }
 
-  const handleSubmit = async (values: { code: string; name: string }) => {
+  const handleSubmit = async (values: { 
+    code: string; 
+    name: string; 
+    description?: string;
+    logo?: string;
+    website?: string;
+    country?: string;
+    status?: "active" | "inactive";
+  }) => {
     try {
       if (selectedBrand) {
         // Update
-        const response = await updateBrand(selectedBrand.code, { name: values.name })
+        const response = await updateBrand(selectedBrand.code, {
+          name: values.name,
+          description: values.description,
+          logo: values.logo,
+          website: values.website,
+          country: values.country,
+          status: values.status
+        })
         if (response) {
           handleCloseModal()
           getAllBrands({ metadata: { page: page, limit: limit } })
         }
       } else {
         // Create
-        const response = await createBrand({ id: values.code, name: values.name })
+        const response = await createBrand({
+          code: values.code,
+          name: values.name,
+          description: values.description,
+          logo: values.logo,
+          website: values.website,
+          country: values.country,
+          status: values.status
+        })
         if (response) {
           handleCloseModal()
           getAllBrands({ metadata: { page: page, limit: limit } })
@@ -130,14 +154,14 @@ export function BrandTable() {
         <SearchInput
           value={searchValue}
           onValueChange={handleSearch}
-          placeholder={t("admin.languages.searchPlaceholder")}
+          placeholder="Tìm kiếm thương hiệu..."
           className="max-w-sm"
         />
         <Button 
           onClick={() => handleOpenModal()}
           className="ml-auto"
         >
-          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
+          <PlusIcon className="w-4 h-4 mr-2" />Thêm Thương Hiệu
         </Button>
       </div>
 
