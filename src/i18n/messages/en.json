@@ -973,6 +973,25 @@
       "myPurchase": {
         "myPurchase": "My Purchase"
       }
+    },
+
+    "cart": {
+      "title": "Shopping Cart",
+      "edit": "Edit",
+      "done": "Done",
+      "emptyCart": "Your cart is empty",
+      "continueShopping": "Continue Shopping",
+      "checkout": "Checkout",
+      "itemsInCart": "{{count}} items in your cart",
+      "totalPrice": "Total Price",
+      "removeItem": "Remove Item",
+      "updateQuantity": "Update Quantity",
+      "quantity": "Quantity",
+      "subtotal": "Subtotal",
+      "taxesAndFees": "Taxes & Fees",
+      "shippingCost": "Shipping Cost",
+      "totalAmount": "Total Amount",
+      "proceedToCheckout": "Proceed to Checkout"
     }
   }
 }
