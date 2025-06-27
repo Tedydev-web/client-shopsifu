@@ -19,9 +19,6 @@ const SuggestSection = () => {
   return (
     <div className="bg-gray-100 py-4">
       <div className="container mx-auto">
-        <div className="bg-white p-4 mb-4">
-          <h2 className="text-lg font-medium text-gray-700 uppercase rounded-xs">Gợi Ý Hôm Nay</h2>
-        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
           {isLoading
             ? Array.from({ length: 12 }).map((_, index) => <ProductItemSkeleton key={index} />)

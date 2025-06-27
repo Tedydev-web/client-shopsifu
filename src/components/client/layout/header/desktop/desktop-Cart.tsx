@@ -70,9 +70,9 @@ export function CartDropdown() {
     <Sheet>
       <SheetTrigger asChild>
         <div className="rounded-full cursor-pointer relative whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-3">
-          <ShoppingCart className="h-6 w-6 text-white" />
+          <ShoppingCart className="h-6 w-6 text-white" strokeWidth={1}/>
           {cart.length > 0 && (
-            <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+            <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-red-600">
               {cart.reduce((count, item) => count + item.quantity, 0)}
             </span>
           )}

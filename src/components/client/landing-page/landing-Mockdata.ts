@@ -21,6 +21,83 @@ export const heroImages = [
   '/images/demo/lazada_3.avif',
 ];
 
+export const banners = [
+	{
+		title: 'Thời Trang Nam',
+		description: 'Khám phá phong cách thời thượng cho phái mạnh',
+		image: '/images/demo/Thoitrangnam.webp',
+		link: '/category/men',
+		gradient: 'to-blue-950/60',
+	},
+	{
+		title: 'Thời Trang Nữ',
+		description: 'Xu hướng thời trang mới nhất cho phái đẹp',
+		image: '/images/demo/Thoitrangnu.webp',
+		link: '/category/women',
+		gradient: 'to-rose-950/60',
+	},
+	{
+		title: 'Phụ Kiện',
+		description: 'Điểm nhấn hoàn hảo cho set đồ của bạn',
+		image: '/images/demo/Phukien.jpg',
+		link: '/category/accessories',
+		gradient: 'to-purple-950/60',
+	},
+];
+
+export const categories = [
+	{
+		title: 'Đề xuất',
+		icon: '🌟',
+		link: '/recommended'
+	},
+	{
+		title: 'Làm đẹp & Sức khỏe',
+		icon: '💄',
+		link: '/beauty-health'
+	},
+	{
+		title: 'Thời trang Nữ',
+		icon: '👗',
+		link: '/women-clothing'
+	},
+	{
+		title: 'Gia dụng & Bếp',
+		icon: '🏠',
+		link: '/home-kitchen'
+	},
+	{
+		title: 'Thời trang Nam',
+		icon: '👔',
+		link: '/men-clothing'
+	},
+	{
+		title: 'Giày Nữ',
+		icon: '👠',
+		link: '/women-shoes'
+	},
+	{
+		title: 'Đồ lót Nam',
+		icon: '🩲',
+		link: '/men-underwear'
+	},
+	{
+		title: 'Thể thao & Ngoài trời',
+		icon: '⚽',
+		link: '/sports-outdoors'
+	},
+	{
+		title: 'Phụ kiện',
+		icon: '👜',
+		link: '/accessories'
+	},
+	{
+		title: 'Điện tử',
+		icon: '📱',
+		link: '/electronics'
+	}
+];
+
 export const serviceItems = [
   { icon: '/images/client/categories/m/6.png', label: 'Mã Giảm Giá' },
   { icon: '/images/client/categories/m/5.png', label: 'Khách Hàng Thân Thiết' },

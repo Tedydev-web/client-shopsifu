@@ -53,28 +53,28 @@ export const sidebarConfig: SidebarItem[] = [
   //     },
   //   ],
   // },
-  // {
-  //   title: t('admin.sidebar.products.products'),
-  //   href: '/admin/products',
-  //   icon: <Package className="w-5 h-5" />,
-  //   subItems: [
-  //     {
-  //       title: t('admin.sidebar.products.productsList'),
-  //       href: '/admin/product',
-  //       icon: null,
-  //     },
-  //     {
-  //       title: t('admin.sidebar.products.addProducts'),
-  //       href: '/admin/products/add',
-  //       icon: null,
-  //     },
-  //     {
-  //       title: t('admin.sidebar.categories.categories'),
-  //       href: '/admin/products/categories',
-  //       icon: null,
-  //     },
-  //   ],
-  // },  
+  {
+    title: t('admin.sidebar.products.products'),
+    href: '/admin/products',
+    icon: <Package className="w-5 h-5" />,
+    subItems: [
+      {
+        title: t('admin.sidebar.products.productsList'),
+        href: '/admin/product',
+        icon: null,
+      },
+      {
+        title: t('admin.sidebar.products.addProducts'),
+        href: '/admin/products/add',
+        icon: null,
+      },
+      {
+        title: t('admin.sidebar.categories.categories'),
+        href: '/admin/products/categories',
+        icon: null,
+      },
+    ],
+  },  
   {
     title: t('admin.sidebar.system.system'),
     href: '/admin/system',

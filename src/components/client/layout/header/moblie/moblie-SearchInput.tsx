@@ -92,7 +92,7 @@ export function MobileSearchInput() {
         className="flex-1 cursor-pointer"
         onClick={handleOpenSearch}
       >
-        <div className="flex items-center gap-2 bg-[#f8f8f8] rounded-lg border border-gray-200 py-1.5 px-3">
+        <div className="flex items-center gap-2 bg-[#f8f8f8] rounded-sm border border-gray-200 py-2.5 px-3">
           <Search className="h-4 w-4 text-gray-400" />
           <span className="text-gray-400 text-sm">Tìm kiếm sản phẩm...</span>
         </div>
