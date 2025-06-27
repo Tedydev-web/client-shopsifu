@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button"
 import { useBrand } from "./useBrand"
 import { useDebounce } from "@/hooks/useDebounce"
 import { Loader2 } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 export function BrandTable() {
+  const { t } = useTranslation('admin')
   const {
     brands,
     totalItems,
@@ -154,14 +156,14 @@ export function BrandTable() {
         <SearchInput
           value={searchValue}
           onValueChange={handleSearch}
-          placeholder="Tìm kiếm thương hiệu..."
+          placeholder={t("brand.searchPlaceholder")}
           className="max-w-sm"
         />
         <Button 
           onClick={() => handleOpenModal()}
           className="ml-auto"
         >
-          <PlusIcon className="w-4 h-4 mr-2" />Thêm Thương Hiệu
+          <PlusIcon className="w-4 h-4 mr-2" />{t("brand.addAction")}
         </Button>
       </div>
 
@@ -200,14 +202,14 @@ export function BrandTable() {
         open={deleteOpen}
         onClose={() => { if (!deleteLoading) handleCloseDeleteModal() }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa thương hiệu"
+        title={t("brand.deleteAction")}
         description={
           brandToDelete
-            ? <>Bạn có chắc chắn muốn xóa thương hiệu <b>{brandToDelete.name}</b> không? Hành động này không thể hoàn tác.</>
+            ? <>{t("brand.confirmDelete")} <b>{brandToDelete.name}</b>?</>
             : ""
         }
-        confirmText="Xóa"
-        cancelText="Hủy"
+        confirmText={t("common.delete", "Xóa")}
+        cancelText={t("common.cancel", "Hủy")}
         loading={deleteLoading}
       />
     </div>

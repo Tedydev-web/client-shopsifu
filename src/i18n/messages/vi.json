@@ -32,7 +32,9 @@
   },
   "common": {
     "title": "Mua sắm dễ dàng",
-    "subtitle": "Giao hàng toàn quốc, thanh toán linh hoạt\nvà đảm bảo hoàn tiền nếu không hài lòng."
+    "subtitle": "Giao hàng toàn quốc, thanh toán linh hoạt\nvà đảm bảo hoàn tiền nếu không hài lòng.",
+    "delete": "Xóa",
+    "cancel": "Hủy"
   },
   "errorPage": {
     "title": "Không tìm thấy trang",
@@ -819,10 +821,33 @@
       "code": "Mã thương hiệu",
       "name": "Tên thương hiệu",
       "actions": "Thao tác",
-      "confirmDelete": "Bạn có chắc chắn muốn xóa thương hiệu này?",
+      "confirmDelete": "Bạn có chắc chắn muốn xóa thương hiệu",
       "addSuccess": "Thêm thương hiệu thành công",
       "editSuccess": "Cập nhật thương hiệu thành công",
-      "deleteSuccess": "Xóa thương hiệu thành công"
+      "deleteSuccess": "Xóa thương hiệu thành công",
+      "modal": {
+        "addTitle": "Thêm mới thương hiệu",
+        "editTitle": "Chỉnh sửa thương hiệu",
+        "codePlaceholder": "VD: APPLE",
+        "namePlaceholder": "VD: Apple Inc.",
+        "descriptionPlaceholder": "Nhập mô tả chi tiết về thương hiệu...",
+        "websitePlaceholder": "https://example.com",
+        "countryPlaceholder": "VD: Việt Nam",
+        "uploadLabel": "Chọn hoặc kéo thả logo vào đây",
+        "uploadDescription": "PNG, JPG, GIF tối đa 5MB",
+        "statusPlaceholder": "Chọn trạng thái hoạt động",
+        "statusActive": "Hoạt động",
+        "statusInactive": "Không hoạt động",
+        "website": "Website",
+        "cancel": "Hủy bỏ",
+        "add": "Thêm mới",
+        "update": "Cập nhật",
+        "validation": {
+          "codeRequired": "Mã không được để trống",
+          "nameRequired": "Tên không được để trống",
+          "websiteInvalid": "URL website không hợp lệ"
+        }
+      }
     }
   },
   "user": {

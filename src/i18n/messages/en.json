@@ -32,7 +32,9 @@
   },
   "common": {
     "title": "Shopping is easy",
-    "subtitle": "Nationwide delivery, flexible payment\nand a money back guarantee if not satisfied."
+    "subtitle": "Nationwide delivery, flexible payment\nand a money back guarantee if not satisfied.",
+    "delete": "Delete",
+    "cancel": "Cancel"
   },
   "errorPage": {
     "title": "Page not found",
@@ -818,10 +820,33 @@
       "code": "Brand Code",
       "name": "Brand Name",
       "actions": "Actions",
-      "confirmDelete": "Are you sure you want to delete this brand?",
+      "confirmDelete": "Are you sure you want to delete brand",
       "addSuccess": "Brand added successfully",
       "editSuccess": "Brand updated successfully",
-      "deleteSuccess": "Brand deleted successfully"
+      "deleteSuccess": "Brand deleted successfully",
+      "modal": {
+        "addTitle": "Add New Brand",
+        "editTitle": "Edit Brand",
+        "codePlaceholder": "E.g: APPLE",
+        "namePlaceholder": "E.g: Apple Inc.",
+        "descriptionPlaceholder": "Enter detailed description about the brand...",
+        "websitePlaceholder": "https://example.com",
+        "countryPlaceholder": "E.g: Vietnam",
+        "uploadLabel": "Choose or drag and drop logo here",
+        "uploadDescription": "PNG, JPG, GIF max 5MB",
+        "statusPlaceholder": "Select status",
+        "statusActive": "Active",
+        "statusInactive": "Inactive",
+        "website": "Website",
+        "cancel": "Cancel",
+        "add": "Add New",
+        "update": "Update",
+        "validation": {
+          "codeRequired": "Code cannot be empty",
+          "nameRequired": "Name cannot be empty",
+          "websiteInvalid": "Invalid website URL"
+        }
+      }
     }
   },
   "user": {

@@ -13,18 +13,17 @@ import { useState, useEffect } from "react"
 import { Upload, X } from "lucide-react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useTranslation } from "react-i18next"
 
-const formSchema = z.object({
-  code: z.string().min(1, "Mã không được để trống"),
-  name: z.string().min(1, "Tên không được để trống"),
-  description: z.string().optional(),
-  logo: z.string().optional(),
-  website: z.string().url("URL website không hợp lệ").optional().or(z.literal("")),
-  country: z.string().optional(),
-  status: z.enum(["active", "inactive"]),
-})
-
-type FormValues = z.infer<typeof formSchema>
+type FormValues = {
+  code: string
+  name: string
+  description?: string
+  logo?: string
+  website?: string
+  country?: string
+  status: "active" | "inactive"
+}
 
 interface BrandModalUpsertProps {
   open: boolean
@@ -41,8 +40,19 @@ export default function BrandModalUpsert({
   brand,
   onSubmit,
 }: BrandModalUpsertProps) {
+  const { t } = useTranslation('admin')
   const [logoPreview, setLogoPreview] = useState<string>("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
+  const formSchema = z.object({
+    code: z.string().min(1, t("brand.modal.validation.codeRequired")),
+    name: z.string().min(1, t("brand.modal.validation.nameRequired")),
+    description: z.string().optional(),
+    logo: z.string().optional(),
+    website: z.string().url(t("brand.modal.validation.websiteInvalid")).optional().or(z.literal("")),
+    country: z.string().optional(),
+    status: z.enum(["active", "inactive"]),
+  })
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -126,7 +136,7 @@ export default function BrandModalUpsert({
         {/* Fixed Header */}
         <DialogHeader className="flex-shrink-0 px-6 py-4 border-b border-gray-200">
           <DialogTitle className="text-xl font-semibold">
-            {mode === "add" ? "Thêm mới thương hiệu" : "Chỉnh sửa thương hiệu"}
+            {mode === "add" ? t("brand.modal.addTitle") : t("brand.modal.editTitle")}
           </DialogTitle>
         </DialogHeader>
         
@@ -143,7 +153,7 @@ export default function BrandModalUpsert({
                     <FormItem>
                       <FormLabel className="text-sm font-medium">Mã thương hiệu <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={mode === "edit"} placeholder="VD: APPLE" />
+                        <Input {...field} disabled={mode === "edit"} placeholder={t("brand.modal.codePlaceholder")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -156,7 +166,7 @@ export default function BrandModalUpsert({
                     <FormItem>
                       <FormLabel className="text-sm font-medium">Tên thương hiệu <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="VD: Apple Inc." />
+                        <Input {...field} placeholder={t("brand.modal.namePlaceholder")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -206,10 +216,10 @@ export default function BrandModalUpsert({
                               <Upload className="h-5 w-5 text-gray-500" />
                               <div className="flex-1">
                                 <p className="text-sm font-medium text-gray-700">
-                                  {selectedFile ? selectedFile.name : "Chọn hoặc kéo thả logo vào đây"}
+                                  {selectedFile ? selectedFile.name : t("brand.modal.uploadLabel")}
                                 </p>
                                 <p className="text-xs text-gray-500 mt-1">
-                                  PNG, JPG, GIF tối đa 5MB
+                                  {t("brand.modal.uploadDescription")}
                                 </p>
                               </div>
                             </div>
@@ -240,7 +250,7 @@ export default function BrandModalUpsert({
                       <Textarea 
                         {...field} 
                         rows={3} 
-                        placeholder="Nhập mô tả chi tiết về thương hiệu..." 
+                        placeholder={t("brand.modal.descriptionPlaceholder")} 
                         className="resize-none"
                       />
                     </FormControl>
@@ -256,9 +266,9 @@ export default function BrandModalUpsert({
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">Website</FormLabel>
+                      <FormLabel className="text-sm font-medium">{t("brand.modal.website")}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="https://example.com" />
+                        <Input {...field} placeholder={t("brand.modal.websitePlaceholder")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -271,7 +281,7 @@ export default function BrandModalUpsert({
                     <FormItem>
                       <FormLabel className="text-sm font-medium">Quốc gia</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="VD: Việt Nam" />
+                        <Input {...field} placeholder={t("brand.modal.countryPlaceholder")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -289,12 +299,12 @@ export default function BrandModalUpsert({
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Chọn trạng thái hoạt động" />
+                          <SelectValue placeholder={t("brand.modal.statusPlaceholder")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">Hoạt động</SelectItem>
-                        <SelectItem value="inactive">Không hoạt động</SelectItem>
+                        <SelectItem value="active">{t("brand.modal.statusActive")}</SelectItem>
+                        <SelectItem value="inactive">{t("brand.modal.statusInactive")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -308,14 +318,14 @@ export default function BrandModalUpsert({
         {/* Fixed Footer */}
         <div className="flex-shrink-0 flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-white">
           <Button type="button" variant="outline" onClick={onClose} className="px-6">
-            Hủy bỏ
+            {t("brand.modal.cancel")}
           </Button>
           <Button 
             type="submit" 
             className="px-6 bg-red-600 hover:bg-red-700"
             onClick={form.handleSubmit(handleSubmit)}
           >
-            Thêm mới
+            {mode === "add" ? t("brand.modal.add") : t("brand.modal.update")}
           </Button>
         </div>
       </DialogContent>
