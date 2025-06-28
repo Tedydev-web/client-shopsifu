@@ -13,6 +13,8 @@ import { useBrand } from "./useBrand"
 import { useDebounce } from "@/hooks/useDebounce"
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { useDataTable } from '@/hooks/useDataTable'
+import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 
 export function BrandTable() {
   const { t } = useTranslation('admin')
@@ -150,8 +152,20 @@ export function BrandTable() {
     getAllBrands({ metadata: { page: 1, limit: newLimit } })
   }
 
+    const columns = BrandColumns({ onDelete: handleOpenDelete, onEdit: handleEdit });
+
+    const table = useDataTable({ data: brands, columns });
+      
   return (
     <div className="w-full space-y-4">
+     <div className="flex items-center gap-2">
+     <Button 
+          onClick={() => handleOpenModal()}
+          className="ml-auto"
+        >
+          <PlusIcon className="w-4 h-4 mr-2" />{t("brand.addAction")}
+        </Button>
+     </div>
       <div className="flex items-center gap-2">
         <SearchInput
           value={searchValue}
@@ -159,23 +173,15 @@ export function BrandTable() {
           placeholder={t("brand.searchPlaceholder")}
           className="max-w-sm"
         />
-        <Button 
-          onClick={() => handleOpenModal()}
-          className="ml-auto"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />{t("brand.addAction")}
-        </Button>
+        <DataTableViewOption table={table} />  
       </div>
 
       <div className="relative">
-        {(loading || isSearching) && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
         <DataTable
-          columns={BrandColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
-          data={brands}
+          table={table}
+          columns={columns}
+          loading={loading || isSearching}
+          notFoundMessage={t('admin.brand.notFound')}
         />
       </div>
 

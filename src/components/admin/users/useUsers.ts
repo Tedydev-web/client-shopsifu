@@ -11,7 +11,7 @@ export const useUsers = () => {
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [isSearching, setIsSearching] = useState(false);
   // Pagination and search state
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -159,7 +159,7 @@ export const useUsers = () => {
     handleSearch,
     handlePageChange,
     handleLimitChange,
-    
+    isSearching,
     // Delete
     deleteOpen,
     userToDelete,

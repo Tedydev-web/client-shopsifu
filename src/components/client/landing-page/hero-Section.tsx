@@ -168,7 +168,7 @@ export function HeroSection({ className }: HeroSectionProps) {
               <a 
                 href="#" 
                 key={item.label} 
-                className="flex flex-col items-center text-center group flex-shrink-0 w-[72px]"
+                className="flex flex-col items-center text-center group flex-shrink-0 w-[72px] sm:w-auto"
               >
                 <div className="flex items-center justify-center w-[52px] h-[52px] bg-white rounded-2xl transition-all duration-300 group-hover:-translate-y-1">
                   <Image 
