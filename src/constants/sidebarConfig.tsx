@@ -60,7 +60,7 @@ export const sidebarConfig: SidebarItem[] = [
     subItems: [
       {
         title: t('admin.sidebar.products.productsList'),
-        href: '/admin/product',
+        href: '/admin/products',
         icon: null,
       },
       {

@@ -197,7 +197,9 @@
       "products": {
         "products": "Sản phẩm",
         "productsList": "Danh sách sản phẩm",
-        "addProducts": "Thêm sản phẩm"
+        "addProducts": "Thêm sản phẩm",
+        "title": "Quản lý sản phẩm",
+        "subtitle": "Quản lý tất cả sản phẩm tại đây"
       },
 
       "categories": {
