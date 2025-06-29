@@ -3,10 +3,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import LanguageDropdown from "@/components/ui/languagedropdown"; // Đảm bảo đúng đường dẫn
 import "@/i18n/i18n";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export function AuthHeader() {
-  // const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <header className="w-full py-2 px-6 md:px-40 lg:px-90 flex items-center justify-between bg-white/80 backdrop-blur-sm fixed top-0 z-50 border-b">

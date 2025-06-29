@@ -6,18 +6,22 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-component/data
 import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
 import { Edit, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { format } from "date-fns";
 
 // Define the Product type based on your data structure
 export type Product = {
   id: string;
   name: string;
+  slug: string;
   images: { url: string }[];
   price: number;
   stock: number;
   status: 'active' | 'inactive' | 'archived';
   category: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 const getProductActions = (
@@ -28,14 +32,14 @@ const getProductActions = (
 ): ActionItem<Product>[] => [
   {
     type: "command",
-    label: t("admin.products.editAction"),
+    label: t("admin.dataTable.edit"),
     icon: <Edit />,
     onClick: () => onEdit(product),
   },
   { type: "separator" },
   {
     type: "command",
-    label: t("admin.products.deleteAction"),
+    label: t("admin.dataTable.delete"),
     icon: <Trash2 />,
     onClick: () => onDelete(product),
     className: "text-red-600 hover:!text-red-700",
@@ -49,7 +53,7 @@ export const productsColumns = ({
   onDelete: (product: Product) => void;
   onEdit: (product: Product) => void;
 }): ColumnDef<Product>[] => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return [
     {
@@ -102,8 +106,26 @@ export const productsColumns = ({
           <DataTableColumnHeader column={column} title={t("admin.products.form.name")} />
         ),
         cell: ({ row }) => (
-            <span className="font-medium truncate w-40">{row.original.name}</span>
+            <span className="font-medium line-clamp-3 w-40 whitespace-normal">{row.original.name}</span>
         ),
+        enableSorting: true,
+        enableHiding: true,
+    },
+    {
+        accessorKey: "slug",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title={t("admin.products.form.slug")} />
+        ),
+        cell: ({ row }) => <div className="w-[150px] line-clamp-3 whitespace-normal">{row.original.slug}</div>,
+        enableSorting: true,
+        enableHiding: true,
+    },
+    {
+        accessorKey: "category",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title={t("admin.products.form.category")} />
+        ),
+        cell: ({ row }) => <div className="w-[100px] line-clamp-3 whitespace-normal">{row.original.category}</div>,
         enableSorting: true,
         enableHiding: true,
     },
@@ -131,7 +153,7 @@ export const productsColumns = ({
     {
         accessorKey: "status",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title={t("admin.products.form.status")} />
+          <DataTableColumnHeader column={column} title={t("admin.dataTable.status")} />
         ),
         cell: ({ row }) => {
             const status = row.original.status;
@@ -142,10 +164,32 @@ export const productsColumns = ({
             }[status] || 'bg-gray-100 text-gray-800';
             return (
                 <Badge variant="outline" className={`capitalize ${statusVariant}`}>
-                    {t(`admin.products.status.${status}`)}
+                    {t(`admin.dataTable.${status}`)}
                 </Badge>
             );
         },
+        enableSorting: true,
+        enableHiding: true,
+    },
+    {
+        accessorKey: "createdAt",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title={t("admin.dataTable.createdAt")} />
+        ),
+        cell: ({ row }) => (
+            <div>{format(new Date(row.original.createdAt), "dd/MM/yyyy")}</div>
+        ),
+        enableSorting: true,
+        enableHiding: true,
+    },
+    {
+        accessorKey: "updatedAt",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title={t("admin.dataTable.updatedAt")} />
+        ),
+        cell: ({ row }) => (
+            <div>{format(new Date(row.original.updatedAt), "dd/MM/yyyy")}</div>
+        ),
         enableSorting: true,
         enableHiding: true,
     },

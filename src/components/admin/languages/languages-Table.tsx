@@ -11,11 +11,11 @@ import { Pagination } from "@/components/ui/data-table-component/pagination"
 import { Button } from "@/components/ui/button"
 import { useLanguages } from "./useLanguages"
 import { useDebounce } from "@/hooks/useDebounce"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { useDataTable } from "@/hooks/useDataTable"
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 export function LanguagesTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     languages,
     totalItems,

@@ -21,14 +21,14 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 
 
 
 export function ResetForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
-  const {t} = useTranslation('')
+  const t = useTranslations('')
 const schema = resetPasswordSchema(t)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),

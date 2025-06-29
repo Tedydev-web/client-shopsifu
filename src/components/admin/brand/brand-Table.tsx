@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button"
 import { useBrand } from "./useBrand"
 import { useDebounce } from "@/hooks/useDebounce"
 import { Loader2 } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { useDataTable } from '@/hooks/useDataTable'
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 
 export function BrandTable() {
-  const { t } = useTranslation('admin')
+  const t = useTranslations('admin')
   const {
     brands,
     totalItems,
@@ -214,8 +214,8 @@ export function BrandTable() {
             ? <>{t("brand.confirmDelete")} <b>{brandToDelete.name}</b>?</>
             : ""
         }
-        confirmText={t("common.delete", "Xóa")}
-        cancelText={t("common.cancel", "Hủy")}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
         loading={deleteLoading}
       />
     </div>

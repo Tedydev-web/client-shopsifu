@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 interface PaginationProps {
   limit: number;
@@ -26,7 +26,7 @@ export function Pagination({
   onPageChange,
   onLimitChange,
 }: PaginationProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const handlePreviousPage = () => {
     if (page > 1) {

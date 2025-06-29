@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { showToast } from "@/components/ui/toastify"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -45,7 +45,7 @@ export default function RolesModalUpsert({
   permissionsData,
   isPermissionsLoading,
 }: RolesModalUpsertProps) {
-  const { t } = useTranslation()
+  const t = useTranslations()
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -176,7 +176,7 @@ export default function RolesModalUpsert({
               <div>
                 <h3 className="font-semibold leading-none tracking-tight">{t("admin.roles.modal.permissions")}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {t("admin.roles.modal.permissionsDescription", "Gán các quyền chi tiết cho vai trò này.")}
+                  {t("admin.roles.modal.permissionsDescription")}
                 </p>
               </div>
               <div className="rounded-lg border mt-2">

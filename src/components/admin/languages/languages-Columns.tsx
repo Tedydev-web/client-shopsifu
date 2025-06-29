@@ -6,7 +6,7 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-component/data
 import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
 import { Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-import { useTranslation } from "react-i18next"; // Giả định bạn đã tạo custom hook useTranslate
+import { useTranslations } from "next-intl";
 
 export type Language = {
   id: number;
@@ -49,8 +49,8 @@ export const LanguagesColumns = ({
   onDelete: (language: Language) => void;
   onEdit: (language: Language) => void;
 }): ColumnDef<Language>[] => {
-  const { t } = useTranslation(); // Sửa lại thành useTranslate, bỏ destructuring
 
+  const t = useTranslations();
   return [
     {
       id: "select",

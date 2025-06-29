@@ -1,36 +1,41 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
 import { RootState } from "@/store/store";
-import { setLanguage } from "@/store/features/lang/langSlice";
-import i18n from "@/i18n/i18n";
+import { setLanguage, toggleLanguage } from "@/store/features/lang/langSlice";
 
 export const useChangeLang = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
   const [showLangMenu, setShowLangMenu] = useState(false);
 
-  const languageRedux = useSelector((state: RootState) => state.langShopsifu.language);
-  const currentLangName = languageRedux === "vi" ? "Tiếng Việt" : "English";
+  const currentLanguage = useSelector((state: RootState) => state.langShopsifu.language);
+  const currentLangName = currentLanguage === "vi" ? "Tiếng Việt" : "English";
 
   const toggleMenu = () => setShowLangMenu(prev => !prev);
 
-  const changeLanguage = (lang: "vi" | "en") => {
+  const handleChangeLanguage = (lang: "vi" | "en") => {
     dispatch(setLanguage(lang));
-    window.location.reload();
+    router.refresh();
+    setShowLangMenu(false);
   };
 
-  useEffect(() => {
-    if (i18n && i18n.isInitialized && i18n.language !== languageRedux) {
-      i18n.changeLanguage(languageRedux);
-    }
-  }, [languageRedux]);
+  const handleToggleLanguage = () => {
+    const newLang = currentLanguage === "vi" ? "en" : "vi";
+    dispatch(toggleLanguage());
+    router.refresh();
+    setShowLangMenu(false);
+  };
 
   return {
     showLangMenu,
     toggleMenu,
-    changeLanguage,
+    changeLanguage: handleChangeLanguage,
+    toggleLanguage: handleToggleLanguage,
     currentLangName,
-    currentSelectedLang: languageRedux,
+    currentSelectedLang: currentLanguage,
   };
 };
 

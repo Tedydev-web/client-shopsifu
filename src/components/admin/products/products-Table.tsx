@@ -7,12 +7,12 @@ import SearchInput from "@/components/ui/data-table-component/search-input"
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
 import { DataTable } from "@/components/ui/data-table-component/data-table"
 import { useProducts } from "./useProducts"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 import { useDataTable } from "@/hooks/useDataTable"
 
 export function ProductsTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     products,
     loading,
@@ -117,7 +117,7 @@ export function ProductsTable() {
         onConfirm={handleConfirmDelete}
         loading={deleteLoading}
         title={t("admin.products.deleteTitle")}
-        description={t("admin.products.deleteDescription", { name: productToDelete?.name })}
+        description={t("admin.products.deleteDescription")}
       />
     </div>
   )

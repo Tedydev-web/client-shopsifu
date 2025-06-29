@@ -193,7 +193,27 @@
         "newOrders": "Đơn hàng mới",
         "processedOrders": "Đơn hàng đã xử lý"
       },
-
+      "permission":{
+        "permissionManager": "Quản lý quyền"
+      },
+      "role":{
+        "roleManager": "Quản lý vai trò"
+      },
+      "user":{
+        "userManager": "Quản lý người dùng"
+      },
+      "device":{
+        "deviceManager": "Quản lý thiết bị"
+      },
+      "brand":{
+        "brandManager": "Quản lý thương hiệu"
+      },
+      "audit-logs":{
+        "auditLogManager": "Quản lý nhật ký"
+      },
+      "category":{
+        "category": "Danh mục"
+      },
       "products": {
         "products": "Sản phẩm",
         "productsList": "Danh sách sản phẩm",

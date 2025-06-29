@@ -7,12 +7,12 @@ import PermissionsModalUpsert from "./permissions-ModalUpsert"
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
 import { DataTable } from "@/components/ui/data-table-component/data-table"
 import { usePermissions } from "./usePermissions"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 import { useDataTable } from "@/hooks/useDataTable"
 
 export function PermissionsTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     permissions,
     loading,

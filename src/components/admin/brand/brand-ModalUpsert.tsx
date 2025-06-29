@@ -13,7 +13,7 @@ import { useState, useEffect } from "react"
 import { Upload, X } from "lucide-react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 type FormValues = {
   code: string
@@ -40,7 +40,7 @@ export default function BrandModalUpsert({
   brand,
   onSubmit,
 }: BrandModalUpsertProps) {
-  const { t } = useTranslation('admin')
+  const t = useTranslations('admin')
   const [logoPreview, setLogoPreview] = useState<string>("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 

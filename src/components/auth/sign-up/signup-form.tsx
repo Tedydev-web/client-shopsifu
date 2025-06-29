@@ -21,7 +21,7 @@ import {
   AnimatedButton
 } from '@/components/ui/animated-form'
 import { OAuthForm } from '../layout/OAuthForm'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { RegisterRequest } from '@/types/auth/auth.interface'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
@@ -32,7 +32,7 @@ interface SignupFormProps {
 
 export function SignupForm({ email, className }: SignupFormProps) {
   const { loading, handleSignup } = useSignup()
-  const { t } = useTranslation('')
+  const t = useTranslations('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const Schema = RegisterSchema(t)
