@@ -1,19 +1,20 @@
 // app/cart/data/mockCartItems.ts
 
+// Cart item types & mock data
 export interface ProductItem {
-  id: string
-  name: string
-  image: string
-  variation: string
-  price: number
-  originalPrice?: number
-  quantity: number
-  soldOut?: boolean
+  id: string;
+  name: string;
+  image: string;
+  variation: string;
+  price: number;
+  originalPrice?: number;
+  quantity: number;
+  soldOut?: boolean;
 }
 
 export interface CartGroup {
-  shop: string
-  items: ProductItem[]
+  shop: string;
+  items: ProductItem[];
 }
 
 export const mockCartItems: CartGroup[] = [
@@ -73,4 +74,36 @@ export const mockCartItems: CartGroup[] = [
       },
     ],
   },
-]
+];
+
+// Search & category types & mock data
+export interface TrendingSearch {
+  id: string;
+  text: string;
+  category: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  image: string;
+}
+
+export const trendingSearches: TrendingSearch[] = [
+  { id: '1', text: 'điện thoại', category: 'Đồ điện tử' },
+  { id: '2', text: 'tai nghe bluetooth', category: 'Phụ kiện' },
+  { id: '3', text: 'áo croptop', category: 'Thời trang nữ' },
+  { id: '4', text: 'bàn học gỗ', category: 'Nội thất' },
+  { id: '5', text: 'khuyên tai bạc', category: 'Trang sức' },
+];
+
+export const popularCategories: Category[] = [
+  { id: 'electronics', name: 'Điện tử', image: '/mock/category/electronics.png' },
+  { id: 'fashion', name: 'Thời trang', image: '/mock/category/fashion.png' },
+  { id: 'home', name: 'Gia dụng', image: '/mock/category/home.png' },
+  { id: 'beauty', name: 'Làm đẹp', image: '/mock/category/beauty.png' },
+  { id: 'baby', name: 'Mẹ & Bé', image: '/mock/category/baby.png' },
+  { id: 'sports', name: 'Thể thao', image: '/mock/category/sports.png' },
+  { id: 'jewelry', name: 'Trang sức', image: '/mock/category/jewelry.png' },
+  { id: 'pets', name: 'Thú cưng', image: '/mock/category/pets.png' },
+];

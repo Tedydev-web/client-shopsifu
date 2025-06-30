@@ -13,6 +13,7 @@ interface ClientLayoutWrapperProps {
   hideCommit?: boolean;
   hideHero?: boolean;
   hideFooter?: boolean;
+  topContent?: React.ReactNode;
 }
 
 export default function ClientLayoutWrapper({
@@ -21,6 +22,7 @@ export default function ClientLayoutWrapper({
   hideCommit = false,
   hideHero = false,
   hideFooter = false,
+  topContent,
 }: ClientLayoutWrapperProps) {
   const deviceType = useCheckDevice();
 
@@ -37,6 +39,7 @@ export default function ClientLayoutWrapper({
         <DesktopCommit />
         </>
       )}
+      {topContent && <div className="w-full">{topContent}</div>}
       <main className="flex-grow bg-[#F5F5FA]">
         {!hideHero && <HeroSectionWrapper />}
         <div

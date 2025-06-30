@@ -3,9 +3,12 @@
 import DesktopCartItem from "./cart-Items"
 import { mockCartItems } from "@/components/client/cart/desktop/cart-MockData"
 import { Checkbox } from "@/components/ui/checkbox"
+import { CartTopBar } from "./cart-TopBar" 
+import { SearchInput } from "./cart-HeaderWrapper"
 
 export default function DesktopCartPageMobile() {
   return (
+  <>
     <div className="space-y-6">
       {/* <DesktopCartHeader /> */}
       {mockCartItems.map((group, index) => (
@@ -23,5 +26,6 @@ export default function DesktopCartPageMobile() {
         </div>
       ))}
     </div>
+    </>
   );
 }

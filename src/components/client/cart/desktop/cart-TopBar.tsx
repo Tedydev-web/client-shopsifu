@@ -12,7 +12,7 @@ import {
 export function CartTopBar() {
   return (
     <div className="bg-white border-b">
-      <div className="max-w-[1300px] mx-auto px-4">
+      <div className="max-w-[1250px] mx-auto px-4">
         <div className="flex justify-between items-center h-12 text-xs text-black gap-16">
 
           {/* Left Column - Static links */}

@@ -8,9 +8,9 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import '../style.css';
-import { trendingSearches, popularCategories} from './desktop-Mockdata';
-import { useDropdown } from '../dropdown-context';
+// import '../style.css';
+import { trendingSearches, popularCategories} from './cart-MockData';
+import { useDropdown } from './cart-DropDownContext';
 // Dữ liệu mẫu cho các trending searches
 
 
