@@ -27,7 +27,7 @@ export default function CartLayout({ children, title = "" }: CartLayoutProps) {
   });
 
   return (
-    <ClientLayoutWrapper hideHeader hideCommit hideHero hideFooter>
+    <ClientLayoutWrapper hideCommit hideHero>
       <div
         className={`w-full bg-background text-foreground ${
           isMobile ? "min-h-screen flex flex-col" : "min-h-screen"
