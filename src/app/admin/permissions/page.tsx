@@ -1,9 +1,9 @@
 'use client'
 import PermissionsTableWrapper from "@/components/admin/permissions/permissions-Wrapper";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export default function PermissionsPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   return (
     <div className="space-y-6">
       <div>

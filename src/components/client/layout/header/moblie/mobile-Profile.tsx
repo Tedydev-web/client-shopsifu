@@ -66,7 +66,7 @@ export function ProfileDropdown() {
         onClick={() => router.push(ROUTES.BUYER.SIGNIN)}
         className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-transparent text-white"
       >
-        <User className="w-5 h-5" />
+        <User className="w-6 h-6" strokeWidth={1}/>
       </button>
     );
   }

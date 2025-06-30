@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { PlusIcon, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -18,9 +18,12 @@ import {
   RoleCreateRequest,
   RoleUpdateRequest,
 } from "@/types/auth/role.interface"
+import { useDataTable } from '@/hooks/useDataTable'
+import SearchInput from '@/components/ui/data-table-component/search-input'
+import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option'
 
 export default function RolesTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     roles,
     totalItems,
@@ -143,35 +146,35 @@ export default function RolesTable() {
     fetchRoles({ metadata: { page: 1, limit: newLimit } })
   }
 
+
+
+    const columns = RolesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit });
+
+    const table = useDataTable({ data: roles, columns })
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2">
-        {/* <SearchInput
-          value={searchValue}
-          onValueChange={handleSearch}
-          placeholder={t("admin.roles.searchPlaceholder")}
-          className="max-w-sm"
-        /> */}
         <Button onClick={() => handleOpenModal()} className="ml-auto">
           <PlusIcon className="w-4 h-4 mr-2" />
           {t("admin.roles.addAction")}
         </Button>
       </div>
-
-      <div className="relative">
-        {(loading || isSearching) && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
-        <DataTable
-          columns={RolesColumns({
-            onDelete: handleOpenDelete,
-            onEdit: handleEdit,
-          })}
-          data={roles}
+      <div className="flex items-center gap-2">
+        <SearchInput
+          value={searchValue}
+          onValueChange={handleSearch}
+          placeholder={t("admin.roles.searchPlaceholder")}
+          className="max-w-sm"
         />
+        <DataTableViewOption table={table} /> 
       </div>
+
+      <DataTable
+        table={table}
+        columns={columns}
+        loading={loading || isSearching}
+        notFoundMessage={t('admin.roles.notFound')}
+      />
 
       {totalPages >= 0 && (
         <Pagination

@@ -17,7 +17,7 @@ import { showToast } from "@/components/ui/toastify"
 import { Language } from "./languages-Columns"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ISO6391 from 'iso-639-1'
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 interface LanguagesModalUpsertProps {
   open: boolean
@@ -39,7 +39,7 @@ export default function LanguagesModalUpsert({
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
-  const { t } = useTranslation()
+  const t = useTranslations()
   useEffect(() => {
     if (mode === 'edit' && language) {
       setCode(language.code || "")

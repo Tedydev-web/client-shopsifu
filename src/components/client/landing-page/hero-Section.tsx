@@ -163,12 +163,12 @@ export function HeroSection({ className }: HeroSectionProps) {
 
         {/* Service Icons Section */}
         <div className="mt-6">
-          <div className="grid grid-cols-3 sm:grid-cols-6 items-start justify-center gap-x-4 gap-y-2">
+          <div className="flex sm:grid sm:grid-cols-6 items-start justify-start sm:justify-center gap-x-4 sm:gap-y-2 overflow-y-hidden overflow-x-auto scrollbar-hide py-2 sm:py-0">
             {serviceItems.map((item) => (
               <a 
                 href="#" 
                 key={item.label} 
-                className="flex flex-col items-center text-center group"
+                className="flex flex-col items-center text-center group flex-shrink-0 w-[72px] sm:w-auto"
               >
                 <div className="flex items-center justify-center w-[52px] h-[52px] bg-white rounded-2xl transition-all duration-300 group-hover:-translate-y-1">
                   <Image 

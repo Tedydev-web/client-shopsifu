@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 interface PaginationProps {
   limit: number;
@@ -26,7 +26,7 @@ export function Pagination({
   onPageChange,
   onLimitChange,
 }: PaginationProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const handlePreviousPage = () => {
     if (page > 1) {
@@ -96,7 +96,7 @@ export function Pagination({
           <ChevronRight size={16} />
         </Button>
         <span className="ml-2 text-gray-400 text-sm">
-          {t('admin.pagination.page', 'Trang')} {page} / {totalPages} | {t('admin.pagination.total', 'Tổng')}: {totalRecords}
+          {t('admin.pagination.page', { page, totalPages })} | {t('admin.pagination.total', { totalRecords })}
         </span>
       </div>
     </div>

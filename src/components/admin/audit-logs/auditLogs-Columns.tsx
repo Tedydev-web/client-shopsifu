@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 export type AuditLog = {
   userEmail: string
@@ -17,7 +17,7 @@ export type AuditLog = {
 }
 
 export const AuditLogsColumns = (): ColumnDef<AuditLog>[] => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   return [
     {
       accessorKey: "userEmail",

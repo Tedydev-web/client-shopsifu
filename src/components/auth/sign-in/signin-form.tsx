@@ -18,13 +18,13 @@ import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
 import { OAuthForm } from '../layout/OAuthForm'
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handleSignin, loading } = useSignin()
-  const { t } = useTranslation()
+  const t = useTranslations()
   const Schema = LoginSchema(t)
 
   type LoginFormData = z.infer<typeof Schema>;

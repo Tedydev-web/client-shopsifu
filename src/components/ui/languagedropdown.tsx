@@ -1,11 +1,11 @@
 "use client";
 import { Globe, ChevronDown } from "lucide-react";
 import { useChangeLang } from "@/hooks/useChangeLang";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 const LanguageDropdown = () => {
   const { showLangMenu, toggleMenu, changeLanguage, currentLangName } = useChangeLang();
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <div className="relative flex items-center">

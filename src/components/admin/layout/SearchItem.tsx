@@ -4,10 +4,11 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { sidebarConfig, SidebarItem } from '@/constants/sidebarConfig';
+import { useSidebarConfig, SidebarItem } from '@/constants/sidebarConfig';
 import { useTranslation } from 'react-i18next';
 
 export function SearchItem() {
+  const sidebarConfig = useSidebarConfig();
   const [open, setOpen] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();

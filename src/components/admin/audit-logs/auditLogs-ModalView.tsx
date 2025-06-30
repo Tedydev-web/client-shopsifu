@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 interface AuditLogDetailProps {
   open: boolean;
@@ -13,7 +13,7 @@ interface AuditLogDetailProps {
 }
 
 export function AuditLogsModalView({ open, onOpenChange, data }: AuditLogDetailProps) {
-  const { t } = useTranslation('admin');
+  const t = useTranslations('admin');
 
   if (!data) return null;
   return (

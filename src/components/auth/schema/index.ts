@@ -1,11 +1,11 @@
 import * as z from 'zod'
 import { TFunction } from 'i18next'
-
-export const EmailSchema = (t: TFunction) => z.object({
+type Translate = (key: string) => string;
+export const EmailSchema = (t: Translate) => z.object({
   email: z.string().email({ message: t('validation.email') })
 })
 
-export const RegisterSchema = (t: TFunction) =>
+export const RegisterSchema = (t: Translate) =>
   z.object({
     firstName: z.string().min(1, {
       message: t('validation.firstName')
@@ -32,7 +32,7 @@ export const RegisterSchema = (t: TFunction) =>
     path: ['confirmPassword']
   })
 
-export const LoginSchema = (t: TFunction) =>
+export const LoginSchema = (t: Translate) =>
   z.object({
     email: z.string().email({ message: t('validation.email') }),
     password: z
@@ -43,21 +43,21 @@ export const LoginSchema = (t: TFunction) =>
     rememberMe: z.boolean()
   })
 
-export const ForgotPasswordSchema = (t: TFunction) =>
+export const ForgotPasswordSchema = (t: Translate) =>
   z.object({
     email: z.string().email({
       message: t('validation.email')
     })
   })
 
-export const otpSchema = (t: TFunction) =>
+export const otpSchema = (t: Translate) =>
   z.object({
     otp: z.string()
       .length(6, { message: t('validation.otp.length') })
       .regex(/^\d+$/, { message: t('validation.otp.numeric') })
   })
 
-export const recoveryCodeSchema = (t: TFunction) =>
+export const recoveryCodeSchema = (t: Translate) =>
   z.object({
     otp: z.string()
       .length(11, { message: t('validation.recovery.codeLength') })
@@ -67,7 +67,7 @@ export const recoveryCodeSchema = (t: TFunction) =>
       .transform(val => val.toUpperCase())
   })
 
-export const resetPasswordSchema = (t: TFunction) =>
+export const resetPasswordSchema = (t: Translate) =>
   z.object({
     password: z
       .string()

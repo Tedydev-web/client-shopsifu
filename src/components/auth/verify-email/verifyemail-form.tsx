@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/animated-form'
 import { useVerifyEmail } from './useVerifyEmail'
 import { OAuthForm } from '../layout/OAuthForm'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 
 interface VerifyEmailFormProps {
   className?: string
@@ -35,7 +35,7 @@ export function VerifyEmailForm({ className, onSuccess }: VerifyEmailFormProps) 
   const searchParams = useSearchParams()
   const action = (searchParams.get('action') as ActionType) || 'signup'
   const { loading, handleSendOTP } = useVerifyEmail()
-  const { t } = useTranslation('')
+  const t = useTranslations('')
   const Schema = EmailSchema(t)
   // Khởi tạo form với zod và react-hook-form
 

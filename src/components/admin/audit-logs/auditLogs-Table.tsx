@@ -10,10 +10,12 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Loader2 } from "lucide-react";
 import { AuditLogsModalView } from "./auditLogs-ModalView";
 import { AuditLogsStats } from "./aduitLogs-Stats";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
+import { useDataTable } from "@/hooks/useDataTable";
+import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option";
 
 export function AuditLogsTable() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const {
     auditLogs,
     totalItems,
@@ -61,6 +63,11 @@ export function AuditLogsTable() {
     setModalOpen(true);
   };
 
+   const table = useDataTable({
+      data: auditLogs,
+      columns: AuditLogsColumns(),
+    })
+
   return (
     <div className="w-full space-y-4">
       <AuditLogsStats />
@@ -71,16 +78,14 @@ export function AuditLogsTable() {
           placeholder={t("admin.auditLogs.searchPlaceholder")}
           className="max-w-sm"
         />
+        <DataTableViewOption table={table} />
       </div>
       <div className="relative">
-        {(loading || isSearching) && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
         <DataTable
+          table={table}
           columns={AuditLogsColumns()}
-          data={auditLogs}
+          loading={loading || isSearching}
+          notFoundMessage={t('admin.auditLogs.notFound')}
           onRowClick={handleRowClick}
         />
       </div>
