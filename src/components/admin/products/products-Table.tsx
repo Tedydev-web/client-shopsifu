@@ -10,9 +10,12 @@ import { useProducts } from "./useProducts"
 import { useTranslations } from "next-intl"
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 import { useDataTable } from "@/hooks/useDataTable"
+import { ProductsExportData } from "./products-ExportData" // Import component export
+import type { Table as TanstackTable } from '@tanstack/react-table' // Import type
+import { ProductsFilter } from "./products-Filter"
 
 export function ProductsTable() {
-  const t = useTranslations()
+  const t = useTranslations('admin.ModuleProduct')
   const {
     products,
     loading,
@@ -80,29 +83,37 @@ export function ProductsTable() {
 
   const table = useDataTable({
     data: products,
-    columns: productsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal }),
+    columns: productsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal, onView: handleOpenModal }),
   })
 
-  return (
-    <div className="w-full space-y-4">
-      <div className="flex items-center justify-end gap-2">
+  // Định nghĩa Toolbar component để truyền vào DataTable
+  const ProductsTableToolbar = ({ table }: { table: TanstackTable<Product> }) => (
+    <div className="flex items-center justify-between">
+      <div className="flex flex-1 items-center space-x-2">
         <SearchInput
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder={t("admin.products.searchPlaceholder")}
+          placeholder={t("searchPlaceholder")}
           className="w-full md:max-w-sm"
         />
+        <ProductsFilter table={table} /> 
+      </div>
+      <div className="flex items-center gap-2">
+        <ProductsExportData data={products} table={table} />
         <DataTableViewOption table={table} />
       </div>
+    </div>
+  );
 
-      <div className="relative">
-        <DataTable
-          table={table}
-          columns={productsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal })}
-          loading={loading || isSearching}
-          notFoundMessage={t('admin.products.notFound')}
-        />
-      </div>
+  return (
+    <div className="w-full space-y-4">
+      <DataTable
+        table={table}
+        columns={productsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal, onView: handleOpenModal })}
+        loading={loading || isSearching}
+        notFoundMessage={t('DataTable.notFound')}
+        Toolbar={ProductsTableToolbar} // Truyền component Toolbar vào đây
+      />
 
       {/* <ProductsModalUpsert
         isOpen={isModalOpen}
@@ -116,8 +127,8 @@ export function ProductsTable() {
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         loading={deleteLoading}
-        title={t("admin.products.deleteTitle")}
-        description={t("admin.products.deleteDescription")}
+        title={t("DeleteModal.title")}
+        description={t("DeleteModal.description")}
       />
     </div>
   )

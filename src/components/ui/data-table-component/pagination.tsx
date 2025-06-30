@@ -96,7 +96,7 @@ export function Pagination({
           <ChevronRight size={16} />
         </Button>
         <span className="ml-2 text-gray-400 text-sm">
-          {t('admin.pagination.page', 'Trang')} {page} / {totalPages} | {t('admin.pagination.total', 'Tổng')}: {totalRecords}
+          {t('admin.pagination.page', { page, totalPages })} | {t('admin.pagination.total', { totalRecords })}
         </span>
       </div>
     </div>

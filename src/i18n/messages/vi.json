@@ -184,6 +184,65 @@
     }
   },
   "admin": {
+    "ModuleProduct":{
+      "title":"Quản lý sản phẩm",
+      "subtitle":"Quản lý tất cả sản phẩm tại đây",
+      "DataTable":{
+        "name":"Tên sản phẩm",
+        "price":"Giá",
+        "category":"Danh mục",
+        "stock":"Tồn kho",
+        "status":"Trạng thái",
+        "action":"Hành động",
+        "image":"Hình ảnh",
+        "description":"Mô tả",
+        "slug":"Slug",
+        "createdAt":"Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "edit":"Sửa thông tin",
+        "delete":"Xóa sản phẩm",
+        "view":"Xem sản phẩm",
+        "notFound": "Không tìm thấy sản phẩm"
+      },
+      "Status":{
+        "active":"Hoạt động",
+        "inactive":"Không hoạt động",
+        "archived":"Đã lưu trữ"
+      },
+      "searchPlaceholder":"Tìm kiếm theo tên sản phẩm",
+      "DeleteModal":{
+        "title":"Xác nhận xóa",
+        "description":"Bạn có chắc chắn muốn xóa sản phẩm này?",
+        "confirmText":"Xóa",
+        "cancelText":"Hủy"
+      },
+      "ExportData":{
+        "title":"Xuất dữ liệu",
+        "description":"Xuất dữ liệu sản phẩm",
+        "confirmText":"Xuất",
+        "cancelText":"Hủy",
+        "pickDate":"Chọn ngày",
+        "selectFormat":"Chọn định dạng",
+        "fileFormat":"Định dạng file",
+        "dateRange":"Khoảng thời gian"
+      },
+      "Filter":{
+        "category":"Danh mục",
+        "price":"Giá",
+        "stock":"Tồn kho",
+        "status":"Trạng thái",
+        "action":"Hành động",
+        "image":"Hình ảnh",
+        "description":"Mô tả",
+        "slug":"Slug",
+        "createdAt":"Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "edit":"Sửa thông tin",
+        "delete":"Xóa sản phẩm",
+        "notFound": "Không tìm thấy sản phẩm",
+        "priceRange":"Khoảng giá"
+      }
+    },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
 
