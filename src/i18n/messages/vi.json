@@ -32,7 +32,9 @@
   },
   "common": {
     "title": "Mua sắm dễ dàng",
-    "subtitle": "Giao hàng toàn quốc, thanh toán linh hoạt\nvà đảm bảo hoàn tiền nếu không hài lòng."
+    "subtitle": "Giao hàng toàn quốc, thanh toán linh hoạt\nvà đảm bảo hoàn tiền nếu không hài lòng.",
+    "delete": "Xóa",
+    "cancel": "Hủy"
   },
   "errorPage": {
     "title": "Không tìm thấy trang",
@@ -182,6 +184,65 @@
     }
   },
   "admin": {
+    "ModuleProduct":{
+      "title":"Quản lý sản phẩm",
+      "subtitle":"Quản lý tất cả sản phẩm tại đây",
+      "DataTable":{
+        "name":"Tên sản phẩm",
+        "price":"Giá",
+        "category":"Danh mục",
+        "stock":"Tồn kho",
+        "status":"Trạng thái",
+        "action":"Hành động",
+        "image":"Hình ảnh",
+        "description":"Mô tả",
+        "slug":"Slug",
+        "createdAt":"Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "edit":"Sửa thông tin",
+        "delete":"Xóa sản phẩm",
+        "view":"Xem sản phẩm",
+        "notFound": "Không tìm thấy sản phẩm"
+      },
+      "Status":{
+        "active":"Hoạt động",
+        "inactive":"Không hoạt động",
+        "archived":"Đã lưu trữ"
+      },
+      "searchPlaceholder":"Tìm kiếm theo tên sản phẩm",
+      "DeleteModal":{
+        "title":"Xác nhận xóa",
+        "description":"Bạn có chắc chắn muốn xóa sản phẩm này?",
+        "confirmText":"Xóa",
+        "cancelText":"Hủy"
+      },
+      "ExportData":{
+        "title":"Xuất dữ liệu",
+        "description":"Xuất dữ liệu sản phẩm",
+        "confirmText":"Xuất",
+        "cancelText":"Hủy",
+        "pickDate":"Chọn ngày",
+        "selectFormat":"Chọn định dạng",
+        "fileFormat":"Định dạng file",
+        "dateRange":"Khoảng thời gian"
+      },
+      "Filter":{
+        "category":"Danh mục",
+        "price":"Giá",
+        "stock":"Tồn kho",
+        "status":"Trạng thái",
+        "action":"Hành động",
+        "image":"Hình ảnh",
+        "description":"Mô tả",
+        "slug":"Slug",
+        "createdAt":"Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "edit":"Sửa thông tin",
+        "delete":"Xóa sản phẩm",
+        "notFound": "Không tìm thấy sản phẩm",
+        "priceRange":"Khoảng giá"
+      }
+    },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
 
@@ -191,11 +252,45 @@
         "newOrders": "Đơn hàng mới",
         "processedOrders": "Đơn hàng đã xử lý"
       },
-
+      "permission":{
+        "permissionManager": "Quản lý quyền"
+      },
+      "role":{
+        "roleManager": "Quản lý vai trò"
+      },
+      "user":{
+        "userManager": "Quản lý người dùng"
+      },
+      "device":{
+        "deviceManager": "Quản lý thiết bị"
+      },
+      "brand":{
+        "brandManager": "Quản lý thương hiệu"
+      },
+      "audit-logs":{
+        "auditLogManager": "Quản lý nhật ký"
+      },
+      "category":{
+        "category": "Danh mục"
+      },
       "products": {
         "products": "Sản phẩm",
         "productsList": "Danh sách sản phẩm",
-        "addProducts": "Thêm sản phẩm"
+        "addProducts": "Thêm sản phẩm",
+        "title": "Quản lý sản phẩm",
+        "subtitle": "Quản lý tất cả sản phẩm tại đây",
+        "form": {
+          "name": "Tên sản phẩm",
+          "slug": "Slug",
+          "category": "Danh mục",
+          "price": "Giá",
+          "stock": "Tồn kho",
+          "status": "Trạng thái",
+          "image": "Hình ảnh",
+          "description": "Mô tả",
+          "submit": "Lưu",
+          "cancel": "Hủy"
+        }
       },
 
       "categories": {
@@ -256,7 +351,11 @@
       "stock": "Tồn kho",
       "status": "Trạng thái",
       "view": "Xem",
-      "toggle_columns": "Bật/tắt cột"
+      "toggle_columns": "Bật/tắt cột",
+      "edit": "Sửa nội dung",
+      "delete": "Xóa nội dung",
+      "Active": "Hoạt động",
+      "Inactive": "Ngừng hoạt động"
     },
     "dataTableExport": {
       "export": "Xuất tệp",
@@ -738,7 +837,7 @@
       "whereYouLogIn": "Thiết bị đăng nhập"
     },
     "languages": {
-      "title": "Ngôn ngữ",
+      "title": "Quản lý ngôn ngữ",
       "subtitle": "Quản lý tất cả ngôn ngữ tại đây",
       "add": "Thêm ngôn ngữ mới",
       "edit": "Chỉnh sửa ngôn ngữ",
@@ -808,6 +907,44 @@
       "emptyDesc": "Hiện tại bạn chưa có thông báo nào, nhưng khi có chúng sẽ hiển thị tại đây.",
       "esc": "thoát",
       "close": "Đóng"
+    },
+    "brand": {
+      "title": "Quản lý thương hiệu",
+      "subtitle": "Quản lý danh sách thương hiệu trong hệ thống.",
+      "searchPlaceholder": "Tìm kiếm thương hiệu...",
+      "addAction": "Thêm thương hiệu",
+      "editAction": "Sửa thương hiệu",
+      "deleteAction": "Xóa thương hiệu",
+      "code": "Mã thương hiệu",
+      "name": "Tên thương hiệu",
+      "actions": "Thao tác",
+      "confirmDelete": "Bạn có chắc chắn muốn xóa thương hiệu",
+      "addSuccess": "Thêm thương hiệu thành công",
+      "editSuccess": "Cập nhật thương hiệu thành công",
+      "deleteSuccess": "Xóa thương hiệu thành công",
+      "modal": {
+        "addTitle": "Thêm mới thương hiệu",
+        "editTitle": "Chỉnh sửa thương hiệu",
+        "codePlaceholder": "VD: APPLE",
+        "namePlaceholder": "VD: Apple Inc.",
+        "descriptionPlaceholder": "Nhập mô tả chi tiết về thương hiệu...",
+        "websitePlaceholder": "https://example.com",
+        "countryPlaceholder": "VD: Việt Nam",
+        "uploadLabel": "Chọn hoặc kéo thả logo vào đây",
+        "uploadDescription": "PNG, JPG, GIF tối đa 5MB",
+        "statusPlaceholder": "Chọn trạng thái hoạt động",
+        "statusActive": "Hoạt động",
+        "statusInactive": "Không hoạt động",
+        "website": "Website",
+        "cancel": "Hủy bỏ",
+        "add": "Thêm mới",
+        "update": "Cập nhật",
+        "validation": {
+          "codeRequired": "Mã không được để trống",
+          "nameRequired": "Tên không được để trống",
+          "websiteInvalid": "URL website không hợp lệ"
+        }
+      }
     }
   },
   "user": {

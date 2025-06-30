@@ -4,20 +4,21 @@ import { useEffect, useState } from "react"
 import { PermissionsColumns, Permission } from "./permissions-Columns"
 import SearchInput from "@/components/ui/data-table-component/search-input"
 import PermissionsModalUpsert from "./permissions-ModalUpsert"
-import { PlusIcon, Loader2 } from "lucide-react"
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
 import { DataTable } from "@/components/ui/data-table-component/data-table"
-
-import { Button } from "@/components/ui/button"
 import { usePermissions } from "./usePermissions"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
+import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
+import { useDataTable } from "@/hooks/useDataTable"
 
 export function PermissionsTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     permissions,
-
     loading,
+    isSearching,
+    search,
+    handleSearch,
     isModalOpen,
     selectedPermission,
     getAllPermissions,
@@ -28,21 +29,14 @@ export function PermissionsTable() {
     handleCloseModal
   } = usePermissions()
 
-  const [searchValue, setSearchValue] = useState("")
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [permissionToDelete, setPermissionToDelete] = useState<Permission | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-
   useEffect(() => {
     getAllPermissions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-
-
-  const handleEdit = (permission: Permission) => {
-    handleOpenModal(permission)
-  }
 
   const handleOpenDelete = (permission: Permission) => {
     setPermissionToDelete(permission)
@@ -55,124 +49,76 @@ export function PermissionsTable() {
   }
 
   const handleConfirmDelete = async () => {
-    if (!permissionToDelete) return;
-    setDeleteLoading(true);
+    if (!permissionToDelete) return
+    setDeleteLoading(true)
     try {
-      const success = await deletePermission(permissionToDelete.id.toString()); // Chuyển id thành string
+      const success = await deletePermission(permissionToDelete.id.toString())
       if (success) {
-        handleCloseDeleteModal();
-        getAllPermissions(); // Chuyển page và limit thành string
+        handleCloseDeleteModal()
+        getAllPermissions()
       }
     } catch (error) {
-      console.error('Lỗi khi xóa quyền:', error);
+      console.error('Lỗi khi xóa quyền:', error)
     } finally {
-      setDeleteLoading(false);
+      setDeleteLoading(false)
     }
-  };
-
-  const handleSubmit = async (values: {
-    code?: string;
-    name: string;
-    description: string;
-    path: string;
-    method: string;
-  }) => {
-    try {
-      if (selectedPermission) {
-        // Gán code cho id vì giá trị code chính là id
-        const id = selectedPermission.code;
-  
-        const response = await updatePermission(id, {
-          name: values.name,
-          description: values.description,
-          path: values.path,
-          method: values.method,
-        });
-  
-        if (response) {
-          handleCloseModal();
-          getAllPermissions();
-        }
-      } else {
-        // Tạo mới
-        const response = await createPermission({
-          name: values.name,
-          description: values.description,
-          path: values.path,
-          method: values.method,
-        });
-  
-        if (response) {
-          handleCloseModal();
-          getAllPermissions();
-        }
-      }
-    } catch (error) {
-      console.error("Error saving permission:", error);
-    }
-  };
-
-  const handleSearch = (value: string) => {
-    setSearchValue(value)
   }
 
-  const filteredPermissions = permissions.filter(
-    (permission) =>
-      permission.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      permission.description.toLowerCase().includes(searchValue.toLowerCase()) ||
-      permission.path.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const handleSubmit = async (formData: any) => {
+    try {
+      if (selectedPermission) {
+        await updatePermission(selectedPermission.code, formData)
+      } else {
+        await createPermission(formData)
+      }
+      handleCloseModal()
+      getAllPermissions()
+    } catch (error) {
+      console.error('Lỗi khi xử lý quyền:', error)
+    }
+  }
+
+  const table = useDataTable({
+    data: permissions,
+    columns: PermissionsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal }),
+  })
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-end gap-2">
         <SearchInput
-          value={searchValue}
-          onValueChange={handleSearch}
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
           placeholder={t("admin.permissions.searchPlaceholder")}
-          className="max-w-sm"
+          className="w-full md:max-w-sm"
         />
-        {/* <Button onClick={() => handleOpenModal()} className="ml-auto">
-          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.permissions.addAction")}
-        </Button> */}
+        <DataTableViewOption table={table} />
       </div>
 
       <div className="relative">
-        {loading && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
         <DataTable
-          columns={PermissionsColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
-          data={filteredPermissions}
+          table={table}
+          columns={PermissionsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal })}
+          loading={loading || isSearching}
+          notFoundMessage={t('admin.permissions.notFound')}
         />
       </div>
 
-
-
-      <PermissionsModalUpsert
-        open={isModalOpen}
+      {/* <PermissionsModalUpsert
+        isOpen={isModalOpen}
         onClose={handleCloseModal}
-        mode={selectedPermission ? "edit" : "add"}
-        // permission={selectedPermission}
-        // onSubmit={handleSubmit}
+        onSubmit={handleSubmit}
+        permission={selectedPermission}
       />
 
       <ConfirmDeleteModal
-        open={deleteOpen}
-        onClose={() => { if (!deleteLoading) handleCloseDeleteModal() }}
+        isOpen={deleteOpen}
+        onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
-        title={t("admin.permissions.confirmDeleteTitle")}
-        description={
-          permissionToDelete
-            ? t("admin.permissions.confirmDeleteDesc", { name: permissionToDelete.name })
-            : ""
-        }
-        confirmText={t("admin.permissions.modal.delete")}
-        cancelText={t("admin.permissions.modal.cancel")}
         loading={deleteLoading}
-      />
+        title={t("admin.permissions.deleteTitle")}
+        description={t("admin.permissions.deleteDescription")}
+      /> */}
     </div>
   )
 }

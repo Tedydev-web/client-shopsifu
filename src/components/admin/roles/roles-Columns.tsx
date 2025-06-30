@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
 import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
 import { Edit, Trash2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { RoleGetAllResponse } from "@/types/auth/role.interface";
 
@@ -40,7 +40,7 @@ export const RolesColumns = ({
   onDelete: (role: Role) => void;
   onEdit: (role: Role) => void;
 }): ColumnDef<Role>[] => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return [
     {

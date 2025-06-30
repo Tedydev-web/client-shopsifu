@@ -1,5 +1,5 @@
 'use client'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table-component/data-table'
 import { Pagination } from '@/components/ui/data-table-component/pagination'
@@ -10,9 +10,11 @@ import { useUsers } from './useUsers'
 import SearchInput from '@/components/ui/data-table-component/search-input'
 import { PlusIcon } from 'lucide-react'
 import { User, UserCreateRequest } from '@/types/admin/user.interface'
+import { useDataTable } from '@/hooks/useDataTable'
+import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option'
 
 export default function UserTable() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   
   const {
     data,
@@ -25,14 +27,12 @@ export default function UserTable() {
     handleSearch,
     handlePageChange,
     handleLimitChange,
-    
     deleteOpen,
     userToDelete,
     deleteLoading,
     handleOpenDelete,
     handleConfirmDelete,
     handleCloseDeleteModal,
-
     upsertOpen,
     modalMode,
     userToEdit,
@@ -40,7 +40,8 @@ export default function UserTable() {
     handleCloseUpsertModal,
     addUser,
     editUser,
-    roles
+    roles,
+    isSearching,
   } = useUsers();
 
   const handleSubmit = async (formData: User | UserCreateRequest) => {
@@ -51,13 +52,20 @@ export default function UserTable() {
     }
   };
 
+  const table = useDataTable({
+      data: data,
+      columns: userColumns({ onEdit: (user) => handleOpenUpsertModal('edit', user), onDelete: handleOpenDelete }),
+    });
   return (
     <div className="space-y-4 relative">
-      {loading && (
-        <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
-          <p>{t('admin.users.loading')}</p>
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+      <Button 
+          onClick={() => handleOpenUpsertModal('add')}
+          className="ml-auto"
+        >
+          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
+        </Button>
+      </div>
        <div className="flex items-center gap-2">
         <SearchInput
           value={search}
@@ -65,17 +73,14 @@ export default function UserTable() {
           placeholder={t("admin.languages.searchPlaceholder")}
           className="max-w-sm"
         />
-        <Button 
-          onClick={() => handleOpenUpsertModal('add')}
-          className="ml-auto"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
-        </Button>
+        <DataTableViewOption table={table} />
       </div>
 
       <DataTable
+        table={table}
         columns={userColumns({ onEdit: (user) => handleOpenUpsertModal('edit', user), onDelete: handleOpenDelete })}
-        data={data}
+        loading={loading || isSearching}
+        notFoundMessage={t('admin.users.notFound')}
       />
 
       {totalPages > 1 && (

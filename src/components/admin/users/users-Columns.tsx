@@ -7,8 +7,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/ui/data-table-component/data-table-column-header'
 import { DataTableRowActions, ActionItem } from '@/components/ui/data-table-component/data-table-row-actions'
 import { Edit, Trash2 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { useTranslations } from 'next-intl'
 
 const getUserActions = (
   onDelete: (user: User) => void,
@@ -34,7 +34,7 @@ const getUserActions = (
 export const userColumns = (
   { onDelete, onEdit }: { onDelete: (user: User) => void; onEdit: (user: User) => void }
 ): ColumnDef<User>[] => {
-  const { t } = useTranslation()
+  const t = useTranslations()
 
   return [
     {

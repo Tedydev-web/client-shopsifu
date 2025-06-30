@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { showToast } from "@/components/ui/toastify";
 import { PermissionItem } from '@/types/auth/permission.interface';
 
@@ -25,7 +25,7 @@ interface PermissionsModalUpsertProps {
 }
 
 export default function PermissionsModalUpsert({ open, onClose, mode, permission, onSubmit }: PermissionsModalUpsertProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [action, setAction] = useState('');
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');

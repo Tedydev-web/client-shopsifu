@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import { Info, Eye, EyeOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ interface ChangePasswordModalProps {
 }
 
 export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalProps) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const user = useUserData();
   const { loading, handleChangePassword } = usePasswordSecurityChangePassword();
   const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);

@@ -26,10 +26,11 @@ import {
 } from '@/components/ui/animated-form'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import {t} from "i18next"
+import { useTranslations } from 'next-intl'
 
 export function Verify2FAForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const router = useRouter()
+  const t = useTranslations()
   const { 
     loading, 
     handleVerifyCode, 

@@ -1,9 +1,9 @@
 'use client'
 import LanguagesTableWrapper from "@/components/admin/languages/languages-Wrapper";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export default function LanguagesPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   return (
     <div className="space-y-6">
       <div>

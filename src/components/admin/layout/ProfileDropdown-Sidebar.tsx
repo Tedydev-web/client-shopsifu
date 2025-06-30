@@ -7,7 +7,7 @@ import React from 'react'
 import { useChangeLang } from '@/hooks/useChangeLang'
 import { useLogout } from '@/hooks/useLogout'
 import { useRouter } from 'next/navigation'
-import { t } from 'i18next'
+import { useTranslations } from 'next-intl'
 import { useUserData } from '@/hooks/useGetData-UserLogin';
 import { AiOutlineHome } from "react-icons/ai";
 
@@ -20,6 +20,7 @@ export function ProfileDropdownSidebar() {
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
   const { handleLogout, loading: logoutLoading } = useLogout()
   const router = useRouter()
+  const t = useTranslations()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

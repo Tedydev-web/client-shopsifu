@@ -70,7 +70,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="h-11 pl-10 pr-4 py-2"
+        className="pl-10 pr-4"
         {...rest}
       />
       <button

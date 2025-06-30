@@ -1,9 +1,9 @@
 'use client'
 import UserTableWrapper from "@/components/admin/users/users-Wrapper";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export default function UsersPage() {
-  const {t} = useTranslation('')
+  const t = useTranslations()
 
   return(
    <div className="space-y-6">

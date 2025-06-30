@@ -7,7 +7,7 @@ import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-comp
 import { Edit, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 // Interface mới theo PerGetByIdResponse
 export type Permission = {
@@ -57,7 +57,7 @@ export const PermissionsColumns = ({
   onDelete: (permission: Permission) => void;
   onEdit: (permission: Permission) => void;
 }): ColumnDef<Permission>[] => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return [
     {

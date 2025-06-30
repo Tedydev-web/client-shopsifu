@@ -2,11 +2,13 @@
 
 import { cn } from '@/lib/utils';
 
-type SocialIconProps = {
+export type SocialIconProps = {
   type: 'facebook' | 'instagram' | 'youtube' | 'mail';
   className?: string;
   size?: number;
 };
+
+export type SocialType = SocialIconProps['type'];
 
 const iconColors = {
   facebook: '#1877F2',

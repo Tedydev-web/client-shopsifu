@@ -11,10 +11,11 @@ import { Pagination } from "@/components/ui/data-table-component/pagination"
 import { Button } from "@/components/ui/button"
 import { useLanguages } from "./useLanguages"
 import { useDebounce } from "@/hooks/useDebounce"
-import { Loader2 } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
+import { useDataTable } from "@/hooks/useDataTable"
+import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 export function LanguagesTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     languages,
     totalItems,
@@ -124,8 +125,21 @@ export function LanguagesTable() {
     getAllLanguages({ metadata: { page: 1, limit: newLimit } })
   }
 
+  const table = useDataTable({
+    data: languages,
+    columns: LanguagesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit }),
+  })
+
   return (
     <div className="w-full space-y-4">
+      <div className="flex items-center gap-2">
+      <Button 
+          onClick={() => handleOpenModal()}
+          className="ml-auto"
+        >
+          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
+        </Button>
+      </div>
       <div className="flex items-center gap-2">
         <SearchInput
           value={searchValue}
@@ -133,23 +147,15 @@ export function LanguagesTable() {
           placeholder={t("admin.languages.searchPlaceholder")}
           className="max-w-sm"
         />
-        <Button 
-          onClick={() => handleOpenModal()}
-          className="ml-auto"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
-        </Button>
+        <DataTableViewOption table={table} />
       </div>
 
       <div className="relative">
-        {(loading || isSearching) && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
         <DataTable
+          table={table}
           columns={LanguagesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
-          data={languages}
+          loading={loading || isSearching}
+          notFoundMessage={t('admin.languages.notFound')}
         />
       </div>
 

@@ -62,7 +62,7 @@ function SheetContent({
       side === "right" &&
         "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right right-0 top-3 bottom-3 max-w-2xl w-full mx-3 border-l", // Thay inset-y-0 bằng top-6 và bottom-6
       side === "left" &&
-        "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full max-w-2xl w-full m-6 border-r",
+        "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-72 border-r",
       side === "top" &&
         "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
       side === "bottom" &&
