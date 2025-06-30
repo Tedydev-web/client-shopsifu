@@ -6,12 +6,12 @@ import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 
-interface MobileHeaderProps {
+interface MobileCartHeaderProps {
   title: string;
   onEdit?: () => void;
 }
 
-export default function MobileHeader({ title, onEdit }: MobileHeaderProps) {
+export default function MobileCartHeader({ title, onEdit }: MobileCartHeaderProps) {
   const pathname = usePathname()
   const { t } = useTranslation()
   const isNestedRoute = pathname.split('/').length > 2

@@ -6,12 +6,18 @@ import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import { ProductItem } from "./cart-MockData";
 
-export default function CartItem({ item }: { item: ProductItem }) {
+interface CartItemProps {
+  item: ProductItem;
+  checked: boolean;
+  onCheck: () => void;
+}
+
+export default function CartItem({ item, checked, onCheck }: CartItemProps) {
   return (
     <div className="flex px-4 py-4 border-b bg-white">
       {/* Checkbox + Image */}
       <div className="flex flex-col items-center justify-start mr-3 mt-1">
-        <Checkbox />
+        <Checkbox checked={checked} onCheckedChange={onCheck} />
       </div>
 
       <Image
