@@ -1,31 +1,39 @@
-"use client"
+'use client';
 
-import { Checkbox } from "@/components/ui/checkbox"
+import Link from 'next/link';
+import Image from 'next/image';
+import { SearchInput } from './cart-SearchInput';
+import { DropdownProvider } from '../dropdown-context';
 
-export default function DesktopCartHeader() {
+export function CartHeader() {
   return (
-    <div className="px-4">
-      <div className="bg-white text-sm text-muted-foreground">
-        <div className="flex items-center px-3 py-2">
-          {/* Product (có checkbox) */}
-          <div className="flex items-center gap-2 w-[45%]">
-            <Checkbox className="scale-90" />
-            <span className="font-medium text-black">Product</span>
+    <DropdownProvider>
+      <header
+        className=" text-white h-[60px] text-[13px] relative z-50 
+        bg-gradient-to-r from-red-700 via-red-600 to-red-700 shadow-md
+        hidden md:block"
+      >
+        <div className="max-w-[1250px] mx-auto h-full flex items-center justify-between px-4 sm:px-6 gap-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <div className="rounded-xl overflow-hidden">
+              <Image
+                src="/images/logo/png-jpeg/Logo-Full-White.png"
+                alt="Shopsifu Logo"
+                width={120}
+                height={36}
+                priority
+                className="object-contain rounded-xl"
+              />
+            </div>
+          </Link>
+
+          {/* Search Input */}
+          <div className="flex-1 max-w-[600px]">
+            <SearchInput />
           </div>
-
-          {/* Unit Price */}
-          <div className="w-[15%] text-center">Unit Price</div>
-
-          {/* Quantity */}
-          <div className="w-[15%] text-center">Quantity</div>
-
-          {/* Total Price */}
-          <div className="w-[15%] text-center">Total Price</div>
-
-          {/* Actions */}
-          <div className="w-[10%] text-center">Actions</div>
         </div>
-      </div>
-    </div>
-  )
+      </header>
+    </DropdownProvider>
+  );
 }

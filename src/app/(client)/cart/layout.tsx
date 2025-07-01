@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useCartLayout } from "@/components/client/cart/cart-Layout";
 import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper";
 import { CartTopBar } from "@/components/client/cart/desktop/cart-TopBar";
-import { SearchInput } from "@/components/client/cart/desktop/cart-HeaderWrapper";
+import { CartHeader } from "@/components/client/cart/desktop/cart-Header";
 
 interface CartLayoutProps {
   children: React.ReactNode;
@@ -32,9 +32,7 @@ export default function CartLayout({ children, title = "" }: CartLayoutProps) {
   const topContent = !isMobile ? (
     <>
       <CartTopBar />
-      <div className="py-3 px-4">
-        <SearchInput />
-      </div>
+      <CartHeader />
     </>
   ) : null;
 
@@ -46,14 +44,11 @@ export default function CartLayout({ children, title = "" }: CartLayoutProps) {
       hideFooter={isMobile} // ✅ chỉ ẩn Footer khi là mobile
       topContent={topContent}
     >
-      <div
-        className={`w-full bg-background text-foreground ${
-          isMobile ? "min-h-screen flex flex-col" : "min-h-screen"
-        }`}
-      >
+      <div className={`w-full ${isMobile ? "min-h-screen flex flex-col" : "min-h-screen"}`}>
+ 
         {Header}
 
-        <main className={`mt-4 flex-1 ${isMobile ? "pb-[80px]" : "p-4"}`}>
+        <main className={`mt-4 flex-1 ${isMobile ? "pb-[80px]" : "py-4"}`}>
           <div className="w-full">{children}</div>
         </main>
 

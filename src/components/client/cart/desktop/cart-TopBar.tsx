@@ -12,11 +12,11 @@ import {
 export function CartTopBar() {
   return (
     <div className="bg-white border-b">
-      <div className="max-w-[1250px] mx-auto px-4">
-        <div className="flex justify-between items-center h-12 text-xs text-black gap-16">
+      <div className="max-w-[1200px] mx-auto px-4">
+        <div className="flex justify-between items-center h-9 text-xs text-gray-700 gap-10">
 
           {/* Left Column - Static links */}
-          <div className="flex items-center gap-6 text-[13px] font-medium text-gray-700">
+          <div className="flex items-center gap-4 text-[13px]">
             <Link href="#" className="flex items-center gap-1.5 hover:opacity-70 hover:underline transition-opacity">
               <Bell className="h-4 w-4" />
               <span>Thông báo</span>
