@@ -4,35 +4,130 @@ import { useEffect, useState } from "react";
 import { mockCartItems } from "@/components/client/cart/mobile/cart-MockData";
 import CartItem from "@/components/client/cart/mobile/cart-ItemsMobile";
 import CartFooter from "@/components/client/cart/mobile/cart-FooterMobile";
+import MobileCartHeader from "@/components/client/cart/mobile/cart-HeaderMobile";
 import { ArrowUpToLine, Edit } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
+
+function getIsMobile(breakpoint = 768) {
+  if (typeof window === "undefined") return false;
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isMobileDevice =
+    /android|iphone|ipad|ipod|webos|blackberry|windows phone/.test(userAgent);
+  const isSmallScreen = window.innerWidth <= breakpoint;
+  return isMobileDevice || isSmallScreen;
+}
 
 export default function CartPageMobile() {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [showScrollButton, setShowScrollButton] = useState(false)
+  const { t } = useTranslation();
+  const [cartItems, setCartItems] = useState(mockCartItems);
+  const [selectedShops, setSelectedShops] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [editingShops, setEditingShops] = useState<Record<string, boolean>>({});
+  const [isEditingGlobal, setIsEditingGlobal] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const handleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(getIsMobile());
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const allSelected = cartItems.every((group) =>
+    group.items.every((item) => selectedItems[item.id])
+  );
+
+  const handleToggleShop = (
+    shop: string,
+    items: (typeof cartItems)[number]["items"]
+  ) => {
+    const isChecked = !selectedShops[shop];
+    const updatedItems = { ...selectedItems };
+    items.forEach((item) => {
+      updatedItems[item.id] = isChecked;
+    });
+    setSelectedShops((prev) => ({ ...prev, [shop]: isChecked }));
+    setSelectedItems(updatedItems);
+  };
+
+  const handleToggleItem = (
+    shop: string,
+    itemId: string,
+    shopItems: (typeof cartItems)[number]["items"]
+  ) => {
+    const updatedItems = { ...selectedItems, [itemId]: !selectedItems[itemId] };
+    setSelectedItems(updatedItems);
+    const allSelected = shopItems.every((item) => updatedItems[item.id]);
+    setSelectedShops((prev) => ({ ...prev, [shop]: allSelected }));
+  };
+
+  const handleToggleAll = () => {
+    const newValue = !allSelected;
+    const updatedShops: Record<string, boolean> = {};
+    const updatedItems: Record<string, boolean> = {};
+    cartItems.forEach((group) => {
+      updatedShops[group.shop] = newValue;
+      group.items.forEach((item) => {
+        updatedItems[item.id] = newValue;
+      });
+    });
+    setSelectedShops(updatedShops);
+    setSelectedItems(updatedItems);
+  };
+
+  const handleQuantityChange = (itemId: string, delta: number) => {
+    setCartItems((prev) =>
+      prev.map((group) => ({
+        ...group,
+        items: group.items.map((item) =>
+          item.id === itemId
+            ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+            : item
+        ),
+      }))
     );
   };
 
-  const allItems = mockCartItems.flatMap((group) => group.items);
-  const selectedItems = allItems.filter((item) => selectedIds.includes(item.id));
-  const total = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const totalSaved = selectedItems.reduce((sum, item) => {
-    if (item.originalPrice !== undefined) {
+  const handleVariationChange = (itemId: string, newVariation: string) => {
+    setCartItems((prev) =>
+      prev.map((group) => ({
+        ...group,
+        items: group.items.map((item) =>
+          item.id === itemId ? { ...item, variation: newVariation } : item
+        ),
+      }))
+    );
+  };
+
+  const selectedItemList = cartItems.flatMap((group) =>
+    group.items.filter((item) => selectedItems[item.id])
+  );
+
+  const total = selectedItemList.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  const totalSaved = selectedItemList.reduce((sum, item) => {
+    if (item.originalPrice) {
       return sum + (item.originalPrice - item.price) * item.quantity;
     }
     return sum;
   }, 0);
-  const selectedCount = selectedItems.length;
 
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollButton(window.scrollY > 300);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -42,64 +137,97 @@ export default function CartPageMobile() {
   };
 
   return (
-    <div className="space-y-4 pb-32">
-      {mockCartItems.map((group, groupIdx) => (
-        <div key={group.shop + "-" + groupIdx} className="bg-white">
-          <div className="flex items-center justify-between px-3 py-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={group.items.every((item) =>
-                  selectedIds.includes(item.id)
-                )}
-                onChange={(e) => {
-                  const allIds = group.items.map((item) => item.id);
-                  if (e.target.checked) {
-                    setSelectedIds((prev) => [
-                      ...new Set([...prev, ...allIds]),
-                    ]);
-                  } else {
-                    setSelectedIds((prev) =>
-                      prev.filter((id) => !allIds.includes(id))
-                    );
-                  }
-                }}
-                className="w-4 h-4 sm:w-5 sm:h-5"
-              />
-              <span className="font-medium text-sm sm:text-base">
-                {group.shop + " >"}
-              </span>
-            </div>
-            <button
-              className="text-sm sm:text-base text-primary flex items-center gap-1"
-              onClick={() => setIsEditing((prev) => !prev)}
-            >
-              <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
-              {isEditing ? "Done" : "Edit"}
-            </button>
-          </div>
-          {group.items.map((item) => (
-            <CartItem
-              key={item.id}
-              item={item}
-              checked={selectedIds.includes(item.id)}
-              onCheck={() => handleSelect(item.id)}
-            />
-          ))}
-        </div>
-      ))}
-
-      {/* Scroll to top button */}
-      {showScrollButton && (
-        <div className="fixed bottom-42 right-4 z-50">
-          <button
-            onClick={scrollToTop}
-            className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center transition-all"
-          >
-            <ArrowUpToLine className="w-6 h-6 text-red-500" />
-          </button>
-        </div>
+    <>
+      {isMobile && (
+        <MobileCartHeader
+          title={t("user.cart.title")}
+          onEdit={() => {
+            setIsEditingGlobal((prev) => !prev);
+            setEditingShops({});
+          }}
+          isEditingGlobal={isEditingGlobal}
+        />
       )}
-    </div>
+
+      <div className="space-y-4 pb-32 pt-[20px]">
+        {" "}
+        {/* padding top để không che header */}
+        {cartItems.map((group, groupIdx) => (
+          <div key={group.shop + "-" + groupIdx} className="bg-white border-b">
+            <div className="flex items-center justify-between px-3 py-2 pl-2">
+              <div className="flex items-center gap-2 pl-2">
+                <Checkbox
+                  checked={!!selectedShops[group.shop]}
+                  onCheckedChange={() =>
+                    handleToggleShop(group.shop, group.items)
+                  }
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                />
+                <span className="font-medium text-sm sm:text-base">
+                  {group.shop + " >"}
+                </span>
+              </div>
+              {!isEditingGlobal && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setEditingShops((prev) => ({
+                      ...prev,
+                      [group.shop]: !prev[group.shop],
+                    }))
+                  }
+                  className="text-primary gap-1"
+                >
+                  <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+                  {editingShops[group.shop] ? "Done" : "Edit"}
+                </Button>
+              )}
+            </div>
+            {group.items.map((item) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                checked={!!selectedItems[item.id]}
+                onCheckedChange={() =>
+                  handleToggleItem(group.shop, item.id, group.items)
+                }
+                onQuantityChange={(delta: number) =>
+                  handleQuantityChange(item.id, delta)
+                }
+                onVariationChange={handleVariationChange}
+                isEditing={editingShops[group.shop] || isEditingGlobal}
+              />
+            ))}
+          </div>
+        ))}
+        {showScrollButton && (
+          <div className="fixed bottom-10 right-4 z-50">
+            <Button
+              onClick={scrollToTop}
+              variant="outline"
+              size="icon"
+              className="rounded-full border shadow-md"
+            >
+              <ArrowUpToLine className="w-6 h-6 text-red-500" />
+            </Button>
+          </div>
+        )}
+        <div
+          className={`w-full bg-white border-t ${
+            isMobile ? "fixed bottom-0 z-50" : "sticky bottom-0"
+          }`}
+        >
+          <CartFooter
+            total={total}
+            totalSaved={totalSaved}
+            selectedCount={selectedItemList.length}
+            allSelected={allSelected}
+            onToggleAll={handleToggleAll}
+            isEditing={isEditingGlobal}
+          />
+        </div>
+      </div>
+    </>
   );
 }

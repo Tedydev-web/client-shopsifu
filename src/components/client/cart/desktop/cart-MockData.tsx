@@ -6,6 +6,7 @@ export interface ProductItem {
   name: string;
   image: string;
   variation: string;
+  variations?: string[];
   price: number;
   originalPrice?: number;
   quantity: number;
@@ -26,6 +27,7 @@ export const mockCartItems: CartGroup[] = [
         name: "Vòi lavabo, Vòi chậu rửa mặt lavab...",
         image: "/mock/voi.png",
         variation: "Thân trúc 30 cm+dây",
+        variations: ["Thân trúc 20 cm", "Thân trúc 30 cm+dây", "Thân trúc 40 cm"],
         price: 335000,
         originalPrice: 580000,
         quantity: 1,
