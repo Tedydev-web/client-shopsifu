@@ -69,7 +69,7 @@ export const useSidebarConfig = (): SidebarItem[] => {
         },
         {
           title: t('products.addProducts'),
-          href: '/admin/products/add',
+          href: '/admin/products/new',
           icon: null,
         },
         {

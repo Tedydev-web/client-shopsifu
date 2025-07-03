@@ -1,5 +1,5 @@
 // Base URL cho API
-const API_BASE = '/api/v1';
+const API_BASE = '';
 
 export const API_ENDPOINTS = {
   AUTH: {

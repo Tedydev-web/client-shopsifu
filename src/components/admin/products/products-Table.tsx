@@ -13,6 +13,9 @@ import { useDataTable } from "@/hooks/useDataTable"
 import { ProductsExportData } from "./products-ExportData" // Import component export
 import type { Table as TanstackTable } from '@tanstack/react-table' // Import type
 import { ProductsFilter } from "./products-Filter"
+import Link from "next/link"
+import { PlusCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export function ProductsTable() {
   const t = useTranslations('admin.ModuleProduct')
@@ -107,6 +110,14 @@ export function ProductsTable() {
 
   return (
     <div className="w-full space-y-4">
+      <div className="flex justify-end mb-4">
+        <Link href="/admin/products/new">
+          <Button>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            {t("AddNew.page.breadcrumb.newPage")}
+          </Button>
+        </Link>
+      </div>
       <DataTable
         table={table}
         columns={productsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal, onView: handleOpenModal })}
@@ -114,14 +125,6 @@ export function ProductsTable() {
         notFoundMessage={t('DataTable.notFound')}
         Toolbar={ProductsTableToolbar} // Truyền component Toolbar vào đây
       />
-
-      {/* <ProductsModalUpsert
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmit}
-        product={selectedProduct}
-      /> */}
-
       <ConfirmDeleteModal
         open={deleteOpen}
         onClose={handleCloseDeleteModal}
