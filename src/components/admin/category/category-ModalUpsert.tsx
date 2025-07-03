@@ -17,6 +17,8 @@ import { SortableItem } from "./category-SortableItem";
 import { ICategory } from "@/types/admin/category.interface";
 import { Loader2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
+import { ChevronDown, ChevronRight } from "lucide-react";
 // import { toast } from "sonner"; // Not used
 import { mockCategoryData } from "./category-MockData";
 
@@ -68,19 +70,40 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
   const [isDeleting, setIsDeleting] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const statusDropdownRef = useRef<HTMLDivElement>(null);
-  const [categories, setCategories] = useState<ICategory[]>(mockCategoryData.map((cat, idx) => ({
-    _id: cat.id,
-    name: cat.name,
-    slug: cat.name.toLowerCase().replace(/\s+/g, '-'),
-    description: cat.description,
-    parentId: null,
-    lft: idx * 2 + 1,
-    rgt: idx * 2 + 2,
-    sortOrder: idx,
-    isActive: cat.isActive,
-    createdAt: new Date(cat.createdAt),
-    updatedAt: new Date(cat.updatedAt),
-  })));
+  // Chuyển mockCategoryData dạng tree sang mảng phẳng, gán parentId đúng
+  const buildInitialCategories = () => {
+    const flat: ICategory[] = [];
+    let idx = 0;
+    const walk = (node: any, parentId: string | null) => {
+      flat.push({
+        _id: node.id,
+        name: node.name,
+        slug: node.name.toLowerCase().replace(/\s+/g, '-'),
+        description: node.description || '',
+        parentId,
+        lft: idx * 2 + 1,
+        rgt: idx * 2 + 2,
+        sortOrder: idx,
+        isActive: node.isActive,
+        createdAt: new Date(node.createdAt),
+        updatedAt: new Date(node.updatedAt),
+      });
+      idx++;
+      if (Array.isArray(node.children)) {
+        node.children.forEach((child: any) => walk(child, node.id));
+      }
+    };
+    mockCategoryData.forEach((cat: any) => walk(cat, null));
+    return flat;
+  };
+  const [categories, setCategories] = useState<ICategory[]>(buildInitialCategories());
+
+  // Reset lại dữ liệu mẫu mỗi khi mở modal
+  useEffect(() => {
+    if (isOpen) {
+      setCategories(buildInitialCategories());
+    }
+  }, [isOpen]);
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
   // Đóng dropdown khi click ngoài
   useEffect(() => {
@@ -109,8 +132,28 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
     useSensor(PointerSensor, { activationConstraint: { distance: 1 }, movementAxis: 'y' }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
-  // Xây cây 1 cấp cha-con
-  const buildTree = (items: ICategory[]) => items.filter(i => i.parentId === null).sort((a, b) => a.lft - b.lft).map(parent => ({ ...parent, children: items.filter(i => i.parentId === parent._id).sort((a, b) => a.lft - b.lft) }));
+  // Xây cây cha-con từ mảng phẳng, hỗ trợ nhiều cấp nếu cần
+  const buildTree = (items: ICategory[]) => {
+    const map: Record<string, any> = {};
+    const roots: any[] = [];
+    items.forEach(item => {
+      map[item._id] = { ...item, children: [] };
+    });
+    items.forEach(item => {
+      if (item.parentId && map[item.parentId]) {
+        map[item.parentId].children.push(map[item._id]);
+      } else {
+        roots.push(map[item._id]);
+      }
+    });
+    // Sắp xếp children theo lft
+    const sortTree = (nodes: any[]) => {
+      nodes.sort((a, b) => a.lft - b.lft);
+      nodes.forEach(n => n.children && sortTree(n.children));
+    };
+    sortTree(roots);
+    return roots;
+  };
   const categoryTree = buildTree(categories);
   // Thêm mới
   const onSubmit = async (data: CategoryFormValues) => {
@@ -177,33 +220,9 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
       return prev.map(i => i._id === active.id ? { ...i, parentId: null } : i);
     });
   }
-  // Accordion tree tối giản
-  const CategoryTreeAccordion = ({ tree, dragOverId, dragOverType }: { tree: any[], dragOverId?: string | null, dragOverType?: 'swap-top' | 'swap-bottom' | 'child' | null }) => (
-    <ul className="space-y-0.5 bg-transparent">
-      {tree.map((cat: any) => (
-        <li key={cat._id} className="bg-transparent">
-          <DroppableWrapper id={cat._id}>
-            <div data-id={cat._id} className={`transition-all relative group ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} rounded-lg`}>
-              <SortableItem item={{ ...cat, depth: 0 }} />
-            </div>
-          </DroppableWrapper>
-          {cat.children?.length > 0 && (
-            <ul className="ml-5 mt-0.5 space-y-0.5 bg-transparent">
-              {cat.children.map((child: any) => (
-                <li key={child._id} className="bg-transparent">
-                  <DroppableWrapper id={child._id}>
-                    <div data-id={child._id}>
-                      <SortableItem item={{ ...child, depth: 1 }} />
-                    </div>
-                  </DroppableWrapper>
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
-      ))}
-    </ul>
-  );
+  // Accordion tree có expand/collapse
+  const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
+  const toggleExpand = (id: string) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   // Tiêu đề
   const title = mode === "add" ? t("admin.pages.category.addTitle") : t("admin.pages.category.editTitle");
   const description = mode === "add"
@@ -254,6 +273,7 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
                     )}
                   />
                 </div>
+                
                 <FormField
                   control={form.control}
                   name="description"
@@ -328,6 +348,8 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
                 setCategories={setCategories}
                 categoryTree={categoryTree}
                 sensors={sensors}
+                expanded={expanded}
+                toggleExpand={toggleExpand}
               />
             </div>
           </div>
@@ -344,34 +366,81 @@ interface DnDTreeProps {
   setCategories: React.Dispatch<React.SetStateAction<ICategory[]>>;
   categoryTree: any[];
   sensors: any;
+  expanded: { [key: string]: boolean };
+  toggleExpand: (id: string) => void;
 }
-const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTree, sensors }) => {
+const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTree, sensors, expanded, toggleExpand }) => {
   const [dragOverId, setDragOverId] = React.useState<string | null>(null);
   const [dragOverType, setDragOverType] = React.useState<'swap-top' | 'swap-bottom' | 'child' | null>(null);
   function handleDragOver(event: any) {
     const { active, over } = event;
-    if (!over || active.id === over.id) { setDragOverId(null); setDragOverType(null); (window as any).__lastDragOverType = null; return; }
+    if (!over || active.id === over.id) {
+      setDragOverId(null);
+      setDragOverType(null);
+      (window as any).__lastDragOverType = null;
+      return;
+    }
     const overElement = document.querySelector(`[data-id='${over.id}']`);
-    if (!overElement) { setDragOverId(null); setDragOverType(null); (window as any).__lastDragOverType = null; return; }
+    if (!overElement) {
+      setDragOverId(null);
+      setDragOverType(null);
+      (window as any).__lastDragOverType = null;
+      return;
+    }
     const draggedId = event.active.id;
     const draggedNode = categories.find((i) => i._id === draggedId);
     const overNode = categories.find((i) => i._id === over.id);
-    if (draggedNode && overNode && draggedNode.parentId !== null && overNode.parentId !== null) { setDragOverId(String(over.id)); setDragOverType(null); (window as any).__lastDragOverType = null; return; }
+    if (!draggedNode || !overNode) {
+      setDragOverId(null);
+      setDragOverType(null);
+      (window as any).__lastDragOverType = null;
+      return;
+    }
+    // Nếu cùng là con thì không cho phép
+    if (draggedNode.parentId !== null && overNode.parentId !== null) {
+      setDragOverId(String(over.id));
+      setDragOverType(null);
+      (window as any).__lastDragOverType = null;
+      return;
+    }
     const rect = overElement.getBoundingClientRect();
     let pointerY = rect.top + rect.height / 2;
     if (event?.delta?.y !== undefined && event?.active?.data?.current?.pointerPosition) pointerY = event.active.data.current.pointerPosition.y;
     else if (event?.delta?.y !== undefined) pointerY = rect.top + event.delta.y;
     const topZone = rect.top + rect.height * 0.25;
     const bottomZone = rect.bottom - rect.height * 0.25;
-    if (pointerY < topZone) { setDragOverId(String(over.id)); setDragOverType('swap-top'); (window as any).__lastDragOverType = 'swap-top'; }
-    else if (pointerY > bottomZone) { setDragOverId(String(over.id)); setDragOverType('swap-bottom'); (window as any).__lastDragOverType = 'swap-bottom'; }
-    else {
+
+    // Nếu pointer nằm giữa (không ở top/bottom), hover làm con
+    if (
+      pointerY >= topZone && pointerY <= bottomZone &&
+      draggedNode._id !== overNode._id &&
+      overNode.parentId === null &&
+      draggedNode.parentId === null
+    ) {
       setDragOverId(String(over.id));
-      if (draggedNode && overNode && draggedNode.parentId === null && overNode.parentId === null) { setDragOverType('child'); (window as any).__lastDragOverType = 'child'; }
-      else if (draggedNode && overNode && draggedNode.parentId === null && overNode.parentId !== null) { setDragOverType(null); (window as any).__lastDragOverType = null; }
-      else if (draggedNode && overNode && draggedNode.parentId !== null && overNode.parentId === null) { setDragOverType('child'); (window as any).__lastDragOverType = 'child'; }
-      else { setDragOverType(null); (window as any).__lastDragOverType = null; }
+      setDragOverType('child');
+      (window as any).__lastDragOverType = 'child';
+      return;
     }
+
+    // Nếu pointer ở trên hoặc dưới, đổi vị trí
+    if (pointerY < topZone) {
+      setDragOverId(String(over.id));
+      setDragOverType('swap-top');
+      (window as any).__lastDragOverType = 'swap-top';
+      return;
+    }
+    if (pointerY > bottomZone) {
+      setDragOverId(String(over.id));
+      setDragOverType('swap-bottom');
+      (window as any).__lastDragOverType = 'swap-bottom';
+      return;
+    }
+
+    // Mặc định không hover
+    setDragOverId(null);
+    setDragOverType(null);
+    (window as any).__lastDragOverType = null;
   }
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -398,29 +467,6 @@ const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTr
       return prev.map(i => i._id === active.id ? { ...i, parentId: null } : i);
     });
   }
-  // Định nghĩa CategoryTreeAccordion ở đây để tránh lỗi không tìm thấy tên
-  const CategoryTreeAccordion = ({ tree, dragOverId, dragOverType }: { tree: any[], dragOverId?: string | null, dragOverType?: 'swap-top' | 'swap-bottom' | 'child' | null }) => (
-    <ul className="space-y-0.5 bg-transparent">
-      {tree.map((cat: any) => (
-        <li key={cat._id} className="bg-transparent">
-          <div data-id={cat._id} className={`transition-all relative group ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} rounded-lg`}>
-            <SortableItem item={{ ...cat, depth: 0 }} />
-          </div>
-          {cat.children?.length > 0 && (
-            <ul className="ml-5 mt-0.5 space-y-0.5 bg-transparent">
-              {cat.children.map((child: any) => (
-                <li key={child._id} className="bg-transparent">
-                  <div data-id={child._id}>
-                    <SortableItem item={{ ...child, depth: 1 }} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
-      ))}
-    </ul>
-  );
   return (
     <DndContext
       sensors={sensors}
@@ -432,8 +478,65 @@ const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTr
         items={categories.map((cat) => cat._id)}
         strategy={verticalListSortingStrategy}
       >
-        <CategoryTreeAccordion tree={categoryTree} dragOverId={dragOverId} dragOverType={dragOverType} />
+        <CategoryTreeAccordion tree={categoryTree} dragOverId={dragOverId} dragOverType={dragOverType} expanded={expanded} toggleExpand={toggleExpand} />
       </SortableContext>
     </DndContext>
+  );
+};
+
+// Accordion tree component moved to shared scope
+interface CategoryTreeAccordionProps {
+  tree: any[];
+  dragOverId?: string | null;
+  dragOverType?: 'swap-top' | 'swap-bottom' | 'child' | null;
+  expanded: { [key: string]: boolean };
+  toggleExpand: (id: string) => void;
+}
+const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dragOverId, dragOverType, expanded, toggleExpand }) => {
+  // DroppableWrapper must be in scope
+  const DroppableWrapper = ({ id, children }: { id: string, children: React.ReactNode }) => {
+    const { setNodeRef } = useDroppable({ id });
+    return <div ref={setNodeRef}>{children}</div>;
+  };
+  return (
+    <ul className="space-y-0.5 bg-transparent">
+      {tree.map((cat: any) => {
+        const hasChildren = cat.children?.length > 0;
+        const isOpen = expanded[cat._id] ?? true;
+        return (
+          <li key={cat._id} className="bg-transparent">
+            <DroppableWrapper id={cat._id}>
+              <div data-id={cat._id} className={`transition-all relative group flex items-center w-full ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} rounded-lg`}>
+                <span className="w-5 inline-block">
+                  {hasChildren ? (
+                    <button type="button" onClick={() => toggleExpand(cat._id)} className="p-1 focus:outline-none">
+                      {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    </button>
+                  ) : null}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <SortableItem item={{ ...cat, depth: 0 }} />
+                </div>
+              </div>
+            </DroppableWrapper>
+            {hasChildren && isOpen && (
+              <ul className="ml-5 mt-0.5 space-y-0.5 bg-transparent">
+                {cat.children.map((child: any) => (
+                  <li key={child._id} className="bg-transparent">
+                    <DroppableWrapper id={child._id}>
+                      <div data-id={child._id} className="flex items-center w-full">
+                        <div className="flex-1 min-w-0">
+                          <SortableItem item={{ ...child, depth: 1 }} />
+                        </div>
+                      </div>
+                    </DroppableWrapper>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        );
+      })}
+    </ul>
   );
 };

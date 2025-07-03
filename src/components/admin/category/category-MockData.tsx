@@ -4,36 +4,49 @@ import { CategoryTableData } from "./category-Columns";
 export const mockCategoryData: CategoryTableData[] = [
   {
     id: "1",
-    name: "Electronics",
-    description: "All electronic gadgets",
+    name: "Thời trang",
     isActive: true,
-    createdAt: "2024-01-15T10:30:00Z",
-    updatedAt: "2024-06-20T14:20:00Z",
+    createdAt: "2025-07-01T10:00:00Z",
+    updatedAt: "2025-07-01T10:00:00Z",
+    depth: 0,
+    children: [
+      {
+        id: "2",
+        name: "Áo thun",
+        isActive: true,
+        createdAt: "2025-07-01T10:10:00Z",
+        updatedAt: "2025-07-01T10:10:00Z",
+        depth: 1,
+        children: []
+      },
+      {
+        id: "3",
+        name: "Quần jean",
+        isActive: false,
+        createdAt: "2025-07-01T10:20:00Z",
+        updatedAt: "2025-07-01T10:20:00Z",
+        depth: 1,
+        children: []
+      },
+    ],
   },
   {
-    id: "2",
-    name: "Smartphones",
-    description: "Mobile phones and accessories from leading brands",
+    id: "5",
+    name: "Giày dép",
     isActive: true,
-    createdAt: "2024-01-16T09:15:00Z",
-    updatedAt: "2024-06-18T11:30:00Z",
+    createdAt: "2025-07-01T11:00:00Z",
+    updatedAt: "2025-07-01T11:00:00Z",
+    depth: 0,
+    children: [
+      {
+        id: "3",
+        name: "Sandals",
+        isActive: false,
+        createdAt: "2025-07-01T10:20:00Z",
+        updatedAt: "2025-07-01T10:20:00Z",
+        depth: 1,
+        children: []
+      }
+    ]
   },
-  {
-    id: "3",
-    name: "Laptops",
-    description: "Portable computers and accessories for work and gaming",
-    isActive: true,
-    createdAt: "2024-01-16T09:20:00Z",
-    updatedAt: "2024-06-19T16:45:00Z",
-  },
-  {
-    id: "4",
-    name: "Fashion",
-    description: "Clothing and accessories for men, women and children",
-    isActive: true,
-    createdAt: "2024-01-20T14:00:00Z",
-    updatedAt: "2024-06-21T09:15:00Z",
-  },
-  
 ];
-
