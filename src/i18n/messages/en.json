@@ -1031,7 +1031,21 @@
       "taxesAndFees": "Taxes & Fees",
       "shippingCost": "Shipping Cost",
       "totalAmount": "Total Amount",
-      "proceedToCheckout": "Proceed to Checkout"
+      "proceedToCheckout": "Proceed to Checkout",
+
+      "footer": {
+        "platformVoucher": "Platform Voucher",
+        "selectOrEnterCode": "Select or enter code",
+        "noItemSelected": "No item selected",
+        "selectAll": "Select All ({{count}})",
+        "delete": "Delete",
+        "removeInactive": "Remove inactive products",
+        "moveToLikes": "Move to My Likes",
+        "total": "Total",
+        "items": "items",
+        "youSaved": "You saved ₫{{amount}}",
+        "checkout": "Check Out"
+      }
     }
   }
 }
