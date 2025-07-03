@@ -119,14 +119,33 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
     resolver: zodResolver(formSchema),
     defaultValues: { name: "", slug: "", description: "", isActive: true, createdAt: new Date().toISOString().slice(0, 16), updatedAt: new Date().toISOString().slice(0, 16) },
   });
+  // State for selected category (instead of window.__selectedCategory)
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
+
+  // Khi chọn danh mục nào thì form sẽ hiển thị nội dung danh mục đó để chỉnh sửa
   useEffect(() => {
-    if (mode === "edit" && category) form.reset({
-      name: category.name, slug: category.slug, description: category.description || "", isActive: category.isActive,
-      createdAt: category.createdAt ? new Date(category.createdAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
-      updatedAt: category.updatedAt ? new Date(category.updatedAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
-    });
-    else form.reset({ name: "", slug: "", description: "", isActive: true, createdAt: new Date().toISOString().slice(0, 16), updatedAt: new Date().toISOString().slice(0, 16) });
-  }, [category, mode, form]);
+    if (selectedCategory) {
+      form.reset({
+        name: selectedCategory.name,
+        slug: selectedCategory.slug,
+        description: selectedCategory.description || "",
+        isActive: selectedCategory.isActive,
+        createdAt: selectedCategory.createdAt ? new Date(selectedCategory.createdAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+        updatedAt: selectedCategory.updatedAt ? new Date(selectedCategory.updatedAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+      });
+      setSelectedParentId(selectedCategory.parentId || null);
+    } else if (mode === "edit" && category) {
+      form.reset({
+        name: category.name, slug: category.slug, description: category.description || "", isActive: category.isActive,
+        createdAt: category.createdAt ? new Date(category.createdAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+        updatedAt: category.updatedAt ? new Date(category.updatedAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+      });
+      setSelectedParentId(category.parentId || null);
+    } else {
+      form.reset({ name: "", slug: "", description: "", isActive: true, createdAt: new Date().toISOString().slice(0, 16), updatedAt: new Date().toISOString().slice(0, 16) });
+      setSelectedParentId(null);
+    }
+  }, [selectedCategory, category, mode, form]);
   // DnD
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 1 }, movementAxis: 'y' }),
@@ -155,26 +174,47 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
     return roots;
   };
   const categoryTree = buildTree(categories);
-  // Thêm mới
+  // Thêm mới hoặc cập nhật
+  // Đảm bảo selectedCategory/setSelectedCategory luôn được khai báo phía trên
   const onSubmit = async (data: CategoryFormValues) => {
     setIsLoading(true);
-    setCategories(prev => [...prev, {
-      _id: `cat_${Date.now()}`,
-      name: data.name,
-      slug: data.slug,
-      description: data.description,
-      parentId: selectedParentId || null,
-      lft: prev.length * 2 + 1,
-      rgt: prev.length * 2 + 2,
-      sortOrder: prev.length,
-      isActive: data.isActive === true || data.isActive === 'true',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }]);
+    if (selectedCategory) {
+      // Cập nhật danh mục đang chọn
+      setCategories(prev => prev.map(cat =>
+        cat._id === selectedCategory._id
+          ? {
+              ...cat,
+              name: data.name,
+              slug: data.slug,
+              description: data.description,
+              isActive: data.isActive === true || data.isActive === 'true',
+              updatedAt: new Date(),
+              parentId: selectedParentId || null,
+            }
+          : cat
+      ));
+      setSelectedCategory(null);
+    } else {
+      // Thêm mới
+      setCategories(prev => [...prev, {
+        _id: `cat_${Date.now()}`,
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+        parentId: selectedParentId || null,
+        lft: prev.length * 2 + 1,
+        rgt: prev.length * 2 + 2,
+        sortOrder: prev.length,
+        isActive: data.isActive === true || data.isActive === 'true',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }]);
+    }
     await new Promise(r => setTimeout(r, 500));
     setIsLoading(false);
     form.reset({ name: "", slug: "", description: "", isActive: true, createdAt: new Date().toISOString().slice(0, 16), updatedAt: new Date().toISOString().slice(0, 16) });
     setSelectedParentId(null);
+    setSelectedCategory(null);
   };
   // Xóa
   const handleDelete = async () => {
@@ -350,6 +390,8 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
                 sensors={sensors}
                 expanded={expanded}
                 toggleExpand={toggleExpand}
+                onSelectCategory={(cat: ICategory) => setSelectedCategory(cat)}
+                selectedCategory={selectedCategory}
               />
             </div>
           </div>
@@ -368,8 +410,10 @@ interface DnDTreeProps {
   sensors: any;
   expanded: { [key: string]: boolean };
   toggleExpand: (id: string) => void;
+  onSelectCategory: (cat: ICategory) => void;
+  selectedCategory: ICategory | null;
 }
-const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTree, sensors, expanded, toggleExpand }) => {
+const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTree, sensors, expanded, toggleExpand, onSelectCategory, selectedCategory }) => {
   const [dragOverId, setDragOverId] = React.useState<string | null>(null);
   const [dragOverType, setDragOverType] = React.useState<'swap-top' | 'swap-bottom' | 'child' | null>(null);
   function handleDragOver(event: any) {
@@ -478,7 +522,15 @@ const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTr
         items={categories.map((cat) => cat._id)}
         strategy={verticalListSortingStrategy}
       >
-        <CategoryTreeAccordion tree={categoryTree} dragOverId={dragOverId} dragOverType={dragOverType} expanded={expanded} toggleExpand={toggleExpand} />
+        <CategoryTreeAccordion
+          tree={categoryTree}
+          dragOverId={dragOverId}
+          dragOverType={dragOverType}
+          expanded={expanded}
+          toggleExpand={toggleExpand}
+          onSelectCategory={onSelectCategory}
+          selectedCategory={selectedCategory}
+        />
       </SortableContext>
     </DndContext>
   );
@@ -491,8 +543,10 @@ interface CategoryTreeAccordionProps {
   dragOverType?: 'swap-top' | 'swap-bottom' | 'child' | null;
   expanded: { [key: string]: boolean };
   toggleExpand: (id: string) => void;
+  onSelectCategory: (cat: ICategory) => void;
+  selectedCategory: ICategory | null;
 }
-const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dragOverId, dragOverType, expanded, toggleExpand }) => {
+const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dragOverId, dragOverType, expanded, toggleExpand, onSelectCategory, selectedCategory }) => {
   // DroppableWrapper must be in scope
   const DroppableWrapper = ({ id, children }: { id: string, children: React.ReactNode }) => {
     const { setNodeRef } = useDroppable({ id });
@@ -503,13 +557,18 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
       {tree.map((cat: any) => {
         const hasChildren = cat.children?.length > 0;
         const isOpen = expanded[cat._id] ?? true;
+        const isSelected = selectedCategory && selectedCategory._id === cat._id;
         return (
           <li key={cat._id} className="bg-transparent">
             <DroppableWrapper id={cat._id}>
-              <div data-id={cat._id} className={`transition-all relative group flex items-center w-full ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} rounded-lg`}>
+              <div
+                data-id={cat._id}
+                className={`transition-all relative group flex items-center w-full ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} ${isSelected ? 'bg-red-300' : ''} rounded-lg cursor-pointer`}
+                onClick={() => onSelectCategory(cat)}
+              >
                 <span className="w-5 inline-block">
                   {hasChildren ? (
-                    <button type="button" onClick={() => toggleExpand(cat._id)} className="p-1 focus:outline-none">
+                    <button type="button" onClick={e => { e.stopPropagation(); toggleExpand(cat._id); }} className="p-1 focus:outline-none">
                       {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                     </button>
                   ) : null}
@@ -521,17 +580,24 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
             </DroppableWrapper>
             {hasChildren && isOpen && (
               <ul className="ml-5 mt-0.5 space-y-0.5 bg-transparent">
-                {cat.children.map((child: any) => (
-                  <li key={child._id} className="bg-transparent">
-                    <DroppableWrapper id={child._id}>
-                      <div data-id={child._id} className="flex items-center w-full">
-                        <div className="flex-1 min-w-0">
-                          <SortableItem item={{ ...child, depth: 1 }} />
+                {cat.children.map((child: any) => {
+                  const isChildSelected = selectedCategory && selectedCategory._id === child._id;
+                  return (
+                    <li key={child._id} className="bg-transparent">
+                      <DroppableWrapper id={child._id}>
+                        <div
+                          data-id={child._id}
+                          className={`flex items-center w-full ${isChildSelected ? 'bg-red-100' : ''} rounded-lg cursor-pointer`}
+                          onClick={() => onSelectCategory(child)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <SortableItem item={{ ...child, depth: 1 }} />
+                          </div>
                         </div>
-                      </div>
-                    </DroppableWrapper>
-                  </li>
-                ))}
+                      </DroppableWrapper>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </li>

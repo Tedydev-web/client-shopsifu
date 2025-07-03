@@ -39,7 +39,7 @@ export const mockCategoryData: CategoryTableData[] = [
     depth: 0,
     children: [
       {
-        id: "3",
+        id: "6",
         name: "Sandals",
         isActive: false,
         createdAt: "2025-07-01T10:20:00Z",
