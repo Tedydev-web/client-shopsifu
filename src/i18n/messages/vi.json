@@ -241,6 +241,23 @@
         "delete":"Xóa sản phẩm",
         "notFound": "Không tìm thấy sản phẩm",
         "priceRange":"Khoảng giá"
+      },
+      "AddNew":{
+        "page":{
+          "breadcrumb":{
+            "products":"Sản phẩm",
+            "newPage":"Thêm mới sản phẩm"
+          },
+          "title":"Thêm sản phẩm",
+          "formPlaceholder":""
+        }
+      },
+      "mainDetails":{
+        "title":"Chi tiết sản phẩm",
+        "productTitle":"Tên sản phẩm",
+        "productTitlePlaceholder":"Nhập tên sản phẩm",
+        "content":"Nội dung",
+        "contentPlaceholder":"Nhập nội dung"
       }
     },
     "sidebar": {
