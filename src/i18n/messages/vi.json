@@ -184,6 +184,52 @@
     }
   },
   "admin": {
+    "pages": {
+      "category": {
+        "title": "Quản lý danh mục",
+        "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
+        "addCategory": "Thêm danh mục",
+        "editCategory": "Chỉnh sửa danh mục",
+        "deleteCategory": "Xóa danh mục",
+        "name": "Tên danh mục",
+        "namePlaceholder": "Nhập tên danh mục",
+        "slug": "Đường dẫn (slug)",
+        "slugPlaceholder": "Nhập slug",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Nhập mô tả danh mục (tuỳ chọn)",
+        "parent": "Danh mục cha",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "status": "Trạng thái",
+        "statusActive": "Đang hoạt động",
+        "statusInactive": "Ngừng hoạt động",
+        "action": "Thao tác",
+        "noData": "Không có dữ liệu",
+        "searchPlaceholder": "Tìm kiếm theo tên danh mục",
+        "addTitle": "Thêm danh mục mới",
+        "save": "Thêm mới",
+        "editTitle": "Chỉnh sửa danh mục",
+        "addDescription": "Tạo mới một danh mục sản phẩm. Có thể kéo thả để sắp xếp hoặc phân cấp.",
+        "editDescription": "Chỉnh sửa thông tin danh mục. Có thể kéo thả để thay đổi vị trí hoặc phân cấp.",
+        "treeTitle": "Cây danh mục",
+        "treeDescription": "Kéo thả để sắp xếp hoặc phân cấp danh mục. Chỉ hỗ trợ 1 cấp cha - 1 cấp con.",
+        "deleteConfirmTitle": "Xác nhận xoá danh mục",
+        "deleteConfirmDescription": "Bạn có chắc chắn muốn xoá danh mục này? Hành động này không thể hoàn tác."
+      ,
+      "column": {
+        "name": "Tên danh mục",
+        "status": "Trạng thái",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "actions": {
+        "view": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      }
+      }
+
+    },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
 
@@ -483,6 +529,7 @@
       "confirm": "Lưu thay đổi",
       "cancel": "Hủy"
     },
+    
     "auditLogs": {
       "title": "Nhật ký hệ thống",
       "subtitle": "Quản lý tất cả nhật ký hệ thống của bạn",

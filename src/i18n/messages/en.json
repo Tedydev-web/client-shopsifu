@@ -847,6 +847,56 @@
           "websiteInvalid": "Invalid website URL"
         }
       }
+    },
+    "category": {
+      "title": "Category Management",
+      "subtitle": "Manage all your product categories",
+      "searchPlaceholder": "Search by name, slug or description",
+      "notFound": "No categories found.",
+      "stats": {
+        "total": "Total Categories",
+        "active": "Active Categories",
+        "inactive": "Inactive Categories",
+        "root": "Root Categories"
+      },
+      "column": {
+        "name": "Category Name",
+        "slug": "Slug",
+        "parent": "Parent Category",
+        "status": "Status",
+        "sortOrder": "Sort Order",
+        "productsCount": "Products Count",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "view": "View Details",
+        "edit": "Edit",
+        "delete": "Delete",
+        "create": "Create New Category"
+      },
+      "modal": {
+        "detailTitle": "Category Details - {{name}}",
+        "detailDesc": "View detailed category information",
+        "name": "Category Name",
+        "slug": "Slug",
+        "status": "Status",
+        "parent": "Parent Category",
+        "sortOrder": "Sort Order",
+        "productsCount": "Products Count",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "description": "Description",
+        "metaTitle": "Meta Title",
+        "metaDescription": "Meta Description",
+        "image": "Image",
+        "more": "Show More",
+        "close": "Close"
+      }
     }
   },
   "user": {
