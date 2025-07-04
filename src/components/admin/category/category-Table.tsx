@@ -70,7 +70,11 @@ export function CategoryTable() {
     getAllCategories({ metadata: { page: 1, limit: newLimit } });
   };
 
-
+  const handleRowClick = (row: any) => {
+    setSelectedCategory(row.original);
+    setModalMode("edit");
+    setModalOpen(true);
+  };
 
   const handleCreateCategory = () => {
     setSelectedCategory(null);
@@ -130,7 +134,7 @@ export function CategoryTable() {
             onView: handleView,
           })}
           notFoundMessage={t('admin.pages.category.noData')}
-          // Đã bỏ tính năng click row mở modal edit, không truyền onRowClick
+          onRowClick={handleRowClick}
         />
       </div>
       {totalPages > 0 && (

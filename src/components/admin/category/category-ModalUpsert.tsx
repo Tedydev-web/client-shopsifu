@@ -1,6 +1,7 @@
 "use client";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ICategory } from "@/types/admin/category.interface";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,14 +13,11 @@ import * as z from "zod";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useRef } from "react";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, useDroppable } from "@dnd-kit/core";
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { SortableItem } from "./category-SortableItem";
-import { ICategory } from "@/types/admin/category.interface";
-import { Loader2 } from "lucide-react";
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import { CSS } from '@dnd-kit/utilities';
+import { Loader2, ChevronDown, ChevronRight, GripVertical } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
-import { ChevronDown, ChevronRight } from "lucide-react";
-// import { toast } from "sonner"; // Not used
 import { mockCategoryData } from "./category-MockData";
 
 const formSchema = z.object({
@@ -401,6 +399,50 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
   );
 }
 
+// SortableItem component for DnD functionality
+interface SortableItemProps {
+  item: ICategory & { depth: number };
+}
+
+const SortableItem: React.FC<SortableItemProps> = ({ item }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: item._id, data: { item } });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    marginLeft: `${item.depth * 24}px`, // Add indentation based on tree depth
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="flex-1"
+    >
+      <div className="flex items-center p-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md">
+        <div className="w-12 flex justify-center">
+          <button {...listeners} className="cursor-grab active:cursor-grabbing p-1">
+            <GripVertical className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+          </button>
+        </div>
+        <div className="w-12 flex justify-center">
+          {/* Placeholder for expand button - will be positioned here by parent component */}
+        </div>
+        <div className="flex-1 pl-2 min-w-0">
+          <span className="truncate">{item.name}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Định nghĩa DnDTree ở cuối file để tránh lỗi JSX và type
 import React from "react";
 interface DnDTreeProps {
@@ -566,15 +608,15 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
                 className={`transition-all relative group flex items-center w-full ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} ${isSelected ? 'bg-red-300' : ''} rounded-lg cursor-pointer`}
                 onClick={() => onSelectCategory(cat)}
               >
-                <span className="w-5 inline-block">
+                <div className="flex-1 relative">
+                    <SortableItem item={{ ...cat, depth: 0 }} />
                   {hasChildren ? (
-                    <button type="button" onClick={e => { e.stopPropagation(); toggleExpand(cat._id); }} className="p-1 focus:outline-none">
-                      {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    </button>
+                    <div className="absolute left-[48px] top-1/2 -translate-y-1/2 z-10">
+                      <button type="button" onClick={e => { e.stopPropagation(); toggleExpand(cat._id); }} className="p-1 focus:outline-none">
+                        {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      </button>
+                    </div>
                   ) : null}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <SortableItem item={{ ...cat, depth: 0 }} />
                 </div>
               </div>
             </DroppableWrapper>
@@ -590,7 +632,7 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
                           className={`flex items-center w-full ${isChildSelected ? 'bg-red-100' : ''} rounded-lg cursor-pointer`}
                           onClick={() => onSelectCategory(child)}
                         >
-                          <div className="flex-1 min-w-0">
+                          <div className="flex-1">
                             <SortableItem item={{ ...child, depth: 1 }} />
                           </div>
                         </div>
