@@ -70,12 +70,6 @@ export function CategoryTable() {
     getAllCategories({ metadata: { page: 1, limit: newLimit } });
   };
 
-  const handleRowClick = (row: any) => {
-    setSelectedCategory(row.original);
-    setModalMode("edit");
-    setModalOpen(true);
-  };
-
   const handleCreateCategory = () => {
     setSelectedCategory(null);
     setModalMode("add");
@@ -95,16 +89,17 @@ export function CategoryTable() {
     alert(`Xóa: ${category.name}`);
   };
   const handleView = (category: CategoryTableData) => {
-    setSelectedCategory(category);
-    setModalMode("edit");
-    setModalOpen(true);
+    // View should only display data, not edit
+    // TODO: Implement view only modal if needed
+    return;
   };
   const table = useDataTable({
     data: (categories && categories.length > 0) ? categories : mockCategoryData,
     columns: CategoryColumns({
       onEdit: handleEdit,
       onDelete: handleDelete,
-      onView: handleView,
+      // Disable view functionality as per requirements
+      onView: undefined,
     }),
   });
 
@@ -131,10 +126,10 @@ export function CategoryTable() {
           columns={CategoryColumns({
             onEdit: handleEdit,
             onDelete: handleDelete,
-            onView: handleView,
+            // Disable view functionality as per requirements
+            onView: undefined,
           })}
           notFoundMessage={t('admin.pages.category.noData')}
-          onRowClick={handleRowClick}
         />
       </div>
       {totalPages > 0 && (
