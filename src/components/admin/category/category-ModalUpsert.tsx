@@ -68,6 +68,20 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
   const [isDeleting, setIsDeleting] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const statusDropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Reset form khi đóng modal hoặc chuyển mode
+  const resetFormAndState = () => {
+    form.reset({ 
+      name: "", 
+      slug: "", 
+      description: "", 
+      isActive: true, 
+      createdAt: new Date().toISOString().slice(0, 16), 
+      updatedAt: new Date().toISOString().slice(0, 16) 
+    });
+    setSelectedParentId(null);
+    setSelectedCategory(null);
+  };
   // Chuyển mockCategoryData dạng tree sang mảng phẳng, gán parentId đúng
   const buildInitialCategories = () => {
     const flat: ICategory[] = [];
@@ -269,8 +283,12 @@ function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: Categor
 
   // Render chia 2 phần 40-60
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={() => {
+      resetFormAndState();
+      onClose();
+    }}>
       <DialogContent
+        data-mode={mode}
         className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 p-8 overflow-y-auto"
         style={{ width: '90vw', height: '90vh', maxWidth: '90vw', maxHeight: '90vh' }}
       >
@@ -594,6 +612,11 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
     const { setNodeRef } = useDroppable({ id });
     return <div ref={setNodeRef}>{children}</div>;
   };
+
+  // Lấy mode từ props gần nhất
+  const mode = document.querySelector('[data-mode]')?.getAttribute('data-mode') || 'add';
+  const isEditMode = mode === 'edit';
+
   return (
     <ul className="space-y-0.5 bg-transparent">
       {tree.map((cat: any) => {
@@ -605,8 +628,12 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
             <DroppableWrapper id={cat._id}>
               <div
                 data-id={cat._id}
-                className={`transition-all relative group flex items-center w-full ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} ${isSelected ? 'bg-red-300' : ''} rounded-lg cursor-pointer`}
-                onClick={() => onSelectCategory(cat)}
+                className={`transition-all relative group flex items-center w-full 
+                  ${dragOverId === cat._id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') ? 'ring-2 ring-yellow-400' : ''} 
+                  ${isSelected ? 'bg-red-300' : ''} 
+                  ${isEditMode ? 'cursor-pointer' : 'cursor-default'} 
+                  rounded-lg`}
+                onClick={() => isEditMode && onSelectCategory(cat)}
               >
                 <div className="flex-1 relative">
                     <SortableItem item={{ ...cat, depth: 0 }} />
@@ -629,8 +656,11 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
                       <DroppableWrapper id={child._id}>
                         <div
                           data-id={child._id}
-                          className={`flex items-center w-full ${isChildSelected ? 'bg-red-100' : ''} rounded-lg cursor-pointer`}
-                          onClick={() => onSelectCategory(child)}
+                          className={`flex items-center w-full 
+                            ${isChildSelected ? 'bg-red-100' : ''} 
+                            ${isEditMode ? 'cursor-pointer' : 'cursor-default'} 
+                            rounded-lg`}
+                          onClick={() => isEditMode && onSelectCategory(child)}
                         >
                           <div className="flex-1">
                             <SortableItem item={{ ...child, depth: 1 }} />
