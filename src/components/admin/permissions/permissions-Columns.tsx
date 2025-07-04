@@ -12,11 +12,17 @@ import { useTranslations } from "next-intl";
 // Interface mới theo PerGetByIdResponse
 export type Permission = {
   id: number;
-  code: string;
   name: string;
   description: string;
+  module: string;
   path: string;
   method: string;
+  createdById: string;
+  updatedById: string;
+  deletedById: string;
+  deletedAt: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 const methodColorMap: { [key: string]: string } = {
@@ -94,6 +100,15 @@ export const PermissionsColumns = ({
       enableHiding: true,
     },
     {
+      accessorKey: "module",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("admin.permissions.form.module")} />
+      ),
+      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("module")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
       accessorKey: "path",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("admin.permissions.form.name")} />
@@ -128,6 +143,24 @@ export const PermissionsColumns = ({
         <DataTableColumnHeader column={column} title={t("admin.permissions.form.description")} />
       ),
       cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("description")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
+      accessorKey: "createdAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("admin.permissions.form.createdAt")} />
+      ),
+      cell: ({ row }) => <div className="w-[220px] truncate">{format(new Date(row.getValue("createdAt")), "yyyy-MM-dd HH:mm:ss")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("admin.permissions.form.updatedAt")} />
+      ),
+      cell: ({ row }) => <div className="w-[220px] truncate">{format(new Date(row.getValue("updatedAt")), "yyyy-MM-dd HH:mm:ss")}</div>,
       enableSorting: true,
       enableHiding: true,
     },

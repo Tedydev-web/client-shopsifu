@@ -18,9 +18,12 @@ export interface DataTablePaginationProps {
 }
 
 export function Pagination({ metadata, onPageChange, onLimitChange }: DataTablePaginationProps) {
-  console.log("Pagination metadata:", metadata);
+  // Log chi tiết để debug
+  console.log("Pagination metadata:", JSON.stringify(metadata));
+  console.log("Pagination component rendering with totalPages:", metadata?.totalPages);
   const t = useTranslations();
 
+  // Đảm bảo có đầy đủ thông tin pagination, dùng default values nếu metadata thiếu
   const {
     page = 1,
     limit = 10,
@@ -28,7 +31,7 @@ export function Pagination({ metadata, onPageChange, onLimitChange }: DataTableP
     totalItems = 0,
     hasNext = false,
     hasPrevious = false,
-  } = metadata;
+  } = metadata || {};
 
   const handlePreviousPage = () => {
     if (hasPrevious) {
@@ -98,7 +101,7 @@ export function Pagination({ metadata, onPageChange, onLimitChange }: DataTableP
           <ChevronRight size={16} />
         </Button>
         <span className="ml-2 text-gray-400 text-sm">
-          {t('admin.pagination.page', { page, totalPages })} | {t('admin.pagination.total', { totalRecords: totalItems })}
+          {`Trang ${page} trên ${totalPages} | Tổng cộng: ${totalItems || 0}`}
         </span>
       </div>
     </div>
