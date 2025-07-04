@@ -33,13 +33,9 @@ export interface RoleResponse {
     permissions: Array<Permission>;
     createdAt: number;
     updatedAt: number;
-    totalItems: number;
-    page: number;
-    limit: number;
-    totalPages: number;
 }
 
-export interface RoleGetAllResponse extends BaseResponse {
+export interface RoleGetAllResponse extends BaseResponse, PaginationRequest {
   data: Array<{
     id: number;
     name: string;
@@ -51,25 +47,7 @@ export interface RoleGetAllResponse extends BaseResponse {
     deletedAt: string;
     createdAt: string;
     updatedAt: string;
-    permissions: Array<{
-        id: number,
-        description: string,
-        createdById: string,
-        updatedById: string,
-        deletedById: string,
-        deletedAt: string,
-        action: string,
-        subject: string,
-        conditions: string,
-        createdAt: string,
-        updatedAt: string,
-        isSystemPermission: boolean
-        }>;
   }>;
-  totalItems: number;
-  page: number;
-  limit: number;
-  totalPages: number;
 }
 
 export interface RoleGetByIdResponse {

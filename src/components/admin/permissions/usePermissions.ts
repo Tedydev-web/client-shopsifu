@@ -8,112 +8,123 @@ import {
   PerUpdateRequest,
 } from "@/types/auth/permission.interface";
 import { useDebounce } from "@/hooks/useDebounce";
+import {
+  PaginationRequest,
+  PaginationMetadata,
+} from "@/types/base.interface";
+
+const INITIAL_PAGINATION: PaginationMetadata = {
+  page: 1,
+  limit: 10,
+  search: "",
+  sortBy: "id",
+  sortOrder: "asc",
+};
 
 export function usePermissions() {
-  const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [pagination, setPagination] =
+    useState<PaginationMetadata>(INITIAL_PAGINATION);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(
     null
   );
   const [loading, setLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500);
+
+
+  const debouncedSearch = useDebounce(pagination?.search, 500);
 
   const getAllPermissions = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await permissionService.getAll();
-      const flattenedPermissions = Object.entries(response.data).flatMap(
-        ([subject, items]) =>
-          items.map((item) => ({
-            subject: subject,
-            ...item,
-          }))
-      );
-      const mappedPermissions: Permission[] = flattenedPermissions.map(
-        (per) => ({
-          id: per.id,
-          code: String(per.id),
-          name: per.description,
-          description: per.description,
-          path: per.subject,
-          method: per.action,
-        })
-      );
-      setAllPermissions(mappedPermissions);
+      const requestParams: PaginationRequest = {
+        page: pagination?.page,
+        limit: pagination?.limit,
+        search: debouncedSearch,
+        sortBy: pagination?.sortBy,
+        sortOrder: pagination?.sortOrder,
+      };
+      const response = await permissionService.getAll(requestParams);
+
+      const mappedPermissions: Permission[] = response.data.map((per) => ({
+        id: per.id,
+        code: String(per.id),
+        name: per.name,
+        description: per.description,
+        path: per.path,
+        method: per.method,
+      }));
+
       setPermissions(mappedPermissions);
+      if (response.metadata) {
+        setPagination(response.metadata);
+      }
     } catch (error) {
       showToast(parseApiError(error), "error");
-      console.error("Error fetching permissions:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [
+    pagination?.page,
+    pagination?.limit,
+    debouncedSearch,
+    pagination?.sortBy,
+    pagination?.sortOrder,
+  ]);
 
   useEffect(() => {
-    if (debouncedSearch) {
-      setIsSearching(true);
-      const filteredData = allPermissions.filter(
-        (permission) =>
-          permission.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          permission.description
-            .toLowerCase()
-            .includes(debouncedSearch.toLowerCase()) ||
-          permission.path.toLowerCase().includes(debouncedSearch.toLowerCase())
-      );
-      setPermissions(filteredData);
-      setIsSearching(false);
-    } else {
-      setPermissions(allPermissions);
-    }
-  }, [debouncedSearch, allPermissions]);
+    getAllPermissions();
+  }, [getAllPermissions]);
 
-  const createPermission = async (data: PerCreateRequest) => {
+  const handleCreate = async (data: PerCreateRequest) => {
     try {
-      const response = await permissionService.create(data);
-      showToast("Tạo quyền thành công", "success");
-      return response;
+      await permissionService.create(data);
+      showToast("Permission created successfully", "success");
+      getAllPermissions();
+      handleCloseModal();
     } catch (error) {
-      showToast(parseApiError(error), 'error');
-      console.error('Error creating permission:', error);
-      return null;
+      showToast(parseApiError(error), "error");
     }
   };
 
-  const updatePermission = async (code: string, data: PerUpdateRequest) => {
+  const handleUpdate = async (id: number, data: PerUpdateRequest) => {
     try {
-      const response = await permissionService.update(code, data);
-      showToast("Cập nhật quyền thành công", "success");
-      return response;
+      await permissionService.update(String(id), data);
+      showToast("Permission updated successfully", "success");
+      getAllPermissions();
+      handleCloseModal();
     } catch (error) {
-      showToast(parseApiError(error), 'error');
-      console.error('Error updating permission:', error);
-      return null;
+      showToast(parseApiError(error), "error");
     }
   };
 
-  const deletePermission = async (id: string) => {
+  const handleDelete = async (id: number) => {
     try {
-      const response = await permissionService.delete(id);
-      showToast("Xóa quyền thành công", "success");
-      return response;
+      await permissionService.delete(String(id));
+      showToast("Permission deleted successfully", "success");
+      getAllPermissions();
     } catch (error) {
-      showToast(parseApiError(error), 'error');
-      console.error('Error deleting permission:', error);
-      return null;
+      showToast(parseApiError(error), "error");
     }
   };
 
-  const handleSearch = (value: string) => {
-    setSearch(value);
+  const handlePageChange = (page: number) => {
+    setPagination((prev) => ({ ...prev, page }));
   };
 
-  const handleOpenModal = useCallback((permission?: Permission) => {
-    setSelectedPermission(permission || null);
+  const handleLimitChange = (limit: number) => {
+    setPagination((prev) => ({ ...prev, limit, page: 1 }));
+  };
+
+  const handleSearch = (search: string) => {
+    setPagination((prev) => ({ ...prev, search, page: 1 }));
+  };
+
+  const handleOpenModal = (permission: Permission | null = null) => {
+    setSelectedPermission(permission);
     setIsModalOpen(true);
-  }, []);
+  };
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
@@ -123,16 +134,17 @@ export function usePermissions() {
   return {
     permissions,
     loading,
-    isSearching,
-    search,
-    handleSearch,
+    pagination,
     isModalOpen,
     selectedPermission,
     getAllPermissions,
-    createPermission,
-    updatePermission,
-    deletePermission,
+    handleCreate,
+    handleUpdate,
+    handleDelete,
     handleOpenModal,
     handleCloseModal,
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
   };
 }

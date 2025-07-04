@@ -42,12 +42,12 @@ export interface LogoutRequest {
 export interface LoginRequest {
   email: string
   password: string
-  rememberMe: boolean
+  rememberMe?: boolean
 }
 
 export interface LoginResponse extends BaseResponse {
   data:{
-    message: string
+    message?: string
     user?: UserProfile
   }
   verificationType?: string

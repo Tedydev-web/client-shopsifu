@@ -20,35 +20,42 @@ export function useSignin() {
   const Schema = LoginSchema(t)  
   const userData = useUserData();
 
-  const handleSignin = async (data: z.infer<typeof Schema>) => {
+  type SigninData = Omit<z.infer<typeof Schema>, 'rememberMe'>
+
+  const handleSignin = async (data: SigninData) => {
     try {
       setLoading(true);
-      const response = await authService.login(data);
+      const { data: responseData, status } = await authService.login(data);
 
-      if (response.status === 200) {
-        // Handle 2FA/OTP redirection first
-        if (response.verificationType === 'OTP') {
-          router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
-          showToast(response.message || t('auth.device.verification.required'), 'info');
-          return;
-        }	
-        if (response.verificationType === '2FA') {
-          router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
-          showToast(response.message || t('auth.device.verification.required'), 'info');
-          return;
-        }
+      if (status === 201) {
+        showToast(responseData.message || t('admin.showToast.auth.success'), 'success');
         await fetchProfile();
-        await fetchAbility();
-        const role = userData?.role;
-        showToast(response.message || t('admin.showToast.auth.success'), 'success');
-        if (role === 'Admin' || role === 'Super Admin') {
-          window.location.href = ROUTES.ADMIN.DASHBOARD;
-        } else {
-          window.location.href = ROUTES.HOME;
-        }
-      } else {
-        showToast(response.message || t('admin.showToast.auth.loginFailed'), 'error');
+        router.push(ROUTES.HOME);
       }
+      // if (response.status === 200) {
+      //   // Handle 2FA/OTP redirection first
+      //   if (response.verificationType === 'OTP') {
+      //     router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
+      //     showToast(response.message || t('auth.device.verification.required'), 'info');
+      //     return;
+      //   }	
+      //   if (response.verificationType === '2FA') {
+      //     router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
+      //     showToast(response.message || t('auth.device.verification.required'), 'info');
+      //     return;
+      //   }
+      //   await fetchProfile();
+      //   await fetchAbility();
+      //   const role = userData?.role;
+      //   showToast(response.message || t('admin.showToast.auth.success'), 'success');
+      //   if (role === 'Admin' || role === 'Super Admin') {
+      //     window.location.href = ROUTES.ADMIN.DASHBOARD;
+      //   } else {
+      //     window.location.href = ROUTES.HOME;
+      //   }
+      // } else {
+      //   showToast(response.message || t('admin.showToast.auth.loginFailed'), 'error');
+      // }
     } catch (error: any) {
       console.error('Login error:', error)
       showToast(parseApiError(error), 'error');

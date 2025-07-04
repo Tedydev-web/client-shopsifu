@@ -1,4 +1,4 @@
-import { BaseResponse } from "../base.interface";
+import { BaseResponse, PaginationRequest } from "../base.interface";
 
 
 export interface PerCreateRequest {
@@ -98,8 +98,26 @@ export interface PermissionItem {
     description: string;
   }
 
-export interface PerGetAllResponse extends BaseResponse {
-    data: {
-        [key: string]: PermissionItem[];
-    };
-};
+// export interface PerGetAllResponse extends BaseResponse {
+//     data: {
+//         [key: string]: PermissionItem[];
+//     };
+// };
+
+
+export interface PermissionDetail {
+    id: number;
+    name: string;
+    description: string;
+    module: string;
+    path: string;
+    method: string;
+    createdById: string;
+    updatedById: string;
+    deletedById: string;
+    deletedAt: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface PerGetAllResponse extends BaseResponse<PermissionDetail[]> {}

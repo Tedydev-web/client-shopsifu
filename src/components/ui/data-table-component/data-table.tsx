@@ -4,6 +4,7 @@ import * as React from 'react'
 import { flexRender, Table as TanstackTable } from '@tanstack/react-table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Loader2 } from 'lucide-react'
+import { DataTablePaginationProps, Pagination } from './pagination'
 
 interface DataTableProps<TData> {
   table: TanstackTable<TData>
@@ -12,15 +13,17 @@ interface DataTableProps<TData> {
   notFoundMessage?: string
   onRowClick?: (row: any) => void
   Toolbar?: React.ComponentType<{ table: TanstackTable<TData> }>
+  pagination?: DataTablePaginationProps
 }
 
 export function DataTable<TData>({
   table,
   columns,
   loading = false,
-  notFoundMessage = "Không có dữ liệu.",
+  notFoundMessage = 'Không có dữ liệu.',
   onRowClick,
   Toolbar,
+  pagination,
 }: DataTableProps<TData>) {
   return (
     <div className="w-full space-y-4">
@@ -72,6 +75,13 @@ export function DataTable<TData>({
             </TableBody>
           </Table>
         </div>
+        {pagination && (
+          <Pagination
+            metadata={pagination.metadata}
+            onPageChange={pagination.onPageChange}
+            onLimitChange={pagination.onLimitChange}
+          />
+        )}
       </div>
     </div>
   )
