@@ -38,6 +38,9 @@ export function useServerDataTable<T, U = T>({
     hasPrevious: false,
   });
 
+  // Thêm trigger để force refresh dữ liệu
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const [data, setData] = useState<U[]>([]);
   const [loading, setLoading] = useState(false);
   const debouncedSearch = useDebounce(pagination.search, 500);
@@ -167,6 +170,7 @@ export function useServerDataTable<T, U = T>({
     debouncedSearch,
     pagination.sortBy,
     pagination.sortOrder,
+    refreshTrigger, // Thêm trigger vào dependency để force re-fetch
     // Loại bỏ các callback ra khỏi dependency array vì đã dùng useRef để ổn định chúng
   ]);
 
@@ -186,6 +190,13 @@ export function useServerDataTable<T, U = T>({
   const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
     setPagination(prev => ({ ...prev, sortBy, sortOrder }));
   };
+  
+  // Hàm để refresh dữ liệu - thực sự bắt buộc fetch lại dữ liệu mới
+  const refreshData = () => {
+    // Tăng giá trị refreshTrigger để kích hoạt useEffect và force re-fetch
+    setRefreshTrigger(prev => prev + 1);
+    console.log("🔄 Refreshing data...");
+  };
 
   return {
     data,
@@ -195,5 +206,6 @@ export function useServerDataTable<T, U = T>({
     handleLimitChange,
     handleSearch,
     handleSortChange,
+    refreshData,
   };
 }

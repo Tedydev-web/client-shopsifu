@@ -46,6 +46,7 @@ export function usePermissions() {
     handleLimitChange,
     handleSearch,
     handleSortChange,
+    refreshData,
   } = useServerDataTable<PermissionDetail, Permission>({
     fetchData: permissionService.getAll,
     getResponseData,
@@ -68,8 +69,10 @@ export function usePermissions() {
     try {
       await permissionService.create(data, controller.signal);
       showToast("Permission created successfully", "success");
-      // Re-fetch the data by changing sort to force refresh
-      handleSortChange(pagination.sortBy || "id", (pagination.sortOrder as "asc" | "desc") || "asc");
+      
+      // Hàm refreshData() sẽ kích hoạt useEffect trong hook để gọi lại API getAll
+      // và cập nhật state với dữ liệu mới nhất
+      refreshData();
       handleCloseModal();
     } catch (error) {
       if (!controller.signal.aborted) {
@@ -88,8 +91,10 @@ export function usePermissions() {
     try {
       await permissionService.update(String(id), data, controller.signal);
       showToast("Permission updated successfully", "success");
-      // Re-fetch the data by changing sort to force refresh
-      handleSortChange(pagination.sortBy || "id", (pagination.sortOrder as "asc" | "desc") || "asc");
+      
+      // Hàm refreshData() sẽ kích hoạt useEffect trong hook để gọi lại API getAll
+      // và cập nhật state với dữ liệu mới nhất
+      refreshData();
       handleCloseModal();
     } catch (error) {
       if (!controller.signal.aborted) {
@@ -108,8 +113,10 @@ export function usePermissions() {
     try {
       await permissionService.delete(String(id), controller.signal);
       showToast("Permission deleted successfully", "success");
-      // Re-fetch the data by changing sort to force refresh
-      handleSortChange(pagination.sortBy || "id", (pagination.sortOrder as "asc" | "desc") || "asc");
+      
+      // Hàm refreshData() sẽ kích hoạt useEffect trong hook để gọi lại API getAll
+      // và cập nhật state với dữ liệu mới nhất
+      refreshData();
     } catch (error) {
       if (!controller.signal.aborted) {
         showToast(parseApiError(error), "error");
@@ -143,5 +150,6 @@ export function usePermissions() {
     handlePageChange,
     handleLimitChange,
     handleSearch,
+    refreshData,
   };
 }
