@@ -14,47 +14,64 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { showToast } from "@/components/ui/toastify";
-import { PermissionItem } from '@/types/auth/permission.interface';
+import { Permission } from './permissions-Columns';
+import { PerCreateRequest, PerUpdateRequest } from '@/types/auth/permission.interface';
+import { 
+  Select,
+  SelectContent, 
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 interface PermissionsModalUpsertProps {
   open: boolean;
   onClose: () => void;
-  mode: 'add' | 'edit';
-  permission?: PermissionItem | null;
-  onSubmit?: (data: Partial<PermissionItem>) => Promise<void>;
+  permission: Permission | null;
+  onSubmit: (data: PerCreateRequest | PerUpdateRequest) => Promise<void>;
 }
 
-export default function PermissionsModalUpsert({ open, onClose, mode, permission, onSubmit }: PermissionsModalUpsertProps) {
+export default function PermissionsModalUpsert({ open, onClose, permission, onSubmit }: PermissionsModalUpsertProps) {
   const t = useTranslations();
-  const [action, setAction] = useState('');
-  const [subject, setSubject] = useState('');
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [path, setPath] = useState('');
+  const [method, setMethod] = useState('GET');
   const [loading, setLoading] = useState(false);
 
+  // Reset form when modal opens or permission changes
   useEffect(() => {
-    if (mode === 'edit' && permission) {
-      setAction(permission.action || '');
+    if (permission) {
+      setName(permission.name || '');
       setDescription(permission.description || '');
+      setPath(permission.path || '');
+      setMethod(permission.method || 'GET');
     } else {
-      setAction('');
+      setName('');
       setDescription('');
+      setPath('');
+      setMethod('GET');
     }
-  }, [mode, permission, open]);
+  }, [permission, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!action.trim() || !subject.trim()) {
-      showToast(t('admin.permissions.modal.validation'), 'error');
+    if (!name.trim() || !path.trim() || !method) {
+      showToast(t('admin.permissions.modal.validation') || 'Please fill in all required fields', 'error');
       return;
     }
 
     setLoading(true);
     try {
-      const data: Partial<PermissionItem> = { action, description };
-      if (mode === 'edit' && permission) {
-        data.id = permission.id;
-      }
-      await onSubmit?.(data);
+      const data: PerCreateRequest | PerUpdateRequest = {
+        name,
+        description,
+        path,
+        method
+      };
+      await onSubmit(data);
       onClose();
     } catch (error) {
       // Error is already handled by the parent component's try-catch block
@@ -63,58 +80,83 @@ export default function PermissionsModalUpsert({ open, onClose, mode, permission
     }
   };
 
+  const isEditMode = !!permission;
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'add'
-              ? t("admin.permissions.modal.addTitle")
-              : t("admin.permissions.modal.editTitle")}
+            {!isEditMode
+              ? t("admin.permissions.modal.addTitle") || 'Add Permission'
+              : t("admin.permissions.modal.editTitle") || 'Edit Permission'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'add'
-              ? t("admin.permissions.modal.addSubtitle")
-              : t("admin.permissions.modal.editSubtitle")}
+            {!isEditMode
+              ? t("admin.permissions.modal.addSubtitle") || 'Create a new permission'
+              : t("admin.permissions.modal.editSubtitle") || 'Update permission details'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.action")}</label>
+            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.name") || 'Name'}</label>
             <Input
-              value={action}
-              onChange={(e) => setAction(e.target.value)}
-              placeholder={t("admin.permissions.modal.actionPlaceholder")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t("admin.permissions.modal.namePlaceholder") || 'Enter permission name'}
               required
             />
           </div>
-          {/* <div>
-            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.subject")}</label>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.path") || 'Path'}</label>
             <Input
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder={t("admin.permissions.modal.subjectPlaceholder")}
+              value={path}
+              onChange={(e) => setPath(e.target.value)}
+              placeholder={t("admin.permissions.modal.pathPlaceholder") || 'Enter API path'}
               required
             />
-          </div> */}
+          </div>
+          
           <div>
-            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.description")}</label>
+            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.method") || 'Method'}</label>
+            <Select value={method} onValueChange={setMethod}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select HTTP method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>HTTP Methods</SelectLabel>
+                  <SelectItem value="GET">GET</SelectItem>
+                  <SelectItem value="POST">POST</SelectItem>
+                  <SelectItem value="PUT">PUT</SelectItem>
+                  <SelectItem value="PATCH">PATCH</SelectItem>
+                  <SelectItem value="DELETE">DELETE</SelectItem>
+                  <SelectItem value="ALL">ALL</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.description") || 'Description'}</label>
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("admin.permissions.modal.descriptionPlaceholder")}
+              placeholder={t("admin.permissions.modal.descriptionPlaceholder") || 'Enter description'}
             />
           </div>
+          
           <DialogFooter className="pt-4">
             <DialogClose asChild>
               <Button type="button" variant="outline" disabled={loading} onClick={onClose}>
-                {t("admin.permissions.modal.cancel")}
+                {t("admin.permissions.modal.cancel") || 'Cancel'}
               </Button>
             </DialogClose>
             <Button type="submit" disabled={loading}>
               {loading
-                ? t("admin.permissions.modal.processing")
-                : (mode === 'add' ? t("admin.permissions.modal.save") : t("admin.permissions.modal.update"))}
+                ? t("admin.permissions.modal.processing") || 'Processing...'
+                : (!isEditMode ? t("admin.permissions.modal.save") || 'Create' : t("admin.permissions.modal.update") || 'Update')}
             </Button>
           </DialogFooter>
         </form>

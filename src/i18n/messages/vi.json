@@ -668,7 +668,10 @@
         "description": "Mô tả vai trò",
         "path": "Đường dẫn vai trò",
         "method": "Phương thức vai trò",
-        "namePlaceholder": "Nhập tên vai trò"
+        "namePlaceholder": "Nhập tên vai trò",
+        "module": "Module",
+        "createdAt": "Ngày tạo",
+        "updatedAt":"Ngày cập nhật"
       },
       "toast": {
         "addSuccess": "Thêm vai trò thành công",
@@ -730,12 +733,22 @@
       "addTitle": "Thêm quyền",
       "editTitle": "Chỉnh sửa quyền",
       "form": {
-        "name": "Tên chức năng",
+        "name": "Đường dẫn quyền",
         "subtitle": "Quản lý tất cả quyền hạn của bạn",
         "description": "Mô tả quyền",
         "path": "Đường dẫn quyền",
         "method": "Phương thức quyền",
-        "namePlaceholder": "Nhập tên quyền"
+        "namePlaceholder": "Nhập tên quyền",
+        "module": "Module",
+        "createdAt": "Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "ID": "ID",
+        "editAction": "Chỉnh sửa quyền",
+        "deleteAction": "Xóa quyền"
+      },
+      "deleteModal":{
+        "deleteTitle": "Thực hiện xóa quyền",
+        "deleteDescription": "Bạn có chắc chắn xóa quyền hạn này không?"
       },
       "toast": {
         "addSuccess": "Thêm quyền thành công",

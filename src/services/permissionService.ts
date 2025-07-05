@@ -13,10 +13,11 @@ import { PaginationRequest } from '@/types/base.interface';
 
 export const permissionService = {
     // Lấy tất cả permissions
-    getAll: async (params?: PaginationRequest): Promise<PerGetAllResponse> => {
+    getAll: async (params?: PaginationRequest, signal?: AbortSignal): Promise<PerGetAllResponse> => {
         try {
           const response = await privateAxios.get(API_ENDPOINTS.PERMISSION.GETALL, {
-            params: params
+            params: params,
+            signal: signal
           })
           return response.data
         } catch (error) {

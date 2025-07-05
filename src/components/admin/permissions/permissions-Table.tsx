@@ -6,7 +6,7 @@ import SearchInput from "@/components/ui/data-table-component/search-input"
 import PermissionsModalUpsert from "./permissions-ModalUpsert"
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
 import { DataTable } from "@/components/ui/data-table-component/data-table"
-import { usePermissions } from "./usePermissions"
+import { usePermissions } from "./usePermissions" // Sử dụng hook mới
 import { useTranslations } from "next-intl"
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 import { useDataTable } from "@/hooks/useDataTable"
@@ -111,7 +111,7 @@ export function PermissionsTable() {
         }}
       />
 
-      {/* <PermissionsModalUpsert
+      <PermissionsModalUpsert
         open={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
@@ -123,9 +123,9 @@ export function PermissionsTable() {
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         loading={deleteLoading}
-        title={t("admin.permissions.deleteTitle")}
-        description={t("admin.permissions.deleteDescription")}
-      /> */}
+        title={t("admin.permissions.deleteModal.deleteTitle")}
+        description={t("admin.permissions.deleteModal.deleteDescription")}
+      />
     </div>
   )
 }

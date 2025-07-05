@@ -3,20 +3,11 @@ import { BaseResponse, PaginationRequest } from "../base.interface";
 
 export interface PerCreateRequest {
     name: string;
-    description: string;
+    module: string;
     path: string;
     method: string;
 }
 
-export interface PerCreateResponse {
-    id: string;
-    name: string;
-    createdById: string;
-    updatedById: string;
-    deletedAt: string;
-    createdAt: string;
-    updatedAt: string;
-}
 
 // export interface PerGetAllResponse {
 //     data: Array<{
@@ -121,3 +112,4 @@ export interface PermissionDetail {
 }
 
 export interface PerGetAllResponse extends BaseResponse<PermissionDetail[]> {}
+export interface PerCreateResponse extends BaseResponse<PermissionDetail[]>{}
