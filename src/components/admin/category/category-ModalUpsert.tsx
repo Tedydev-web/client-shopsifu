@@ -29,8 +29,14 @@ const formSchema = z.object({
   updatedAt: z.string(),
 });
 
-type CategoryFormValues = z.infer<typeof formSchema>;
+// Helper function for getting parent node
+const getParentNode = (nodeId: string, categories: ICategory[]): ICategory | null => {
+  const node = categories.find(cat => cat._id === nodeId);
+  if (!node?.parentId) return null;
+  return categories.find(cat => cat._id === node.parentId) || null;
+};
 
+type CategoryFormValues = z.infer<typeof formSchema>;
 
 
 
@@ -484,6 +490,7 @@ const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTr
       (window as any).__lastDragOverType = null;
       return;
     }
+
     const overElement = document.querySelector(`[data-id='${over.id}']`);
     if (!overElement) {
       setDragOverId(null);
@@ -491,50 +498,65 @@ const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTr
       (window as any).__lastDragOverType = null;
       return;
     }
+
     const draggedId = event.active.id;
     const draggedNode = categories.find((i) => i._id === draggedId);
     const overNode = categories.find((i) => i._id === over.id);
+    
     if (!draggedNode || !overNode) {
       setDragOverId(null);
       setDragOverType(null);
       (window as any).__lastDragOverType = null;
       return;
     }
-    // Nếu cùng là con thì không cho phép
-    if (draggedNode.parentId !== null && overNode.parentId !== null) {
-      setDragOverId(String(over.id));
-      setDragOverType(null);
-      (window as any).__lastDragOverType = null;
-      return;
-    }
+
+    // Kiểm tra các quy tắc kéo thả
+    const targetId = over.id;
+    const canMoveToChild = canBecomeChild(draggedId.toString(), targetId.toString(), categories);
+    
+    // Quy tắc:
+    // 1. Không cho phép thả vào node con
+    // 2. Chỉ cho phép trở thành con nếu thỏa mãn điều kiện canBecomeChild
+    // 3. Cho phép hoán đổi vị trí giữa các node cùng cấp
+    // 4. Cho phép kéo node cha từ dưới lên để trở thành con
+    
     const rect = overElement.getBoundingClientRect();
-    let pointerY = rect.top + rect.height / 2;
-    if (event?.delta?.y !== undefined && event?.active?.data?.current?.pointerPosition) pointerY = event.active.data.current.pointerPosition.y;
-    else if (event?.delta?.y !== undefined) pointerY = rect.top + event.delta.y;
+    let pointerY = event?.active?.data?.current?.pointerPosition?.y ?? rect.top + rect.height / 2;
+    
     const topZone = rect.top + rect.height * 0.25;
     const bottomZone = rect.bottom - rect.height * 0.25;
 
-    // Nếu pointer nằm giữa (không ở top/bottom), hover làm con
-    if (
-      pointerY >= topZone && pointerY <= bottomZone &&
-      draggedNode._id !== overNode._id &&
-      overNode.parentId === null &&
-      draggedNode.parentId === null
-    ) {
-      setDragOverId(String(over.id));
-      setDragOverType('child');
-      (window as any).__lastDragOverType = 'child';
-      return;
+    // Logic xử lý khi kéo thả:
+    
+    // 1. Kiểm tra trường hợp kéo vào khu vực chứa con (khi pointer ở giữa)
+    if (pointerY >= topZone && pointerY <= bottomZone) {
+      // Cho phép kéo thả vào bất kỳ node nào, canBecomeChild sẽ xử lý logic thực tế
+      if (draggedNode._id !== overNode._id &&
+          canBecomeChild(draggedNode._id.toString(), overNode._id.toString(), categories)) {
+        setDragOverId(String(over.id));
+        setDragOverType('child');
+        (window as any).__lastDragOverType = 'child';
+        return;
+      }
     }
 
-    // Nếu pointer ở trên hoặc dưới, đổi vị trí
-    if (pointerY < topZone) {
+    // 2. Kiểm tra hoán đổi vị trí
+    // Node cùng cấp là:
+    // - Cả hai đều là node cha, hoặc
+    // - Cả hai đều là node con của cùng một cha
+    const sameLevel = (draggedNode.parentId === null && overNode.parentId === null) ||
+                     (draggedNode.parentId === overNode.parentId);
+    
+    // Nếu pointer ở trên và cùng cấp
+    if (pointerY < topZone && sameLevel) {
       setDragOverId(String(over.id));
       setDragOverType('swap-top');
       (window as any).__lastDragOverType = 'swap-top';
       return;
     }
-    if (pointerY > bottomZone) {
+
+    // Nếu pointer ở dưới và cùng cấp
+    if (pointerY > bottomZone && sameLevel) {
       setDragOverId(String(over.id));
       setDragOverType('swap-bottom');
       (window as any).__lastDragOverType = 'swap-bottom';
@@ -551,24 +573,63 @@ const DnDTree: React.FC<DnDTreeProps> = ({ categories, setCategories, categoryTr
     // @ts-ignore
     const dragOverType = event?.dragOverType || window.__lastDragOverType;
     if (!over || active.id === over.id) {
+      // Reset any dropped item to be a parent if dropped outside
       setCategories((prev) => prev.map(i => i._id === active.id ? { ...i, parentId: null } : i));
       return;
     }
+    
     setCategories((prev) => {
       const dragged = prev.find(i => i._id === active.id);
       const overNode = prev.find(i => i._id === over?.id);
       if (!dragged || !overNode) return prev;
-      if (dragged.parentId === null && overNode.parentId === null && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') && dragged._id !== overNode._id) {
-        const newCats = prev.map(i => i._id === active.id ? { ...i, sortOrder: overNode.sortOrder } : i._id === overNode._id ? { ...i, sortOrder: dragged.sortOrder } : i);
-        return [...newCats].sort((a, b) => (a.sortOrder as number) - (b.sortOrder as number)).map((i, idx) => ({ ...i, lft: idx * 2 + 1, rgt: idx * 2 + 2 }));
+
+      // Case 1: Hoán đổi vị trí hoặc chuyển sang cha mới
+      if (dragOverType === 'swap-top' || dragOverType === 'swap-bottom') {
+        const bothParents = dragged.parentId === null && overNode.parentId === null;
+        const sameParent = dragged.parentId !== null && dragged.parentId === overNode.parentId;
+        
+        // Nếu kéo node con vào node cha khác -> trở thành con của cha mới
+        if (dragged.parentId !== null && overNode.parentId === null) {
+          return prev.map(i => 
+            i._id === active.id ? { ...i, parentId: overNode._id } : i
+          );
+        }
+        
+        // Nếu cả hai là cha hoặc cùng một cha -> hoán đổi vị trí
+        if (bothParents || sameParent) {
+          const newCats = prev.map(i => {
+            if (i._id === active.id) {
+              return { ...i, sortOrder: overNode.sortOrder };
+            }
+            if (i._id === overNode._id) {
+              return { ...i, sortOrder: dragged.sortOrder };
+            }
+            return i;
+          });
+          
+          return [...newCats]
+            .sort((a, b) => (a.sortOrder as number) - (b.sortOrder as number))
+            .map((i, idx) => ({ ...i, lft: idx * 2 + 1, rgt: idx * 2 + 2 }));
+        }
       }
-      if (dragOverType === 'child' && dragged._id !== overNode._id) return prev.map(i => i._id === active.id ? { ...i, parentId: overNode._id } : i);
-      if (overNode.parentId === null && dragged.parentId !== null && overNode._id !== active.id && (dragOverType === 'swap-top' || dragOverType === 'swap-bottom')) {
-        const newCats = prev.map(i => i._id === active.id ? { ...i, sortOrder: overNode.sortOrder, parentId: null } : i._id === overNode._id ? { ...i, sortOrder: dragged.sortOrder } : i);
-        return [...newCats].sort((a, b) => (a.sortOrder as number) - (b.sortOrder as number)).map((i, idx) => ({ ...i, lft: idx * 2 + 1, rgt: idx * 2 + 2 }));
+
+      // Case 2: Making a node a child of another
+      if (dragOverType === 'child') {
+        // Lấy parentId của node đích nếu nó là con, ngược lại dùng node đích làm cha
+        const newParentId = overNode.parentId || overNode._id;
+        
+        // Kiểm tra một lần nữa để đảm bảo an toàn
+        if (canBecomeChild(active.id.toString(), over.id.toString(), prev)) {
+          return prev.map(i => 
+            i._id === active.id ? { ...i, parentId: newParentId } : i
+          );
+        }
       }
-      if (dragged.parentId !== null && overNode.parentId !== null && dragOverType === 'child') return prev;
-      return prev.map(i => i._id === active.id ? { ...i, parentId: null } : i);
+
+      // If no valid operation was found, reset the dragged node to be a parent
+      return prev.map(i => 
+        i._id === active.id ? { ...i, parentId: null } : i
+      );
     });
   }
   return (
@@ -678,3 +739,47 @@ const CategoryTreeAccordion: React.FC<CategoryTreeAccordionProps> = ({ tree, dra
     </ul>
   );
 };
+
+// Helper functions to check parent-child relationships
+function hasChildren(categoryId: string, categories: ICategory[]): boolean {
+  return categories.some(cat => cat.parentId === categoryId);
+}
+
+function isChild(categoryId: string, categories: ICategory[]): boolean {
+  return categories.some(cat => cat._id === categoryId && cat.parentId !== null);
+}
+
+function canBecomeChild(draggedId: string, targetId: string, categories: ICategory[]): boolean {
+  const draggedItem = categories.find(c => c._id === draggedId);
+  const targetItem = categories.find(c => c._id === targetId);
+  
+  if (!draggedItem || !targetItem) return false;
+  
+  // Rules for parent-child relationships:
+  // 1. Cannot drag to self
+  // 2. Target cannot be a descendant of dragged node
+  // 3. Dragged node must not have children
+  // 4. If target is a child, use its parent as the actual target
+  // 5. Cannot create circular references
+  
+  // Nếu target là con, lấy parentId của nó làm target mới
+  const actualTargetId = targetItem.parentId || targetId;
+  const actualTarget = categories.find(c => c._id === actualTargetId);
+  
+  if (!actualTarget) return false;
+  
+  return draggedId !== targetId &&
+         draggedId !== actualTargetId &&
+         !hasChildren(draggedId, categories) &&
+         !isAncestor(draggedId, actualTargetId, categories);
+}
+
+// Hàm kiểm tra xem một node có phải là con cháu của node khác không
+function isAncestor(ancestorId: string, descendantId: string, categories: ICategory[]): boolean {
+  const descendant = categories.find(cat => cat._id === descendantId);
+  if (!descendant || !descendant.parentId) return false;
+  
+  if (descendant.parentId === ancestorId) return true;
+  
+  return isAncestor(ancestorId, descendant.parentId, categories);
+}
