@@ -11,9 +11,9 @@ export const productMock = {
   discountPrice: 499000,
   discountPercent: 50,
   images: [
-    "/sample-product.jpg",
-    "/sample-product-2.jpg",
-    "/sample-product-3.jpg",
+    "/images/client/product/Product-1.webp",
+    "/images/client/product/Product-2.webp",
+    "/images/client/product/Product-3.webp",
   ],
   sizes: ["38", "39", "40", "41", "42"],
   colors: ["Đen", "Trắng"],
