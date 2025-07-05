@@ -13,6 +13,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  TableOptions,
 } from '@tanstack/react-table'
 
 interface UseDataTableProps<TData> {
@@ -26,34 +27,30 @@ export function useDataTable<TData>({ data, columns }: UseDataTableProps<TData>)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  // Use useMemo to create the table instance only when dependencies change
-  const table = useMemo(
-    () => 
-      useReactTable({
-        data,
-        columns,
-        state: {
-          sorting,
-          columnVisibility,
-          rowSelection,
-          columnFilters,
-        },
-        enableRowSelection: true,
-        onRowSelectionChange: setRowSelection,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        onColumnVisibilityChange: setColumnVisibility,
-        getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFacetedRowModel: getFacetedRowModel(),
-        getFacetedUniqueValues: getFacetedUniqueValues(),
-        // Disable internal pagination as we're using server-side pagination
-        manualPagination: true,
-      }),
-    [data, columns, sorting, columnVisibility, rowSelection, columnFilters]
-  );
+  // Gọi hook ở top level với options đã được memoized - không qua useMemo
+  const table = useReactTable<TData>({
+    data,
+    columns,
+    state: {
+      sorting,
+      columnVisibility,
+      rowSelection,
+      columnFilters,
+    },
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    // Disable internal pagination as we're using server-side pagination
+    manualPagination: true,
+  });
 
   return table
 }
