@@ -100,6 +100,15 @@ export const PermissionsColumns = ({
       enableHiding: true,
     },
     {
+      accessorKey: "name",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("Name")} />
+      ),
+      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("name")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
       accessorKey: "module",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("module")} />

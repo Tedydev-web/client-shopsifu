@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 import { showToast } from "@/components/ui/toastify";
 import { Permission } from './permissions-Columns';
 import { PerCreateRequest, PerUpdateRequest } from '@/types/auth/permission.interface';
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Select,
   SelectContent, 
@@ -36,7 +37,7 @@ interface PermissionsModalUpsertProps {
 export default function PermissionsModalUpsert({ open, onClose, permission, onSubmit }: PermissionsModalUpsertProps) {
   const t = useTranslations();
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [module, setModule] = useState('');
   const [path, setPath] = useState('');
   const [method, setMethod] = useState('GET');
   const [loading, setLoading] = useState(false);
@@ -45,12 +46,12 @@ export default function PermissionsModalUpsert({ open, onClose, permission, onSu
   useEffect(() => {
     if (permission) {
       setName(permission.name || '');
-      setDescription(permission.description || '');
+      setModule(permission.module || '');
       setPath(permission.path || '');
       setMethod(permission.method || 'GET');
     } else {
       setName('');
-      setDescription('');
+      setModule('');
       setPath('');
       setMethod('GET');
     }
@@ -58,7 +59,7 @@ export default function PermissionsModalUpsert({ open, onClose, permission, onSu
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !path.trim() || !method) {
+    if (!name.trim() || !path.trim() || !method || !module.trim()) {
       showToast(t('admin.permissions.modal.validation') || 'Please fill in all required fields', 'error');
       return;
     }
@@ -67,9 +68,9 @@ export default function PermissionsModalUpsert({ open, onClose, permission, onSu
     try {
       const data: PerCreateRequest | PerUpdateRequest = {
         name,
-        description,
         path,
-        method
+        method,
+        module
       };
       await onSubmit(data);
       onClose();
@@ -109,6 +110,16 @@ export default function PermissionsModalUpsert({ open, onClose, permission, onSu
           </div>
           
           <div>
+            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.module") || 'Module'}</label>
+            <Input
+              value={module}
+              onChange={(e) => setModule(e.target.value)}
+              placeholder={t("admin.permissions.modal.modulePlaceholder") || 'Enter module name'}
+              required
+            />
+          </div>
+          
+          <div>
             <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.path") || 'Path'}</label>
             <Input
               value={path}
@@ -138,14 +149,7 @@ export default function PermissionsModalUpsert({ open, onClose, permission, onSu
             </Select>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("admin.permissions.modal.description") || 'Description'}</label>
-            <Input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("admin.permissions.modal.descriptionPlaceholder") || 'Enter description'}
-            />
-          </div>
+
           
           <DialogFooter className="pt-4">
             <DialogClose asChild>

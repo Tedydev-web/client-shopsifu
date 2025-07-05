@@ -27,10 +27,10 @@ export const permissionService = {
       
 
     // Lấy chi tiết permission theo ID
-    getById: async (id: string): Promise<PerGetByIdResponse> => {
+    getById: async (id: string, signal?: AbortSignal): Promise<PerGetByIdResponse> => {
         try {
             const url = API_ENDPOINTS.PERMISSION.GETBYID.replace(':id', id);
-            const response = await privateAxios.get(url);
+            const response = await privateAxios.get(url, { signal });
             return response.data;
         } catch (error) {
             throw error;
@@ -38,9 +38,9 @@ export const permissionService = {
     },
 
     // Tạo permission mới
-    create: async (data: PerCreateRequest): Promise<PerCreateResponse> => {
+    create: async (data: PerCreateRequest, signal?: AbortSignal): Promise<PerCreateResponse> => {
         try {
-            const response = await privateAxios.post(API_ENDPOINTS.PERMISSION.POST, data);
+            const response = await privateAxios.post(API_ENDPOINTS.PERMISSION.POST, data, { signal });
             return response.data;
         } catch (error) {
             throw error;
@@ -48,10 +48,10 @@ export const permissionService = {
     },
 
     // Cập nhật permission theo ID
-    update: async (id: string, data: PerUpdateRequest): Promise<PerUpdateResponse> => {
+    update: async (id: string, data: PerUpdateRequest, signal?: AbortSignal): Promise<PerUpdateResponse> => {
         try {
             const url = API_ENDPOINTS.PERMISSION.UPDATE.replace(':id', id);
-            const response = await privateAxios.put(url, data);
+            const response = await privateAxios.put(url, data, { signal });
             return response.data;
         } catch (error) {
             throw error;
@@ -59,10 +59,10 @@ export const permissionService = {
     },
 
     // Xoá permission theo ID
-    delete: async (id: string): Promise<PerDeleteResponse> => {
+    delete: async (id: string, signal?: AbortSignal): Promise<PerDeleteResponse> => {
         try {
             const url = API_ENDPOINTS.PERMISSION.DELETE_BY_ID.replace(':id', id);
-            const response = await privateAxios.delete(url);
+            const response = await privateAxios.delete(url, { signal });
             return response.data;
         } catch (error) {
             throw error;

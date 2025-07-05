@@ -10,6 +10,9 @@ import { usePermissions } from "./usePermissions" // Sử dụng hook mới
 import { useTranslations } from "next-intl"
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
 import { useDataTable } from "@/hooks/useDataTable"
+import { Button } from '@/components/ui/button'
+import { PlusIcon, Loader2 } from 'lucide-react'
+
 
 export function PermissionsTable() {
   const t = useTranslations()
@@ -81,51 +84,64 @@ export function PermissionsTable() {
   });
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex items-center justify-end gap-2">
-        <SearchInput
-          value={pagination?.search || ""}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder={t("admin.permissions.searchPlaceholder")}
-          className="w-full md:max-w-sm"
-        />
-        <DataTableViewOption table={table} />
-      </div>
+   <div className="w-full space-y-4">
+  {/* Hàng riêng cho nút "Thêm mới" */}
+  <div className="flex justify-end">
+    <Button onClick={() => handleOpenModal()} variant="default">
+      <PlusIcon className="w-4 h-4 mr-2" />
+      {t("admin.permissions.addAction") || "Thêm mới quyền"}
+    </Button>
+  </div>
 
-      <DataTable
-        table={table}
-        columns={PermissionsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal })}
-        loading={loading}
-        notFoundMessage={t("admin.permissions.notFound")}
-        pagination={{
-          metadata: pagination || {
-            page: 1,
-            limit: 10,
-            totalPages: 1,
-            totalItems: 0,
-            hasNext: false,
-            hasPrevious: false
-          },
-          onPageChange: handlePageChange,
-          onLimitChange: handleLimitChange,
-        }}
-      />
+  {/* Hàng search + data view option */}
+  <div className="flex justify-between flex-wrap gap-2 items-center">
+    <SearchInput
+      value={pagination?.search || ""}
+      onChange={(e) => handleSearch(e.target.value)}
+      placeholder={t("admin.permissions.searchPlaceholder")}
+      className="w-full md:max-w-sm"
+    />
+    <DataTableViewOption table={table} />
+  </div>
 
-      <PermissionsModalUpsert
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmit}
-        permission={selectedPermission}
-      />
+  {/* Bảng dữ liệu */}
+  <DataTable
+    table={table}
+    columns={PermissionsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal })}
+    loading={loading}
+    notFoundMessage={t("admin.permissions.notFound")}
+    pagination={{
+      metadata: pagination || {
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalItems: 0,
+        hasNext: false,
+        hasPrevious: false
+      },
+      onPageChange: handlePageChange,
+      onLimitChange: handleLimitChange,
+    }}
+  />
 
-      <ConfirmDeleteModal
-        open={deleteOpen}
-        onClose={handleCloseDeleteModal}
-        onConfirm={handleConfirmDelete}
-        loading={deleteLoading}
-        title={t("admin.permissions.deleteModal.deleteTitle")}
-        description={t("admin.permissions.deleteModal.deleteDescription")}
-      />
-    </div>
+  {/* Modal thêm/sửa quyền */}
+  <PermissionsModalUpsert
+    open={isModalOpen}
+    onClose={handleCloseModal}
+    onSubmit={handleSubmit}
+    permission={selectedPermission}
+  />
+
+  {/* Modal xác nhận xóa */}
+  <ConfirmDeleteModal
+    open={deleteOpen}
+    onClose={handleCloseDeleteModal}
+    onConfirm={handleConfirmDelete}
+    loading={deleteLoading}
+    title={t("admin.permissions.deleteModal.deleteTitle")}
+    description={t("admin.permissions.deleteModal.deleteDescription")}
+  />
+</div>
+
   )
 }

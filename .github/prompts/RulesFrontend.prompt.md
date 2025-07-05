@@ -179,4 +179,10 @@ Leverage these shared UI components for consistent implementation:
 7. Follow naming conventions consistently
 
 This structure ensures maintainable, consistent module implementations across the application.
-VIETNAMESEE
+
+
+
+You must follow exactly what is requested.
+Do not assume, add, or do anything beyond the specific instruction.
+If additional clarification is needed, you must ask the user before proceeding.
+All responses must be written in Vietnamese only.

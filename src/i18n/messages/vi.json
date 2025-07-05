@@ -744,7 +744,8 @@
         "updatedAt":"Ngày cập nhật",
         "ID": "ID",
         "editAction": "Chỉnh sửa quyền",
-        "deleteAction": "Xóa quyền"
+        "deleteAction": "Xóa quyền",
+        "Name": "Tên quyền"
       },
       "deleteModal":{
         "deleteTitle": "Thực hiện xóa quyền",
@@ -759,8 +760,10 @@
       "deleteAction": "Xóa quyền",
       "addAction": "Thêm quyền",
       "modal": {
-        "title": "Thêm quyền mới",
-        "subtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "addTitle": "Thêm quyền mới",
+        "addSubtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "editTitle": "Sửa quyền hạn",
+        "editSubtitle": "Nhập thông tin quyền để sửa hệ thống",
         "description": "Mô tả quyền",
         "name": "Tên quyền",
         "path": "Đường dẫn quyền",
@@ -775,7 +778,9 @@
         "delete": "Xóa",
         "processing": "Đang xử lý...",
         "success": "Thêm quyền thành công",
-        "error": "Đã xảy ra lỗi"
+        "error": "Đã xảy ra lỗi",
+        "module": "Module",
+        "modulePlaceholder": "Nhập Module tính năng...."
       },
       "modalEdit": {
         "title": "Chỉnh sửa quyền",

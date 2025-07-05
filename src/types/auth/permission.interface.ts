@@ -40,7 +40,7 @@ export interface PerListResponse {
 
 export interface PerUpdateRequest {
     name: string;
-    description: string;
+    module: string;
     path: string;
     method: string;
 }

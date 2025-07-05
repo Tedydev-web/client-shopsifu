@@ -61,37 +61,61 @@ export function usePermissions() {
   );
 
   const handleCreate = async (data: PerCreateRequest) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      await permissionService.create(data);
+      await permissionService.create(data, controller.signal);
       showToast("Permission created successfully", "success");
       // Re-fetch the data by changing sort to force refresh
       handleSortChange(pagination.sortBy || "id", (pagination.sortOrder as "asc" | "desc") || "asc");
       handleCloseModal();
     } catch (error) {
-      showToast(parseApiError(error), "error");
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), "error");
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
   const handleUpdate = async (id: number, data: PerUpdateRequest) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      await permissionService.update(String(id), data);
+      await permissionService.update(String(id), data, controller.signal);
       showToast("Permission updated successfully", "success");
       // Re-fetch the data by changing sort to force refresh
       handleSortChange(pagination.sortBy || "id", (pagination.sortOrder as "asc" | "desc") || "asc");
       handleCloseModal();
     } catch (error) {
-      showToast(parseApiError(error), "error");
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), "error");
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
   const handleDelete = async (id: number) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      await permissionService.delete(String(id));
+      await permissionService.delete(String(id), controller.signal);
       showToast("Permission deleted successfully", "success");
       // Re-fetch the data by changing sort to force refresh
       handleSortChange(pagination.sortBy || "id", (pagination.sortOrder as "asc" | "desc") || "asc");
     } catch (error) {
-      showToast(parseApiError(error), "error");
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), "error");
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
