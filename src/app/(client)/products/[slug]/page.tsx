@@ -28,7 +28,7 @@ export default function ProductPage({ params }: Props) {
     <ClientLayoutWrapper
       hideHeader={isMobile}
       hideCommit={isMobile}
-      hideHero={isMobile}
+      hideHero
       hideFooter={isMobile}
       topContent={isMobile}
     >

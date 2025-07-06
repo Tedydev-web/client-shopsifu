@@ -85,7 +85,7 @@ export default function ProductGalleryMobile({ images }: Props) {
       )}
 
       {/* ✅ 3 nút đầu trang */}
-      <div className="absolute top-2 left-0 right-0 px-4 flex justify-between items-center z-10">
+      <div className="absolute top-6 left-0 right-0 px-4 flex justify-between items-center z-10">
         <Button
           variant="ghost"
           size="icon"
