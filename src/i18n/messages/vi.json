@@ -227,7 +227,8 @@
         "edit": "Chỉnh sửa",
         "delete": "Xóa"
       }
-    },
+    }
+  },
 
     "ModuleProduct":{
       "title":"Quản lý sản phẩm",
