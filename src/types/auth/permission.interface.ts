@@ -1,101 +1,6 @@
 import { BaseResponse, PaginationRequest } from "../base.interface";
 
-
-export interface PerCreateRequest {
-    name: string;
-    module: string;
-    path: string;
-    method: string;
-}
-
-
-// export interface PerGetAllResponse {
-//     data: Array<{
-//         id: string;
-//         name: string;
-//         path: string;
-//         description: string;
-//         type: string;
-//         method: string;
-//         createdById: string;
-//         updatedById: string;
-//         deletedById: string;
-//         deletedAt: string;
-//         createdAt: string;
-//         updatedAt: string;
-//     }>;
-//     totalItems: number;
-//     page: number;
-//     limit: number;
-//     totalPages: number;
-// }
-
-export interface PerListResponse {
-    data: PerGetAllResponse[];
-    totalItems: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-}
-
-export interface PerUpdateRequest {
-    name: string;
-    module: string;
-    path: string;
-    method: string;
-}
-
-export interface PerUpdateResponse {
-    id: string;
-    name: string;
-    description: string;
-    path: string;
-    method: string;
-    createdById: string;
-    updatedById: string;
-    deletedById: string;
-    deletedAt: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface PerDeleteRequest {
-    id: string;
-}
-
-export interface PerDeleteResponse {
-    message: string;
-}
-
-export interface PerGetByIdResponse {
-    id: string;
-    name: string;
-    description: string;
-    path: string;
-    method: string;
-    createdById: string;
-    updatedById: string;
-    deletedById: string;
-    deletedAt: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-
-
-export interface PermissionItem {
-    id: number;
-    action: string;
-    description: string;
-  }
-
-// export interface PerGetAllResponse extends BaseResponse {
-//     data: {
-//         [key: string]: PermissionItem[];
-//     };
-// };
-
-
+// Định nghĩa chi tiết dữ liệu permission
 export interface PermissionDetail {
     id: number;
     name: string;
@@ -111,5 +16,57 @@ export interface PermissionDetail {
     updatedAt: string;
 }
 
-export interface PerGetAllResponse extends BaseResponse<PermissionDetail[]> {}
-export interface PerCreateResponse extends BaseResponse<PermissionDetail[]>{}
+// Interface request và response
+export interface PerCreateRequest {
+    name: string;
+    module: string;
+    path: string;
+    method: string;
+}
+
+export interface PerUpdateRequest {
+    name: string;
+    module: string;
+    path: string;
+    method: string;
+}
+
+// Loại bỏ generic và định nghĩa rõ kiểu data 
+export interface PerGetAllResponse extends BaseResponse {
+    data: PermissionDetail[]; // Chỉ định rõ kiểu dữ liệu tại đây
+}
+
+export interface PerCreateResponse extends BaseResponse {
+    data: PermissionDetail; // Chỉ định rõ kiểu dữ liệu tại đây
+}
+
+export interface PerUpdateResponse extends BaseResponse {
+    data: PermissionDetail;
+}
+
+export interface PerDeleteResponse extends BaseResponse {
+    data: { message: string };
+}
+
+export interface PerGetByIdResponse extends BaseResponse {
+    data: PermissionDetail;
+}
+
+// Interface khác
+export interface PerListResponse {
+    data: PermissionDetail[];
+    totalItems: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
+export interface PerDeleteRequest {
+    id: string;
+}
+
+export interface PermissionItem {
+    id: number;
+    action: string;
+    description: string;
+}

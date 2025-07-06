@@ -1,4 +1,16 @@
-export interface BaseResponse<T> {
+// export interface BaseResponse<T> {
+//   status?: number;
+//   success?: boolean;
+//   statusCode?: number;
+//   title?: string;
+//   message?: string;
+//   timestamp?: string;
+//   requestId?: string;
+//   data: T;
+//   metadata?: PaginationMetadata;
+// }
+
+export interface BaseResponse {
   status?: number;
   success?: boolean;
   statusCode?: number;
@@ -6,7 +18,7 @@ export interface BaseResponse<T> {
   message?: string;
   timestamp?: string;
   requestId?: string;
-  data: T;
+  data: any; // Sử dụng any thay vì generic type T
   metadata?: PaginationMetadata;
 }
 
