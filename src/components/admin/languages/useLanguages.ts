@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Language } from "./languages-Columns"
 import { languagesService } from "@/services/admin/languagesService"
 import { showToast } from "@/components/ui/toastify"
@@ -8,131 +8,160 @@ import {
   LangUpdateRequest,
   LangGetAllResponse
 } from "@/types/admin/languages.interface"
-import { PaginationRequest } from "@/types/base.interface"
+import { useServerDataTable } from "@/hooks/useServerDataTable"
 import { t } from "i18next"
 
 export function useLanguages() {
-  const [languages, setLanguages] = useState<Language[]>([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [totalItems, setTotalItems] = useState(0)
-  const [page, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  // Tạo các callbacks memoized để tránh tạo lại mỗi lần render
+  const getResponseData = useCallback((response: any) => {
+    return response.data || [];
+  }, []);
 
-  // Get all languages
-  const getAllLanguages = async (params?: PaginationRequest) => {
-    try {
-      setLoading(true)
-      const response = await languagesService.getAll(params)
-      // Map API response to Language type
-      const mappedLanguages: Language[] = response.data.map(lang => ({
-        id: parseInt(lang.id),
-        code: lang.id, // Using id as code
-        name: lang.name,
-        isActive: true, // Default value
-        createdAt: lang.createdAt,
-        updatedAt: lang.updatedAt
-      }))
-      setLanguages(mappedLanguages)
-      setTotalItems(response.totalItems)
-      setCurrentPage(response.page)
-      setTotalPages(response.totalPages)
-    } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error fetching languages:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const getResponseMetadata = useCallback((response: any) => {
+    return {
+      totalItems: response.totalItems,
+      page: response.page,
+      totalPages: response.totalPages,
+      limit: response.limit || 10,
+      hasNext: response.page < response.totalPages,
+      hasPrevious: response.page > 1
+    };
+  }, []);
+
+  const mapResponseToData = useCallback((lang: any): Language => ({
+    id: parseInt(lang.id),
+    code: lang.id, // Using id as code
+    name: lang.name,
+    isActive: true, // Default value
+    createdAt: lang.createdAt,
+    updatedAt: lang.updatedAt
+  }), []);
+
+  // Sử dụng hook useServerDataTable để quản lý data và pagination
+  const {
+    data: languages,
+    loading,
+    pagination,
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    handleSortChange,
+    refreshData,
+  } = useServerDataTable({
+    fetchData: languagesService.getAll,
+    getResponseData,
+    getResponseMetadata,
+    mapResponseToData,
+    initialSort: { sortBy: "id", sortOrder: "asc" },
+    defaultLimit: 10,
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
 
   // Get language by ID
-  const getLanguageById = async (id: string) => {
+  const getLanguageById = useCallback(async (id: string) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      setLoading(true)
-      const response = await languagesService.getById(id)
-      return response
+      const response = await languagesService.getById(id, controller.signal);
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error fetching language:', error)
-      return null
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), 'error');
+      }
+      return null;
     } finally {
-      setLoading(false)
+      clearTimeout(timeoutId);
     }
-  }
+  }, []);
 
   // Create new language
-  const createLanguage = async (data: LangCreateRequest) => {
+  const createLanguage = useCallback(async (data: LangCreateRequest) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      setLoading(true)
-      const response = await languagesService.create(data)
-      showToast(t('admin.showToast.language.createSuccessful'), "success")
-      return response
+      const response = await languagesService.create(data, controller.signal);
+      showToast(t('admin.showToast.language.createSuccessful'), "success");
+      refreshData(); // Refresh data sau khi tạo thành công
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error creating language:', error)
-      return null
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), 'error');
+      }
+      return null;
     } finally {
-      setLoading(false)
+      clearTimeout(timeoutId);
     }
-  }
+  }, [refreshData]);
 
   // Update language
-  const updateLanguage = async (id: string, data: LangUpdateRequest) => {
+  const updateLanguage = useCallback(async (id: string, data: LangUpdateRequest) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      setLoading(true)
-      const response = await languagesService.update(id, data)
-      showToast(t('admin.showToast.language.updateSuccessful'), "success")
-      return response
+      const response = await languagesService.update(id, data, controller.signal);
+      showToast(t('admin.showToast.language.updateSuccessful'), "success");
+      refreshData(); // Refresh data sau khi cập nhật thành công
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error updating language:', error)
-      return null
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), 'error');
+      }
+      return null;
     } finally {
-      setLoading(false)
+      clearTimeout(timeoutId);
     }
-  }
+  }, [refreshData]);
 
   // Delete language
-  const deleteLanguage = async (id: string) => {
+  const deleteLanguage = useCallback(async (id: string) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      setLoading(true)
-      const response = await languagesService.deleteById(id)
-      showToast(t('admin.showToast.language.deleteSuccessful'), "success")
-      return response
+      const response = await languagesService.deleteById(id, controller.signal);
+      showToast(t('admin.showToast.language.deleteSuccessful'), "success");
+      refreshData(); // Refresh data sau khi xóa thành công
+      return response;
     } catch (error) {
-      showToast(parseApiError(error), 'error')
-      console.error('Error deleting language:', error)
-      return null
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), 'error');
+      }
+      return null;
     } finally {
-      setLoading(false)
+      clearTimeout(timeoutId);
     }
-  }
+  }, [refreshData]);
 
-  const handleOpenModal = (language?: Language) => {
+  const handleOpenModal = useCallback((language?: Language) => {
     if (language) {
-      setSelectedLanguage(language)
+      setSelectedLanguage(language);
     } else {
-      setSelectedLanguage(null)
+      setSelectedLanguage(null);
     }
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  }, []);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedLanguage(null)
-  }
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedLanguage(null);
+  }, []);
 
   return {
     languages,
-    totalItems,
-    page,
-    totalPages,
+    pagination, // Thay thế các thuộc tính pagination riêng lẻ
     isModalOpen,
     selectedLanguage,
     loading,
     // API handlers
-    getAllLanguages,
     getLanguageById,
     createLanguage,
     updateLanguage,
@@ -140,5 +169,10 @@ export function useLanguages() {
     // UI handlers
     handleOpenModal,
     handleCloseModal,
-  }
+    // Pagination handlers
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    refreshData,
+  };
 }

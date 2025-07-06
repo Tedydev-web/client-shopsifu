@@ -86,7 +86,7 @@ export default function MobileSettings() {
         <div className="fixed bottom-6 right-4 z-50">
           <Link
             href="/"
-            className="flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all"
+            className="flex items-center justify-center w-12 h-12 bg-white border rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all"
           >
             <Home className="w-5 h-5 text-black" />
           </Link>

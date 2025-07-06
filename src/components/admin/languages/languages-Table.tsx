@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useState, useCallback } from "react"
 import { LanguagesColumns, Language } from "./languages-Columns"
 import SearchInput from "@/components/ui/data-table-component/search-input"
 import LanguagesModalUpsert from "./languages-ModalUpsert"
@@ -10,188 +10,164 @@ import { DataTable } from "@/components/ui/data-table-component/data-table"
 import { Pagination } from "@/components/ui/data-table-component/pagination"
 import { Button } from "@/components/ui/button"
 import { useLanguages } from "./useLanguages"
-import { useDebounce } from "@/hooks/useDebounce"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { useDataTable } from "@/hooks/useDataTable"
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
+
 export function LanguagesTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     languages,
-    totalItems,
-    page,
-    totalPages,
+    pagination,
     loading,
     isModalOpen,
     selectedLanguage,
-    getAllLanguages,
     deleteLanguage,
     createLanguage,
     updateLanguage,
     handleOpenModal,
-    handleCloseModal
+    handleCloseModal,
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    refreshData
   } = useLanguages()
 
-  const [searchValue, setSearchValue] = useState("")
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [languageToDelete, setLanguageToDelete] = useState<Language | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
-  const [isSearching, setIsSearching] = useState(false)
 
-  // Pagination states
-  const [limit, setLimit] = useState(10)
-  const [offset, setOffset] = useState(0)
+  const handleEdit = useCallback((language: Language) => {
+    handleOpenModal(language);
+  }, [handleOpenModal]);
 
-  // Debounce search value
-  const debouncedSearchValue = useDebounce(searchValue, 1000)
+  const handleOpenDelete = useCallback((language: Language) => {
+    setLanguageToDelete(language);
+    setDeleteOpen(true);
+  }, []);
 
-  useEffect(() => {
-    getAllLanguages()
-  }, [])
+  const handleCloseDeleteModal = useCallback(() => {
+    setDeleteOpen(false);
+    setLanguageToDelete(null);
+  }, []);
 
-  // Effect to handle debounced search
-  useEffect(() => {
-    if (debouncedSearchValue !== undefined) {
-      setIsSearching(true)
-      getAllLanguages({ metadata: { page: 1, limit: limit } })
-        .finally(() => {
-          setIsSearching(false)
-        })
-    }
-  }, [debouncedSearchValue, limit])
-
-  const handleEdit = (language: Language) => {
-    handleOpenModal(language)
-  }
-
-  const handleOpenDelete = (language: Language) => {
-    setLanguageToDelete(language)
-    setDeleteOpen(true)
-  }
-
-  const handleCloseDeleteModal = () => {
-    setDeleteOpen(false)
-    setLanguageToDelete(null)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!languageToDelete) return
-    setDeleteLoading(true)
+  const handleConfirmDelete = useCallback(async () => {
+    if (!languageToDelete) return;
+    setDeleteLoading(true);
     try {
-      const success = await deleteLanguage(languageToDelete.code)
-      if (success) {
-        handleCloseDeleteModal()
-        getAllLanguages({ metadata: { page: page, limit: limit } })
-      }
+      await deleteLanguage(languageToDelete.code);
+      // Đóng modal xác nhận xóa sau khi xóa thành công
+      handleCloseDeleteModal();
+      // Lưu ý: refreshData đã được gọi trong deleteLanguage
     } catch (error) {
-      console.error('Error deleting language:', error)
+      // Lỗi đã được xử lý trong deleteLanguage
+      console.error('Error deleting language:', error);
     } finally {
-      setDeleteLoading(false)
+      setDeleteLoading(false);
     }
-  }
+  }, [languageToDelete, deleteLanguage, handleCloseDeleteModal]);
 
-  const handleSubmit = async (values: { code: string; name: string }) => {
+  const handleSubmit = useCallback(async (values: { code: string; name: string }) => {
     try {
       if (selectedLanguage) {
         // Update
-        const response = await updateLanguage(selectedLanguage.code, { name: values.name })
-        if (response) {
-          handleCloseModal()
-          getAllLanguages({ metadata: { page: page, limit: limit } })
-        }
+        await updateLanguage(selectedLanguage.code, { name: values.name });
       } else {
         // Create
-        const response = await createLanguage({ id: values.code, name: values.name })
-        if (response) {
-          handleCloseModal()
-          getAllLanguages({ metadata: { page: page, limit: limit } })
-        }
+        await createLanguage({ id: values.code, name: values.name });
       }
+      // Đóng modal sau khi thực hiện thành công
+      handleCloseModal();
+      // Lưu ý: refreshData đã được gọi trong createLanguage/updateLanguage
     } catch (error) {
-      console.error('Error saving language:', error)
+      // Lỗi đã được xử lý trong createLanguage/updateLanguage
+      console.error('Error handling language operation:', error);
     }
-  }
+  }, [selectedLanguage, createLanguage, updateLanguage, handleCloseModal]);
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value)
-  }
-
-  const handlePageChange = (newPage: number) => {
-    getAllLanguages({ metadata: { page: newPage, limit: limit } })
-  }
-
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit)
-    getAllLanguages({ metadata: { page: 1, limit: newLimit } })
-  }
-
+  // Sử dụng useDataTable để tạo bảng từ dữ liệu
   const table = useDataTable({
     data: languages,
     columns: LanguagesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit }),
-  })
+  });
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex items-center gap-2">
-      <Button 
-          onClick={() => handleOpenModal()}
-          className="ml-auto"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
-        </Button>
-      </div>
-      <div className="flex items-center gap-2">
-        <SearchInput
-          value={searchValue}
-          onValueChange={handleSearch}
-          placeholder={t("admin.languages.searchPlaceholder")}
-          className="max-w-sm"
-        />
-        <DataTableViewOption table={table} />
-      </div>
+   <div className="w-full space-y-4">
+  {/* Hàng 1: Nút Thêm mới */}
+  <div className="flex justify-end">
+    <Button onClick={() => handleOpenModal()}>
+      <PlusIcon className="w-4 h-4 mr-2" />
+      {t("admin.languages.addAction")}
+    </Button>
+  </div>
 
-      <div className="relative">
-        <DataTable
-          table={table}
-          columns={LanguagesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
-          loading={loading || isSearching}
-          notFoundMessage={t('admin.languages.notFound')}
-        />
-      </div>
-
-      {totalPages > 0 && (
-        <Pagination
-          limit={limit}
-          page={page}
-          totalPages={totalPages}
-          totalRecords={totalItems}
-          onPageChange={handlePageChange}
-          onLimitChange={handleLimitChange}
-        />
-      )}
-
-      <LanguagesModalUpsert 
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        mode={selectedLanguage ? "edit" : "add"}
-        language={selectedLanguage}
-        onSubmit={handleSubmit}
-      />
-
-      <ConfirmDeleteModal
-        open={deleteOpen}
-        onClose={() => { if (!deleteLoading) handleCloseDeleteModal() }}
-        onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa ngôn ngữ"
-        description={
-          languageToDelete
-            ? <>Bạn có chắc chắn muốn xóa ngôn ngữ <b>{languageToDelete.name}</b> không? Hành động này không thể hoàn tác.</>
-            : ""
-        }
-        confirmText="Xóa"
-        cancelText="Hủy"
-        loading={deleteLoading}
+  {/* Hàng 2: Search + View Option */}
+  <div className="flex justify-between flex-wrap gap-4 items-center">
+    <div className="flex-1">
+      <SearchInput
+        value={pagination.search || ""}
+        onValueChange={(value) => handleSearch(value)}
+        placeholder={t("admin.languages.searchPlaceholder")}
+        className="w-full md:max-w-sm"
       />
     </div>
+    <DataTableViewOption table={table} />
+  </div>
+
+  {/* Data Table */}
+  <div className="relative">
+    <DataTable
+      table={table}
+      columns={LanguagesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit })}
+      loading={loading}
+      notFoundMessage={t("admin.languages.notFound")}
+      pagination={{
+        metadata: pagination || {
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+          totalItems: 0,
+          hasNext: false,
+          hasPrevious: false,
+        },
+        onPageChange: handlePageChange,
+        onLimitChange: handleLimitChange,
+      }}
+    />
+  </div>
+
+  {/* Modal thêm/sửa */}
+  <LanguagesModalUpsert
+    open={isModalOpen}
+    onClose={handleCloseModal}
+    mode={selectedLanguage ? 'edit' : 'add'}
+    language={selectedLanguage}
+    onSubmit={handleSubmit}
+  />
+
+  {/* Modal xác nhận xóa */}
+  <ConfirmDeleteModal
+    open={deleteOpen}
+    onClose={() => {
+      if (!deleteLoading) handleCloseDeleteModal()
+    }}
+    onConfirm={handleConfirmDelete}
+    title={t('admin.languages.modalDelete.deleteConfirmTitle')}
+    description={
+      languageToDelete ? (
+        <>
+          {t('admin.languages.modalDelete.deleteConfirmMessage')}{' '}
+          <b>{languageToDelete.name}</b>?
+        </>
+      ) : (
+        ''
+      )
+    }
+    confirmText={t('admin.languages.deleteAction')}
+    cancelText={t('admin.languages.modalDelete.cancelAction')}
+    loading={deleteLoading}
+  />
+</div>
+
   )
 }

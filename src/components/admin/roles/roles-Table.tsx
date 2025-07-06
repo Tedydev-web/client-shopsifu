@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { PlusIcon, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,7 @@ import SearchInput from '@/components/ui/data-table-component/search-input'
 import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option'
 
 export default function RolesTable() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const {
     roles,
     totalItems,

@@ -18,13 +18,13 @@ import { LoginSchema } from '../schema'
 import { useSignin } from './useSignin'
 import { AnimatedForm, AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
 import { OAuthForm } from '../layout/OAuthForm'
-import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handleSignin, loading } = useSignin()
-  const { t } = useTranslation()
+  const t = useTranslations()
   const Schema = LoginSchema(t)
 
   type LoginFormData = z.infer<typeof Schema>;
@@ -40,10 +40,17 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const [showPassword, setShowPassword] = useState(false)
 
+  const onSubmit = async (values: z.infer<typeof Schema>) => {
+    // Create a copy of the values and remove rememberMe before submitting
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { rememberMe, ...submissionValues } = values
+    await handleSignin(submissionValues)
+  }
+
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleSignin)}
+        onSubmit={form.handleSubmit(onSubmit)}
         className={cn('flex flex-col gap-6', className)}
         {...props}
       >

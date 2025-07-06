@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { auditLogsService } from '@/services/admin/auditLogsService';
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 
 export function AuditLogsStats() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [stats, setStats] = useState({
     totalLogs: 0,
     totalSuccessLogs: 0,

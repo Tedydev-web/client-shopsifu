@@ -24,11 +24,11 @@ import {
   AnimatedFormItem,
   AnimatedButton
 } from '@/components/ui/animated-form'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 
 export function VerifyForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { loading, handleVerifyCode, resendOTP } = useVerify()
-  const { t } = useTranslation('')
+  const t = useTranslations('')
   const otp = otpSchema(t)
 
   const form = useForm<z.infer<typeof otp>>({

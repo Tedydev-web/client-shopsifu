@@ -4,14 +4,14 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { sidebarConfig, SidebarItem, settingsSidebarConfig } from '@/constants/sidebarConfig'
+import { useSidebarConfig, useSettingsSidebarConfig, SidebarItem } from '@/constants/sidebarConfig'
 import { ChevronDown, X, Undo, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import { ProfileDropdownSidebar } from './ProfileDropdown-Sidebar'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from "next-intl";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -20,12 +20,14 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen: externalOpen, onOpenChange, onCollapse }: SidebarProps) {
+  const sidebarConfig = useSidebarConfig();
+  const settingsSidebarConfig = useSettingsSidebarConfig();
   const pathname = usePathname()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [internalOpen, setInternalOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { isMobile } = useResponsive()
-  const {t} = useTranslation('')
+  const t = useTranslations('')
 
   const open = externalOpen ?? internalOpen
   const setOpen = (value: boolean) => {
@@ -253,7 +255,7 @@ export function Sidebar({ isOpen: externalOpen, onOpenChange, onCollapse }: Side
         {!isSettingsPage && !isCollapsed && (
           <div className="px-4 py-2">
             <Link
-              href="/admin/settings"
+              href="/admin/settings/profile"
               className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-[#52525B] hover:bg-primary/10 font-semibold text-sm"
             >
               <Settings className="w-5 h-5 text-[#52525B]" />

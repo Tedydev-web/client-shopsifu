@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { AnimatedFormItem, AnimatedButton } from '@/components/ui/animated-form'
 import { authService } from '@/services/auth/authService'
 import { toast } from 'react-toastify'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 
 interface OAuthFormProps {
   className?: string
@@ -14,7 +14,7 @@ interface OAuthFormProps {
 
 export function OAuthForm({ className, type = 'signin' }: OAuthFormProps) {
   const [error, setError] = useState<string | null>(null)
-  const { t } = useTranslation('')
+  const t = useTranslations('')
 
   const handleGoogleAuth = async () => {
     try {

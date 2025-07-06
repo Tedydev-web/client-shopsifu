@@ -1,24 +1,28 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import i18n from '@/i18n/i18n'; // để đồng bộ thay đổi với i18n
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface LanguageState {
-  language: 'vi' | 'en';
-}
-
-const initialState: LanguageState = {
-  language: 'vi', // mặc định là tiếng Việt
+const initialState = {
+  language: "vi" as "vi" | "en",
 };
 
-const langSlice = createSlice({
-  name: 'language',
+
+const languageSlice = createSlice({
+  name: "language",
   initialState,
   reducers: {
-    setLanguage: (state, action: PayloadAction<'vi' | 'en'>) => {
+    setLanguage: (state, action: PayloadAction<"vi" | "en">) => {
       state.language = action.payload;
-      i18n.changeLanguage(action.payload); // cập nhật i18n luôn
+      localStorage.setItem("language", state.language);
+      document.cookie = `NEXT_LOCALE=${state.language}; path=/;`;
+      
+    },
+    toggleLanguage: (state) => {
+      state.language = state.language === "vi" ? "en" : "vi";
+      localStorage.setItem("language", state.language);
+      document.cookie = `NEXT_LOCALE=${state.language}; path=/;`;
+
     },
   },
 });
 
-export const { setLanguage } = langSlice.actions;
-export default langSlice.reducer;
+export const { setLanguage, toggleLanguage } = languageSlice.actions;
+export default languageSlice.reducer;

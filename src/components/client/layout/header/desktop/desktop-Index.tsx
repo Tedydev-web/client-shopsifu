@@ -75,7 +75,7 @@ function HeaderLayout() {
           </div>
         </div>
       </header>
-      <DesktopCommit />
+      {/* <DesktopCommit /> */}
       <div className="body-overlay" />
     </>
   );

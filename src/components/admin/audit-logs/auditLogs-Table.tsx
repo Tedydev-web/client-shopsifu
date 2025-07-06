@@ -10,12 +10,12 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { Loader2 } from "lucide-react";
 import { AuditLogsModalView } from "./auditLogs-ModalView";
 import { AuditLogsStats } from "./aduitLogs-Stats";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { useDataTable } from "@/hooks/useDataTable";
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option";
 
 export function AuditLogsTable() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const {
     auditLogs,
     totalItems,

@@ -12,7 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>
@@ -21,7 +21,7 @@ interface DataTableViewOptionsProps<TData> {
 export default function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
-  const { t } = useTranslation()
+  const t = useTranslations()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

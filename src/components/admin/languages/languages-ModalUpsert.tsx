@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import { showToast } from "@/components/ui/toastify"
 import { Language } from "./languages-Columns"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ISO6391 from 'iso-639-1'
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 interface LanguagesModalUpsertProps {
   open: boolean
@@ -39,60 +39,66 @@ export default function LanguagesModalUpsert({
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState("")
-  const { t } = useTranslation()
+  const t = useTranslations()
+  
+  // Reset form khi modal mở/đóng hoặc chuyển chế độ
   useEffect(() => {
     if (mode === 'edit' && language) {
       setCode(language.code || "")
       setName(language.name || "")
       setIsActive(language.isActive ?? true)
+      setSearch("") // Reset search khi chuyển mode
     } else if (mode === 'add') {
       setCode("")
       setName("")
       setIsActive(true)
+      setSearch("") // Reset search khi chuyển mode
     }
   }, [mode, language, open])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     if (!code) {
-      showToast("Vui lòng chọn mã ngôn ngữ", "error")
+      showToast(t("admin.languages.validation.codeRequired"), "error")
       return
     }
     if (name.length < 2) {
-      showToast("Tên ngôn ngữ phải có ít nhất 2 ký tự", "error")
+      showToast(t("admin.languages.validation.nameMinLength"), "error")
       return
     }
 
     setLoading(true)
     try {
       await onSubmit({ code, name })
-      onClose()
+      // onClose() được gọi trong component cha sau khi xử lý thành công
     } catch (error) {
-      showToast("Có lỗi xảy ra", "error")
+      showToast(t("admin.languages.error.generic"), "error")
     } finally {
       setLoading(false)
     }
-  }
+  }, [code, name, onSubmit, t]);
 
   // Lấy danh sách code ngôn ngữ từ iso-639-1
-  const languageOptions = ISO6391.getAllCodes().map(code => ({
+  const languageOptions = useCallback(() => ISO6391.getAllCodes().map(code => ({
     code,
     name: ISO6391.getNativeName(code) || ISO6391.getName(code)
-  }))
+  })), [])();
 
   // Lọc theo search
-  const filteredOptions = search
-    ? languageOptions.filter(opt =>
-        opt.code.toLowerCase().includes(search.toLowerCase()) ||
-        (opt.name && opt.name.toLowerCase().includes(search.toLowerCase()))
-      )
-    : languageOptions
+  const filteredOptions = useCallback(() => {
+    return search
+      ? languageOptions.filter(opt =>
+          opt.code.toLowerCase().includes(search.toLowerCase()) ||
+          (opt.name && opt.name.toLowerCase().includes(search.toLowerCase()))
+        )
+      : languageOptions
+  }, [search, languageOptions])();
 
-  const handleCodeChange = (selectedCode: string) => {
+  const handleCodeChange = useCallback((selectedCode: string) => {
     setCode(selectedCode)
     const found = languageOptions.find(opt => opt.code === selectedCode)
     if (found) setName(found.name)
-  }
+  }, [languageOptions]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -127,7 +133,7 @@ export default function LanguagesModalUpsert({
                 </div>
                 <div className="max-h-60 overflow-y-auto">
                   {filteredOptions.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground">Không tìm thấy ngôn ngữ phù hợp</div>
+                    <div className="p-2 text-sm text-muted-foreground">{t("admin.languages.modal.noLanguagesFound")}</div>
                   ) : (
                     filteredOptions.map(opt => (
                       <SelectItem key={opt.code} value={opt.code} className="w-full">

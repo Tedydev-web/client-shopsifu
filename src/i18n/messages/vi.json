@@ -227,8 +227,83 @@
         "edit": "Chỉnh sửa",
         "delete": "Xóa"
       }
-      }
+    },
 
+    "ModuleProduct":{
+      "title":"Quản lý sản phẩm",
+      "subtitle":"Quản lý tất cả sản phẩm tại đây",
+      "DataTable":{
+        "name":"Tên sản phẩm",
+        "price":"Giá",
+        "category":"Danh mục",
+        "stock":"Tồn kho",
+        "status":"Trạng thái",
+        "action":"Hành động",
+        "image":"Hình ảnh",
+        "description":"Mô tả",
+        "slug":"Slug",
+        "createdAt":"Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "edit":"Sửa thông tin",
+        "delete":"Xóa sản phẩm",
+        "view":"Xem sản phẩm",
+        "notFound": "Không tìm thấy sản phẩm"
+      },
+      "Status":{
+        "active":"Hoạt động",
+        "inactive":"Không hoạt động",
+        "archived":"Đã lưu trữ"
+      },
+      "searchPlaceholder":"Tìm kiếm theo tên sản phẩm",
+      "DeleteModal":{
+        "title":"Xác nhận xóa",
+        "description":"Bạn có chắc chắn muốn xóa sản phẩm này?",
+        "confirmText":"Xóa",
+        "cancelText":"Hủy"
+      },
+      "ExportData":{
+        "title":"Xuất dữ liệu",
+        "description":"Xuất dữ liệu sản phẩm",
+        "confirmText":"Xuất",
+        "cancelText":"Hủy",
+        "pickDate":"Chọn ngày",
+        "selectFormat":"Chọn định dạng",
+        "fileFormat":"Định dạng file",
+        "dateRange":"Khoảng thời gian"
+      },
+      "Filter":{
+        "category":"Danh mục",
+        "price":"Giá",
+        "stock":"Tồn kho",
+        "status":"Trạng thái",
+        "action":"Hành động",
+        "image":"Hình ảnh",
+        "description":"Mô tả",
+        "slug":"Slug",
+        "createdAt":"Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "edit":"Sửa thông tin",
+        "delete":"Xóa sản phẩm",
+        "notFound": "Không tìm thấy sản phẩm",
+        "priceRange":"Khoảng giá"
+      },
+      "AddNew":{
+        "page":{
+          "breadcrumb":{
+            "products":"Sản phẩm",
+            "newPage":"Thêm mới sản phẩm"
+          },
+          "title":"Thêm sản phẩm",
+          "formPlaceholder":""
+        }
+      },
+      "mainDetails":{
+        "title":"Chi tiết sản phẩm",
+        "productTitle":"Tên sản phẩm",
+        "productTitlePlaceholder":"Nhập tên sản phẩm",
+        "content":"Nội dung",
+        "contentPlaceholder":"Nhập nội dung"
+      }
     },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
@@ -239,11 +314,45 @@
         "newOrders": "Đơn hàng mới",
         "processedOrders": "Đơn hàng đã xử lý"
       },
-
+      "permission":{
+        "permissionManager": "Quản lý quyền"
+      },
+      "role":{
+        "roleManager": "Quản lý vai trò"
+      },
+      "user":{
+        "userManager": "Quản lý người dùng"
+      },
+      "device":{
+        "deviceManager": "Quản lý thiết bị"
+      },
+      "brand":{
+        "brandManager": "Quản lý thương hiệu"
+      },
+      "audit-logs":{
+        "auditLogManager": "Quản lý nhật ký"
+      },
+      "category":{
+        "category": "Danh mục"
+      },
       "products": {
         "products": "Sản phẩm",
         "productsList": "Danh sách sản phẩm",
-        "addProducts": "Thêm sản phẩm"
+        "addProducts": "Thêm sản phẩm",
+        "title": "Quản lý sản phẩm",
+        "subtitle": "Quản lý tất cả sản phẩm tại đây",
+        "form": {
+          "name": "Tên sản phẩm",
+          "slug": "Slug",
+          "category": "Danh mục",
+          "price": "Giá",
+          "stock": "Tồn kho",
+          "status": "Trạng thái",
+          "image": "Hình ảnh",
+          "description": "Mô tả",
+          "submit": "Lưu",
+          "cancel": "Hủy"
+        }
       },
 
       "categories": {
@@ -304,7 +413,11 @@
       "stock": "Tồn kho",
       "status": "Trạng thái",
       "view": "Xem",
-      "toggle_columns": "Bật/tắt cột"
+      "toggle_columns": "Bật/tắt cột",
+      "edit": "Sửa nội dung",
+      "delete": "Xóa nội dung",
+      "Active": "Hoạt động",
+      "Inactive": "Ngừng hoạt động"
     },
     "dataTableExport": {
       "export": "Xuất tệp",
@@ -601,7 +714,10 @@
         "description": "Mô tả vai trò",
         "path": "Đường dẫn vai trò",
         "method": "Phương thức vai trò",
-        "namePlaceholder": "Nhập tên vai trò"
+        "namePlaceholder": "Nhập tên vai trò",
+        "module": "Module",
+        "createdAt": "Ngày tạo",
+        "updatedAt":"Ngày cập nhật"
       },
       "toast": {
         "addSuccess": "Thêm vai trò thành công",
@@ -663,12 +779,23 @@
       "addTitle": "Thêm quyền",
       "editTitle": "Chỉnh sửa quyền",
       "form": {
-        "name": "Tên chức năng",
+        "name": "Đường dẫn quyền",
         "subtitle": "Quản lý tất cả quyền hạn của bạn",
         "description": "Mô tả quyền",
         "path": "Đường dẫn quyền",
         "method": "Phương thức quyền",
-        "namePlaceholder": "Nhập tên quyền"
+        "namePlaceholder": "Nhập tên quyền",
+        "module": "Module",
+        "createdAt": "Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "ID": "ID",
+        "editAction": "Chỉnh sửa quyền",
+        "deleteAction": "Xóa quyền",
+        "Name": "Tên quyền"
+      },
+      "deleteModal":{
+        "deleteTitle": "Thực hiện xóa quyền",
+        "deleteDescription": "Bạn có chắc chắn xóa quyền hạn này không?"
       },
       "toast": {
         "addSuccess": "Thêm quyền thành công",
@@ -679,8 +806,10 @@
       "deleteAction": "Xóa quyền",
       "addAction": "Thêm quyền",
       "modal": {
-        "title": "Thêm quyền mới",
-        "subtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "addTitle": "Thêm quyền mới",
+        "addSubtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "editTitle": "Sửa quyền hạn",
+        "editSubtitle": "Nhập thông tin quyền để sửa hệ thống",
         "description": "Mô tả quyền",
         "name": "Tên quyền",
         "path": "Đường dẫn quyền",
@@ -695,7 +824,9 @@
         "delete": "Xóa",
         "processing": "Đang xử lý...",
         "success": "Thêm quyền thành công",
-        "error": "Đã xảy ra lỗi"
+        "error": "Đã xảy ra lỗi",
+        "module": "Module",
+        "modulePlaceholder": "Nhập Module tính năng...."
       },
       "modalEdit": {
         "title": "Chỉnh sửa quyền",
@@ -843,6 +974,11 @@
         "success": "Cập nhật ngôn ngữ thành công",
         "error": "Đã xảy ra lỗi",
         "edit": "Chỉnh sửa ngôn ngữ"
+      },
+      "modalDelete":{
+        "deleteConfirmTitle": "Xóa ngôn ngữ",
+        "deleteConfirmMessage": "Bạn có chắc chắn xóa ngôn ngữ",
+        "cancelAction": "Hủy"
       }
     },
     "settings": {

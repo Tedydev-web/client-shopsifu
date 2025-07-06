@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { z, ZodError } from 'zod'
 import {
   Dialog,
@@ -38,7 +38,7 @@ interface UsersModalUpsertProps {
 export default function UsersModalUpsert({
   roles, open, onClose, mode, user, onSubmit
 }: UsersModalUpsertProps) {
-  const { t } = useTranslation('')
+  const t = useTranslations('')
   // Form state
   const [step, setStep] = useState(1);
   const [firstName, setFirstName] = useState("")

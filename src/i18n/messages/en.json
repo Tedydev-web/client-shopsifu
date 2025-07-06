@@ -1063,6 +1063,39 @@
       "myPurchase": {
         "myPurchase": "My Purchase"
       }
+    },
+
+    "cart": {
+      "title": "Shopping Cart",
+      "edit": "Edit",
+      "done": "Done",
+      "emptyCart": "Your cart is empty",
+      "continueShopping": "Continue Shopping",
+      "checkout": "Checkout",
+      "itemsInCart": "{{count}} items in your cart",
+      "totalPrice": "Total Price",
+      "removeItem": "Remove Item",
+      "updateQuantity": "Update Quantity",
+      "quantity": "Quantity",
+      "subtotal": "Subtotal",
+      "taxesAndFees": "Taxes & Fees",
+      "shippingCost": "Shipping Cost",
+      "totalAmount": "Total Amount",
+      "proceedToCheckout": "Proceed to Checkout",
+
+      "footer": {
+        "platformVoucher": "Platform Voucher",
+        "selectOrEnterCode": "Select or enter code",
+        "noItemSelected": "No item selected",
+        "selectAll": "Select All ({{count}})",
+        "delete": "Delete",
+        "removeInactive": "Remove inactive products",
+        "moveToLikes": "Move to My Likes",
+        "total": "Total",
+        "items": "items",
+        "youSaved": "You saved ₫{{amount}}",
+        "checkout": "Check Out"
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 'use client'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table-component/data-table'
 import { Pagination } from '@/components/ui/data-table-component/pagination'
@@ -14,7 +14,7 @@ import { useDataTable } from '@/hooks/useDataTable'
 import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option'
 
 export default function UserTable() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   
   const {
     data,

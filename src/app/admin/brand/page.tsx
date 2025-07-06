@@ -1,16 +1,16 @@
 'use client'
 
 import BrandTableWrapper from "@/components/admin/brand/brand-Wrapper";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export default function BrandPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">{t("admin.brand.title", "Quản lý thương hiệu")}</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{t("admin.brand.title")}</h2>
         <p className="text-muted-foreground">
-          {t("admin.brand.subtitle", "Quản lý các thương hiệu trong hệ thống.")}
+          {t("admin.brand.subtitle")}
         </p>
       </div>
       <BrandTableWrapper />

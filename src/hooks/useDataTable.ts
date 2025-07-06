@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,6 +13,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  TableOptions,
 } from '@tanstack/react-table'
 
 interface UseDataTableProps<TData> {
@@ -26,7 +27,8 @@ export function useDataTable<TData>({ data, columns }: UseDataTableProps<TData>)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const table = useReactTable({
+  // Gọi hook ở top level với options đã được memoized - không qua useMemo
+  const table = useReactTable<TData>({
     data,
     columns,
     state: {
@@ -46,14 +48,9 @@ export function useDataTable<TData>({ data, columns }: UseDataTableProps<TData>)
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    // Bổ sung tree/expand/collapse
-    // Nếu chỉ cần 1 cấp cha-con, chỉ trả về children ở cấp 1, các cấp sâu hơn sẽ không expand được
-    getSubRows: (row: any) => Array.isArray(row.children) && row.children.length > 0 && !row._isChild
-      ? row.children.map((child: any) => ({ ...child, _isChild: true }))
-      : [],
-    getRowId: (row: any) => row.id,
-    getExpandedRowModel: require('@tanstack/react-table').getExpandedRowModel(),
-  })
+    // Disable internal pagination as we're using server-side pagination
+    manualPagination: true,
+  });
 
   return table
 }
