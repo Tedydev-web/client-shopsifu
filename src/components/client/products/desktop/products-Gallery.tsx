@@ -51,7 +51,6 @@ export default function ProductGallery({ images }: Props) {
     }
   };
 
-  // ✨ Disable scroll when modal open
   useEffect(() => {
     if (selectedIndex !== null) {
       document.body.style.overflow = "hidden";
@@ -59,7 +58,6 @@ export default function ProductGallery({ images }: Props) {
     } else {
       document.body.style.overflow = "";
     }
-
     return () => {
       document.body.style.overflow = "";
     };
@@ -78,7 +76,7 @@ export default function ProductGallery({ images }: Props) {
       />
 
       {/* Thumbnails */}
-      <div className="w-full flex items-center gap-2">
+      <div className="w-full flex items-center gap-1">
         <Button
           variant="ghost"
           className="w-10 h-10 bg-white border shadow-sm rounded-full"
@@ -123,34 +121,46 @@ export default function ProductGallery({ images }: Props) {
       {/* Modal */}
       {selectedIndex !== null && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-hidden">
-          <div
-            className="absolute inset-0"
-            onClick={() => setSelectedIndex(null)}
-          />
-
           <div className="relative z-50 w-full h-full flex items-center justify-center px-4">
-            {/* Close */}
+            {/* ✅ Nền đen click để đóng modal */}
+            <div
+              className="absolute inset-0 pointer-events-auto"
+              onClick={() => setSelectedIndex(null)}
+              style={{ zIndex: 0 }}
+            />
+
+            {/* Nút đóng */}
             <Button
               size="icon"
               variant="ghost"
               onClick={() => setSelectedIndex(null)}
-              className="absolute top-6 right-6 w-10 h-10 bg-white shadow rounded-full"
+              className="absolute top-6 right-6 w-10 h-10 bg-white shadow rounded-full z-20"
             >
               <X className="w-6 h-6" />
             </Button>
 
-            {/* Left arrow */}
+            {/* Nút mũi tên trái */}
             <Button
               size="icon"
               variant="ghost"
               onClick={showPrev}
-              className="absolute left-[max(1rem,calc(50%-350px))] top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow rounded-full"
+              className="absolute left-[max(1rem,calc(50%-350px))] top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow rounded-full z-20"
             >
               <ChevronLeft className="w-7 h-7" />
             </Button>
 
-            {/* Main image in modal */}
-            <div className="flex w-full max-w-6xl h-[90vh] rounded-xl overflow-hidden relative items-center justify-center">
+            {/* Nút mũi tên phải */}
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={showNext}
+              className="absolute right-[max(1rem,calc(50%-350px))] top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow rounded-full z-20"
+            >
+              <ChevronRight className="w-7 h-7" />
+            </Button>
+
+            {/* Nội dung modal */}
+            <div className="flex w-full max-w-6xl h-[90vh] rounded-xl overflow-hidden relative items-center justify-center z-10">
               <div className="flex-1 flex items-center justify-center p-4">
                 <Image
                   src={images[selectedIndex]}
@@ -161,11 +171,11 @@ export default function ProductGallery({ images }: Props) {
                 />
               </div>
 
-              {/* Modal thumbnails */}
+              {/* Thumbnail modal */}
               <div
                 ref={modalThumbRef}
                 className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 overflow-x-auto max-w-[90%] px-2
-                [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden z-10"
               >
                 {images.map((img, index) => (
                   <Image
@@ -182,16 +192,6 @@ export default function ProductGallery({ images }: Props) {
                 ))}
               </div>
             </div>
-
-            {/* Right arrow */}
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={showNext}
-              className="absolute right-[max(1rem,calc(50%-350px))] top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow rounded-full"
-            >
-              <ChevronRight className="w-7 h-7" />
-            </Button>
           </div>
         </div>
       )}
