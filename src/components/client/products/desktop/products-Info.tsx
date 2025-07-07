@@ -30,8 +30,10 @@ interface Product {
 }
 
 export default function ProductInfo({ product }: { product: Product }) {
-  const sizes = product.variations.find(v => v.name === "Kích thước")?.options ?? [];
-  const colors = product.variations.find(v => v.name === "Màu sắc")?.options ?? [];
+  const sizes =
+    product.variations.find((v) => v.name === "Kích thước")?.options ?? [];
+  const colors =
+    product.variations.find((v) => v.name === "Màu sắc")?.options ?? [];
 
   return (
     <div className="flex-1 space-y-4">
@@ -41,7 +43,8 @@ export default function ProductInfo({ product }: { product: Product }) {
       {/* Giá, giảm giá, flash sale */}
       <div className="flex items-center gap-4">
         <span className="text-red-600 text-2xl font-bold">
-          ₫{(product.flashSale?.isActive
+          ₫
+          {(product.flashSale?.isActive
             ? product.flashSale.salePrice
             : product.discountPrice
           ).toLocaleString("vi-VN")}
