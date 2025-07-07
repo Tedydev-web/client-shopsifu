@@ -63,7 +63,7 @@ export const productMock = {
     "/images/client/product/Product-2.webp",
     "/images/client/product/Product-3.webp",
   ],
-  video: "/videos/client/product-demo.mp4",
+  video: "https://www.youtube.com/watch?v=-l3JvyMHfEQ&list=RD-l3JvyMHfEQ&start_radio=1&pp=oAcB",
   specifications: [
     { name: "Chất liệu", value: "Vải + cao su" },
     { name: "Thương hiệu", value: "XYZ" },

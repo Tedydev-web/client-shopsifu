@@ -77,7 +77,7 @@ export default function ProductDetail({ slug }: Props) {
       {/* ✅ Khối chi tiết sản phẩm */}
       <div className="max-w-[1200px] mx-auto bg-white p-4 rounded">
         <div className="flex flex-col md:flex-row gap-6">
-          <ProductGallery images={product.images} />
+          <ProductGallery images={productMock.images} video={productMock.video} />
           <ProductInfo product={product} />
         </div>
 
