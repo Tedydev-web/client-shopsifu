@@ -184,6 +184,26 @@
     }
   },
   "admin": {
+    "ModuleUsers":{
+      "Table":{
+        "name":"Tên người dùng",
+        "Email": "Email",
+        "status":"Trạng thái",
+        "createdAt":"Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "notFound": "Không tìm thấy người dùng",
+        "addAction": "Thêm người dùng",
+        "searchPlaceholder": "Tìm theo tên hoặc mô tả vai trò....",
+        "deleteConfirm":{
+          "title": "Xác nhận xóa người dùng",
+          "description":"Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không thể hoàn tác."
+        },
+        "actions":{
+          "edit": "Chỉnh sửa người dùng",
+          "delete": "Xóa người dùng"
+        }
+      }
+    },
     "ModuleProduct":{
       "title":"Quản lý sản phẩm",
       "subtitle":"Quản lý tất cả sản phẩm tại đây",

@@ -14,7 +14,7 @@ import { useDataTable } from '@/hooks/useDataTable'
 import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option'
 
 export default function UserTable() {
-  const t = useTranslations();
+  const t = useTranslations("admin.ModuleUsers.Table");
   
   const {
     data,
@@ -63,14 +63,14 @@ export default function UserTable() {
           onClick={() => handleOpenUpsertModal('add')}
           className="ml-auto"
         >
-          <PlusIcon className="w-4 h-4 mr-2" />{t("admin.languages.addAction")}
+          <PlusIcon className="w-4 h-4 mr-2" />{t("addAction")}
         </Button>
       </div>
        <div className="flex items-center gap-2">
         <SearchInput
           value={search}
           onValueChange={handleSearch}
-          placeholder={t("admin.languages.searchPlaceholder")}
+          placeholder={t("searchPlaceholder")}
           className="max-w-sm"
         />
         <DataTableViewOption table={table} />
@@ -80,7 +80,7 @@ export default function UserTable() {
         table={table}
         columns={userColumns({ onEdit: (user) => handleOpenUpsertModal('edit', user), onDelete: handleOpenDelete })}
         loading={loading || isSearching}
-        notFoundMessage={t('admin.users.notFound')}
+        notFoundMessage={t('notFound')}
       />
 
       {totalPages > 1 && (
@@ -98,10 +98,10 @@ export default function UserTable() {
         open={deleteOpen}
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
-        title={t('admin.users.deleteConfirm.title')}
+        title={t('deleteConfirm.title')}
         description={
           userToDelete
-            ? t('admin.users.deleteConfirm.description', {
+            ? t('deleteConfirm.description', {
                 name: userToDelete?.userProfile?.username || '',
               })
             : ''
