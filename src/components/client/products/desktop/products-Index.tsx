@@ -21,10 +21,10 @@ interface Props {
 }
 
 export default function ProductDetail({ slug }: Props) {
-  // ✅ An toàn khi đọc variations
   const sizes =
     productMock?.variations?.find((v) => v.name === "Kích thước")?.options ||
     [];
+
   const colors =
     productMock?.variations?.find((v) => v.name === "Màu sắc")?.options || [];
 
@@ -32,9 +32,9 @@ export default function ProductDetail({ slug }: Props) {
     ...productMock,
     sizes,
     colors,
+    media: productMock.media as { type: "image" | "video"; src: string }[], // ✅ ép kiểu tại đây
   };
 
-  // ✅ Nếu không có shop hoặc shipping hoặc warranty
   if (!product?.shop || !product.shipping || !product.warranty) {
     return (
       <div className="p-4 text-red-500">
@@ -74,23 +74,12 @@ export default function ProductDetail({ slug }: Props) {
         </Breadcrumb>
       </div>
 
-      {/* ✅ Khối chi tiết sản phẩm */}
+      {/* ✅ Chi tiết sản phẩm */}
       <div className="max-w-[1200px] mx-auto bg-white p-4 rounded">
         <div className="flex flex-col md:flex-row gap-6">
-          <ProductGallery images={productMock.images} video={productMock.video} />
+          <ProductGallery media={product.media} />
           <ProductInfo product={product} />
         </div>
-
-        {/* ✅ Video */}
-        {product.video && (
-          <div className="mt-6">
-            <video
-              controls
-              className="w-full max-h-[500px] rounded-lg border"
-              src={product.video}
-            />
-          </div>
-        )}
 
         {/* ✅ Thông số kỹ thuật */}
         <div className="mt-6">
@@ -102,14 +91,13 @@ export default function ProductDetail({ slug }: Props) {
           <ProductReviews reviews={product.reviews} />
         </div>
 
-        {/* ✅ Sản phẩm gợi ý */}
+        {/* ✅ Gợi ý sản phẩm */}
         <div className="mt-6">
           <ProductSuggestions products={product.suggestions} />
         </div>
 
-        {/* ✅ Thông tin shop + vận chuyển */}
+        {/* ✅ Shop + Vận chuyển */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Shop info */}
           <div className="p-4 border rounded-lg">
             <h4 className="font-semibold mb-2 text-sm">Thông tin Shop</h4>
             <ul className="text-sm text-muted-foreground space-y-1">
@@ -121,7 +109,6 @@ export default function ProductDetail({ slug }: Props) {
             </ul>
           </div>
 
-          {/* Shipping info */}
           <div className="p-4 border rounded-lg">
             <h4 className="font-semibold mb-2 text-sm">Thông tin vận chuyển</h4>
             <ul className="text-sm text-muted-foreground space-y-1">
@@ -140,7 +127,7 @@ export default function ProductDetail({ slug }: Props) {
           </div>
         </div>
 
-        {/* ✅ Chính sách bảo hành */}
+        {/* ✅ Bảo hành */}
         <div className="mt-6 p-4 border rounded-lg">
           <h4 className="font-semibold mb-2 text-sm">Bảo hành</h4>
           <ul className="text-sm text-muted-foreground space-y-1">
@@ -150,7 +137,7 @@ export default function ProductDetail({ slug }: Props) {
           </ul>
         </div>
 
-        {/* ✅ Nhãn sản phẩm */}
+        {/* ✅ Nhãn */}
         {product.labels?.length > 0 && (
           <div className="mt-6">
             <h4 className="font-semibold mb-2 text-sm">Nhãn nổi bật</h4>

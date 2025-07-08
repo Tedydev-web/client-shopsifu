@@ -1,26 +1,26 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface Props {
-  images: string[];
-  video?: string;
+interface MediaItem {
+  type: "image" | "video";
+  src: string;
 }
 
-export default function ProductGallery({ images, video }: Props) {
-  const media = video ? [video, ...images] : images;
+interface Props {
+  media: MediaItem[];
+}
 
+export default function ProductGallery({ media }: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const modalThumbRef = useRef<HTMLDivElement>(null);
 
-  const currentImageIndex = hoveredIndex ?? 0;
-
-  const isVideo = (src: string) => src.endsWith(".mp4");
+  const currentIndex = hoveredIndex ?? 0;
 
   const scrollThumbnails = (direction: "left" | "right") => {
     if (!thumbRef.current) return;
@@ -66,26 +66,36 @@ export default function ProductGallery({ images, video }: Props) {
     };
   }, [selectedIndex]);
 
+  const renderMainMedia = (item: MediaItem, index: number) => {
+    if (item.type === "video") {
+      return (
+        <video
+          key={index}
+          src={item.src}
+          controls
+          autoPlay
+          className="w-full aspect-square object-cover rounded-lg border cursor-pointer"
+          onClick={() => setSelectedIndex(index)}
+        />
+      );
+    }
+
+    return (
+      <Image
+        key={index}
+        src={item.src}
+        alt={`Main ${index}`}
+        width={450}
+        height={450}
+        className="w-full aspect-square object-cover rounded-lg border cursor-pointer"
+        onClick={() => setSelectedIndex(index)}
+      />
+    );
+  };
+
   return (
     <div className="w-full md:w-[450px] space-y-3">
-      {/* Main preview */}
-      {isVideo(media[currentImageIndex]) ? (
-        <video
-          src={media[currentImageIndex]}
-          controls
-          className="w-full aspect-square object-cover rounded-lg border cursor-pointer"
-          onClick={() => setSelectedIndex(currentImageIndex)}
-        />
-      ) : (
-        <Image
-          src={media[currentImageIndex]}
-          alt="Main product image"
-          width={450}
-          height={450}
-          className="w-full aspect-square object-cover rounded-lg border cursor-pointer"
-          onClick={() => setSelectedIndex(currentImageIndex)}
-        />
-      )}
+      {renderMainMedia(media[currentIndex], currentIndex)}
 
       {/* Thumbnails */}
       <div className="w-full flex items-center gap-1">
@@ -102,20 +112,26 @@ export default function ProductGallery({ images, video }: Props) {
           className="flex gap-3 overflow-x-auto scroll-smooth px-1 w-full
           [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          {media.map((src, index) =>
-            isVideo(src) ? (
+          {media.map((item, index) =>
+            item.type === "video" ? (
               <video
                 key={index}
-                src={src}
+                src={item.src}
                 muted
-                className="w-20 h-20 object-cover rounded-lg border cursor-pointer shrink-0"
+                autoPlay
+                playsInline
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => setSelectedIndex(index)}
+                className={`w-20 h-20 object-cover rounded-lg border cursor-pointer shrink-0 ${
+                  hoveredIndex === index ? "ring-2 ring-primary" : ""
+                }`}
               />
             ) : (
               <Image
                 key={index}
-                src={src}
-                alt={`Thumbnail ${index}`}
+                src={item.src}
+                alt={`Thumb ${index}`}
                 width={80}
                 height={80}
                 onMouseEnter={() => setHoveredIndex(index)}
@@ -176,15 +192,19 @@ export default function ProductGallery({ images, video }: Props) {
 
             <div className="flex w-full max-w-6xl h-[90vh] rounded-xl overflow-hidden relative items-center justify-center z-10">
               <div className="flex-1 flex items-center justify-center p-4">
-                {isVideo(media[selectedIndex]) ? (
-                  <video
-                    src={media[selectedIndex]}
-                    controls
-                    className="max-w-full max-h-[80vh] rounded-xl"
-                  />
+                {media[selectedIndex].type === "video" ? (
+                  <div className="max-w-full max-h-[80vh] w-full h-full flex items-center justify-center">
+                    <video
+                      key={selectedIndex}
+                      src={media[selectedIndex].src}
+                      controls
+                      autoPlay
+                      className="w-auto h-auto max-w-full max-h-full object-contain rounded-xl"
+                    />
+                  </div>
                 ) : (
                   <Image
-                    src={media[selectedIndex]}
+                    src={media[selectedIndex].src}
                     alt="Preview"
                     width={600}
                     height={600}
@@ -198,11 +218,11 @@ export default function ProductGallery({ images, video }: Props) {
                 className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 overflow-x-auto max-w-[90%] px-2
                 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden z-10"
               >
-                {media.map((src, index) =>
-                  isVideo(src) ? (
+                {media.map((item, index) =>
+                  item.type === "video" ? (
                     <video
                       key={index}
-                      src={src}
+                      src={item.src}
                       muted
                       className={`w-20 h-20 object-cover rounded border cursor-pointer ${
                         index === selectedIndex ? "ring-2 ring-primary" : ""
@@ -212,7 +232,7 @@ export default function ProductGallery({ images, video }: Props) {
                   ) : (
                     <Image
                       key={index}
-                      src={src}
+                      src={item.src}
                       alt={`Modal thumb ${index}`}
                       width={80}
                       height={80}
