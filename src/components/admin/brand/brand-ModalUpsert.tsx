@@ -1,36 +1,22 @@
 'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { z } from 'zod'
+import { ZodError } from 'zod'
+import { useTranslations } from 'next-intl'
+import { Brand, BrandCreateRequest, BrandUpdateRequest } from '@/types/admin/brands.interface'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Brand } from "./brand-Columns"
-import { useForm } from "react-hook-form"
-import { useState, useEffect } from "react"
 import { Upload, X } from "lucide-react"
-import * as z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useTranslations } from "next-intl"
-
-type FormValues = {
-  code: string
-  name: string
-  description?: string
-  logo?: string
-  website?: string
-  country?: string
-  status: "active" | "inactive"
-}
 
 interface BrandModalUpsertProps {
   open: boolean
   onClose: () => void
   mode: "add" | "edit"
-  brand?: Brand | null
-  onSubmit: (values: FormValues) => Promise<void>
+  brand: Brand | null
+  onSubmit: (values: BrandCreateRequest | BrandUpdateRequest) => Promise<void>
 }
 
 export default function BrandModalUpsert({
@@ -40,294 +26,150 @@ export default function BrandModalUpsert({
   brand,
   onSubmit,
 }: BrandModalUpsertProps) {
-  const t = useTranslations('admin')
-  const [logoPreview, setLogoPreview] = useState<string>("")
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const t = useTranslations('admin.ModuleBrands')
+  
+  // Form state
+  const [name, setName] = useState("")
+  const [logo, setLogo] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const formSchema = z.object({
-    code: z.string().min(1, t("brand.modal.validation.codeRequired")),
-    name: z.string().min(1, t("brand.modal.validation.nameRequired")),
-    description: z.string().optional(),
+  // Reset form when modal opens or mode/brand changes
+  useEffect(() => {
+    if (mode === 'edit' && brand) {
+      setName(brand.name || "")
+      setLogo(brand.logo || "")
+    } else if (mode === 'add') {
+      setName("")
+      setLogo("")
+      setErrors({})
+    }
+  }, [mode, brand, open])
+
+  // Create validation schema
+  const brandSchema = z.object({
+    name: z.string().min(1, "Tên thương hiệu là bắt buộc"),
     logo: z.string().optional(),
-    website: z.string().url(t("brand.modal.validation.websiteInvalid")).optional().or(z.literal("")),
-    country: z.string().optional(),
-    status: z.enum(["active", "inactive"]),
   })
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      code: "",
-      name: "",
-      description: "",
-      logo: "",
-      website: "",
-      country: "",
-      status: "active",
-    },
-  })
-
-  // Reset form when brand changes
-  useEffect(() => {
-    if (brand) {
-      form.reset({
-        code: brand.code || "",
-        name: brand.name || "",
-        description: brand.description || "",
-        logo: brand.logo || "",
-        website: brand.website || "",
-        country: brand.country || "",
-        status: brand.status || "active",
-      })
-    } else {
-      form.reset({
-        code: "",
-        name: "",
-        description: "",
-        logo: "",
-        website: "",
-        country: "",
-        status: "active",
-      })
-    }
-  }, [brand, form])
-
-  // Set logo preview when brand data changes
-  useEffect(() => {
-    if (brand?.logo) {
-      setLogoPreview(brand.logo)
-      form.setValue("logo", brand.logo)
-    } else {
-      setLogoPreview("")
-      form.setValue("logo", "")
-    }
-  }, [brand, form])
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setSelectedFile(file)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setLogoPreview(result)
-        form.setValue("logo", result)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      brandSchema.parse({ name, logo });
+      setErrors({});
+      setLoading(true);
+      
+      try {
+        if (mode === 'add') {
+          const data: BrandCreateRequest = {
+            name,
+            logo,
+          };
+          await onSubmit(data);
+        } else if (mode === 'edit' && brand) {
+          const data: BrandUpdateRequest = {
+            name,
+            logo,
+          };
+          await onSubmit(data);
+        }
+        onClose();
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      } finally {
+        setLoading(false);
       }
-      reader.readAsDataURL(file)
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const formattedErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            formattedErrors[err.path[0].toString()] = err.message;
+          }
+        });
+        setErrors(formattedErrors);
+      }
     }
-  }
-
-  const handleRemoveLogo = () => {
-    setLogoPreview("")
-    setSelectedFile(null)
-    form.setValue("logo", "")
-  }
-
-  const handleSubmit = async (values: FormValues) => {
-    await onSubmit(values)
-    form.reset()
-    setLogoPreview("")
-    setSelectedFile(null)
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl h-[90vh] flex flex-col p-0">
-        {/* Fixed Header */}
-        <DialogHeader className="flex-shrink-0 px-6 py-4 border-b border-gray-200">
-          <DialogTitle className="text-xl font-semibold">
-            {mode === "add" ? t("brand.modal.addTitle") : t("brand.modal.editTitle")}
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {mode === 'add' ? t('modal.addTitle') || 'Thêm thương hiệu' : t('modal.editTitle') || 'Chỉnh sửa thương hiệu'}
           </DialogTitle>
+          <DialogDescription>
+            {mode === 'add' 
+              ? t('modal.addDescription') || 'Điền thông tin để thêm thương hiệu mới'
+              : t('modal.editDescription') || 'Chỉnh sửa thông tin thương hiệu'
+            }
+          </DialogDescription>
         </DialogHeader>
-        
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-              {/* Row 1: Code and Name */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">Mã thương hiệu <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={mode === "edit"} placeholder={t("brand.modal.codePlaceholder")} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('modal.name') || 'Tên thương hiệu'} <span className="text-red-500">*</span>
+              </label>
+              <Input 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                placeholder={t('modal.namePlaceholder') || 'Nhập tên thương hiệu'} 
+              />
+              {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('modal.logo') || 'Logo URL'}
+              </label>
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16 border-2 border-gray-200">
+                  {logo ? (
+                    <AvatarImage 
+                      src={logo} 
+                      alt="Logo preview" 
+                      className="object-contain p-2" 
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                      {name ? name.substring(0, 2).toUpperCase() : <Upload className="h-6 w-6" />}
+                    </AvatarFallback>
                   )}
-                />
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">Tên thương hiệu <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={t("brand.modal.namePlaceholder")} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                </Avatar>
+                <Input 
+                  value={logo} 
+                  onChange={e => setLogo(e.target.value)} 
+                  placeholder={t('modal.logoPlaceholder') || 'Nhập URL logo'} 
                 />
               </div>
+              {errors.logo && <p className="text-sm text-red-500 mt-1">{errors.logo}</p>}
+            </div>
+          </div>
 
-              {/* Row 2: Logo Upload */}
-              <FormField
-                control={form.control}
-                name="logo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Logo thương hiệu</FormLabel>
-                    <FormControl>
-                      <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50/50">
-                        {/* Avatar hiển thị luôn */}
-                        <div className="relative flex-shrink-0">
-                          <Avatar className="h-16 w-16 border-2 border-gray-200 bg-white">
-                            {logoPreview ? (
-                              <AvatarImage 
-                                src={logoPreview} 
-                                alt="Logo preview" 
-                                className="object-contain p-2" 
-                              />
-                            ) : (
-                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                                <Upload className="h-6 w-6" />
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          {logoPreview && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 hover:bg-red-600 border-white border-2 text-white shadow-sm"
-                              onClick={handleRemoveLogo}
-                            >
-                              <X className="h-2.5 w-2.5" />
-                            </Button>
-                          )}
-                        </div>
-                        <div className="flex-1 space-y-2">
-                          <label htmlFor="logo-upload" className="cursor-pointer block">
-                            <div className="flex items-center gap-3 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all">
-                              <Upload className="h-5 w-5 text-gray-500" />
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-700">
-                                  {selectedFile ? selectedFile.name : t("brand.modal.uploadLabel")}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {t("brand.modal.uploadDescription")}
-                                </p>
-                              </div>
-                            </div>
-                          </label>
-                          <input
-                            id="logo-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                          />
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Row 3: Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Mô tả thương hiệu</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        {...field} 
-                        rows={3} 
-                        placeholder={t("brand.modal.descriptionPlaceholder")} 
-                        className="resize-none"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Row 4: Website and Country */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="website"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">{t("brand.modal.website")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={t("brand.modal.websitePlaceholder")} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">Quốc gia</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={t("brand.modal.countryPlaceholder")} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Row 5: Status */}
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Trạng thái <span className="text-red-500">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("brand.modal.statusPlaceholder")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">{t("brand.modal.statusActive")}</SelectItem>
-                        <SelectItem value="inactive">{t("brand.modal.statusInactive")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </div>
-
-        {/* Fixed Footer */}
-        <div className="flex-shrink-0 flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-white">
-          <Button type="button" variant="outline" onClick={onClose} className="px-6">
-            {t("brand.modal.cancel")}
-          </Button>
-          <Button 
-            type="submit" 
-            className="px-6 bg-red-600 hover:bg-red-700"
-            onClick={form.handleSubmit(handleSubmit)}
-          >
-            {mode === "add" ? t("brand.modal.add") : t("brand.modal.update")}
-          </Button>
-        </div>
+          <DialogFooter className="mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={loading}
+            >
+              {t('modal.cancel') || 'Hủy'}
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading}
+            >
+              {loading 
+                ? (mode === 'add' ? t('modal.adding') || 'Đang thêm...' : t('modal.saving') || 'Đang lưu...')
+                : (mode === 'add' ? t('modal.add') || 'Thêm' : t('modal.save') || 'Lưu')
+              }
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

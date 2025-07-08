@@ -290,6 +290,42 @@
         "contentPlaceholder":"Nhập nội dung"
       }
     },
+    "ModuleBrands":{
+      "Table":{
+        "logo": "Logo",
+        "name": "Tên thương hiệu",
+        "createdAt": "Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "addAction": "Thêm thương hiệu",
+        "notFound": "Không tìm thấy thương hiệu",
+        "deleteConfirm":{
+          "title": "Xác nhận xóa thương hiệu",
+          "description": "Bạn có chắc chắn muốn xóa thương hiệu {name} này không?",
+          "deleteAction": "Xóa ngay",
+          "cancel": "Hủy bỏ"
+        },
+        "actions":{
+          "edit": "Chỉnh sửa thương hiệu",
+          "delete": "Xóa thương hiệu"
+        }, 
+        "searchPlaceholder": "Tìm kiếm theo tên thương hiệu..."
+      },
+      "modal":{
+          "addTitle": "Thêm mới thương hiệu",
+          "editTitle":"Chỉnh sửa thương hiệu",
+          "addDescription": "Nhập thông tin thương hiệu bên dưới",
+          "editDescription": "Cập nhật thông tin thương hiệu",
+          "name": "Tên thương hiệu",
+          "namePlaceholder": "Nhập tên thương hiệu",
+          "logo": "Logo",
+          "logoPlaceholder": "Nhập Logo",
+          "cancel": "Hủy bỏ",
+          "adding": "Đang thêm...",
+          "saving": "Đang lưu...",
+          "add": "Thêm mới",
+          "save":"Lưu thay đổi"
+        }
+    },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
 

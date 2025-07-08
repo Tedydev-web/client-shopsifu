@@ -94,5 +94,20 @@ export const API_ENDPOINTS = {
     REVOKE: `${API_BASE}/sessions/revoke`,
     REVOKE_ALL: `${API_BASE}/sessions/revoke-all`
   },
+  //QUẢN LÝ THƯƠNG HIỆU - BRAND
+  BRANDS:{
+    GETALL: `${API_BASE}/brands`,
+    GET_BY_ID: `${API_BASE}/brands/:brandsId`,
+    CREATE: `${API_BASE}/brands`,
+    UPDATE: `${API_BASE}/brands/:brandsId`,
+    DELETE: `${API_BASE}/brands/:brandsId`
+  },
+  BRANDS_TRANSLATIONS:{
+    GETALL: `${API_BASE}/brands`,
+    GET_BY_ID: `${API_BASE}/brands/:brandsId`,
+    CREATE: `${API_BASE}/brands`,
+    UPDATE: `${API_BASE}/brands/:brandsId`,
+    DELETE: `${API_BASE}/brands/:brandsId`
+  }
   // ... các endpoints khác
 }

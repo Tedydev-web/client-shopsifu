@@ -1,164 +1,164 @@
 'use client'
 
-import { useState } from "react"
-import { Brand } from "./brand-Columns"
-import { mockBrandData, searchBrands } from "./brand-MockData"
+import { useState, useCallback } from "react"
+import { useTranslations } from 'next-intl'
+import { toast } from "sonner"
+import { Brand, BrandCreateRequest, BrandUpdateRequest } from "@/types/admin/brands.interface"
+import * as brandsService from "@/services/admin/brandsService"
+import { useServerDataTable } from "@/hooks/useServerDataTable"
 
 export const useBrand = () => {
-  const [brands, setBrands] = useState<Brand[]>([])
-  const [totalItems, setTotalItems] = useState(0)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null)
-  const [currentSearchQuery, setCurrentSearchQuery] = useState("")
+  const t = useTranslations();
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const getAllBrands = async ({ metadata }: { metadata: { page: number; limit: number } }) => {
+  // Tạo các callbacks cho useServerDataTable
+  const getResponseData = useCallback((response: any) => {
+    return response.data || [];
+  }, []);
+
+  const getResponseMetadata = useCallback((response: any) => {
+    const metadata = response.metadata || {};
+    return {
+      totalItems: metadata.totalItems || 0,
+      page: metadata.page || 1,
+      totalPages: metadata.totalPages || 1,
+      limit: metadata.limit || 10,
+      hasNext: metadata.hasNext || false,
+      hasPrevious: metadata.hasPrevious || false
+    };
+  }, []);
+
+  const mapResponseToData = useCallback((brand: any): Brand => {
+    return brand;
+  }, []);
+
+  // Sử dụng hook useServerDataTable để quản lý data và pagination
+  const {
+    data,
+    loading,
+    pagination,
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    handleSortChange,
+    refreshData,
+  } = useServerDataTable({
+    fetchData: brandsService.getAllBrands,
+    getResponseData,
+    getResponseMetadata,
+    mapResponseToData,
+    initialSort: { sortBy: "id", sortOrder: "asc" },
+    defaultLimit: 10,
+  });
+
+  // CRUD operations
+  const createBrand = async (brand: BrandCreateRequest) => {
     try {
-      setLoading(true)
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Get filtered data based on search query
-      let filteredData = currentSearchQuery 
-        ? searchBrands(currentSearchQuery)
-        : mockBrandData
-      
-      // Paginate the data
-      const startIndex = (metadata.page - 1) * metadata.limit
-      const endIndex = startIndex + metadata.limit
-      const paginatedData = filteredData.slice(startIndex, endIndex)
-      
-      // Update state
-      setBrands(paginatedData)
-      setTotalItems(filteredData.length)
-      setTotalPages(Math.ceil(filteredData.length / metadata.limit))
-      setPage(metadata.page)
-      
-    } catch (error) {
-      console.error('Error fetching brands:', error)
-      setBrands([])
-      setTotalItems(0)
-      setTotalPages(0)
-    } finally {
-      setLoading(false)
+      await brandsService.createBrand(brand);
+      toast.success(t('system.toasts.createSuccessDescription'), {
+        description: brand.name,
+      });
+      refreshData();
+      handleCloseModal();
+      return true;
+    } catch (error: any) {
+      toast.error(t('system.toasts.error'), {
+        description: error.message || t('system.toasts.createErrorDescription'),
+      });
+      return false;
     }
-  }
+  };
 
-  const deleteBrand = async (code: string) => {
+  const updateBrand = async (id: number | string, brand: BrandUpdateRequest) => {
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // Remove from mock data
-      const index = mockBrandData.findIndex(brand => brand.code === code)
-      if (index > -1) {
-        mockBrandData.splice(index, 1)
+      await brandsService.updateBrand(id, brand);
+      toast.success(t('system.toasts.updateSuccessDescription'), {
+        description: brand.name,
+      });
+      refreshData();
+      handleCloseModal();
+      return true;
+    } catch (error: any) {
+      toast.error(t('system.toasts.error'), {
+        description: error.message || t('system.toasts.updateErrorDescription'),
+      });
+      return false;
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (brandToDelete) {
+      setDeleteLoading(true);
+      try {
+        await brandsService.deleteBrand(brandToDelete.id);
+        toast.success(t('system.toasts.deleteSuccessDescription'), {
+          description: brandToDelete.name,
+        });
+        refreshData();
+        setDeleteOpen(false);
+        setBrandToDelete(null);
+      } catch (error: any) {
+        toast.error(t('system.toasts.error'), {
+          description: error.message || t('system.toasts.deleteErrorDescription'),
+        });
+      } finally {
+        setDeleteLoading(false);
       }
-      
-      return true
-    } catch (error) {
-      console.error('Error deleting brand:', error)
-      return false
     }
-  }
+  };
 
-  const createBrand = async (brandData: { 
-    code: string; 
-    name: string; 
-    description?: string;
-    logo?: string;
-    website?: string;
-    country?: string;
-    status?: "active" | "inactive";
-  }) => {
-    try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // Create new brand object
-      const newBrand: Brand = {
-        id: mockBrandData.length + 1,
-        code: brandData.code,
-        name: brandData.name,
-        description: brandData.description || "",
-        logo: brandData.logo || "",
-        website: brandData.website || "",
-        country: brandData.country || "",
-        status: brandData.status || "active",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-      
-      // Add to mock data
-      mockBrandData.push(newBrand)
-      
-      return true
-    } catch (error) {
-      console.error('Error creating brand:', error)
-      return false
-    }
-  }
+  const handleOpenDelete = (brand: Brand) => {
+    setBrandToDelete(brand);
+    setDeleteOpen(true);
+  };
 
-  const updateBrand = async (code: string, brandData: { 
-    name?: string;
-    description?: string;
-    logo?: string;
-    website?: string;
-    country?: string;
-    status?: "active" | "inactive";
-  }) => {
-    try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // Find and update brand in mock data
-      const brandIndex = mockBrandData.findIndex(brand => brand.code === code)
-      if (brandIndex > -1) {
-        mockBrandData[brandIndex] = {
-          ...mockBrandData[brandIndex],
-          ...brandData,
-          updatedAt: new Date().toISOString()
-        }
-      }
-      
-      return true
-    } catch (error) {
-      console.error('Error updating brand:', error)
-      return false
-    }
-  }
+  const handleCloseDeleteModal = () => {
+    setDeleteOpen(false);
+    setBrandToDelete(null);
+  };
 
   const handleOpenModal = (brand?: Brand) => {
-    setSelectedBrand(brand || null)
-    setIsModalOpen(true)
-  }
+    setSelectedBrand(brand || null);
+    setIsModalOpen(true);
+  };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedBrand(null)
-  }
-
-  const handleSearch = (query: string) => {
-    setCurrentSearchQuery(query)
-  }
+    setIsModalOpen(false);
+    setSelectedBrand(null);
+  };
 
   return {
-    brands,
-    totalItems,
-    page,
-    totalPages,
+    data,
     loading,
+    pagination,
+    
+    // Server-side pagination handlers
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    handleSortChange,
+    refreshData,
+    
+    // Delete
+    deleteOpen,
+    brandToDelete,
+    deleteLoading,
+    handleOpenDelete,
+    handleConfirmDelete,
+    handleCloseDeleteModal,
+
+    // Upsert
     isModalOpen,
     selectedBrand,
-    getAllBrands,
-    deleteBrand,
-    createBrand,
-    updateBrand,
     handleOpenModal,
     handleCloseModal,
-    handleSearch,
-  }
-}
+    createBrand,
+    updateBrand,
+  };
+};
