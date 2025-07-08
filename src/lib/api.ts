@@ -31,49 +31,6 @@ interface DecodedToken {
   sub?: string;
 }
 
-// Token refresh state
-let isRefreshing = false;
-let failedQueue: any[] = [];
-let refreshPromise: Promise<void> | null = null;
-
-// const processQueue = (error: any = null, token: string | null = null) => {
-//   failedQueue.forEach(prom => {
-//     if (error) {
-//       prom.reject(error);
-//     } else {
-//       prom.resolve(token);
-//     }
-//   });
-//   failedQueue = [];
-// };
-
-// const refreshTokenWithRetry = async (retries = MAX_REFRESH_RETRIES) => {
-//   for (let i = 0; i < retries; i++) {
-//     try {
-//       await authService.refreshToken();
-//       return true;
-//     } catch (error) {
-//       if (i === retries - 1) throw error;
-//       await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-//     }
-//   }
-//   return false;
-// };
-
-// const refreshToken = async (): Promise<void> => {
-//   if (refreshPromise) {
-//     return refreshPromise;
-//   }
-  
-//   refreshPromise = refreshTokenWithRetry()
-//     .then(() => {}) // Convert Promise<boolean> to Promise<void>
-//     .finally(() => {
-//       refreshPromise = null;
-//     });
-    
-//   return refreshPromise;
-// };
-
 // ==================== PUBLIC AXIOS (Truyền csrf-token vào header) ====================
 
 export const publicAxios = axios.create({
@@ -230,9 +187,9 @@ privateAxios.interceptors.response.use(
       showToast('Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại', 'info');
 
       // 4. Redirect to sign-in page after a short delay to allow state changes to process
-      // setTimeout(() => {
-      //   window.location.href = ROUTES.BUYER.SIGNIN;
-      // }, 100);
+      setTimeout(() => {
+        window.location.href = ROUTES.BUYER.SIGNIN;
+      }, 100);
     }
     return Promise.reject(error);
   }
@@ -243,7 +200,8 @@ const checkToken = async () => {
   const accessToken = Cookies.get('access_token');
   const refreshToken = Cookies.get('refresh_token');
 
-  // Case 1: Không có access token, nhưng có refresh token. Try to recover the session.
+
+  // ✅ Case 1: Không có access token, nhưng có refresh token → thử làm mới
   if (!accessToken && refreshToken) {
     console.log('Không có access token, đang thử làm mới từ refresh token...');
     try {
@@ -251,31 +209,31 @@ const checkToken = async () => {
       console.log('✅ Token đã được làm mới thành công khi khởi tạo.');
     } catch (error) {
       console.error('❌ Không thể làm mới token. Đăng xuất người dùng.', error);
-      await clearClientState();
+      // await clearClientState();
       if (window.location.pathname !== ROUTES.BUYER.SIGNIN) {
-        window.location.href = ROUTES.BUYER.SIGNIN;
+        // window.location.href = ROUTES.BUYER.SIGNIN;
       }
     }
-    return; // End this check cycle. The next one will have the new access token.
-  }
-
-  // Case 2: Không có token. Người dùng chưa đăng nhập. Bỏ qua kiểm tra.
-  if (!accessToken && !refreshToken) {
-    console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
-    await clearClientState();
     return;
   }
 
-  // Case 3: Access token tồn tại. Tiếp tục kiểm tra.
+  // ✅ Case 2: Không có access lẫn refresh token → chưa đăng nhập
+  if (!accessToken && !refreshToken) {
+    console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
+    // await clearClientState();
+    return;
+  }
+
+  // ✅ Case 3: Có accessToken → decode và kiểm tra hạn
   try {
     const decodedToken = jwt.decode(accessToken!) as DecodedToken;
+
     if (!decodedToken?.exp) {
       throw new Error('Token không hợp lệ hoặc thiếu trường exp');
     }
 
     const timeLeftInMinutes = getTokenTimeLeft(decodedToken.exp);
 
-    // If token is already expired, try to refresh it.
     if (timeLeftInMinutes < 0) {
       console.warn('Token đã hết hạn. Thử làm mới...');
       try {
@@ -283,13 +241,12 @@ const checkToken = async () => {
         console.log('✅ Token đã được làm mới do đã hết hạn.');
       } catch (error) {
         console.error('❌ Không thể làm mới token đã hết hạn. Đăng xuất...', error);
-        await clearClientState();
-        window.location.href = ROUTES.BUYER.SIGNIN;
+        // await clearClientState();
+        // window.location.href = ROUTES.BUYER.SIGNIN;
       }
       return;
     }
 
-    // If token is nearing expiry, refresh it proactively.
     if (timeLeftInMinutes <= TOKEN_REFRESH_THRESHOLD) {
       try {
         console.log(`Token sắp hết hạn (còn ${timeLeftInMinutes.toFixed(2)} phút), đang làm mới...`);
@@ -298,15 +255,16 @@ const checkToken = async () => {
       } catch (error) {
         console.error('❌ Không thể làm mới token chủ động:', error);
       }
-    } else {
-      // console.log(`Token còn ${timeLeftInMinutes.toFixed(2)} phút`);
+    }else {
+      console.log(`Token còn ${timeLeftInMinutes.toFixed(2)} phút`);
     }
+
   } catch (error) {
     console.error('Lỗi khi giải mã hoặc kiểm tra token. Token có thể bị lỗi:', error);
-    await clearClientState();
-    window.location.href = ROUTES.BUYER.SIGNIN;
+    // await clearClientState();
+    // window.location.href = ROUTES.BUYER.SIGNIN;
   }
-};
+}
 
 // Interval management
 let tokenCheckInterval: NodeJS.Timeout;
