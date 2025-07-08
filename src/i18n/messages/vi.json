@@ -922,7 +922,9 @@
         "confirmPassword": "Xác nhận mật khẩu",
         "avatar": "Ảnh đại diện",
         "passwordStepDescription": "Mật khẩu phải chứa ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
-        "confirmPasswordStepDescription": "Xác nhận mật khẩu phải khớp với mật khẩu"
+        "confirmPasswordStepDescription": "Xác nhận mật khẩu phải khớp với mật khẩu",
+        "statusActive":"Hoạt động",
+        "statusInactive":"Không hoạt động"
       },
       "deleteConfirm": {
         "title": "Xác nhận xóa người dùng",

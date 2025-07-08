@@ -57,7 +57,7 @@ export const useUsers = () => {
     getResponseData,
     getResponseMetadata,
     mapResponseToData,
-    initialSort: { sortBy: "id", sortOrder: "asc" },
+    initialSort: { sortBy: "createdAt", sortOrder: "asc" },
     defaultLimit: 10,
   });
 

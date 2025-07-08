@@ -41,3 +41,10 @@ export interface PaginationMetadata {
   sortBy?: string;
   sortOrder?: string;
 }
+
+
+export interface MediaUploadResponse {
+  data: {
+    url: string;
+  }[];
+}
