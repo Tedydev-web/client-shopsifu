@@ -1,33 +1,46 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { z, ZodError } from 'zod'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { z } from 'zod'
+import { ZodError } from 'zod'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
-import { User, UserCreateRequest } from "@/types/admin/user.interface";
-import { Role } from "@/types/auth/role.interface";
-import { Textarea } from '@/components/ui/textarea'
-import { userStepOneSchema, userStepTwoSchema } from '@/utils/schema'
+import { User, UserCreateRequest, UserRole } from '@/types/admin/user.interface'
+
+// Validation schemas
+const userCreateSchema = (t: (key: string) => string) => z.object({
+  email: z.string().email(t('admin.users.validation.emailValid')),
+  name: z.string().min(1, t('admin.users.validation.nameRequired')),
+  phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
+  password: z.string().min(8, t('admin.users.validation.passwordLength')),
+  confirmPassword: z.string(),
+  roleId: z.number(),
+  status: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: t('admin.users.validation.passwordMatch'),
+  path: ['confirmPassword'],
+});
+
+const userUpdateSchema = (t: (key: string) => string) => z.object({
+  email: z.string().email(t('admin.users.validation.emailValid')),
+  name: z.string().min(1, t('admin.users.validation.nameRequired')),
+  phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
+  roleId: z.number(),
+  status: z.string(),
+});
 
 interface UsersModalUpsertProps {
-  roles: Role[];
+  roles: UserRole[];
   open: boolean;
   onClose: () => void;
   mode: 'add' | 'edit';
@@ -38,82 +51,114 @@ interface UsersModalUpsertProps {
 export default function UsersModalUpsert({
   roles, open, onClose, mode, user, onSubmit
 }: UsersModalUpsertProps) {
-  const t = useTranslations('')
+  const t = useTranslations()
+  
   // Form state
-  const [step, setStep] = useState(1);
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [username, setUsername] = useState("")
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
-  const [bio, setBio] = useState("")
-  const [avatar, setAvatar] = useState<File | null>(null)
-  const [countryCode, setCountryCode] = useState("")
-  const [roleId, setRoleId] = useState(1) 
+  const [avatar, setAvatar] = useState("")
+  const [roleId, setRoleId] = useState<number>(1) 
   const [status, setStatus] = useState("ACTIVE")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // These should ideally come from an API or a shared constant
+  // Status options
   const STATUS_OPTIONS = [
-    { value: 'ACTIVE', label: t('Hoạt động') },
-    { value: 'INACTIVE', label: t('Không hoạt động') },
+    { value: 'ACTIVE', label: t('admin.users.modal.statusActive') || 'Hoạt động' },
+    { value: 'INACTIVE', label: t('admin.users.modal.statusInactive') || 'Không hoạt động' },
   ]
 
+  // Reset form when modal opens or mode/user changes
   useEffect(() => {
-    setStep(1); 
     if (mode === 'edit' && user) {
-      setFirstName(user.userProfile?.firstName || "")
-      setLastName(user.userProfile?.lastName || "")
-      setUsername(user.userProfile?.username || '')
+      setName(user.name || "")
       setEmail(user.email || "")
-      setPhoneNumber(user.userProfile?.phoneNumber || "")
-      setBio(user.userProfile?.bio || "")
-      setCountryCode(user.userProfile?.countryCode || "")
+      setPhoneNumber(user.phoneNumber || "")
+      setAvatar(user.avatar || "")
       setRoleId(user.roleId || 1)
       setStatus(user.status || "ACTIVE")
       setPassword("")
       setConfirmPassword("")
-      setAvatar(null)
     } else if (mode === 'add') {
-      setFirstName("")
-      setLastName("")
-      setUsername("");
-      setEmail("");
+      setName("")
+      setEmail("")
       setPassword("")
       setConfirmPassword("")
       setPhoneNumber("")
-      setBio("")
-      setCountryCode("")
-      setAvatar(null)
-      setRoleId(1);
-      setStatus("ACTIVE");
+      setAvatar("")
+      setRoleId(1)
+      setStatus("ACTIVE")
       setErrors({})
     }
   }, [mode, user, open])
 
-  const handleNextStep = () => {
-    const dataToValidate = {
-      firstName,
-      lastName,
-      username,
-      email,
-      phoneNumber,
-      roleId,
-    };
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     try {
-      userStepOneSchema(t).parse(dataToValidate);
+      if (mode === 'add') {
+        userCreateSchema(t).parse({
+          email,
+          name,
+          phoneNumber,
+          password,
+          confirmPassword,
+          roleId,
+          status
+        });
+      } else {
+        userUpdateSchema(t).parse({
+          email,
+          name,
+          phoneNumber,
+          roleId,
+          status
+        });
+      }
+      
       setErrors({});
-      setStep(2);
+      setLoading(true);
+      
+      try {
+        if (mode === 'add') {
+          const data: UserCreateRequest = {
+            email,
+            name,
+            phoneNumber,
+            password,
+            confirmPassword,
+            roleId,
+            status,
+            avatar
+          };
+          await onSubmit(data);
+        } else if (mode === 'edit' && user) {
+          const data: User = {
+            ...user,
+            email,
+            name,
+            phoneNumber,
+            roleId,
+            status,
+            avatar
+          };
+          await onSubmit(data);
+        }
+        onClose();
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      } finally {
+        setLoading(false);
+      }
     } catch (error) {
       if (error instanceof ZodError) {
         const formattedErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
           if (err.path[0]) {
-            formattedErrors[err.path[0]] = err.message;
+            formattedErrors[err.path[0].toString()] = err.message;
           }
         });
         setErrors(formattedErrors);
@@ -121,222 +166,173 @@ export default function UsersModalUpsert({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (mode === 'add') {
-      const passwordData = { password, confirmPassword };
-      try {
-        userStepTwoSchema(t).parse(passwordData);
-        setErrors({});
-      } catch (error) {
-        if (error instanceof ZodError) {
-          const formattedErrors: Record<string, string> = {};
-          error.errors.forEach((err) => {
-            if (err.path[0]) {
-              formattedErrors[err.path[0]] = err.message;
-            }
-          });
-          setErrors(formattedErrors);
-        }
-        return; 
-      }
-    }
-
-    setLoading(true);
-    try {
-      if (mode === 'add') {
-        const data: UserCreateRequest = {
-          email,
-          password,
-          confirmPassword,
-          roleId,
-          firstName,
-          lastName,
-          username,
-          phoneNumber,
-          bio,
-          avatar: '', 
-          countryCode,
-        };
-        await onSubmit(data);
-      } else if (mode === 'edit' && user) {
-        const data: User = {
-          ...user,
-          email,
-          status,
-          roleId,
-          userProfile: {
-            ...user.userProfile!,
-            firstName,
-            lastName,
-            username,
-            phoneNumber,
-            bio,
-            countryCode,
-          },
-        };
-        await onSubmit(data);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const renderStepOne = () => (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.firstName')}</label>
-          <Input value={firstName} onChange={e => setFirstName(e.target.value)} required placeholder={t('admin.users.modal.firstName')} />
-          {errors.firstName && <p className="text-sm text-red-500 mt-1">{errors.firstName}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.lastName')}</label>
-          <Input value={lastName} onChange={e => setLastName(e.target.value)} required placeholder={t('admin.users.modal.lastName')} />
-          {errors.lastName && <p className="text-sm text-red-500 mt-1">{errors.lastName}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('Tên người dùng')}</label>
-          <Input value={username} onChange={e => setUsername(e.target.value)} required placeholder={t('Tên người dùng')} />
-          {errors.username && <p className="text-sm text-red-500 mt-1">{errors.username}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.email')}</label>
-          <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder={t('admin.users.modal.email')} disabled={mode === 'edit'} />
-          {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.phoneNumber')}</label>
-          <Input value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder={t('admin.users.modal.phoneNumber')} />
-          {errors.phoneNumber && <p className="text-sm text-red-500 mt-1">{errors.phoneNumber}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.countryCode')}</label>
-          <Input value={countryCode} onChange={e => setCountryCode(e.target.value)} placeholder={t('admin.users.modal.countryCode')} />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.role')}</label>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full flex justify-between items-center">
-                {roles.find(role => role.id === roleId)?.name || t('admin.users.modal.role')}
-                <ChevronDown size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-full min-w-[120px]">
-              {roles.map((role) => (
-                <DropdownMenuItem
-                  key={role.id}
-                  onClick={() => {
-                    if (typeof role.id === 'number') {
-                      setRoleId(role.id);
-                    }
-                  }}
-                >
-                  {role.name}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {errors.roleId && <p className="text-sm text-red-500 mt-1">{errors.roleId}</p>}
-        </div>
-        {mode === 'edit' && (
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('admin.users.modal.status')}</label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full flex justify-between items-center">
-                  {STATUS_OPTIONS.find(opt => opt.value === status)?.label || t('admin.users.modal.status')}
-                  <ChevronDown size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-full min-w-[120px]">
-                {STATUS_OPTIONS.map(opt => (
-                  <DropdownMenuItem key={opt.value} onClick={() => setStatus(opt.value)}>
-                    {opt.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">{t('admin.users.modal.bio')}</label>
-        <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder={t('admin.users.modal.bio')} />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">{t('admin.users.modal.avatar')}</label>
-        <Input type="file" onChange={e => setAvatar(e.target.files ? e.target.files[0] : null)} accept="image/*" />
-      </div>
-    </>
-  );
-
-  const renderStepTwo = () => (
-    <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.password')}</label>
-          <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder={t('admin.users.modal.password')} />
-          {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">{t('admin.users.modal.confirmPassword')}</label>
-          <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder={t('admin.users.modal.confirmPassword')} />
-          {errors.confirmPassword && <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>}
-        </div>
-    </div>
-  );
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'add' ? `${t('admin.users.modal.addTitle')} - ${t('Bước')} ${step}/2` : t('admin.users.modal.editTitle')}
+            {mode === 'add' ? t('admin.users.modal.addTitle') || 'Thêm người dùng' : t('admin.users.modal.editTitle') || 'Chỉnh sửa người dùng'}
           </DialogTitle>
           <DialogDescription>
             {mode === 'add' 
-              ? (step === 1 ? t('admin.users.modal.addDescription') : t('admin.users.modal.passwordStepDescription'))
-              : t('admin.users.modal.editDescription')
+              ? t('admin.users.modal.addDescription') || 'Điền thông tin để thêm người dùng mới'
+              : t('admin.users.modal.editDescription') || 'Chỉnh sửa thông tin người dùng'
             }
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'edit' && renderStepOne()}
-          {mode === 'add' && step === 1 && renderStepOne()}
-          {mode === 'add' && step === 2 && renderStepTwo()}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('admin.users.modal.name') || 'Họ tên'}
+              </label>
+              <Input 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                placeholder={t('admin.users.modal.name') || 'Họ tên'} 
+              />
+              {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+            </div>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={loading} onClick={onClose}>
-                {t('admin.users.modal.cancel')}
-              </Button>
-            </DialogClose>
-            
-            {mode === 'add' && step === 1 && (
-              <Button type="button" onClick={handleNextStep}>{t('Tiếp theo')}</Button>
-            )}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('admin.users.modal.email') || 'Email'}
+              </label>
+              <Input 
+                type="email" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                placeholder={t('admin.users.modal.email') || 'Email'}
+                disabled={mode === 'edit'}
+              />
+              {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+            </div>
 
-            {mode === 'add' && step === 2 && (
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('admin.users.modal.phoneNumber') || 'Số điện thoại'}
+              </label>
+              <Input 
+                value={phoneNumber} 
+                onChange={e => setPhoneNumber(e.target.value)} 
+                placeholder={t('admin.users.modal.phoneNumber') || 'Số điện thoại'} 
+              />
+              {errors.phoneNumber && <p className="text-sm text-red-500 mt-1">{errors.phoneNumber}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('admin.users.modal.avatar') || 'Avatar URL'}
+              </label>
+              <Input 
+                value={avatar} 
+                onChange={e => setAvatar(e.target.value)} 
+                placeholder={t('admin.users.modal.avatar') || 'Liên kết ảnh đại diện'} 
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('admin.users.modal.role') || 'Vai trò'}
+              </label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full flex justify-between items-center">
+                    {roles.find(role => role.id === roleId)?.name || t('admin.users.modal.selectRole') || 'Chọn vai trò'}
+                    <ChevronDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[200px]">
+                  {roles.map((role) => (
+                    <DropdownMenuItem
+                      key={role.id}
+                      onClick={() => setRoleId(role.id)}
+                    >
+                      {role.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {errors.roleId && <p className="text-sm text-red-500 mt-1">{errors.roleId}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t('admin.users.modal.status') || 'Trạng thái'}
+              </label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full flex justify-between items-center">
+                    {STATUS_OPTIONS.find(option => option.value === status)?.label || 'Chọn trạng thái'}
+                    <ChevronDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[200px]">
+                  {STATUS_OPTIONS.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => setStatus(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {mode === 'add' && (
               <>
-                <Button type="button" variant="outline" onClick={() => setStep(1)}>{t('Quay lại')}</Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? t('admin.users.modal.loadingAdd') : t('admin.users.modal.confirmAdd')}
-                </Button>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t('admin.users.modal.password') || 'Mật khẩu'}
+                  </label>
+                  <Input 
+                    type="password" 
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)} 
+                    placeholder={t('admin.users.modal.password') || 'Mật khẩu'} 
+                  />
+                  {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t('admin.users.modal.confirmPassword') || 'Xác nhận mật khẩu'}
+                  </label>
+                  <Input 
+                    type="password" 
+                    value={confirmPassword} 
+                    onChange={e => setConfirmPassword(e.target.value)} 
+                    placeholder={t('admin.users.modal.confirmPassword') || 'Xác nhận mật khẩu'} 
+                  />
+                  {errors.confirmPassword && <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>}
+                </div>
               </>
             )}
+          </div>
 
-            {mode === 'edit' && (
-              <Button type="submit" disabled={loading}>
-                {loading ? t('admin.users.modal.loadingEdit') : t('admin.users.modal.confirmEdit')}
-              </Button>
-            )}
+          <DialogFooter className="mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={loading}
+            >
+              {t('admin.users.modal.cancel') || 'Hủy'}
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading}
+            >
+              {loading 
+                ? (mode === 'add' ? t('admin.users.modal.adding') || 'Đang thêm...' : t('admin.users.modal.saving') || 'Đang lưu...')
+                : (mode === 'add' ? t('admin.users.modal.add') || 'Thêm' : t('admin.users.modal.save') || 'Lưu')
+              }
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   )
 }
-

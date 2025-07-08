@@ -8,7 +8,7 @@ export const API_ENDPOINTS = {
     LOGOUT: `${API_BASE}/auth/logout`,
     SEND_OTP: `${API_BASE}/auth/send-otp`,
     GOOGLE_LOGIN: `${API_BASE}/auth/google-link`,
-    GET_CSRF_TOKEN: `${API_BASE}/auth/csrf`,
+    GET_CSRF_TOKEN: `${API_BASE}/cookies/csrf-token`,
     //PROFILE
     PROFILE: `${API_BASE}/profile`,
     UPDATE_PROFILE: `${API_BASE}/profile`,
@@ -35,6 +35,9 @@ export const API_ENDPOINTS = {
     UNTRUST_DEVICE: `${API_BASE}/auth/devices/:deviceId/untrust`,
     //GET ABILITY BY ROLE (PERMISSION)
     GET_ABILITY: `${API_BASE}/auth/ui-capabilities`,
+  },
+  BASE:{
+    UPLOAD_MEDIA: `${API_BASE}/media/images/upload`,
   },
   // QUẢN LÝ NGƯỜI DÙNG - USERS
   USERS:{

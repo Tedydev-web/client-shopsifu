@@ -2,7 +2,6 @@
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table-component/data-table'
-import { Pagination } from '@/components/ui/data-table-component/pagination'
 import { userColumns } from './users-Columns'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
 import UsersModalUpsert from './users-ModalUpsert'
@@ -18,12 +17,8 @@ export default function UserTable() {
   
   const {
     data,
-    totalRecords,
     loading,
-    limit,
-    currentPage,
-    totalPages,
-    search,
+    pagination,
     handleSearch,
     handlePageChange,
     handleLimitChange,
@@ -41,7 +36,6 @@ export default function UserTable() {
     addUser,
     editUser,
     roles,
-    isSearching,
   } = useUsers();
 
   const handleSubmit = async (formData: User | UserCreateRequest) => {
@@ -57,55 +51,59 @@ export default function UserTable() {
       columns: userColumns({ onEdit: (user) => handleOpenUpsertModal('edit', user), onDelete: handleOpenDelete }),
     });
   return (
-    <div className="space-y-4 relative">
-      <div className="flex items-center gap-2">
-      <Button 
-          onClick={() => handleOpenUpsertModal('add')}
-          className="ml-auto"
-        >
+    <div className="w-full space-y-4">
+      {/* Hàng 1: Nút Thêm mới */}
+      <div className="flex justify-end">
+        <Button onClick={() => handleOpenUpsertModal('add')}>
           <PlusIcon className="w-4 h-4 mr-2" />{t("addAction")}
         </Button>
       </div>
-       <div className="flex items-center gap-2">
-        <SearchInput
-          value={search}
-          onValueChange={handleSearch}
-          placeholder={t("searchPlaceholder")}
-          className="max-w-sm"
-        />
+
+      {/* Hàng 2: Search + View Option */}
+      <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex-1">
+          <SearchInput
+            value={pagination.search || ""}
+            onValueChange={(value) => handleSearch(value)}
+            placeholder={t("searchPlaceholder")}
+            className="w-full md:max-w-sm"
+          />
+        </div>
         <DataTableViewOption table={table} />
       </div>
 
-      <DataTable
-        table={table}
-        columns={userColumns({ onEdit: (user) => handleOpenUpsertModal('edit', user), onDelete: handleOpenDelete })}
-        loading={loading || isSearching}
-        notFoundMessage={t('notFound')}
-      />
-
-      {totalPages > 1 && (
-        <Pagination
-          limit={limit}
-          page={currentPage}
-          totalPages={totalPages}
-          totalRecords={totalRecords}
-          onPageChange={handlePageChange}
-          onLimitChange={handleLimitChange}
+      {/* Data Table */}
+      <div className="relative">
+        <DataTable
+          table={table}
+          columns={userColumns({ onEdit: (user) => handleOpenUpsertModal('edit', user), onDelete: handleOpenDelete })}
+          loading={loading}
+          notFoundMessage={t('notFound')}
+          pagination={{
+            metadata: pagination,
+            onPageChange: handlePageChange,
+            onLimitChange: handleLimitChange,
+          }}
         />
-      )}
+      </div>
 
+      {/* Modal xác nhận xóa */}
       <ConfirmDeleteModal
         open={deleteOpen}
-        onClose={handleCloseDeleteModal}
+        onClose={() => {
+          if (!deleteLoading) handleCloseDeleteModal();
+        }}
         onConfirm={handleConfirmDelete}
         title={t('deleteConfirm.title')}
         description={
           userToDelete
             ? t('deleteConfirm.description', {
-                name: userToDelete?.userProfile?.username || '',
+                name: userToDelete?.name || '',
               })
             : ''
         }
+        confirmText={t('deleteConfirm.deleteAction')}
+        cancelText={t('deleteConfirm.cancel')}
         loading={deleteLoading}
       />
 

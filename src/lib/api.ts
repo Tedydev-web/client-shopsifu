@@ -85,7 +85,7 @@ export const publicAxios = axios.create({
 publicAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token');
+      const csrfToken = Cookies.get('csrf-token');
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
       }
@@ -178,7 +178,7 @@ export const privateAxios = axios.create({
 privateAxios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token');
+      const csrfToken = Cookies.get('csrf_token');
       const sltToken = Cookies.get('slt_token');
       console.log("sessionToken: ", sltToken)
       if (csrfToken && config.headers) {
@@ -230,9 +230,9 @@ privateAxios.interceptors.response.use(
       showToast('Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại', 'info');
 
       // 4. Redirect to sign-in page after a short delay to allow state changes to process
-      setTimeout(() => {
-        window.location.href = ROUTES.BUYER.SIGNIN;
-      }, 100);
+      // setTimeout(() => {
+      //   window.location.href = ROUTES.BUYER.SIGNIN;
+      // }, 100);
     }
     return Promise.reject(error);
   }
