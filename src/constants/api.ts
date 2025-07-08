@@ -36,6 +36,9 @@ export const API_ENDPOINTS = {
     //GET ABILITY BY ROLE (PERMISSION)
     GET_ABILITY: `${API_BASE}/auth/ui-capabilities`,
   },
+  BASE:{
+    UPLOAD_MEDIA: `${API_BASE}/media/images/upload`,
+  },
   // QUẢN LÝ NGƯỜI DÙNG - USERS
   USERS:{
     GETALL: `${API_BASE}/users`,

@@ -28,11 +28,11 @@ export async function clearClientState() {
   // 3. Dọn dẹp cookies ngoại trừ XSRF-TOKEN
   const allCookies = Cookies.get();
   for (const cookieName in allCookies) {
-    if (cookieName !== 'XSRF-TOKEN') {
+    if (cookieName !== 'csrf_token') {
       Cookies.remove(cookieName, { path: '/' });
     }
   }
-  console.log('Cookies đã được dọn dẹp (ngoại trừ XSRF-TOKEN).');
+  console.log('Cookies đã được dọn dẹp (ngoại trừ csrf_token).');
 
   // 4. Dọn dẹp localStorage
   if (typeof window !== 'undefined') {

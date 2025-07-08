@@ -178,7 +178,7 @@ export const privateAxios = axios.create({
 privateAxios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token');
+      const csrfToken = Cookies.get('csrf_token');
       const sltToken = Cookies.get('slt_token');
       console.log("sessionToken: ", sltToken)
       if (csrfToken && config.headers) {

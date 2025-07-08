@@ -27,10 +27,10 @@ export function useSignin() {
       setLoading(true);
       const { data: responseData, status } = await authService.login(data);
 
-      if (status === 201) {
+      if (status === 200) {
         showToast(responseData.message || t('admin.showToast.auth.success'), 'success');
         await fetchProfile();
-        router.push(ROUTES.HOME);
+        router.push(ROUTES.ADMIN.DASHBOARD);
       }
       // if (response.status === 200) {
       //   // Handle 2FA/OTP redirection first
