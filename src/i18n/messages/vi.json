@@ -184,6 +184,26 @@
     }
   },
   "admin": {
+    "ModuleUsers":{
+      "Table":{
+        "name":"Tên người dùng",
+        "Email": "Email",
+        "status":"Trạng thái",
+        "createdAt":"Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "notFound": "Không tìm thấy người dùng",
+        "addAction": "Thêm người dùng",
+        "searchPlaceholder": "Tìm theo tên hoặc mô tả vai trò....",
+        "deleteConfirm":{
+          "title": "Xác nhận xóa người dùng",
+          "description":"Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không thể hoàn tác."
+        },
+        "actions":{
+          "edit": "Chỉnh sửa người dùng",
+          "delete": "Xóa người dùng"
+        }
+      }
+    },
     "ModuleProduct":{
       "title":"Quản lý sản phẩm",
       "subtitle":"Quản lý tất cả sản phẩm tại đây",
@@ -668,7 +688,10 @@
         "description": "Mô tả vai trò",
         "path": "Đường dẫn vai trò",
         "method": "Phương thức vai trò",
-        "namePlaceholder": "Nhập tên vai trò"
+        "namePlaceholder": "Nhập tên vai trò",
+        "module": "Module",
+        "createdAt": "Ngày tạo",
+        "updatedAt":"Ngày cập nhật"
       },
       "toast": {
         "addSuccess": "Thêm vai trò thành công",
@@ -730,12 +753,23 @@
       "addTitle": "Thêm quyền",
       "editTitle": "Chỉnh sửa quyền",
       "form": {
-        "name": "Tên chức năng",
+        "name": "Đường dẫn quyền",
         "subtitle": "Quản lý tất cả quyền hạn của bạn",
         "description": "Mô tả quyền",
         "path": "Đường dẫn quyền",
         "method": "Phương thức quyền",
-        "namePlaceholder": "Nhập tên quyền"
+        "namePlaceholder": "Nhập tên quyền",
+        "module": "Module",
+        "createdAt": "Ngày tạo",
+        "updatedAt":"Ngày cập nhật",
+        "ID": "ID",
+        "editAction": "Chỉnh sửa quyền",
+        "deleteAction": "Xóa quyền",
+        "Name": "Tên quyền"
+      },
+      "deleteModal":{
+        "deleteTitle": "Thực hiện xóa quyền",
+        "deleteDescription": "Bạn có chắc chắn xóa quyền hạn này không?"
       },
       "toast": {
         "addSuccess": "Thêm quyền thành công",
@@ -746,8 +780,10 @@
       "deleteAction": "Xóa quyền",
       "addAction": "Thêm quyền",
       "modal": {
-        "title": "Thêm quyền mới",
-        "subtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "addTitle": "Thêm quyền mới",
+        "addSubtitle": "Nhập thông tin quyền để thêm vào hệ thống",
+        "editTitle": "Sửa quyền hạn",
+        "editSubtitle": "Nhập thông tin quyền để sửa hệ thống",
         "description": "Mô tả quyền",
         "name": "Tên quyền",
         "path": "Đường dẫn quyền",
@@ -762,7 +798,9 @@
         "delete": "Xóa",
         "processing": "Đang xử lý...",
         "success": "Thêm quyền thành công",
-        "error": "Đã xảy ra lỗi"
+        "error": "Đã xảy ra lỗi",
+        "module": "Module",
+        "modulePlaceholder": "Nhập Module tính năng...."
       },
       "modalEdit": {
         "title": "Chỉnh sửa quyền",
@@ -910,6 +948,11 @@
         "success": "Cập nhật ngôn ngữ thành công",
         "error": "Đã xảy ra lỗi",
         "edit": "Chỉnh sửa ngôn ngữ"
+      },
+      "modalDelete":{
+        "deleteConfirmTitle": "Xóa ngôn ngữ",
+        "deleteConfirmMessage": "Bạn có chắc chắn xóa ngôn ngữ",
+        "cancelAction": "Hủy"
       }
     },
     "settings": {

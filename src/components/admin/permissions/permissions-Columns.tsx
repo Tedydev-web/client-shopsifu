@@ -12,16 +12,22 @@ import { useTranslations } from "next-intl";
 // Interface mới theo PerGetByIdResponse
 export type Permission = {
   id: number;
-  code: string;
   name: string;
   description: string;
+  module: string;
   path: string;
   method: string;
+  createdById: string;
+  updatedById: string;
+  deletedById: string;
+  deletedAt: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 const methodColorMap: { [key: string]: string } = {
-  READ: "text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100",
-  CREATE: "text-green-600 border-green-200 bg-green-50 hover:bg-green-100",
+  GET: "text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100",
+  POST: "text-green-600 border-green-200 bg-green-50 hover:bg-green-100",
   PUT: "text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100",
   UPDATE: "text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100",
   DELETE: "text-red-600 border-red-200 bg-red-50 hover:bg-red-100",
@@ -36,14 +42,14 @@ const getPermissionActions = (
 ): ActionItem<Permission>[] => [
   {
     type: "command",
-    label: t("admin.permissions.editAction"),
+    label: t("editAction"),
     icon: <Edit />,
     onClick: (permission) => onEdit(permission),
   },
   { type: "separator" },
   {
     type: "command",
-    label: t("admin.permissions.deleteAction"),
+    label: t("deleteAction"),
     icon: <Trash2 />,
     onClick: (permission) => onDelete(permission),
     className: "text-red-600 hover:!text-red-700",
@@ -57,7 +63,7 @@ export const PermissionsColumns = ({
   onDelete: (permission: Permission) => void;
   onEdit: (permission: Permission) => void;
 }): ColumnDef<Permission>[] => {
-  const t = useTranslations();
+  const t = useTranslations('admin.permissions.form');
 
   return [
     {
@@ -94,18 +100,40 @@ export const PermissionsColumns = ({
       enableHiding: true,
     },
     {
-      accessorKey: "path",
+      accessorKey: "name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.permissions.form.name")} />
+        <DataTableColumnHeader column={column} title={t("Name")} />
       ),
-      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("path")}</div>,
+      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("name")}</div>,
       enableSorting: true,
       enableHiding: true,
     },
     {
+      accessorKey: "module",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("module")} />
+      ),
+      cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("module")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
+    accessorKey: "path",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={t("name")} />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[220px] line-clamp-3 break-words text-sm">
+        {row.getValue("path")}
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: true,
+  },
+    {
       accessorKey: "method",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.permissions.form.method")} />
+        <DataTableColumnHeader column={column} title={t("method")} />
       ),
       cell: ({ row }) => {
         const method = (row.getValue("method") as string).toUpperCase();
@@ -125,20 +153,38 @@ export const PermissionsColumns = ({
     {
       accessorKey: "description",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.permissions.form.description")} />
+        <DataTableColumnHeader column={column} title={t("description")} />
       ),
       cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("description")}</div>,
       enableSorting: true,
       enableHiding: true,
     },
-    // {
-    //   id: "actions",
-    //   cell: ({ row }) => (
-    //     <DataTableRowActions
-    //       row={row}
-    //       actions={getPermissionActions(row.original, onDelete, onEdit, t)}
-    //     />
-    //   ),
-    // },
+    {
+      accessorKey: "createdAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("createdAt")} />
+      ),
+      cell: ({ row }) => <div className="w-[220px] truncate">{format(new Date(row.getValue("createdAt")), "yyyy-MM-dd HH:mm:ss")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("updatedAt")} />
+      ),
+      cell: ({ row }) => <div className="w-[220px] truncate">{format(new Date(row.getValue("updatedAt")), "yyyy-MM-dd HH:mm:ss")}</div>,
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <DataTableRowActions
+          row={row}
+          actions={getPermissionActions(row.original, onDelete, onEdit, t)}
+        />
+      ),
+    },
   ];
 };

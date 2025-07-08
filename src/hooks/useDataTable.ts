@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,6 +13,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  TableOptions,
 } from '@tanstack/react-table'
 
 interface UseDataTableProps<TData> {
@@ -26,7 +27,8 @@ export function useDataTable<TData>({ data, columns }: UseDataTableProps<TData>)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const table = useReactTable({
+  // Gọi hook ở top level với options đã được memoized - không qua useMemo
+  const table = useReactTable<TData>({
     data,
     columns,
     state: {
@@ -46,7 +48,9 @@ export function useDataTable<TData>({ data, columns }: UseDataTableProps<TData>)
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+    // Disable internal pagination as we're using server-side pagination
+    manualPagination: true,
+  });
 
   return table
 }

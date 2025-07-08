@@ -17,14 +17,14 @@ const getUserActions = (
 ): ActionItem<User>[] => [
   {
     type: 'command',
-    label: t('admin.users.actions.edit'),
+    label: t('actions.edit'),
     icon: <Edit className="w-4 h-4" />,
     onClick: (user) => onEdit(user),
   },
   { type: 'separator' },
   {
     type: 'command',
-    label: t('admin.users.actions.delete'),
+    label: t('actions.delete'),
     icon: <Trash2 className="w-4 h-4" />,
     onClick: (user) => onDelete(user),
     className: 'text-red-500 hover:!text-red-500',
@@ -34,7 +34,7 @@ const getUserActions = (
 export const userColumns = (
   { onDelete, onEdit }: { onDelete: (user: User) => void; onEdit: (user: User) => void }
 ): ColumnDef<User>[] => {
-  const t = useTranslations()
+  const t = useTranslations("admin.ModuleUsers.Table");
 
   return [
     {
@@ -58,7 +58,7 @@ export const userColumns = (
     },
     {
       accessorKey: 'userProfile.username',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Họ và tên')} />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('name')} />,
       cell: ({ row }) => {
         const name = `${row.original.userProfile?.username || ''}`;
         return <div className="font-medium">{name.trim() || 'N/A'}</div>;
@@ -70,7 +70,7 @@ export const userColumns = (
     },
     {
       accessorKey: 'status',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Trạng thái')} />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('status')} />,
       cell: ({ row }) => {
         const isActive = row.getValue('status') === 'ACTIVE';
         return (
@@ -88,7 +88,7 @@ export const userColumns = (
     },
     {
       accessorKey: 'createdAt',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Tạo lúc')} />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('createdAt')} />,
       cell: ({ row }) => {
         const date = new Date(row.getValue('createdAt'));
         return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
@@ -96,7 +96,7 @@ export const userColumns = (
     },
     {
       accessorKey: 'updatedAt',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('Cập nhật lần cuối')} />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('updatedAt')} />,
       cell: ({ row }) => {
         const date = new Date(row.getValue('updatedAt'));
         return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;

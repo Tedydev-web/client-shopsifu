@@ -9,33 +9,38 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslations } from "next-intl";
 
-interface PaginationProps {
-  limit: number;
-  page: number;
-  totalPages: number;
-  totalRecords: number;
-  onPageChange: (newPage: number) => void;
-  onLimitChange: (newLimit: number) => void;
+import { PaginationMetadata } from "@/types/base.interface";
+
+export interface DataTablePaginationProps {
+  metadata: PaginationMetadata;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
 }
 
-export function Pagination({
-  limit,
-  page,
-  totalPages,
-  totalRecords,
-  onPageChange,
-  onLimitChange,
-}: PaginationProps) {
+export function Pagination({ metadata, onPageChange, onLimitChange }: DataTablePaginationProps) {
+  // Log chi tiết để debug
+  console.log("Pagination metadata:", JSON.stringify(metadata));
+  console.log("Pagination component rendering with totalPages:", metadata?.totalPages);
   const t = useTranslations();
 
+  // Đảm bảo có đầy đủ thông tin pagination, dùng default values nếu metadata thiếu
+  const {
+    page = 1,
+    limit = 10,
+    totalPages = 1,
+    totalItems = 0,
+    hasNext = false,
+    hasPrevious = false,
+  } = metadata || {};
+
   const handlePreviousPage = () => {
-    if (page > 1) {
+    if (hasPrevious) {
       onPageChange(page - 1);
     }
   };
 
   const handleNextPage = () => {
-    if (page < totalPages) {
+    if (hasNext) {
       onPageChange(page + 1);
     }
   };
@@ -78,7 +83,7 @@ export function Pagination({
           variant="outline"
           size="sm"
           className="h-8 w-8 p-0 border-gray-300"
-          disabled={page === 1}
+          disabled={!hasPrevious}
           onClick={handlePreviousPage}
         >
           <ChevronLeft size={16} />
@@ -90,13 +95,13 @@ export function Pagination({
           variant="outline"
           size="sm"
           className="h-8 w-8 p-0 border-gray-300"
-          disabled={page === totalPages}
+          disabled={!hasNext}
           onClick={handleNextPage}
         >
           <ChevronRight size={16} />
         </Button>
         <span className="ml-2 text-gray-400 text-sm">
-          {t('admin.pagination.page', { page, totalPages })} | {t('admin.pagination.total', { totalRecords })}
+          {`Trang ${page} trên ${totalPages} | Tổng cộng: ${totalItems || 0}`}
         </span>
       </div>
     </div>

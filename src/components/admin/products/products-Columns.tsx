@@ -101,10 +101,10 @@ export const productsColumns = ({
         accessorKey: "image",
         header: () => t("DataTable.image"),
         cell: ({ row }) => {
-            const imageUrl = row.original.images[0].url || '/images/image-placeholder.jpg';
+            const imageUrl = row.original.images?.[0]?.url || '/images/image-placeholder.jpg';
             return (
                 <Image
-                    src={'/images/image-placeholder.jpg'}
+                    src={imageUrl}
                     alt={row.original.name}
                     width={65}
                     height={65}
@@ -139,28 +139,28 @@ export const productsColumns = ({
         enableSorting: true,
         enableHiding: true,
     },
-    // {
-    //     accessorKey: "price",
-    //     header: ({ column }) => (
-    //       <DataTableColumnHeader column={column} title={t("DataTable.price")} />
-    //     ),
-    //     cell: ({ row }) => {
-    //         const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(row.original.price);
-    //         return <div className="w-[100px]">{formattedPrice}</div>;
-    //     },
-    //     enableSorting: true,
-    //     enableHiding: true,
-    //     filterFn: priceInRange,
-    // },
-    // {
-    //     accessorKey: "stock",
-    //     header: ({ column }) => (
-    //       <DataTableColumnHeader column={column} title={t("DataTable.stock")} />
-    //     ),
-    //     cell: ({ row }) => <div className="w-[80px] text-center">{row.original.stock}</div>,
-    //     enableSorting: true,
-    //     enableHiding: true,
-    // },
+    {
+        accessorKey: "price",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title={t("DataTable.price")} />
+        ),
+        cell: ({ row }) => {
+            const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(row.original.price);
+            return <div className="w-[100px]">{formattedPrice}</div>;
+        },
+        enableSorting: true,
+        enableHiding: true,
+        filterFn: priceInRange,
+    },
+    {
+        accessorKey: "stock",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title={t("DataTable.stock")} />
+        ),
+        cell: ({ row }) => <div className="w-[80px] text-center">{row.original.stock}</div>,
+        enableSorting: true,
+        enableHiding: true,
+    },
     {
         accessorKey: "status",
         header: () => t("DataTable.status"),

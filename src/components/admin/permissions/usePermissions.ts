@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Permission } from "./permissions-Columns";
 import { permissionService } from "@/services/permissionService";
 import { showToast } from "@/components/ui/toastify";
@@ -6,114 +6,130 @@ import { parseApiError } from "@/utils/error";
 import {
   PerCreateRequest,
   PerUpdateRequest,
+  PermissionDetail,
 } from "@/types/auth/permission.interface";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useServerDataTable } from "@/hooks/useServerDataTable";
 
 export function usePermissions() {
-  const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
-  const [permissions, setPermissions] = useState<Permission[]>([]);
+  // Tạo các callbacks memoized để tránh tạo lại mỗi lần render
+  const getResponseData = useCallback((response: any) => {
+    // Trích xuất mảng dữ liệu từ response
+    return response.data || [];
+  }, []);
+
+  const getResponseMetadata = useCallback((response: any) => {
+    // Trích xuất metadata từ response
+    return response.metadata;
+  }, []);
+
+  const mapResponseToData = useCallback((item: PermissionDetail): Permission => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    path: item.path,
+    method: item.method,
+    module: item.module,
+    createdById: item.createdById,
+    updatedById: item.updatedById,
+    deletedById: item.deletedById,
+    deletedAt: item.deletedAt,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+  }), []);
+
+  // Setup our data table with direct API call và các hàm đã memoized
+  const {
+    data: permissions,
+    loading,
+    pagination,
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    handleSortChange,
+    refreshData,
+  } = useServerDataTable<PermissionDetail, Permission>({
+    fetchData: permissionService.getAll,
+    getResponseData,
+    getResponseMetadata,
+    mapResponseToData,
+    initialSort: { sortBy: "id", sortOrder: "asc" },
+    defaultLimit: 10,
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(
     null
   );
-  const [loading, setLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500);
 
-  const getAllPermissions = useCallback(async () => {
+  const handleCreate = async (data: PerCreateRequest) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      setLoading(true);
-      const response = await permissionService.getAll();
-      const flattenedPermissions = Object.entries(response.data).flatMap(
-        ([subject, items]) =>
-          items.map((item) => ({
-            subject: subject,
-            ...item,
-          }))
-      );
-      const mappedPermissions: Permission[] = flattenedPermissions.map(
-        (per) => ({
-          id: per.id,
-          code: String(per.id),
-          name: per.description,
-          description: per.description,
-          path: per.subject,
-          method: per.action,
-        })
-      );
-      setAllPermissions(mappedPermissions);
-      setPermissions(mappedPermissions);
+      await permissionService.create(data, controller.signal);
+      showToast("Permission created successfully", "success");
+      
+      // Hàm refreshData() sẽ kích hoạt useEffect trong hook để gọi lại API getAll
+      // và cập nhật state với dữ liệu mới nhất
+      refreshData();
+      handleCloseModal();
     } catch (error) {
-      showToast(parseApiError(error), "error");
-      console.error("Error fetching permissions:", error);
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), "error");
+      }
     } finally {
-      setLoading(false);
+      clearTimeout(timeoutId);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    if (debouncedSearch) {
-      setIsSearching(true);
-      const filteredData = allPermissions.filter(
-        (permission) =>
-          permission.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          permission.description
-            .toLowerCase()
-            .includes(debouncedSearch.toLowerCase()) ||
-          permission.path.toLowerCase().includes(debouncedSearch.toLowerCase())
-      );
-      setPermissions(filteredData);
-      setIsSearching(false);
-    } else {
-      setPermissions(allPermissions);
-    }
-  }, [debouncedSearch, allPermissions]);
-
-  const createPermission = async (data: PerCreateRequest) => {
+  const handleUpdate = async (id: number, data: PerUpdateRequest) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      const response = await permissionService.create(data);
-      showToast("Tạo quyền thành công", "success");
-      return response;
+      await permissionService.update(String(id), data, controller.signal);
+      showToast("Permission updated successfully", "success");
+      
+      // Hàm refreshData() sẽ kích hoạt useEffect trong hook để gọi lại API getAll
+      // và cập nhật state với dữ liệu mới nhất
+      refreshData();
+      handleCloseModal();
     } catch (error) {
-      showToast(parseApiError(error), 'error');
-      console.error('Error creating permission:', error);
-      return null;
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), "error");
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
-  const updatePermission = async (code: string, data: PerUpdateRequest) => {
+  const handleDelete = async (id: number) => {
+    // Tạo controller mới để có thể hủy request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
+    
     try {
-      const response = await permissionService.update(code, data);
-      showToast("Cập nhật quyền thành công", "success");
-      return response;
+      await permissionService.delete(String(id), controller.signal);
+      showToast("Permission deleted successfully", "success");
+      
+      // Hàm refreshData() sẽ kích hoạt useEffect trong hook để gọi lại API getAll
+      // và cập nhật state với dữ liệu mới nhất
+      refreshData();
     } catch (error) {
-      showToast(parseApiError(error), 'error');
-      console.error('Error updating permission:', error);
-      return null;
+      if (!controller.signal.aborted) {
+        showToast(parseApiError(error), "error");
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
-  const deletePermission = async (id: string) => {
-    try {
-      const response = await permissionService.delete(id);
-      showToast("Xóa quyền thành công", "success");
-      return response;
-    } catch (error) {
-      showToast(parseApiError(error), 'error');
-      console.error('Error deleting permission:', error);
-      return null;
-    }
-  };
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-  };
-
-  const handleOpenModal = useCallback((permission?: Permission) => {
-    setSelectedPermission(permission || null);
+  const handleOpenModal = (permission: Permission | null = null) => {
+    setSelectedPermission(permission);
     setIsModalOpen(true);
-  }, []);
+  };
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
@@ -123,16 +139,17 @@ export function usePermissions() {
   return {
     permissions,
     loading,
-    isSearching,
-    search,
-    handleSearch,
+    pagination,
     isModalOpen,
     selectedPermission,
-    getAllPermissions,
-    createPermission,
-    updatePermission,
-    deletePermission,
+    handleCreate,
+    handleUpdate,
+    handleDelete,
     handleOpenModal,
     handleCloseModal,
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    refreshData,
   };
 }
