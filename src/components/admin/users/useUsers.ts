@@ -1,22 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
+import { useState, useCallback, useEffect } from 'react';
+import { showToast } from '@/components/ui/toastify';
+import { parseApiError } from '@/utils/error';
 import { userService } from '@/services/admin/userService';
-import { roleService } from '@/services/roleService'; // Import roleService
-import { User, UserCreateRequest } from '@/types/admin/user.interface';
-import { Role } from '@/types/auth/role.interface'; // Import Role type
+import { roleService } from '@/services/roleService'; 
+import { User, UserCreateRequest, UserRole } from '@/types/admin/user.interface';
+import { useServerDataTable } from '@/hooks/useServerDataTable';
+import { useTranslations } from 'next-intl'
 
 export const useUsers = () => {
-  const { t } = useTranslation('');
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  // Pagination and search state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState('');
-
+  const t = useTranslations();
   // Modal states
   const [upsertOpen, setUpsertOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
@@ -27,62 +19,77 @@ export const useUsers = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Roles state
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [roles, setRoles] = useState<UserRole[]>([]);
 
-  const fetchRoles = async () => {
-    try {
-      const response = await roleService.getAll({ "all-records": true });
-      setRoles(response.data);
-    } catch (err) {
-      toast.error(t('admin.users.toasts.fetchRolesError', 'Failed to fetch roles'));
-    }
-  };
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await userService.getAll({ page: 1, limit: 1000, "all-records": true }); // Fetch all for client-side pagination
-      setAllUsers(response.data);
-      setError(null);
-    } catch (err) {
-      setError(t('admin.users.toasts.fetchError'));
-      toast.error(t('admin.users.toasts.fetchError'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-    fetchRoles();
+  // Tạo các callbacks cho useServerDataTable
+  const getResponseData = useCallback((response: any) => {
+    return response.data || [];
   }, []);
 
-  // Client-side filtering and pagination
-  const filteredUsers = useMemo(() => {
-    return allUsers.filter(user =>
-      (user.userProfile?.username?.toLowerCase() || '').includes(search.toLowerCase()) ||
-      (user.email?.toLowerCase() || '').includes(search.toLowerCase())
-    );
-  }, [allUsers, search]);
+  const getResponseMetadata = useCallback((response: any) => {
+    const metadata = response.metadata || {};
+    return {
+      totalItems: metadata.totalItems || 0,
+      page: metadata.page || 1,
+      totalPages: metadata.totalPages || 1,
+      limit: metadata.limit || 10,
+      hasNext: metadata.hasNext || false,
+      hasPrevious: metadata.hasPrev || false
+    };
+  }, []);
 
-  const paginatedUsers = useMemo(() => {
-    const start = (currentPage - 1) * limit;
-    const end = start + limit;
-    return filteredUsers.slice(start, end);
-  }, [filteredUsers, currentPage, limit]);
+  const mapResponseToData = useCallback((user: any): User => {
+    return user;
+  }, []);
 
-  const totalPages = useMemo(() => {
-    return Math.ceil(filteredUsers.length / limit);
-  }, [filteredUsers, limit]);
+  // Sử dụng hook useServerDataTable để quản lý data và pagination
+  const {
+    data: users,
+    loading,
+    pagination,
+    handlePageChange,
+    handleLimitChange,
+    handleSearch,
+    handleSortChange,
+    refreshData,
+  } = useServerDataTable({
+    fetchData: userService.getAll,
+    getResponseData,
+    getResponseMetadata,
+    mapResponseToData,
+    initialSort: { sortBy: "id", sortOrder: "asc" },
+    defaultLimit: 10,
+  });
+
+  // Fetch roles data
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        // Truyền tham số thông qua options với tham số all-records
+        const response = await roleService.getAll({ limit: 100, page: 1 } as any);
+        // Map response data to UserRole structure
+        const userRoles: UserRole[] = response.data.map((role: any) => ({
+          id: role.id,
+          name: role.name
+        }));
+        setRoles(userRoles);
+      } catch (error) {
+        showToast(parseApiError(error), 'error');
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   // CRUD operations
   const addUser = async (user: UserCreateRequest) => {
     try {
       await userService.create(user);
-      toast.success(t('admin.users.toasts.createSuccess'));
-      fetchUsers();
+      showToast(t('system.toasts.createSuccess'), 'success');
+      refreshData();
+      handleCloseUpsertModal();
     } catch (error) {
-      toast.error(t('admin.users.toasts.createError'));
+      showToast(parseApiError(error), 'error');
       console.error(error);
     }
   };
@@ -90,10 +97,11 @@ export const useUsers = () => {
   const editUser = async (user: User) => {
     try {
       await userService.update(user.id, user);
-      toast.success(t('admin.users.toasts.updateSuccess'));
-      fetchUsers();
+      showToast(t('system.toasts.updateSuccess'), 'success');
+      refreshData();
+      handleCloseUpsertModal();
     } catch (error) {
-      toast.error(t('admin.users.toasts.updateError'));
+      showToast(parseApiError(error), 'error');
       console.error(error);
     }
   };
@@ -103,27 +111,16 @@ export const useUsers = () => {
       setDeleteLoading(true);
       try {
         await userService.delete(userToDelete.id);
-        toast.success(t('admin.users.toasts.deleteSuccess'));
-        fetchUsers();
+        showToast(t('system.toasts.deleteSuccess'), 'success');
+        refreshData();
         setDeleteOpen(false);
         setUserToDelete(null);
       } catch (error) {
-        toast.error(t('admin.users.toasts.deleteError'));
+        showToast(parseApiError(error), 'error');
       } finally {
         setDeleteLoading(false);
       }
     }
-  };
-
-  // Handlers
-  const handlePageChange = (page: number) => setCurrentPage(page);
-  const handleLimitChange = (limit: number) => {
-    setLimit(limit);
-    setCurrentPage(1);
-  };
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    setCurrentPage(1);
   };
 
   const handleOpenDelete = (user: User) => {
@@ -148,18 +145,17 @@ export const useUsers = () => {
   };
 
   return {
-    data: paginatedUsers,
-    totalRecords: filteredUsers.length,
+    data: users,
     loading,
-    error,
-    limit,
-    currentPage,
-    totalPages,
-    search,
-    handleSearch,
+    pagination,
+    
+    // Server-side pagination handlers
     handlePageChange,
     handleLimitChange,
-    isSearching,
+    handleSearch,
+    handleSortChange,
+    refreshData,
+    
     // Delete
     deleteOpen,
     userToDelete,

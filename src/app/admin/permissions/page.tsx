@@ -1,7 +1,6 @@
 'use client'
 import PermissionsTableWrapper from "@/components/admin/permissions/permissions-Wrapper";
 import { useTranslations } from "next-intl";
-import { PermissionsTable } from "@/components/admin/permissions/permissions-Table";
 
 export default function PermissionsPage() {
   const t = useTranslations()
@@ -13,7 +12,7 @@ export default function PermissionsPage() {
           {t("admin.permissions.subtitle")}
         </p>
       </div>
-      <PermissionsTable />
+      <PermissionsTableWrapper />
     </div>
   )
 }

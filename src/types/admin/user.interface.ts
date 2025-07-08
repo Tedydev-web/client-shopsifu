@@ -25,36 +25,62 @@ export interface UserProfile {
   createdById: string | null;
 }
 
+// export interface User {
+//   id: number;
+//   email: string;
+//   status: string;
+//   roleId: number;
+//   isEmailVerified: boolean;
+//   createdAt: string;
+//   updatedAt: string;
+//   userProfile?: UserProfile;
+// }
+
+export interface UserRole {
+  id: number;
+  name: string;
+}
+
 export interface User {
   id: number;
   email: string;
+  name: string;
+  phoneNumber: string;
+  avatar: string;
   status: string;
   roleId: number;
-  isEmailVerified: boolean;
+  createdById: number | null;
+  updatedById: number | null;
+  deletedById: number | null;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
-  userProfile?: UserProfile;
+  role: UserRole;
 }
 
 // LẤY TẤT CẢ DANH SÁCH NGƯỜI DÙNG - GET ALL USER
 export interface UserGetAllResponse extends BaseResponse {
   data: User[];
-  meta: PaginationMeta;
+  metadata: {
+    totalItems: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 // TẠO NGƯỜI DÙNG - CREATE USER
 export interface UserCreateRequest {
   email: string;
+  name: string;
+  phoneNumber: string;
+  avatar?: string;
   password: string;
   confirmPassword: string;
   roleId: number;
-  firstName: string;
-  lastName: string;
-  username: string;
-  phoneNumber: string;
-  bio?: string;
-  avatar?: string;
-  countryCode?: string;
+  status: string;
 }
 
 export interface UserCreateResponse extends BaseResponse {
@@ -65,16 +91,13 @@ export interface UserCreateResponse extends BaseResponse {
 export interface UserUpdateRequest {
   id: number;
   email?: string;
+  name?: string;
+  phoneNumber?: string;
+  avatar?: string;
   password?: string;
   confirmPassword?: string;
   roleId?: number;
-  firstName?: string;
-  lastName?: string;
-  username?: string;
-  phoneNumber?: string;
-  bio?: string;
-  avatar?: string;
-  countryCode?: string;
+  status?: string;
 }
 
 export interface UserUpdateResponse extends BaseResponse {
