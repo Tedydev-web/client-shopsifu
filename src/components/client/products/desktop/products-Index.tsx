@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
@@ -45,29 +43,61 @@ export default function ProductDetail({ slug }: Props) {
     media: productMock.media as { type: "image" | "video"; src: string }[],
   };
 
+  // Lấy category cha đầu tiên (nếu có)
+  const category =
+    product.categories && product.categories.length > 0
+      ? product.categories[0]
+      : null;
+
+  // Lấy brand (nếu có)
+  const brand = product.brand?.name || "";
+
   return (
     <div className="bg-[#f5f5f5] py-4">
       {/* ✅ Breadcrumb */}
       <div className="max-w-[1200px] mx-auto px-4 mb-3">
         <Breadcrumb className="mb-3 flex flex-wrap items-center text-sm text-muted-foreground">
+          {/* Shopsifu cố định */}
           <BreadcrumbItem className="flex items-center gap-1">
             <BreadcrumbLink asChild>
               <Link href="/" className="text-black hover:underline">
-                Trang chủ
+                Shopsifu
               </Link>
             </BreadcrumbLink>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </BreadcrumbItem>
 
-          <BreadcrumbItem className="flex items-center gap-1">
-            <BreadcrumbLink asChild>
-              <Link href="/products" className="text-black hover:underline">
-                Sản phẩm
-              </Link>
-            </BreadcrumbLink>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </BreadcrumbItem>
+          {/* Category */}
+          {category && (
+            <BreadcrumbItem className="flex items-center gap-1">
+              <BreadcrumbLink asChild>
+                <Link
+                  href={`/category/${slugify(category.name)}`}
+                  className="text-black hover:underline"
+                >
+                  {category.name}
+                </Link>
+              </BreadcrumbLink>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </BreadcrumbItem>
+          )}
 
+          {/* Brand */}
+          {brand && (
+            <BreadcrumbItem className="flex items-center gap-1">
+              <BreadcrumbLink asChild>
+                <Link
+                  href={`/brand/${slugify(brand)}`}
+                  className="text-black hover:underline"
+                >
+                  {brand}
+                </Link>
+              </BreadcrumbLink>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </BreadcrumbItem>
+          )}
+
+          {/* Product name */}
           <BreadcrumbItem>
             <span className="text-foreground font-medium line-clamp-1">
               {product.name}
@@ -78,9 +108,13 @@ export default function ProductDetail({ slug }: Props) {
 
       {/* ✅ Chi tiết sản phẩm */}
       <div className="max-w-[1200px] mx-auto bg-white p-4 rounded">
-        <div className="flex flex-col md:flex-row gap-6">
-          <ProductGallery media={product.media} />
-          <ProductInfo product={product} />
+        <div className="flex flex-col md:flex-row gap-6 md:items-stretch">
+          <div className="flex-1">
+            <ProductGallery media={product.media} />
+          </div>
+          <div className="flex-1 flex flex-col justify-between min-h-[400px]">
+            <ProductInfo product={product} />
+          </div>
         </div>
 
         {/* ✅ Thông số kỹ thuật */}
