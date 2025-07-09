@@ -191,6 +191,51 @@
     }
   },
   "admin": {
+     "pages": {
+      "category": {
+        "title": "Quản lý danh mục",
+        "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
+        "addCategory": "Thêm danh mục",
+        "editCategory": "Chỉnh sửa danh mục",
+        "deleteCategory": "Xóa danh mục",
+        "name": "Tên danh mục",
+        "namePlaceholder": "Nhập tên danh mục",
+        "slug": "Đường dẫn (slug)",
+        "slugPlaceholder": "Nhập slug",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Nhập mô tả danh mục (tuỳ chọn)",
+        "parent": "Danh mục cha",
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "status": "Trạng thái",
+        "statusActive": "Đang hoạt động",
+        "statusInactive": "Ngừng hoạt động",
+        "action": "Thao tác",
+        "noData": "Không có dữ liệu",
+        "searchPlaceholder": "Tìm kiếm theo tên danh mục",
+        "addTitle": "Thêm danh mục mới",
+        "save": "Thêm mới",
+        "editTitle": "Chỉnh sửa danh mục",
+        "addDescription": "Tạo mới một danh mục sản phẩm. Có thể kéo thả để sắp xếp hoặc phân cấp.",
+        "editDescription": "Chỉnh sửa thông tin danh mục. Có thể kéo thả để thay đổi vị trí hoặc phân cấp.",
+        "treeTitle": "Cây danh mục",
+        "treeDescription": "Kéo thả để sắp xếp hoặc phân cấp danh mục. Chỉ hỗ trợ 1 cấp cha - 1 cấp con.",
+        "deleteConfirmTitle": "Xác nhận xoá danh mục",
+        "deleteConfirmDescription": "Bạn có chắc chắn muốn xoá danh mục này? Hành động này không thể hoàn tác."
+      ,
+      "column": {
+        "name": "Tên danh mục",
+        "status": "Trạng thái",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "actions": {
+        "view": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      }
+    }
+  },
     "ModuleUsers":{
       "Table":{
         "role": "Vai trò",
@@ -292,6 +337,7 @@
     },
     "ModuleBrands":{
       "Table":{
+        "id": "ID",
         "logo": "Logo",
         "name": "Tên thương hiệu",
         "createdAt": "Ngày tạo",
@@ -323,7 +369,10 @@
           "adding": "Đang thêm...",
           "saving": "Đang lưu...",
           "add": "Thêm mới",
-          "save":"Lưu thay đổi"
+          "save":"Lưu thay đổi",
+          "uploadImage":"Tải ảnh lên",
+          "uploading": "",
+          "selectImage": "Chọn ảnh lên"
         }
     },
     "sidebar": {
@@ -663,6 +712,7 @@
       "confirm": "Lưu thay đổi",
       "cancel": "Hủy"
     },
+    
     "auditLogs": {
       "title": "Nhật ký hệ thống",
       "subtitle": "Quản lý tất cả nhật ký hệ thống của bạn",
@@ -729,6 +779,7 @@
       "addTitle": "Thêm vai trò",
       "editTitle": "Chỉnh sửa vai trò",
       "form": {
+        "id": "ID",
         "name": "Tên vai trò",
         "subtitle": "Quản lý tất cả vai trò của bạn",
         "description": "Mô tả vai trò",
@@ -922,7 +973,13 @@
         "confirmPassword": "Xác nhận mật khẩu",
         "avatar": "Ảnh đại diện",
         "passwordStepDescription": "Mật khẩu phải chứa ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
-        "confirmPasswordStepDescription": "Xác nhận mật khẩu phải khớp với mật khẩu"
+        "confirmPasswordStepDescription": "Xác nhận mật khẩu phải khớp với mật khẩu",
+        "statusActive":"Hoạt động",
+        "statusInactive":"Không hoạt động",
+        "avatarUrl": "Đường dẫn Url avatar của bạn....",
+        "add":"Thêm mới",
+        "uploadImage": "Tải ảnh lên",
+        "selectImage": "Chọn ảnh lên"
       },
       "deleteConfirm": {
         "title": "Xác nhận xóa người dùng",

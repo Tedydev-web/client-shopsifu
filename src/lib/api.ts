@@ -81,7 +81,7 @@ export const refreshAxios = axios.create({
 refreshAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token');
+      const csrfToken = Cookies.get('csrf-token');
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
       }
@@ -137,7 +137,7 @@ privateAxios.interceptors.request.use(
     if (typeof window !== 'undefined') {
       const csrfToken = Cookies.get('csrf_token');
       const sltToken = Cookies.get('slt_token');
-      console.log("sessionToken: ", sltToken)
+      // console.log("sessionToken: ", sltToken)
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
       }
@@ -209,9 +209,9 @@ const checkToken = async () => {
       console.log('✅ Token đã được làm mới thành công khi khởi tạo.');
     } catch (error) {
       console.error('❌ Không thể làm mới token. Đăng xuất người dùng.', error);
-      // await clearClientState();
+      await clearClientState();
       if (window.location.pathname !== ROUTES.BUYER.SIGNIN) {
-        // window.location.href = ROUTES.BUYER.SIGNIN;
+        window.location.href = ROUTES.BUYER.SIGNIN;
       }
     }
     return;
@@ -220,7 +220,7 @@ const checkToken = async () => {
   // ✅ Case 2: Không có access lẫn refresh token → chưa đăng nhập
   if (!accessToken && !refreshToken) {
     console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
-    // await clearClientState();
+    await clearClientState();
     return;
   }
 
@@ -241,8 +241,8 @@ const checkToken = async () => {
         console.log('✅ Token đã được làm mới do đã hết hạn.');
       } catch (error) {
         console.error('❌ Không thể làm mới token đã hết hạn. Đăng xuất...', error);
-        // await clearClientState();
-        // window.location.href = ROUTES.BUYER.SIGNIN;
+        await clearClientState();
+        window.location.href = ROUTES.BUYER.SIGNIN;
       }
       return;
     }
@@ -261,8 +261,8 @@ const checkToken = async () => {
 
   } catch (error) {
     console.error('Lỗi khi giải mã hoặc kiểm tra token. Token có thể bị lỗi:', error);
-    // await clearClientState();
-    // window.location.href = ROUTES.BUYER.SIGNIN;
+    await clearClientState();
+    window.location.href = ROUTES.BUYER.SIGNIN;
   }
 }
 

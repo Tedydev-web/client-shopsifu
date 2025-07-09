@@ -64,7 +64,7 @@ export const userColumns = (
       cell: ({ row }) => {
         const user = row.original;
         return (
-          <Avatar className="h-9 w-9">
+          <Avatar className="h-12 w-12">
             {user.avatar ? (
               <AvatarImage 
                 src={user.avatar}

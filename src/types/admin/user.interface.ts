@@ -78,7 +78,7 @@ export interface UserCreateRequest {
   phoneNumber: string;
   avatar?: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string; // Made optional since it's only used for frontend validation
   roleId: number;
   status: string;
 }
@@ -89,13 +89,11 @@ export interface UserCreateResponse extends BaseResponse {
 
 // SỬA NGƯỜI DÙNG - UPDATE USER
 export interface UserUpdateRequest {
-  id: number;
+  // id excluded from the request body as it should be provided as URL parameter only
   email?: string;
   name?: string;
   phoneNumber?: string;
   avatar?: string;
-  password?: string;
-  confirmPassword?: string;
   roleId?: number;
   status?: string;
 }

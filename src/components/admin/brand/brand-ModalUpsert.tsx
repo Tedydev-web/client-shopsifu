@@ -7,9 +7,12 @@ import { Input } from '@/components/ui/input'
 import { z } from 'zod'
 import { ZodError } from 'zod'
 import { useTranslations } from 'next-intl'
+import { showToast } from '@/components/ui/toastify'
 import { Brand, BrandCreateRequest, BrandUpdateRequest } from '@/types/admin/brands.interface'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Upload, X } from "lucide-react"
+import { Upload, X, Camera, Image as ImageIcon } from "lucide-react"
+import { useUploadMedia } from '@/hooks/useUploadMedia'
+import { Progress } from '@/components/ui/progress'
 
 interface BrandModalUpsertProps {
   open: boolean
@@ -33,18 +36,67 @@ export default function BrandModalUpsert({
   const [logo, setLogo] = useState("")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  // Upload media hook
+  const { 
+    files, 
+    uploadedUrls, 
+    isUploading,
+    progress,
+    error: uploadError,
+    handleAddFiles,
+    handleRemoveFile,
+    handleRemoveAllFiles,
+    uploadFiles,
+    reset: resetUpload
+  } = useUploadMedia()
 
   // Reset form when modal opens or mode/brand changes
   useEffect(() => {
     if (mode === 'edit' && brand) {
       setName(brand.name || "")
       setLogo(brand.logo || "")
+      
+      // Reset upload state
+      resetUpload()
     } else if (mode === 'add') {
       setName("")
       setLogo("")
       setErrors({})
+      
+      // Reset upload state
+      resetUpload()
     }
-  }, [mode, brand, open])
+  }, [mode, brand, open, resetUpload])
+
+  // Handle file change for logo upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      // File type validation
+      const file = e.target.files[0];
+      if (!file.type.startsWith('image/')) {
+        showToast('Định dạng tệp không được hỗ trợ. Vui lòng chọn tệp hình ảnh (JPG, PNG, GIF, etc.)', 'error');
+        return;
+      }
+      
+      // Clear existing files first
+      handleRemoveAllFiles();
+      
+      // Add the new file (which will be compressed automatically)
+      handleAddFiles(e.target.files);
+    }
+  };
+  
+  // Handle logo upload
+  const handleUploadLogo = async () => {
+    if (files.length === 0) return;
+    
+    const urls = await uploadFiles();
+    if (urls.length > 0) {
+      // Use the first uploaded image URL as logo
+      setLogo(urls[0]);
+    }
+  };
 
   // Create validation schema
   const brandSchema = z.object({
@@ -124,27 +176,95 @@ export default function BrandModalUpsert({
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                {t('modal.logo') || 'Logo URL'}
+                {t('modal.logo') || 'Logo thương hiệu'}
               </label>
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16 border-2 border-gray-200">
-                  {logo ? (
-                    <AvatarImage 
-                      src={logo} 
-                      alt="Logo preview" 
-                      className="object-contain p-2" 
+              
+              <div className="space-y-3">
+                {/* Logo preview with integrated select button */}
+                <div className="flex items-center space-x-4">
+                  <div className="relative group">
+                    <Avatar className="h-16 w-16 border-2 border-gray-200">
+                      {logo ? (
+                        <AvatarImage 
+                          src={logo} 
+                          alt="Logo preview" 
+                          className="object-contain p-1" 
+                        />
+                      ) : (
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                          {name ? name.substring(0, 2).toUpperCase() : <ImageIcon className="h-6 w-6" />}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    
+                    {/* Overlay select button */}
+                    <button 
+                      type="button"
+                      onClick={() => document.getElementById('logo-upload')?.click()}
+                      disabled={isUploading}
+                      aria-label={t('modal.selectImage') || 'Chọn logo'}
+                      title={t('modal.selectImage') || 'Chọn logo'}
+                      className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 rounded-full transition-opacity"
+                    >
+                      <Camera className="h-5 w-5 text-white" />
+                    </button>
+                  </div>
+                  
+                  {/* Logo URL - Read Only */}
+                  <div className="flex-1 space-y-1">
+                    <Input 
+                      value={logo} 
+                      onChange={e => setLogo(e.target.value)}
+                      placeholder={t('modal.logoPlaceholder') || 'URL sẽ được tạo sau khi tải lên'} 
+                      className="bg-muted"
                     />
-                  ) : (
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                      {name ? name.substring(0, 2).toUpperCase() : <Upload className="h-6 w-6" />}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <Input 
-                  value={logo} 
-                  onChange={e => setLogo(e.target.value)} 
-                  placeholder={t('modal.logoPlaceholder') || 'Nhập URL logo'} 
+                    
+                    {/* Upload button only shown when a file is selected */}
+                    {files.length > 0 && (
+                      <Button 
+                        type="button"
+                        size="sm"
+                        onClick={handleUploadLogo}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        {isUploading ? t('modal.uploading') || 'Đang tải lên...' : t('modal.uploadImage') || 'Tải lên'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <input
+                  id="logo-upload"
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  accept="image/*"
+                  aria-label={t('modal.selectImage') || 'Chọn logo'}
                 />
+                
+                {/* Upload progress */}
+                {isUploading && (
+                  <div className="space-y-1">
+                    <Progress value={progress} className="h-1" />
+                    <p className="text-xs text-muted-foreground">
+                      {progress}% {t('modal.completed') || 'đã hoàn thành'}
+                    </p>
+                  </div>
+                )}
+                
+                {/* File preview */}
+                {files.length > 0 && !isUploading && (
+                  <div className="text-xs text-muted-foreground">
+                    {files[0].name} ({Math.round(files[0].size / 1024)} KB)
+                  </div>
+                )}
+                
+                {/* Upload error */}
+                {uploadError && (
+                  <p className="text-sm text-red-500">{uploadError}</p>
+                )}
               </div>
               {errors.logo && <p className="text-sm text-red-500 mt-1">{errors.logo}</p>}
             </div>
@@ -155,15 +275,15 @@ export default function BrandModalUpsert({
               type="button" 
               variant="outline" 
               onClick={onClose} 
-              disabled={loading}
+              disabled={loading || isUploading}
             >
               {t('modal.cancel') || 'Hủy'}
             </Button>
             <Button 
               type="submit" 
-              disabled={loading}
+              disabled={loading || isUploading}
             >
-              {loading 
+              {loading || isUploading
                 ? (mode === 'add' ? t('modal.adding') || 'Đang thêm...' : t('modal.saving') || 'Đang lưu...')
                 : (mode === 'add' ? t('modal.add') || 'Thêm' : t('modal.save') || 'Lưu')
               }

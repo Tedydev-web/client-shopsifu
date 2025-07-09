@@ -57,7 +57,7 @@ export const useUsers = () => {
     getResponseData,
     getResponseMetadata,
     mapResponseToData,
-    initialSort: { sortBy: "id", sortOrder: "asc" },
+    initialSort: { sortBy: "createdAt", sortOrder: "asc" },
     defaultLimit: 10,
   });
 
@@ -96,7 +96,10 @@ export const useUsers = () => {
 
   const editUser = async (user: User) => {
     try {
-      await userService.update(user.id, user);
+      // Extract id for URL parameter and prepare update data without backend-managed fields
+      const { id, createdById, updatedById, deletedById, deletedAt, createdAt, updatedAt, role, ...updateData } = user;
+      
+      await userService.update(id, updateData);
       showToast(t('system.toasts.updateSuccess'), 'success');
       refreshData();
       handleCloseUpsertModal();

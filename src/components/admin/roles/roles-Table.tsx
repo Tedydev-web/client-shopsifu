@@ -1,17 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { PlusIcon, Loader2 } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table-component/data-table'
-import { Pagination } from '@/components/ui/data-table-component/pagination'
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
 
 import { RolesColumns, Role } from './roles-Columns'
 import RolesModalUpsert from './roles-ModalUpsert'
-import { useDebounce } from '@/hooks/useDebounce'
 import { showToast } from '@/components/ui/toastify'
 import { useRoles } from './useRoles'
 import {
@@ -23,78 +20,31 @@ import SearchInput from '@/components/ui/data-table-component/search-input'
 import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option'
 
 export default function RolesTable() {
-  const t = useTranslations()
+  const t = useTranslations("admin.roles")
+  
   const {
-    roles,
-    totalItems,
-    page,
-    totalPages,
+    data,
     loading,
-    isModalOpen,
-    selectedRole,
-    fetchRoles,
-    handleOpenModal,
-    handleCloseModal,
-    setCurrentPage,
-    deleteRole,
-    createRole,
-    updateRole,
+    pagination,
+    handleSearch,
+    handlePageChange,
+    handleLimitChange,
+    deleteOpen,
+    roleToDelete,
+    deleteLoading,
+    handleOpenDelete,
+    handleConfirmDelete,
+    handleCloseDeleteModal,
+    upsertOpen,
+    modalMode,
+    roleToEdit,
+    handleOpenUpsertModal,
+    handleCloseUpsertModal,
+    addRole,
+    editRole,
     permissionsData,
     isPermissionsLoading,
   } = useRoles()
-
-  const [searchValue, setSearchValue] = useState("");
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [roleToDelete, setRoleToDelete] =
-    useState<Role | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const [limit, setLimit] = useState(10)
-  const [offset, setOffset] = useState(0)
-
-  const debouncedSearchValue = useDebounce(searchValue, 1000)
-
-  useEffect(() => {
-    fetchRoles({ metadata: { page: page, limit: limit } })
-  }, [page, limit])
-
-  useEffect(() => {
-    if (debouncedSearchValue !== undefined) {
-      setCurrentPage(1)
-      fetchRoles({ metadata: { page: 1, limit: limit, search: debouncedSearchValue } })
-    }
-  }, [debouncedSearchValue, limit])
-
-  const handleEdit = (role: Role) => {
-    handleOpenModal(role)
-  }
-
-  const handleOpenDelete = (role: Role) => {
-    setRoleToDelete(role);
-    setDeleteOpen(true);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setDeleteOpen(false)
-    setRoleToDelete(null)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!roleToDelete) return;
-    setDeleteLoading(true);
-    try {
-      const success = await deleteRole(roleToDelete.id); // Chuyển id thành string
-      if (success) {
-        handleCloseDeleteModal();
-        fetchRoles({ metadata: { page: page, limit: limit }}); // Chuyển page và limit thành string
-      }
-    } catch (error) {
-      console.error('Lỗi khi xóa quyền:', error);
-    } finally {
-      setDeleteLoading(false);
-    }
-  };
 
   const handleSubmit = async (values: {
     name: string
@@ -103,112 +53,106 @@ export default function RolesTable() {
     permissionIds: number[]
   }) => {
     try {
-      if (selectedRole) {
+      if (modalMode === 'edit' && roleToEdit) {
         const payload: RoleUpdateRequest = {
           name: values.name,
           description: values.description,
           isActive: values.isActive,
           permissionIds: values.permissionIds,
-          message: "",
         };
-        await updateRole(selectedRole.id, payload);
+        await editRole(roleToEdit.id, payload);
       } else {
         const payload: RoleCreateRequest = {
           name: values.name,
           description: values.description,
-          permissionIds: values.permissionIds,
-          message: "",
+          isActive: values.isActive,
         };
-        await createRole(payload);
+        await addRole(payload);
       }
-      handleCloseModal();
-      fetchRoles({ metadata: { page: page, limit: limit, search: debouncedSearchValue } });
     } catch (err) {
       showToast(
-        selectedRole
-          ? t('admin.roles.updateError')
-          : t('admin.roles.createError'),
+        modalMode === 'edit'
+          ? t('updateError')
+          : t('createError'),
         'error'
       )
     }
   }
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value)
-  }
-
-  const handlePageChange = (newPage: number) => {
-    fetchRoles({ metadata: { page: newPage, limit: limit } })
-  }
-
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit)
-    fetchRoles({ metadata: { page: 1, limit: newLimit } })
-  }
 
 
+    const columns = RolesColumns({ 
+      onDelete: handleOpenDelete, 
+      onEdit: (role) => handleOpenUpsertModal('edit', role) 
+    });
 
-    const columns = RolesColumns({ onDelete: handleOpenDelete, onEdit: handleEdit });
-
-    const table = useDataTable({ data: roles, columns })
+    const table = useDataTable({ data: data, columns })
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center gap-2">
-        <Button onClick={() => handleOpenModal()} className="ml-auto">
+      {/* Hàng 1: Nút Thêm mới */}
+      <div className="flex justify-end">
+        <Button onClick={() => handleOpenUpsertModal('add')}>
           <PlusIcon className="w-4 h-4 mr-2" />
-          {t("admin.roles.addAction")}
+          {t("addAction")}
         </Button>
       </div>
-      <div className="flex items-center gap-2">
-        <SearchInput
-          value={searchValue}
-          onValueChange={handleSearch}
-          placeholder={t("admin.roles.searchPlaceholder")}
-          className="max-w-sm"
-        />
-        <DataTableViewOption table={table} /> 
+
+      {/* Hàng 2: Search + View Option */}
+      <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex-1">
+          <SearchInput
+            value={pagination.search || ""}
+            onValueChange={(value) => handleSearch(value)}
+            placeholder={t("searchPlaceholder")}
+            className="w-full md:max-w-sm"
+          />
+        </div>
+        <DataTableViewOption table={table} />
       </div>
 
-      <DataTable
-        table={table}
-        columns={columns}
-        loading={loading || isSearching}
-        notFoundMessage={t('admin.roles.notFound')}
-      />
+      {/* Data Table */}
+      <div className="relative">
+        <DataTable
+          table={table}
+          columns={columns}
+          loading={loading}
+          notFoundMessage={t('notFound')}
+          pagination={{
+            metadata: pagination,
+            onPageChange: handlePageChange,
+            onLimitChange: handleLimitChange,
+          }}
+        />
+      </div>
 
-      {totalPages >= 0 && (
-        <Pagination
-          limit={limit}
-          page={page}
-          totalPages={totalPages}
-          totalRecords={totalItems}
-          onPageChange={setCurrentPage}
-          onLimitChange={setLimit}
+      {/* Modal Add/Edit */}
+      {upsertOpen && (
+        <RolesModalUpsert
+          open={upsertOpen}
+          onClose={handleCloseUpsertModal}
+          mode={modalMode}
+          role={roleToEdit}
+          onSubmit={handleSubmit}
+          permissionsData={permissionsData}
+          isPermissionsLoading={isPermissionsLoading}
         />
       )}
 
-      <RolesModalUpsert
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        mode={selectedRole ? "edit" : "add"}
-        role={selectedRole}
-        onSubmit={handleSubmit}
-        permissionsData={permissionsData}
-        isPermissionsLoading={isPermissionsLoading}
-      />
-
+      {/* Modal xác nhận xóa */}
       <ConfirmDeleteModal
         open={deleteOpen}
-        onClose={() => !deleteLoading && setDeleteOpen(false)}
+        onClose={() => {
+          if (!deleteLoading) handleCloseDeleteModal();
+        }}
         onConfirm={handleConfirmDelete}
-        title={t("admin.roles.confirmDeleteTitle")}
+        title={t("confirmDeleteTitle")}
         description={
           roleToDelete
-            ? t("admin.roles.confirmDeleteDesc", { name: roleToDelete.name })
+            ? t("confirmDeleteDesc", { name: roleToDelete.name })
             : ""
         }
-        confirmText={t("admin.roles.modal.delete")}
-        cancelText={t("admin.roles.modal.cancel")}
+        confirmText={t("modal.delete")}
+        cancelText={t("modal.cancel")}
         loading={deleteLoading}
       />
     </div>

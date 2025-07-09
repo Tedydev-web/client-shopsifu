@@ -2,42 +2,24 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { z } from 'zod'
 import { ZodError } from 'zod'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronDown } from 'lucide-react'
-import { User, UserCreateRequest, UserRole } from '@/types/admin/user.interface'
-
-// Validation schemas
-const userCreateSchema = (t: (key: string) => string) => z.object({
-  email: z.string().email(t('admin.users.validation.emailValid')),
-  name: z.string().min(1, t('admin.users.validation.nameRequired')),
-  phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
-  password: z.string().min(8, t('admin.users.validation.passwordLength')),
-  confirmPassword: z.string(),
-  roleId: z.number(),
-  status: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: t('admin.users.validation.passwordMatch'),
-  path: ['confirmPassword'],
-});
-
-const userUpdateSchema = (t: (key: string) => string) => z.object({
-  email: z.string().email(t('admin.users.validation.emailValid')),
-  name: z.string().min(1, t('admin.users.validation.nameRequired')),
-  phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
-  roleId: z.number(),
-  status: z.string(),
-});
+import { ChevronDown, Upload, X, Image as ImageIcon, Camera } from 'lucide-react'
+import { User, UserCreateRequest, UserRole, UserUpdateRequest } from '@/types/admin/user.interface'
+import { useUploadMedia } from '@/hooks/useUploadMedia'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Progress } from '@/components/ui/progress'
+import { userCreateSchema, userUpdateSchema } from '@/utils/schema'
 
 interface UsersModalUpsertProps {
   roles: UserRole[];
@@ -64,6 +46,20 @@ export default function UsersModalUpsert({
   const [status, setStatus] = useState("ACTIVE")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  // Upload media hook
+  const { 
+    files, 
+    uploadedUrls, 
+    isUploading,
+    progress,
+    error: uploadError,
+    handleAddFiles,
+    handleRemoveFile,
+    handleRemoveAllFiles,
+    uploadFiles,
+    reset: resetUpload
+  } = useUploadMedia()
 
   // Status options
   const STATUS_OPTIONS = [
@@ -82,6 +78,9 @@ export default function UsersModalUpsert({
       setStatus(user.status || "ACTIVE")
       setPassword("")
       setConfirmPassword("")
+      
+      // Reset upload state
+      resetUpload()
     } else if (mode === 'add') {
       setName("")
       setEmail("")
@@ -92,9 +91,43 @@ export default function UsersModalUpsert({
       setRoleId(1)
       setStatus("ACTIVE")
       setErrors({})
+      
+      // Reset upload state
+      resetUpload()
     }
-  }, [mode, user, open])
+  }, [mode, user, open, resetUpload])
 
+  // Handle file change for avatar upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      // File type validation
+      const file = e.target.files[0];
+      if (!file.type.startsWith('image/')) {
+        toast.error('Định dạng tệp không được hỗ trợ', {
+          description: 'Vui lòng chọn tệp hình ảnh (JPG, PNG, GIF, etc.)'
+        });
+        return;
+      }
+      
+      // Clear existing files first
+      handleRemoveAllFiles();
+      
+      // Add the new file (which will be compressed automatically)
+      handleAddFiles(e.target.files);
+    }
+  };
+  
+  // Handle avatar upload
+  const handleUploadAvatar = async () => {
+    if (files.length === 0) return;
+    
+    const urls = await uploadFiles();
+    if (urls.length > 0) {
+      // Use the first uploaded image URL as avatar
+      setAvatar(urls[0]);
+    }
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -110,6 +143,7 @@ export default function UsersModalUpsert({
           status
         });
       } else {
+        // Kiểm tra xác thực cho mode edit, không yêu cầu password
         userUpdateSchema(t).parse({
           email,
           name,
@@ -128,24 +162,29 @@ export default function UsersModalUpsert({
             email,
             name,
             phoneNumber,
-            password,
-            confirmPassword,
+            password, // Only send password, not confirmPassword
             roleId,
             status,
             avatar
           };
           await onSubmit(data);
         } else if (mode === 'edit' && user) {
-          const data: User = {
-            ...user,
-            email,
+          // Chỉ gửi các trường được định nghĩa trong UserUpdateRequest (không bao gồm id)
+          const data: UserUpdateRequest = {
             name,
             phoneNumber,
             roleId,
             status,
-            avatar
+            avatar,
           };
-          await onSubmit(data);
+          
+          // Email có thể không được sửa trong chế độ edit
+          if (!user.email.toLowerCase().includes('admin')) {
+            data.email = email;
+          }
+          
+          // Truyền id riêng cho hàm onSubmit để nó có thể được sử dụng làm tham số URL
+          await onSubmit({...data, id: user.id} as User);
         }
         onClose();
       } catch (error) {
@@ -223,13 +262,96 @@ export default function UsersModalUpsert({
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                {t('admin.users.modal.avatar') || 'Avatar URL'}
+                {t('admin.users.modal.avatar') || 'Ảnh đại diện'}
               </label>
-              <Input 
-                value={avatar} 
-                onChange={e => setAvatar(e.target.value)} 
-                placeholder={t('admin.users.modal.avatar') || 'Liên kết ảnh đại diện'} 
-              />
+              
+              <div className="space-y-3">
+                {/* Avatar preview with integrated select button */}
+                <div className="flex items-center space-x-4">
+                  <div className="relative group">
+                    <Avatar className="h-16 w-16 border-2 border-gray-200">
+                      {avatar ? (
+                        <AvatarImage 
+                          src={avatar} 
+                          alt="Avatar preview" 
+                          className="object-cover" 
+                        />
+                      ) : (
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                          {name ? name.substring(0, 2).toUpperCase() : <ImageIcon className="h-6 w-6" />}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    
+                    {/* Overlay select button */}
+                    <button 
+                      type="button"
+                      onClick={() => document.getElementById('avatar-upload')?.click()}
+                      disabled={isUploading}
+                      aria-label={t('admin.users.modal.selectImage') || 'Chọn ảnh đại diện'}
+                      title={t('admin.users.modal.selectImage') || 'Chọn ảnh đại diện'}
+                      className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 rounded-full transition-opacity"
+                    >
+                      <Camera className="h-5 w-5 text-white" />
+                    </button>
+                  </div>
+                  
+                  {/* Avatar URL - Read Only */}
+                  <div className="flex-1 space-y-1">
+                    <Input 
+                      value={avatar} 
+                      readOnly
+                      placeholder={t('admin.users.modal.avatarUrl') || 'URL sẽ được tạo sau khi tải lên'} 
+                      className="bg-muted"
+                    />
+                    
+                    {/* Upload button only shown when a file is selected */}
+                    {files.length > 0 && (
+                      <Button 
+                        type="button"
+                        size="sm"
+                        onClick={handleUploadAvatar}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        {isUploading ? t('admin.users.modal.uploading') || 'Đang tải lên...' : t('admin.users.modal.uploadImage') || 'Tải lên'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  accept="image/*"
+                  aria-label={t('admin.users.modal.selectImage') || 'Chọn ảnh đại diện'}
+                />
+                
+                {/* Upload progress */}
+                {isUploading && (
+                  <div className="space-y-1">
+                    <Progress value={progress} className="h-1" />
+                    <p className="text-xs text-muted-foreground">
+                      {progress}% {t('admin.users.modal.completed') || 'đã hoàn thành'}
+                    </p>
+                  </div>
+                )}
+                
+                {/* File preview */}
+                {files.length > 0 && !isUploading && (
+                  <div className="text-xs text-muted-foreground">
+                    {files[0].name} ({Math.round(files[0].size / 1024)} KB)
+                  </div>
+                )}
+                
+                {/* Upload error */}
+                {uploadError && (
+                  <p className="text-sm text-red-500">{uploadError}</p>
+                )}
+              </div>
             </div>
 
             <div>
@@ -281,6 +403,7 @@ export default function UsersModalUpsert({
               </DropdownMenu>
             </div>
 
+            {/* Chỉ hiển thị trường mật khẩu khi ở chế độ thêm mới */}
             {mode === 'add' && (
               <>
                 <div>

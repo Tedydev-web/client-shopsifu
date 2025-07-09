@@ -70,6 +70,17 @@ export const BrandColumns = ({
       enableHiding: false,
     },
     {
+      accessorKey: "id",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("id") || "ID"} />
+      ),
+      cell: ({ row }) => (
+        <div className="font-mono text-xs">{row.getValue("id")}</div>
+      ),
+      enableSorting: true,
+      enableHiding: true,
+    },
+    {
       accessorKey: "logo",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("logo")} />

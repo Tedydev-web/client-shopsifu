@@ -2,15 +2,16 @@ import { BaseResponse, PaginationRequest } from "../base.interface";
 
 
 export interface Permission {
-    id: string;
+    id: number;
     name: string;
     description: string;
+    module: string;
     path: string;
     method: string;
-    createdById: string;
-    updatedById: string;
-    deletedById: string;
-    deletedAt: string;
+    createdById: string | null;
+    updatedById: string | null;
+    deletedById: string | null;
+    deletedAt: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -51,26 +52,26 @@ export interface RoleGetAllResponse extends BaseResponse, PaginationRequest {
 }
 
 export interface RoleGetByIdResponse {
-    id: string;
+    id: number;
     name: string;
     description: string;
-    role: RoleType;
     isActive: boolean;
     permissions: Permission[];
-    createdById: string,
-    updatedById: string,
-    deletedById: string,
-    deletedAt: string,
+    createdById: string | null;
+    updatedById: string | null;
+    deletedById: string | null;
+    deletedAt: string | null;
     createdAt: string;
     updatedAt: string;
 }
 
-export interface RoleCreateRequest extends BaseResponse {
+export interface RoleCreateRequest {
     name: string;
     description?: string;
+    isActive?: boolean;
     isSystemRole?: boolean;
     isSuperAdmin?: boolean;
-    permissionIds?: number[];
+    // permissionIds are not needed for create request, they are only set in update
 }
 
 export interface RoleCreateResponse extends BaseResponse {
@@ -91,7 +92,7 @@ export interface RoleCreateResponse extends BaseResponse {
    
 }
 
-export interface RoleUpdateRequest extends BaseResponse {
+export interface RoleUpdateRequest {
     name?: string;
     description?: string;
     isActive?: boolean;
@@ -143,9 +144,15 @@ export interface RoleAssignPermissionResponse {
 }
 
 export interface Role {
-  id?: number
-  name: string
-  description?: string
-  isActive: boolean
-  permissionIds?: string[]
+  id: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdById?: string;
+  updatedById?: string;
+  deletedById?: string;
+  deletedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  permissions?: Permission[];
 }

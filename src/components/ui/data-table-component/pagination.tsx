@@ -19,8 +19,8 @@ export interface DataTablePaginationProps {
 
 export function Pagination({ metadata, onPageChange, onLimitChange }: DataTablePaginationProps) {
   // Log chi tiết để debug
-  console.log("Pagination metadata:", JSON.stringify(metadata));
-  console.log("Pagination component rendering with totalPages:", metadata?.totalPages);
+  // console.log("Pagination metadata:", JSON.stringify(metadata));
+  // console.log("Pagination component rendering with totalPages:", metadata?.totalPages);
   const t = useTranslations();
 
   // Đảm bảo có đầy đủ thông tin pagination, dùng default values nếu metadata thiếu

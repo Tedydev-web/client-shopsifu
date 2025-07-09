@@ -35,7 +35,7 @@ export const userService = {
     },
     // Cập nhật người dùng
     async update(id: number, data: UserUpdateRequest): Promise<UserUpdateResponse> {
-        const response = await privateAxios.patch(
+        const response = await privateAxios.put(
             API_ENDPOINTS.USERS.UPDATE.replace(':id', String(id)),
             data
         );
