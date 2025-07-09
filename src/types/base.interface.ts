@@ -37,6 +37,7 @@ export interface PaginationMetadata {
   totalPages?: number;
   hasNext?: boolean;
   hasPrevious?: boolean;
+  hasPrev?: boolean; // Added to support both naming conventions
   search?: string;
   sortBy?: string;
   sortOrder?: string;

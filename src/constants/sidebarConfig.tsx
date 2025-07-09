@@ -104,16 +104,6 @@ export const useSidebarConfig = (): SidebarItem[] => {
           href: '/admin/audit-logs',
           icon: null,
         },
-        {
-          title: t('device.deviceManager'),
-          href: '/admin/device',
-          icon: null,
-        },
-        {
-          title: t('brand.brandManager'),
-          href: '/admin/brand',
-          icon: <Tags className="w-4 h-4" />,
-        }
       ],
     },  
     {
@@ -126,6 +116,16 @@ export const useSidebarConfig = (): SidebarItem[] => {
           href: '/admin/languages',
           icon: null,
         },
+        {
+          title: t('device.deviceManager'),
+          href: '/admin/device',
+          icon: null,
+        },
+        {
+          title: t('brand.brandManager'),
+          href: '/admin/brand',
+          icon: <Tags className="w-4 h-4" />,
+        }
       ],
     },
   ]

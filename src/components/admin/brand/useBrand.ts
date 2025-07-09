@@ -2,10 +2,10 @@
 
 import { useState, useCallback } from "react"
 import { useTranslations } from 'next-intl'
-import { toast } from "sonner"
 import { Brand, BrandCreateRequest, BrandUpdateRequest } from "@/types/admin/brands.interface"
 import * as brandsService from "@/services/admin/brandsService"
 import { useServerDataTable } from "@/hooks/useServerDataTable"
+import { showToast } from "@/components/ui/toastify"
 
 export const useBrand = () => {
   const t = useTranslations();
@@ -30,7 +30,7 @@ export const useBrand = () => {
       totalPages: metadata.totalPages || 1,
       limit: metadata.limit || 10,
       hasNext: metadata.hasNext || false,
-      hasPrevious: metadata.hasPrevious || false
+      hasPrevious: metadata.hasPrev || false // Fixed property name to match server response
     };
   }, []);
 
@@ -53,41 +53,35 @@ export const useBrand = () => {
     getResponseData,
     getResponseMetadata,
     mapResponseToData,
-    initialSort: { sortBy: "id", sortOrder: "asc" },
+    initialSort: { sortBy: "createdAt", sortOrder: "desc" },
     defaultLimit: 10,
   });
 
   // CRUD operations
   const createBrand = async (brand: BrandCreateRequest) => {
     try {
-      await brandsService.createBrand(brand);
-      toast.success(t('system.toasts.createSuccessDescription'), {
-        description: brand.name,
-      });
+      const response = await brandsService.createBrand(brand);
+      showToast(`Thêm thương hiệu thành công: ${brand.name}`, 'success');
       refreshData();
       handleCloseModal();
       return true;
     } catch (error: any) {
-      toast.error(t('system.toasts.error'), {
-        description: error.message || t('system.toasts.createErrorDescription'),
-      });
+      const errorMessage = error.response?.data?.message || 'Không thể thêm thương hiệu. Vui lòng thử lại sau.';
+      showToast(errorMessage, 'error');
       return false;
     }
   };
 
   const updateBrand = async (id: number | string, brand: BrandUpdateRequest) => {
     try {
-      await brandsService.updateBrand(id, brand);
-      toast.success(t('system.toasts.updateSuccessDescription'), {
-        description: brand.name,
-      });
+      const response = await brandsService.updateBrand(id, brand);
+      showToast(`Cập nhật thương hiệu thành công: ${brand.name}`, 'success');
       refreshData();
       handleCloseModal();
       return true;
     } catch (error: any) {
-      toast.error(t('system.toasts.error'), {
-        description: error.message || t('system.toasts.updateErrorDescription'),
-      });
+      const errorMessage = error.response?.data?.message || 'Không thể cập nhật thương hiệu. Vui lòng thử lại sau.';
+      showToast(errorMessage, 'error');
       return false;
     }
   };
@@ -96,17 +90,14 @@ export const useBrand = () => {
     if (brandToDelete) {
       setDeleteLoading(true);
       try {
-        await brandsService.deleteBrand(brandToDelete.id);
-        toast.success(t('system.toasts.deleteSuccessDescription'), {
-          description: brandToDelete.name,
-        });
+        const response = await brandsService.deleteBrand(brandToDelete.id);
+        showToast(`Xóa thương hiệu thành công: ${brandToDelete.name}`, 'success');
         refreshData();
         setDeleteOpen(false);
         setBrandToDelete(null);
       } catch (error: any) {
-        toast.error(t('system.toasts.error'), {
-          description: error.message || t('system.toasts.deleteErrorDescription'),
-        });
+        const errorMessage = error.response?.data?.message || 'Không thể xóa thương hiệu. Vui lòng thử lại sau.';
+        showToast(errorMessage, 'error');
       } finally {
         setDeleteLoading(false);
       }

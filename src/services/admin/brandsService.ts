@@ -57,7 +57,7 @@ export const createBrand = async (data: BrandCreateRequest): Promise<Brand> => {
 export const updateBrand = async (id: number | string, data: BrandUpdateRequest): Promise<Brand> => {
   try {
     const url = API_ENDPOINTS.BRANDS.UPDATE.replace(':brandsId', id.toString());
-    const response = await privateAxios.patch(url, data);
+    const response = await privateAxios.put(url, data);
     return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError;

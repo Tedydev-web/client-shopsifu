@@ -292,6 +292,7 @@
     },
     "ModuleBrands":{
       "Table":{
+        "id": "ID",
         "logo": "Logo",
         "name": "Tên thương hiệu",
         "createdAt": "Ngày tạo",
@@ -323,7 +324,10 @@
           "adding": "Đang thêm...",
           "saving": "Đang lưu...",
           "add": "Thêm mới",
-          "save":"Lưu thay đổi"
+          "save":"Lưu thay đổi",
+          "uploadImage":"Tải ảnh lên",
+          "uploading": "",
+          "selectImage": "Chọn ảnh lên"
         }
     },
     "sidebar": {
@@ -729,6 +733,7 @@
       "addTitle": "Thêm vai trò",
       "editTitle": "Chỉnh sửa vai trò",
       "form": {
+        "id": "ID",
         "name": "Tên vai trò",
         "subtitle": "Quản lý tất cả vai trò của bạn",
         "description": "Mô tả vai trò",
@@ -924,7 +929,11 @@
         "passwordStepDescription": "Mật khẩu phải chứa ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
         "confirmPasswordStepDescription": "Xác nhận mật khẩu phải khớp với mật khẩu",
         "statusActive":"Hoạt động",
-        "statusInactive":"Không hoạt động"
+        "statusInactive":"Không hoạt động",
+        "avatarUrl": "Đường dẫn Url avatar của bạn....",
+        "add":"Thêm mới",
+        "uploadImage": "Tải ảnh lên",
+        "selectImage": "Chọn ảnh lên"
       },
       "deleteConfirm": {
         "title": "Xác nhận xóa người dùng",

@@ -131,7 +131,8 @@ export function useServerDataTable<T, U = T>({
                 limit: metadata.limit || prev.limit,
                 totalPages: metadata.totalPages || prev.totalPages,
                 hasNext: metadata.hasNext ?? prev.hasNext,
-                hasPrevious: metadata.hasPrevious ?? prev.hasPrevious,
+                // Support both hasPrevious and hasPrev to ensure compatibility
+                hasPrevious: (metadata.hasPrevious !== undefined ? metadata.hasPrevious : metadata.hasPrev) ?? prev.hasPrevious,
               }));
             }
           } catch (error) {

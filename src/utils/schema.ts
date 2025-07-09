@@ -55,3 +55,27 @@ export const userStepTwoSchema = (t: Translate) => z.object({
   message: t('schema.validation.password.match'),
   path: ["confirmPassword"]
 });
+
+// User Create schema for modal upsert
+export const userCreateSchema = (t: Translate) => z.object({
+  email: z.string().email(t('admin.users.validation.emailValid')),
+  name: z.string().min(1, t('admin.users.validation.nameRequired')),
+  phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
+  password: z.string().min(8, t('admin.users.validation.passwordLength')),
+  confirmPassword: z.string(),
+  roleId: z.number(),
+  status: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: t('admin.users.validation.passwordMatch'),
+  path: ['confirmPassword'],
+});
+
+// User Update schema for modal upsert
+export const userUpdateSchema = (t: Translate) => z.object({
+  email: z.string().email(t('admin.users.validation.emailValid')),
+  name: z.string().min(1, t('admin.users.validation.nameRequired')),
+  phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
+  roleId: z.number(),
+  status: z.string(),
+  // Cho phép password trống hoặc phải dài tối thiểu 8 ký tự nếu có giá trị
+});

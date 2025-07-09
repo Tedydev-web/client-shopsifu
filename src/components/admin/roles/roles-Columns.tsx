@@ -7,9 +7,23 @@ import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-comp
 import { Edit, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
-import { RoleGetAllResponse } from "@/types/auth/role.interface";
+import { Permission, RoleGetAllResponse } from "@/types/auth/role.interface";
+import { Badge } from "@/components/ui/badge";
 
-export type Role = RoleGetAllResponse['data'][0];
+// Extend Role type với đầy đủ thuộc tính cần thiết
+export interface Role {
+  id: number;
+  name: string;
+  description: string;
+  isActive: boolean;
+  createdById: string | null;
+  updatedById: string | null;
+  deletedById: string | null;
+  deletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  permissions?: Permission[];
+}
 
 const getRoleActions = (
   role: Role,
@@ -64,6 +78,13 @@ export const RolesColumns = ({
       enableSorting: false,
       enableHiding: false,
     },
+     {
+      accessorKey: "id",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("admin.roles.form.id")} />
+      ),
+      cell: ({ row }) => <div className="w-[100px] truncate">{row.getValue("id")}</div>,
+    },
     {
       accessorKey: "name",
       header: ({ column }) => (
@@ -77,6 +98,25 @@ export const RolesColumns = ({
         <DataTableColumnHeader column={column} title={t("admin.roles.form.description")} />
       ),
       cell: ({ row }) => <div className="w-[220px] truncate">{row.getValue("description")}</div>,
+    },
+    {
+      accessorKey: "isActive",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Trạng thái" />
+      ),
+      cell: ({ row }) => {
+        const isActive = row.getValue("isActive") as boolean;
+        return (
+          <div className="flex justify-start">
+            <Badge 
+              variant={isActive ? "default" : "outline"} 
+              className={isActive ? "bg-green-500 hover:bg-green-600" : "text-slate-500 border-slate-300"}
+            >
+              {isActive ? "Hoạt động" : "Không hoạt động"}
+            </Badge>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "createdAt",

@@ -81,7 +81,7 @@ export const refreshAxios = axios.create({
 refreshAxios.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
-      const csrfToken = Cookies.get('xsrf-token');
+      const csrfToken = Cookies.get('csrf-token');
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
       }
@@ -137,7 +137,7 @@ privateAxios.interceptors.request.use(
     if (typeof window !== 'undefined') {
       const csrfToken = Cookies.get('csrf_token');
       const sltToken = Cookies.get('slt_token');
-      console.log("sessionToken: ", sltToken)
+      // console.log("sessionToken: ", sltToken)
       if (csrfToken && config.headers) {
         config.headers['x-csrf-token'] = csrfToken;
       }
@@ -166,34 +166,34 @@ const clearAllCookies = () => {
 };
 
 // Response Interceptor → Xử lý lỗi 401
-// privateAxios.interceptors.response.use(
-//   (response: AxiosResponse) => {
-//     return response;
-//   },
-//   async (error: any) => {
-//     if (axios.isAxiosError(error) && error.response?.status === 401) {
-//       console.error('❌ Lỗi 401 - Unauthorized. Token không hợp lệ hoặc đã hết hạn. Đang đăng xuất...');
-//       const { store, persistor } = getStore();
+privateAxios.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
+  },
+  async (error: any) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      console.error('❌ Lỗi 401 - Unauthorized. Token không hợp lệ hoặc đã hết hạn. Đang đăng xuất...');
+      const { store, persistor } = getStore();
 
-//       // 1. Clear all site cookies
-//       clearAllCookies();
+      // 1. Clear all site cookies
+      clearAllCookies();
 
-//       // 2. Purge persisted state from storage
-//       await persistor.purge();
+      // 2. Purge persisted state from storage
+      await persistor.purge();
 
-//       // 3. Dispatch action to clear profile from the current redux state
-//       store.dispatch(clearProfile());
+      // 3. Dispatch action to clear profile from the current redux state
+      store.dispatch(clearProfile());
 
-//       showToast('Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại', 'info');
+      showToast('Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại', 'info');
 
-//       // 4. Redirect to sign-in page after a short delay to allow state changes to process
-//       setTimeout(() => {
-//         window.location.href = ROUTES.BUYER.SIGNIN;
-//       }, 100);
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+      // 4. Redirect to sign-in page after a short delay to allow state changes to process
+      setTimeout(() => {
+        window.location.href = ROUTES.BUYER.SIGNIN;
+      }, 100);
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Token check function
 const checkToken = async () => {
@@ -220,7 +220,7 @@ const checkToken = async () => {
   // ✅ Case 2: Không có access lẫn refresh token → chưa đăng nhập
   if (!accessToken && !refreshToken) {
     console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
-    // await clearClientState();
+    await clearClientState();
     return;
   }
 
