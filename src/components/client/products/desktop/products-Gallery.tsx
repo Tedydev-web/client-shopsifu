@@ -17,10 +17,26 @@ interface Props {
 export default function ProductGallery({ media }: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const thumbRef = useRef<HTMLDivElement>(null);
   const modalThumbRef = useRef<HTMLDivElement>(null);
 
   const currentIndex = hoveredIndex ?? 0;
+
+  const handlePlay = (index: number) => {
+    videoRefs.current[index]?.play();
+  };
+
+  const handlePause = (index: number) => {
+    videoRefs.current[index]?.pause();
+  };
+
+  const handleReplay = (index: number) => {
+    if (videoRefs.current[index]) {
+      videoRefs.current[index]!.currentTime = 0;
+      videoRefs.current[index]!.play();
+    }
+  };
 
   const scrollThumbnails = (direction: "left" | "right") => {
     if (!thumbRef.current) return;
@@ -69,14 +85,44 @@ export default function ProductGallery({ media }: Props) {
   const renderMainMedia = (item: MediaItem, index: number) => {
     if (item.type === "video") {
       return (
-        <video
-          key={index}
-          src={item.src}
-          controls
-          autoPlay
-          className="w-full aspect-square object-cover rounded-lg border cursor-pointer"
-          onClick={() => setSelectedIndex(index)}
-        />
+        <div className="relative w-full">
+          <video
+            key={index}
+            ref={el => { videoRefs.current[index] = el; }}
+            src={item.src}
+            className="w-full aspect-square object-contain rounded-lg border cursor-pointer"
+            onClick={() => setSelectedIndex(index)}
+          />
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <button
+              className="bg-white/80 hover:bg-white text-black px-3 py-1 rounded shadow text-xs font-medium"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePlay(index);
+              }}
+            >
+              Play
+            </button>
+            <button
+              className="bg-white/80 hover:bg-white text-black px-3 py-1 rounded shadow text-xs font-medium"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePause(index);
+              }}
+            >
+              Stop
+            </button>
+            <button
+              className="bg-white/80 hover:bg-white text-black px-3 py-1 rounded shadow text-xs font-medium"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleReplay(index);
+              }}
+            >
+              Replay
+            </button>
+          </div>
+        </div>
       );
     }
 

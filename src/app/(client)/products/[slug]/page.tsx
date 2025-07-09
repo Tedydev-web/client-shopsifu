@@ -1,19 +1,18 @@
 'use client';
 
-import { use } from 'react';
-import { useCheckDevice } from '@/hooks/useCheckDevices';
 import { useEffect, useState } from 'react';
+import { useCheckDevice } from '@/hooks/useCheckDevices';
 import ClientLayoutWrapper from '@/components/client/layout/ClientLayoutWrapper';
 import ProductDetail from '@/components/client/products/desktop/products-Index';
 import ProductDetailMobile from '@/components/client/products/mobile/products-IndexMobile';
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface Props {
-  params: Promise<{ slug: string }>; // 👈 phải là Promise
+  params: { slug: string }; // ✅ Không cần Promise
 }
 
 export default function ProductPage({ params }: Props) {
-  const { slug } = use(params); // ✅ unwrap params safely
+  const { slug } = params;
   const [mounted, setMounted] = useState(false);
   const deviceType = useCheckDevice();
   const { isMobile } = useResponsive();

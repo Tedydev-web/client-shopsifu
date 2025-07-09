@@ -15,7 +15,18 @@ export const productMock = {
     updatedAt: "2025-07-05T16:13:00.796Z",
     brandTranslations: [],
   },
-  images: [],
+  media: [
+    { type: "image", src: "/images/client/product/Product-1.webp" },
+    { type: "image", src: "/images/client/product/Product-2.webp" },
+    { type: "video", src: "/Download.mp4" },
+    { type: "image", src: "/images/client/product/Product-3.webp" },
+    { type: "video", src: "/Download 1.mp4" },
+    { type: "image", src: "/images/client/product/Product-1.webp" },
+    { type: "image", src: "/images/client/product/Product-2.webp" },
+    { type: "video", src: "/Download.mp4" },
+    { type: "image", src: "/images/client/product/Product-3.webp" },
+    { type: "video", src: "/Download 1.mp4" },
+  ],
   variants: [
     {
       value: "Màu sắc",
