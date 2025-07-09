@@ -108,6 +108,21 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE}/brands`,
     UPDATE: `${API_BASE}/brands/:brandsId`,
     DELETE: `${API_BASE}/brands/:brandsId`
-  }
+  },
+  // QUẢN LÝ DANH MỤC - CATEGORIES
+  CATEGORIES:{
+    GETALL: `${API_BASE}/categories`,
+    GET_BY_ID: `${API_BASE}/categories/:categoriesId`,
+    CREATE: `${API_BASE}/categories`,
+    UPDATE: `${API_BASE}/categories/:categoriesId`,
+    DELETE_BY_ID: `${API_BASE}/categories/:categoriesId`
+  },
+   CATEGORIES_TRANSLATIONS:{
+    GETALL: `${API_BASE}/categories`,
+    GET_BY_ID: `${API_BASE}/categories/:categoriesId`,
+    CREATE: `${API_BASE}/categories`,
+    UPDATE: `${API_BASE}/categories/:categoriesId`,
+    DELETE: `${API_BASE}/categories/:categoriesId`
+  },
   // ... các endpoints khác
 }

@@ -74,7 +74,7 @@ export const useSidebarConfig = (): SidebarItem[] => {
         },
         {
           title: t('categories.categories'),
-          href: '/admin/categories',
+          href: '/admin/category',
           icon: null,
         },
       ],

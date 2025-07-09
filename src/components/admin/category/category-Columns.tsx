@@ -17,8 +17,8 @@ import {
 export type CategoryTableData = {
   id: string
   name: string
-  description?: string
-  isActive: boolean
+  parentCategoryId?: number | null
+  logo?: string | null
   createdAt: string
   updatedAt: string
   depth?: number
@@ -168,47 +168,3 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
     },
   ];
 };
-
-// =============================
-// HƯỚNG DẪN SỬ DỤNG CHO TABLE DANH MỤC (CÓ HIERARCHY, EXPAND/COLLAPSE, MULTI-SELECT)
-//
-// 1. Import mock data và columns:
-//    import { mockCategoryData } from './category-MockData';
-//    import { CategoryColumns } from './category-Columns';
-//
-// 2. Khởi tạo table với TanStack Table:
-//    const table = useReactTable({
-//      data: mockCategoryData, // DỮ LIỆU TREE (KHÔNG FLATTEN)
-//      columns: CategoryColumns({ ...handlers }, table),
-//      getSubRows: row => row.children || [], // BẮT BUỘC để expand/collapse hoạt động
-//      getRowId: row => row.id, // Đảm bảo row có id duy nhất
-//      getExpandedRowModel: getExpandedRowModel(), // BẮT BUỘC để expand/collapse hoạt động
-//      // ... các options khác
-//    });
-//
-// 3. Đảm bảo table được cấu hình đúng:
-//    - getSubRows: row => row.children || []
-//    - getRowId: row => row.id
-//    - getExpandedRowModel: getExpandedRowModel()
-//    - data: mockCategoryData (tree, không flatten)
-//    - columns: CategoryColumns({ ...handlers }, table)
-//    Nếu dùng Next.js/React, hãy chắc chắn table.getRowModel().rows chứa các row cha/con đúng thứ tự tree.
-//    Nếu muốn custom render row con, dùng table.getExpandedRowModel().rows hoặc table.getRowModel().rows.
-//    Nếu vẫn không thấy dữ liệu con, kiểm tra lại mockCategoryData có children đúng dạng array và mỗi node có id duy nhất.
-//
-// 4. KHÔNG FLATTEN dữ liệu, truyền tree trực tiếp từ mockCategoryData hoặc API.
-//
-// 5. Để expand/collapse hoạt động:
-//    - getSubRows: row => row.children || []
-//    - getRowId: row => row.id
-//    - getExpandedRowModel: getExpandedRowModel()
-//
-// 6. Để multi-select hoạt động:
-//    - Sử dụng column id "select" (đã có sẵn ở đầu columns)
-//    - table.getIsAllPageRowsSelected(), row.getIsSelected(), ...
-//
-// 7. Để filter/sort/hide hoạt động:
-//    - Đã cấu hình sẵn cho các column phù hợp (xem enableSorting, enableHiding, filterFn trong từng column ở CategoryColumns)
-//
-// 8. Nếu muốn custom thêm, hãy xem ví dụ ở README hoặc hỏi Copilot để được hướng dẫn chi tiết hơn.
-// =============================
