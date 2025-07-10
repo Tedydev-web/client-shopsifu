@@ -26,7 +26,7 @@ export const categoryService = {
   // Lấy chi tiết danh mục theo ID
   getById: async (id: string): Promise<CategoryGetByIdResponse> => {
     try {
-      const url = API_ENDPOINTS.CATEGORIES.GET_BY_ID.replace(":id", id);
+      const url = API_ENDPOINTS.CATEGORIES.GET_BY_ID.replace(":categoriesId", id);
       const response = await privateAxios.get(url);
       return response.data;
     } catch (error) {
@@ -50,7 +50,7 @@ export const categoryService = {
     data: CategoryUpdateRequest
   ): Promise<CategoryUpdateResponse> => {
     try {
-      const url = API_ENDPOINTS.CATEGORIES.UPDATE.replace(":id", id);
+      const url = API_ENDPOINTS.CATEGORIES.UPDATE.replace(":categoriesId", id);
       const response = await privateAxios.put(url, data);
       return response.data;
     } catch (error) {
@@ -61,7 +61,7 @@ export const categoryService = {
   // Xoá danh mục theo ID
   delete: async (id: string): Promise<CategoryDeleteResponse> => {
     try {
-      const url = API_ENDPOINTS.CATEGORIES.DELETE_BY_ID.replace(":id", id);
+      const url = API_ENDPOINTS.CATEGORIES.DELETE_BY_ID.replace(":categoriesId", id);
       const response = await privateAxios.delete(url);
       return response.data;
     } catch (error) {

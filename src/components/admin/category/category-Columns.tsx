@@ -4,40 +4,57 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { useTranslations } from "next-intl"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { MoreHorizontal, Edit, Trash2, Eye, ChevronDown, ChevronRight } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Edit, Trash2 } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox";
+import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
+import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
+import { Category } from "@/types/admin/category.interface";
 
-export type CategoryTableData = {
-  id: string
-  name: string
-  parentCategoryId?: number | null
-  logo?: string | null
-  createdAt: string
-  updatedAt: string
-  depth?: number
-  children?: CategoryTableData[]
-}
+// Use Category type from interface instead of local type
+export type CategoryTableData = Category;
+
+// Hàm tạo danh sách actions cho Category
+const getCategoryActions = (
+  category: Category,
+  onEdit: ((category: Category) => void) | undefined,
+  onDelete: ((category: Category) => void) | undefined,
+  t: (key: string) => string
+): ActionItem<Category>[] => {
+  const actions: ActionItem<Category>[] = [];
+
+  if (onEdit) {
+    actions.push({
+      type: "command",
+      label: t("edit"),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (category) => onEdit(category),
+    });
+  }
+
+  if (onEdit && onDelete) {
+    actions.push({ type: "separator" });
+  }
+
+  if (onDelete) {
+    actions.push({
+      type: "command",
+      label: t("delete"),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (category) => onDelete(category),
+      className: "text-destructive hover:!text-destructive",
+    });
+  }
+
+  return actions;
+};
 
 interface CategoryColumnsProps {
-  onView?: (category: CategoryTableData) => void;
   onEdit?: (category: CategoryTableData) => void;
   onDelete?: (category: CategoryTableData) => void;
 }
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
-
-
-export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): ColumnDef<CategoryTableData>[] => {
-  const { onView, onEdit, onDelete } = param || {};
+export const CategoryColumns = (param: CategoryColumnsProps = {}): ColumnDef<CategoryTableData>[] => {
+  const { onEdit, onDelete } = param || {};
   const t  = useTranslations("admin.ModuleCategory.Table");
   return [
     {
@@ -46,6 +63,7 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
         <Checkbox
           checked={table.getIsAllPageRowsSelected()}
           onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+          onClick={(e) => e.stopPropagation()} // Ngăn event bubble up
           // aria-label={t('admin.pages.category.selectAll')}
         />
       ),
@@ -54,6 +72,7 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
           checked={row.getIsSelected()}
           disabled={!row.getCanSelect()}
           onCheckedChange={value => row.toggleSelected(!!value)}
+          onClick={(e) => e.stopPropagation()} // Ngăn event bubble up
           // aria-label={t('admin.pages.category.selectRow')}
         />
       ),
@@ -130,51 +149,30 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
         return rowDate === filterValue;
       },
     },
+     {
+      accessorKey: "updatedAt",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("updatedAt")} />
+      ),
+      cell: ({ row }) => (
+        <div className="whitespace-nowrap">{format(new Date(row.getValue("updatedAt")), "yyyy-MM-dd HH:mm")}</div>
+      ),
+      enableSorting: true,
+      enableHiding: true,
+      filterFn: (row, columnId, filterValue) => {
+        if (!filterValue) return true;
+        const rowDate = format(new Date(row.getValue(columnId)), "yyyy-MM-dd");
+        return rowDate === filterValue;
+      },
+    },
     {
       id: "actions",
-      header: () => <div>{t("actions")}</div>,
-      cell: ({ row }) => {
-        const category = row.original;
-        return (
-          <div className="flex justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                  <span className="sr-only">{t("openMenu")}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem
-                  onClick={() => onView(category)}
-                  className="cursor-pointer"
-                >
-                  <Eye className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                  {t("viewSubcategories")}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onEdit(category)}
-                  className="cursor-pointer"
-                >
-                  <Edit className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                  {t("edit")}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => onDelete(category)}
-                  className="cursor-pointer text-destructive focus:text-destructive"
-                >
-                  <Trash2 className="mr-2 h-3.5 w-3.5" />
-                  {t("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <DataTableRowActions
+          row={row}
+          actions={getCategoryActions(row.original, onEdit, onDelete, t)}
+        />
+      ),
       enableSorting: false,
       enableHiding: false,
     },

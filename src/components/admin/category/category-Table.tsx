@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { CategoryColumns } from "./category-Columns";
+import { CategoryColumns, CategoryTableData } from "./category-Columns";
 import SearchInput from "@/components/ui/data-table-component/search-input";
 import { CategoryModalUpsert } from "./category-ModalUpsert";
 import { Plus } from "lucide-react";
@@ -13,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { useDataTable } from "@/hooks/useDataTable";
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CategoryCreateRequest, CategoryUpdateRequest } from "@/types/admin/category.interface";
 
 export function CategoryTable() {
   const t = useTranslations("admin.ModuleCategory.Table");
@@ -37,6 +37,14 @@ export function CategoryTable() {
     addCategory,
     editCategory,
     
+    // Delete state & handlers
+    deleteOpen,
+    categoryToDelete,
+    deleteLoading,
+    handleOpenDelete,
+    handleConfirmDelete,
+    handleCloseDeleteModal,
+    
     // Navigation
     currentParentId,
     breadcrumb,
@@ -46,35 +54,6 @@ export function CategoryTable() {
     handleBreadcrumbClick,
   } = useCategory();
 
-  // Delete state management
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<any>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-
-  const handleOpenDelete = useCallback((category: any) => {
-    setCategoryToDelete(category);
-    setDeleteOpen(true);
-  }, []);
-
-  const handleCloseDeleteModal = useCallback(() => {
-    setDeleteOpen(false);
-    setCategoryToDelete(null);
-  }, []);
-
-  const handleConfirmDelete = useCallback(async () => {
-    if (!categoryToDelete) return;
-    setDeleteLoading(true);
-    try {
-      await categoryService.delete(String(categoryToDelete.id));
-      handleCloseDeleteModal();
-      refreshData();
-    } catch (error) {
-      console.error('Error deleting category:', error);
-    } finally {
-      setDeleteLoading(false);
-    }
-  }, [categoryToDelete, refreshData]);
-
   const handleCreateCategory = () => {
     handleOpenUpsertModal('add');
   };
@@ -82,7 +61,6 @@ export function CategoryTable() {
   const columns = CategoryColumns({
     onEdit: (category) => handleOpenUpsertModal('edit', category),
     onDelete: handleOpenDelete,
-    onView: handleViewSubcategories,
   });
   
   const table = useDataTable({
@@ -160,6 +138,7 @@ export function CategoryTable() {
           columns={columns}
           loading={loading}
           notFoundMessage={t("notFound")}
+          onRowClick={handleViewSubcategories}
           pagination={{
             metadata: pagination || {
               page: 1,
@@ -183,9 +162,9 @@ export function CategoryTable() {
         category={categoryToEdit}
         onSubmit={(data) => {
           if (modalMode === 'add') {
-            return addCategory(data);
+            return addCategory(data as CategoryCreateRequest);
           } else if (categoryToEdit) {
-            return editCategory(String(categoryToEdit.id), data);
+            return editCategory(String(categoryToEdit.id), data as CategoryUpdateRequest);
           }
           return Promise.resolve(null);
         }}

@@ -56,12 +56,17 @@ export function DataTableRowActions<TData>({
         <Button
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+          onClick={(e) => e.stopPropagation()} // Ngăn event bubble up
         >
           <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">Mở menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-auto min-w-[160px]">
+      <DropdownMenuContent 
+        align="end" 
+        className="w-auto min-w-[160px]"
+        onClick={(e) => e.stopPropagation()} // Ngăn event bubble up từ menu content
+      >
         {actions.map((action, index) => {
           if (action.type === 'separator') {
             return <DropdownMenuSeparator key={index} />;
@@ -70,7 +75,10 @@ export function DataTableRowActions<TData>({
           return (
             <DropdownMenuItem
               key={index}
-              onClick={() => action.onClick?.(row.original)}
+              onClick={(e) => {
+                e.stopPropagation(); // Ngăn event bubble up
+                action.onClick?.(row.original);
+              }}
               className={action.className}
             >
               {action.icon && <span className="mr-2 h-4 w-4">{action.icon}</span>}
