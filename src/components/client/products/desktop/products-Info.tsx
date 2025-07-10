@@ -27,7 +27,7 @@ interface Product {
   material?: string;
   flashSale?: {
     price: number;
-    endTime: string; // ISO string
+    endTime: string;
   };
   vouchers?: { code: string; desc: string }[];
   rating?: number;
@@ -50,31 +50,23 @@ export default function ProductInfo({ product }: { product: Product }) {
     ((product.basePrice - product.virtualPrice) / product.basePrice) * 100
   );
 
-  const category =
-    product.categories && product.categories.length > 0
-      ? product.categories[0]
-      : null;
-
-  const brand = product.brand?.name || "";
+  const category = product.categories[0]?.name ?? "";
+  const brand = product.brand?.name ?? "";
   const origin = product.origin ?? "Không rõ";
   const material = product.material ?? "Không rõ";
 
-  // Flash sale
   const isFlashSale = !!product.flashSale;
   const flashSalePrice = product.flashSale?.price ?? 0;
   const flashSaleEnd = product.flashSale?.endTime
     ? new Date(product.flashSale.endTime)
     : null;
 
-  // Vouchers
   const vouchers = product.vouchers ?? [];
 
-  // Đã chọn đủ loại sản phẩm chưa
   const isVariantSelected =
     (sizes.length === 0 || !!selectedSize) &&
     (colors.length === 0 || !!selectedColor);
 
-  // Xử lý nhập số lượng trực tiếp
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = parseInt(e.target.value.replace(/\D/g, ""), 10);
     if (isNaN(val)) val = 1;
@@ -83,7 +75,10 @@ export default function ProductInfo({ product }: { product: Product }) {
     setQuantity(val);
   };
 
-  // Hàm render icon sao theo rating
+  const rating = product.rating ?? 0;
+  const reviewCount = product.reviewCount ?? 0;
+  const sold = product.sold ?? 0;
+
   const renderStars = (rating: number) => {
     const full = Math.floor(rating);
     const half = rating % 1 >= 0.5 ? 1 : 0;
@@ -110,55 +105,50 @@ export default function ProductInfo({ product }: { product: Product }) {
     );
   };
 
-  // Rating, đánh giá, đã bán
-  const rating = product.rating ?? 0;
-  const reviewCount = product.reviewCount ?? 0;
-  const sold = product.sold ?? 0;
-
   return (
-    <div className="flex-1 flex flex-col items-start max-w-[370px] mx-auto space-y-4 h-full relative">
-      {/* Tố cáo góc phải */}
-      <div className="absolute right-0 top-0">
-        <button className="flex items-center gap-1 text-xs text-blue-500 hover:underline">
-          <Flag className="w-4 h-4" />
-          Tố cáo
-        </button>
-      </div>
-
+    <div className="w-full max-w-[650px] flex flex-col gap-7 text-[15px] leading-relaxed">
       {/* Tên sản phẩm */}
-      <h1 className="text-xl font-semibold leading-6 pr-16">{product.name}</h1>
+      <h1 className="text-2xl font-semibold text-gray-900">{product.name}</h1>
 
-      {/* Dòng rating, đánh giá, đã bán */}
-      <div className="flex w-full text-sm text-muted-foreground">
-        <div className="flex-1 flex flex-col items-center min-w-0">
-          <span className="font-semibold text-black flex items-center">
-            {rating.toFixed(1)}
-            {renderStars(rating)}
-          </span>
-          <span className="text-xs text-muted-foreground">Đánh giá</span>
-        </div>
-        <div className="h-8 w-px bg-gray-300 mx-2" />
-        <div className="flex-1 flex flex-col items-center min-w-0">
-          <span className="font-semibold text-black">{reviewCount}</span>
-          <span className="text-xs text-muted-foreground">Lượt đánh giá</span>
-        </div>
-        <div className="h-8 w-px bg-gray-300 mx-2" />
-        <div className="flex-1 flex flex-col items-center min-w-0">
-          <span className="font-semibold text-black">
-            {sold.toLocaleString()}
-          </span>
-          <span className="text-xs text-muted-foreground">Đã bán</span>
-        </div>
+      {/* Mô tả ngắn */}
+      <p className="text-muted-foreground text-sm">
+        Áo thun thời trang nam chất liệu cotton cao cấp, thoáng mát phù hợp mọi
+        hoạt động.
+      </p>
+
+      {/* Dịch vụ hỗ trợ */}
+      <div className="flex items-center gap-4 text-sm mt-1">
+        <span className="text-green-600">🚚 Miễn phí vận chuyển</span>
+        <span className="text-blue-600">🔁 Đổi trả 7 ngày</span>
       </div>
 
-      {/* Flash sale hoặc giá sản phẩm */}
+      {/* Đánh giá, bán, tố cáo */}
+      <div className="flex items-center w-full text-sm text-muted-foreground mb-1">
+        <div className="flex items-center gap-1">
+          <span className="font-medium text-black">{rating.toFixed(1)}</span>
+          {renderStars(rating)}
+        </div>
+        <span className="mx-2">|</span>
+        <span>{reviewCount} lượt đánh giá</span>
+        <span className="mx-2">|</span>
+        <span>Đã bán {sold.toLocaleString()}</span>
+        <div className="flex-1" />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-blue-500 hover:underline px-2 py-1 h-auto"
+        >
+          <Flag className="w-4 h-4 mr-1" />
+          Tố cáo
+        </Button>
+      </div>
+
+      {/* Giá */}
       {isFlashSale ? (
-        <div className="flex items-center gap-2">
-          <Badge className="bg-red-600 text-white">FLASH SALE</Badge>
-          <span className="text-red-600 text-xl font-bold">
-            ₫{flashSalePrice.toLocaleString("vi-VN")}
-          </span>
-          <span className="line-through text-muted-foreground text-sm">
+        <div className="flex items-center gap-3 text-xl font-bold text-red-600">
+          <Badge className="bg-red-600 text-white">FLASH SALE</Badge>₫
+          {flashSalePrice.toLocaleString("vi-VN")}
+          <span className="text-sm line-through text-muted-foreground font-normal">
             ₫{product.virtualPrice.toLocaleString("vi-VN")}
           </span>
           {flashSaleEnd && (
@@ -168,11 +158,9 @@ export default function ProductInfo({ product }: { product: Product }) {
           )}
         </div>
       ) : (
-        <div className="flex items-center gap-4">
-          <span className="text-red-600 text-2xl font-bold">
-            ₫{product.virtualPrice.toLocaleString("vi-VN")}
-          </span>
-          <span className="line-through text-muted-foreground text-sm">
+        <div className="flex items-center gap-3 text-xl font-bold text-red-600">
+          ₫{product.virtualPrice.toLocaleString("vi-VN")}
+          <span className="text-sm line-through text-muted-foreground font-normal">
             ₫{product.basePrice.toLocaleString("vi-VN")}
           </span>
           <Badge className="bg-yellow-400 text-black">
@@ -181,20 +169,18 @@ export default function ProductInfo({ product }: { product: Product }) {
         </div>
       )}
 
-      {/* Voucher Shopee */}
+      {/* Vouchers */}
       {vouchers.length > 0 && (
-        <div className="flex flex-col gap-2 w-full">
-          <div className="flex items-center gap-2">
-            <TicketPercent className="w-5 h-5 text-orange-500" />
-            <span className="font-medium text-orange-500">
-              Voucher của Shop
-            </span>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-orange-500 font-medium text-sm">
+            <TicketPercent className="w-5 h-5" />
+            Voucher của Shop
           </div>
           <div className="flex gap-2 flex-wrap">
             {vouchers.map((v) => (
               <Badge
                 key={v.code}
-                className="bg-orange-100 text-orange-600 border border-orange-400 px-3 py-1"
+                className="bg-orange-100 text-orange-600 border border-orange-400 px-3 py-1 text-sm"
               >
                 <span className="font-semibold">{v.code}</span>
                 <span className="ml-2 text-xs">{v.desc}</span>
@@ -204,32 +190,26 @@ export default function ProductInfo({ product }: { product: Product }) {
         </div>
       )}
 
-      {/* Thông tin chung: Danh mục, Thương hiệu, Xuất xứ, Chất liệu */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 w-full text-sm text-muted-foreground">
-        {category && (
-          <div>
-            <span className="font-medium">Danh mục:</span> {category.name}
-          </div>
-        )}
-        {brand && (
-          <div>
-            <span className="font-medium">Thương hiệu:</span> {brand}
-          </div>
-        )}
+      {/* Thông tin chung */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground">
         <div>
-          <span className="font-medium">Xuất xứ:</span> {origin}
+          <span className="font-medium text-black">Danh mục:</span> {category}
         </div>
         <div>
-          <span className="font-medium">Chất liệu:</span> {material}
+          <span className="font-medium text-black">Thương hiệu:</span> {brand}
+        </div>
+        <div>
+          <span className="font-medium text-black">Xuất xứ:</span> {origin}
+        </div>
+        <div>
+          <span className="font-medium text-black">Chất liệu:</span> {material}
         </div>
       </div>
 
-      {/* Kích thước */}
+      {/* Variants */}
       {sizes.length > 0 && (
-        <div className="flex items-center gap-2 flex-wrap w-full">
-          <span className="min-w-[80px] text-muted-foreground">
-            Kích thước:
-          </span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="w-24 text-muted-foreground">Kích thước:</span>
           <div className="flex gap-2 flex-wrap">
             {sizes.map((size) => (
               <Button
@@ -237,7 +217,7 @@ export default function ProductInfo({ product }: { product: Product }) {
                 variant={selectedSize === size ? "default" : "outline"}
                 size="sm"
                 onClick={() =>
-                  setSelectedSize(selectedSize === size ? null : size)
+                  setSelectedSize(size === selectedSize ? null : size)
                 }
               >
                 {size}
@@ -246,11 +226,9 @@ export default function ProductInfo({ product }: { product: Product }) {
           </div>
         </div>
       )}
-
-      {/* Màu sắc */}
       {colors.length > 0 && (
-        <div className="flex items-center gap-2 flex-wrap w-full">
-          <span className="min-w-[80px] text-muted-foreground">Màu sắc:</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="w-24 text-muted-foreground">Màu sắc:</span>
           <div className="flex gap-2 flex-wrap">
             {colors.map((color) => (
               <Button
@@ -258,7 +236,7 @@ export default function ProductInfo({ product }: { product: Product }) {
                 variant={selectedColor === color ? "default" : "outline"}
                 size="sm"
                 onClick={() =>
-                  setSelectedColor(selectedColor === color ? null : color)
+                  setSelectedColor(color === selectedColor ? null : color)
                 }
               >
                 {color}
@@ -268,21 +246,20 @@ export default function ProductInfo({ product }: { product: Product }) {
         </div>
       )}
 
-      {/* Số lượng và tồn kho */}
-      <div className="flex items-center gap-4 w-full">
-        <div className="flex items-center gap-2">
-          <span className="min-w-[80px] text-muted-foreground">Số lượng:</span>
-          <div className="flex items-center border rounded">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-8 h-8"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              disabled={!isVariantSelected || quantity <= 1}
-            >
-              <Minus className="w-4 h-4" />
-            </Button>
-            <input
+      {/* Số lượng */}
+      <div className="flex items-center gap-4">
+        <span className="min-w-[90px] text-muted-foreground">Số lượng:</span>
+        <div className="flex items-center border rounded !items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8"
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            disabled={!isVariantSelected || quantity <= 1}
+          >
+            <Minus className="w-4 h-4" />
+          </Button>
+          <input
               type="number"
               min={1}
               max={totalStock}
@@ -292,42 +269,44 @@ export default function ProductInfo({ product }: { product: Product }) {
               className="w-14 text-center outline-none border-x [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               style={{ MozAppearance: "textfield" }}
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-8 h-8"
-              onClick={() => setQuantity((q) => Math.min(totalStock, q + 1))}
-              disabled={!isVariantSelected || quantity >= totalStock}
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8"
+            onClick={() => setQuantity((q) => Math.min(totalStock, q + 1))}
+            disabled={!isVariantSelected || quantity >= totalStock}
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
         </div>
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
-          Tồn kho:{" "}
-          <span className="font-semibold">{totalStock.toLocaleString()}</span>
-        </span>
+        {isVariantSelected && (
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            Tồn kho:{" "}
+            <span className="font-semibold">{totalStock.toLocaleString()}</span>
+          </span>
+        )}
       </div>
 
       {/* Nút thao tác */}
-      <div className="flex gap-2 pt-2 w-full">
+      <div className="flex gap-3 pt-2 w-full">
         <Button
-          className="bg-red-600 text-white hover:bg-red-700 flex-1"
+          className="w-full h-10 rounded-md bg-red-600 text-white hover:bg-red-700 text-base font-semibold flex items-center justify-center gap-2 transition-colors"
           disabled={!isVariantSelected}
         >
-          <ShoppingCart className="w-4 h-4 mr-1" />
+          <ShoppingCart className="w-4 h-4" />
           Thêm vào giỏ
         </Button>
         <Button
-          className="bg-yellow-400 text-black hover:bg-yellow-500 flex-1 font-semibold"
+          className="w-full h-10 rounded-md bg-yellow-400 text-black hover:bg-yellow-500 text-base font-semibold flex items-center justify-center gap-2 transition-colors"
           disabled={!isVariantSelected}
         >
-          Mua ngay&nbsp;
+          Mua ngay
           <span>
             ₫
-            {isFlashSale
-              ? flashSalePrice.toLocaleString("vi-VN")
-              : product.virtualPrice.toLocaleString("vi-VN")}
+            {(isFlashSale
+              ? flashSalePrice
+              : product.virtualPrice
+            ).toLocaleString("vi-VN")}
           </span>
         </Button>
       </div>

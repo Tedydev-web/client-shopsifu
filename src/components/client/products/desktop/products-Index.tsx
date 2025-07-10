@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
@@ -20,19 +22,9 @@ interface Props {
 }
 
 export default function ProductDetail({ slug }: Props) {
-  const isMatch = slugify(productMock.name) === slug;
-
-  if (!isMatch) {
-    return (
-      <div className="text-center text-red-500 py-10">
-        Không tìm thấy sản phẩm
-      </div>
-    );
-  }
-
+  // ✅ Hook và logic xử lý data nên luôn ở đầu để tránh lỗi hook
   const sizes =
     productMock?.variants?.find((v) => v.value === "Kích thước")?.options || [];
-
   const colors =
     productMock?.variants?.find((v) => v.value === "Màu sắc")?.options || [];
 
@@ -43,21 +35,22 @@ export default function ProductDetail({ slug }: Props) {
     media: productMock.media as { type: "image" | "video"; src: string }[],
   };
 
-  // Lấy category cha đầu tiên (nếu có)
   const category =
     product.categories && product.categories.length > 0
       ? product.categories[0]
       : null;
 
-  // Lấy brand (nếu có)
   const brand = product.brand?.name || "";
 
-  return (
+  const isMatch = slugify(productMock.name) === slug;
+
+  // ⚠️ Không return trước khi hook/data xử lý hoàn tất
+  // Giải pháp: Trả về fallback bên dưới cùng nếu không khớp
+  return isMatch ? (
     <div className="bg-[#f5f5f5] py-4">
       {/* ✅ Breadcrumb */}
       <div className="max-w-[1200px] mx-auto px-4 mb-3">
         <Breadcrumb className="mb-3 flex flex-wrap items-center text-sm text-muted-foreground">
-          {/* Shopsifu cố định */}
           <BreadcrumbItem className="flex items-center gap-1">
             <BreadcrumbLink asChild>
               <Link href="/" className="text-black hover:underline">
@@ -67,7 +60,6 @@ export default function ProductDetail({ slug }: Props) {
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </BreadcrumbItem>
 
-          {/* Category */}
           {category && (
             <BreadcrumbItem className="flex items-center gap-1">
               <BreadcrumbLink asChild>
@@ -82,7 +74,6 @@ export default function ProductDetail({ slug }: Props) {
             </BreadcrumbItem>
           )}
 
-          {/* Brand */}
           {brand && (
             <BreadcrumbItem className="flex items-center gap-1">
               <BreadcrumbLink asChild>
@@ -97,7 +88,6 @@ export default function ProductDetail({ slug }: Props) {
             </BreadcrumbItem>
           )}
 
-          {/* Product name */}
           <BreadcrumbItem>
             <span className="text-foreground font-medium line-clamp-1">
               {product.name}
@@ -108,11 +98,11 @@ export default function ProductDetail({ slug }: Props) {
 
       {/* ✅ Chi tiết sản phẩm */}
       <div className="max-w-[1200px] mx-auto bg-white p-4 rounded">
-        <div className="flex flex-col md:flex-row gap-6 md:items-stretch">
-          <div className="flex-1">
+        <div className="grid md:grid-cols-[minmax(0,500px)_1fr] gap-4 md:items-start">
+          <div className="w-full max-w-[500px]">
             <ProductGallery media={product.media} />
           </div>
-          <div className="flex-1 flex flex-col justify-between min-h-[400px]">
+          <div className="w-full">
             <ProductInfo product={product} />
           </div>
         </div>
@@ -122,16 +112,20 @@ export default function ProductDetail({ slug }: Props) {
           <ProductSpecs product={product} />
         </div>
 
-        {/* ✅ Đánh giá (dữ liệu giả nếu chưa có) */}
+        {/* ✅ Đánh giá */}
         <div className="mt-6">
           <ProductReviews reviews={[]} />
         </div>
 
-        {/* ✅ Gợi ý sản phẩm (dữ liệu giả nếu chưa có) */}
+        {/* ✅ Gợi ý sản phẩm */}
         <div className="mt-6">
           <ProductSuggestions products={[]} />
         </div>
       </div>
+    </div>
+  ) : (
+    <div className="text-center text-red-500 py-10">
+      Không tìm thấy sản phẩm
     </div>
   );
 }

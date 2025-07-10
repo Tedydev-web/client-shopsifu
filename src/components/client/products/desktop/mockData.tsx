@@ -6,9 +6,9 @@ export const productMock = {
   virtualPrice: 5000,
   brandId: 4,
   media: [
+    { type: "video", src: "/Download.mp4" },
     { type: "image", src: "/images/client/product/Product-1.webp" },
     { type: "image", src: "/images/client/product/Product-2.webp" },
-    { type: "video", src: "/Download.mp4" },
     { type: "image", src: "/images/client/product/Product-3.webp" },
     { type: "video", src: "/Download 1.mp4" },
     { type: "image", src: "/images/client/product/Product-1.webp" },

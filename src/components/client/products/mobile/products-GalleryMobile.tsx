@@ -1,9 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ShoppingCart, MoreVertical } from "lucide-react";
+import {
+  ChevronLeft,
+  ShoppingCart,
+  MoreVertical,
+  PlayCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MediaItem {
@@ -17,7 +22,11 @@ interface Props {
 
 export default function ProductGalleryMobile({ media }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(true);
+  const [hasEnded, setHasEnded] = useState(false);
+
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const dragStartX = useRef<number | null>(null);
 
   const router = useRouter();
@@ -41,9 +50,9 @@ export default function ProductGalleryMobile({ media }: Props) {
     wrapperRef.current.style.transition = "transform 0.3s ease-in-out";
 
     if (deltaX < -40 && currentIndex < media.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else if (deltaX > 40 && currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+      setCurrentIndex((prev) => prev - 1);
     } else {
       wrapperRef.current.style.transform = `translateX(-${
         currentIndex * 100
@@ -52,6 +61,54 @@ export default function ProductGalleryMobile({ media }: Props) {
 
     dragStartX.current = null;
   };
+
+  const handleVideoClick = () => {
+    const video = videoRefs.current[currentIndex];
+    if (!video) return;
+
+    if (video.ended) {
+      video.currentTime = 0;
+      video.play();
+    } else if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
+  };
+
+  useEffect(() => {
+    const video = videoRefs.current[currentIndex];
+    if (!video) return;
+
+    const handlePlay = () => {
+      setIsPaused(false);
+      setHasEnded(false);
+    };
+    const handlePause = () => setIsPaused(true);
+    const handleEnded = () => {
+      setIsPaused(true);
+      setHasEnded(true);
+    };
+
+    video.addEventListener("play", handlePlay);
+    video.addEventListener("pause", handlePause);
+    video.addEventListener("ended", handleEnded);
+
+    return () => {
+      video.removeEventListener("play", handlePlay);
+      video.removeEventListener("pause", handlePause);
+      video.removeEventListener("ended", handleEnded);
+    };
+  }, [currentIndex]);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (index !== currentIndex && video && !video.paused) {
+        video.pause();
+        video.currentTime = 0; // reset về đầu luôn
+      }
+    });
+  }, [currentIndex]);
 
   return (
     <div className="w-full aspect-square bg-white relative overflow-hidden">
@@ -66,7 +123,7 @@ export default function ProductGalleryMobile({ media }: Props) {
         {media.map((item, index) => (
           <div
             key={index}
-            className="w-full h-full flex-shrink-0 flex items-center justify-center bg-black"
+            className="w-full h-full flex-shrink-0 flex items-center justify-center bg-black relative"
           >
             {item.type === "image" ? (
               <Image
@@ -78,12 +135,24 @@ export default function ProductGalleryMobile({ media }: Props) {
                 draggable={false}
               />
             ) : (
-              <video
-                src={item.src}
-                controls
-                className="w-full h-full object-contain"
-                preload="metadata"
-              />
+              <>
+                <video
+                  ref={(el) => {
+                    videoRefs.current[index] = el;
+                  }} // ✅ không return gì, hợp lệ với React Ref
+                  src={item.src}
+                  preload="metadata"
+                  className="w-full h-full object-contain"
+                  onClick={handleVideoClick}
+                />
+                {index === currentIndex && (isPaused || hasEnded) && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="bg-black/60 rounded-full p-3">
+                      <PlayCircle className="w-12 h-12 text-white" />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         ))}
