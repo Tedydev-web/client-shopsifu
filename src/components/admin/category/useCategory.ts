@@ -1,208 +1,226 @@
-import { useState, useCallback, useEffect } from 'react';
-import { categoryService } from '@/services/admin/categoryService';
-import { showToast } from '@/components/ui/toastify';
-import { parseApiError } from '@/utils/error';
-import { Category, CategoryCreateRequest, CategoryUpdateRequest } from '@/types/admin/category.interface';
-import { useServerDataTable } from '@/hooks/useServerDataTable';
-import { useTranslations } from "next-intl";
-import { CategoryTableData } from './category-Columns';
+import { useState, useEffect, useCallback, useRef } from "react";
 
-export function useCategory() {
-  const t = useTranslations();
-  
-  // Modal states
-  const [upsertOpen, setUpsertOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
-  
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  
-  // Callbacks for useServerDataTable
-  const getResponseData = useCallback((response: any) => {
-    return response.data || [];
-  }, []);
+// Types
+type ModalMode = 'add' | 'edit';
 
-  const getResponseMetadata = useCallback((response: any) => {
-    const metadata = response.metadata || {};
-    return {
-      totalItems: metadata.totalItems || 0,
-      page: metadata.page || 1,
-      totalPages: metadata.totalPages || 1,
-      limit: metadata.limit || 10,
-      hasNext: metadata.hasNext || false,
-      hasPrevious: metadata.hasPrev || false
-    };
-  }, []);
+type BreadcrumbItem = {
+  id: string;
+  name: string;
+};
 
-  const mapResponseToData = useCallback((category: any): CategoryTableData => {
-    return {
-      id: String(category.id),
-      name: category.name,
-      parentCategoryId: category.parentCategoryId,
-      logo: category.logo || null,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt,
-    };
-  }, []);
+type Category = {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  parentId?: string | null;
+};
 
-  // Use the useServerDataTable hook
-  const {
-    data: categories,
-    loading,
-    pagination,
-    handlePageChange,
-    handleLimitChange,
-    handleSearch,
-    handleSortChange,
-    refreshData,
-  } = useServerDataTable({
-    fetchData: categoryService.getAll,
-    getResponseData,
-    getResponseMetadata,
-    mapResponseToData,
-    initialSort: { sortBy: "createdAt", sortOrder: "desc" },
-    defaultLimit: 10,
+type PaginationResponse = {
+  page: number;
+  limit: number;
+  totalPages: number;
+  totalItems: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+};
+
+type PaginationRequest = {
+  page: number;
+  limit: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  parentId?: string | null;
+};
+
+export const useCategory = () => {
+  // Data & Pagination state
+  const [data, setData] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState<PaginationResponse>({
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    totalItems: 0,
+    hasNext: false,
+    hasPrevious: false,
   });
 
-  // CRUD operations
-  const addCategory = async (data: CategoryCreateRequest) => {
-    try {
-      const response = await categoryService.create(data);
-      showToast(response.message || t("admin.notifications.categoryCreated"), "success");
-      refreshData();
-      handleCloseUpsertModal();
-      return response;
-    } catch (error) {
-      showToast(parseApiError(error), "error");
-      console.error("Error creating category:", error);
-      return null;
-    }
+  // Modal state
+  const [upsertOpen, setUpsertOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<ModalMode>('add');
+  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
+
+  // Navigation state
+  const [currentParentId, setCurrentParentId] = useState<string | null>(null);
+  const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([]);
+  const [currentCategoryTitle, setCurrentCategoryTitle] = useState<string>("");
+
+  // Request params
+  const paramsRef = useRef<PaginationRequest>({
+    page: 1,
+    limit: 10,
+    search: "",
+    sortBy: "",
+    sortOrder: "asc",
+  });
+
+  // Mock API call - Replace with actual API call
+  const fetchCategories = async (params: PaginationRequest) => {
+    // Simulated API response
+    return {
+      data: [],
+      pagination: {
+        page: params.page,
+        limit: params.limit,
+        totalPages: 1,
+        totalItems: 0,
+        hasNext: false,
+        hasPrevious: false,
+      },
+    };
   };
 
-  const editCategory = async (id: string, data: CategoryUpdateRequest) => {
+  // Fetch data
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await categoryService.update(id, data);
-      showToast(response.message || t("admin.notifications.categoryUpdated"), "success");
-      refreshData();
-      handleCloseUpsertModal();
-      return response;
+      const response = await fetchCategories({
+        ...paramsRef.current,
+        parentId: currentParentId,
+      });
+      setData(response.data);
+      setPagination(response.pagination);
     } catch (error) {
-      showToast(parseApiError(error), "error");
-      console.error("Error updating category:", error);
-      return null;
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [currentParentId]);
 
-  const handleConfirmDelete = async (): Promise<void> => {
-    if (categoryToDelete) {
-      setDeleteLoading(true);
-      try {
-        const response = await categoryService.delete(String(categoryToDelete.id));
-        showToast(response.message || t("admin.notifications.categoryDeleted"), "success");
-        refreshData();
-        handleCloseDeleteModal();
-      } catch (error) {
-        showToast(parseApiError(error), "error");
-        console.error("Error deleting category:", error);
-      } finally {
-        setDeleteLoading(false);
-      }
-    }
-  };
+  // Initial fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Modal handlers
-  const handleOpenDelete = (category: CategoryTableData) => {
-    setCategoryToDelete(category as unknown as Category);
-    setDeleteOpen(true);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setDeleteOpen(false);
-    setCategoryToDelete(null);
-  };
-
-  // Fetch category details by ID
-  const fetchCategoryDetails = async (categoryId: string) => {
-    try {
-      const response = await categoryService.getById(categoryId);
-      if (response) {
-        setCategoryToEdit(response.data);
-      }
-    } catch (error) {
-      showToast(parseApiError(error), "error");
-      console.error("Error fetching category details:", error);
-    }
-  };
-  
-  const handleOpenUpsertModal = (mode: 'add' | 'edit', category?: CategoryTableData) => {
+  const handleOpenUpsertModal = useCallback((mode: ModalMode, category?: Category) => {
     setModalMode(mode);
-    
-    if (mode === 'edit' && category) {
-      console.log("Opening edit modal for category:", category);
-      setCategoryToEdit(category as unknown as Category);
-      // Fetch detailed category info
-      fetchCategoryDetails(category.id);
-    } else {
-      console.log("Opening add modal");
-      setCategoryToEdit(null);
-    }
-    
+    setCategoryToEdit(category || null);
     setUpsertOpen(true);
-  };
+  }, []);
 
-  const handleCloseUpsertModal = () => {
+  const handleCloseUpsertModal = useCallback(() => {
     setUpsertOpen(false);
     setCategoryToEdit(null);
-  };
+  }, []);
+
+  // CRUD operations
+  const addCategory = useCallback(async (data: Partial<Category>) => {
+    try {
+      // Implement actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      fetchData();
+      handleCloseUpsertModal();
+    } catch (error) {
+      throw error;
+    }
+  }, [fetchData, handleCloseUpsertModal]);
+
+  const editCategory = useCallback(async (id: string, data: Partial<Category>) => {
+    try {
+      // Implement actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      fetchData();
+      handleCloseUpsertModal();
+    } catch (error) {
+      throw error;
+    }
+  }, [fetchData, handleCloseUpsertModal]);
+
+  // Navigation handlers
+  const handleViewSubcategories = useCallback((category: Category) => {
+    setCurrentParentId(category.id);
+    setBreadcrumb(prev => [...prev, { id: category.id, name: category.name }]);
+    setCurrentCategoryTitle(category.name);
+    paramsRef.current = { ...paramsRef.current, page: 1 };
+    fetchData();
+  }, [fetchData]);
+
+  const handleBackToRoot = useCallback(() => {
+    setCurrentParentId(null);
+    setBreadcrumb([]);
+    setCurrentCategoryTitle("");
+    paramsRef.current = { ...paramsRef.current, page: 1 };
+    fetchData();
+  }, [fetchData]);
+
+  const handleBreadcrumbClick = useCallback((index: number) => {
+    if (index === 0) {
+      handleBackToRoot();
+      return;
+    }
+    const newBreadcrumb = breadcrumb.slice(0, index);
+    const lastCrumb = newBreadcrumb[newBreadcrumb.length - 1];
+    setCurrentParentId(lastCrumb.id);
+    setBreadcrumb(newBreadcrumb);
+    setCurrentCategoryTitle(lastCrumb.name);
+    paramsRef.current = { ...paramsRef.current, page: 1 };
+    fetchData();
+  }, [breadcrumb, handleBackToRoot, fetchData]);
+
+  // Table handlers
+  const handlePageChange = useCallback((page: number) => {
+    paramsRef.current = { ...paramsRef.current, page };
+    fetchData();
+  }, [fetchData]);
+
+  const handleLimitChange = useCallback((limit: number) => {
+    paramsRef.current = { ...paramsRef.current, limit, page: 1 };
+    fetchData();
+  }, [fetchData]);
+
+  const handleSearch = useCallback((search: string) => {
+    paramsRef.current = { ...paramsRef.current, search, page: 1 };
+    fetchData();
+  }, [fetchData]);
+
+  const handleSortChange = useCallback((sortBy: string, sortOrder: "asc" | "desc") => {
+    paramsRef.current = { ...paramsRef.current, sortBy, sortOrder, page: 1 };
+    fetchData();
+  }, [fetchData]);
 
   return {
-    data: categories,
+    // Data & loading state
+    data,
     loading,
     pagination,
-    
-    // Server-side pagination handlers
+    refreshData: fetchData,
+
+    // Table handlers
     handlePageChange,
-    handleLimitChange,
+    handleLimitChange, 
     handleSearch,
     handleSortChange,
-    refreshData,
-    
-    // Delete
-    deleteOpen,
-    categoryToDelete,
-    deleteLoading,
-    handleOpenDelete,
-    handleConfirmDelete,
-    handleCloseDeleteModal,
 
-    // Upsert
+    // Modal state & handlers
     upsertOpen,
     modalMode,
     categoryToEdit,
     handleOpenUpsertModal,
     handleCloseUpsertModal,
+
+    // CRUD operations 
     addCategory,
     editCategory,
-    fetchCategoryDetails,
-  };
-    } catch (error) {
-      return [];
-    }
-  };
 
-  return {
-    categories,
-    totalItems,
-    page,
-    totalPages,
-    loading,
-    getAllCategories,
-    getCategoryById,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    getRootCategories,
+    // Navigation state & handlers
+    currentParentId,
+    breadcrumb,
+    currentCategoryTitle,
+    handleViewSubcategories,
+    handleBackToRoot,
+    handleBreadcrumbClick,
   };
-}
+};

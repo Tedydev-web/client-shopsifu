@@ -3,7 +3,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MoreHorizontal, Edit, Trash2, Eye, ChevronDown, ChevronRight } from "lucide-react"
@@ -11,6 +11,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
@@ -37,7 +38,7 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-component/data
 
 export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): ColumnDef<CategoryTableData>[] => {
   const { onView, onEdit, onDelete } = param || {};
-  const { t } = useTranslation();
+  const t  = useTranslations("admin.ModuleCategory.Table");
   return [
     {
       id: "select",
@@ -45,7 +46,7 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
         <Checkbox
           checked={table.getIsAllPageRowsSelected()}
           onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-          aria-label={t('admin.pages.category.selectAll')}
+          // aria-label={t('admin.pages.category.selectAll')}
         />
       ),
       cell: ({ row }) => (
@@ -53,7 +54,7 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
           checked={row.getIsSelected()}
           disabled={!row.getCanSelect()}
           onCheckedChange={value => row.toggleSelected(!!value)}
-          aria-label={t('admin.pages.category.selectRow')}
+          // aria-label={t('admin.pages.category.selectRow')}
         />
       ),
       enableSorting: false,
@@ -63,26 +64,12 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
     {
       accessorKey: "name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.pages.category.column.name")} />
+        <DataTableColumnHeader column={column} title={t("name")} />
       ),
       cell: ({ row }) => {
         const category = row.original;
-        const hasChildren = Array.isArray(category.children) && category.children.length > 0;
-        const expanded = row.getIsExpanded ? row.getIsExpanded() : false;
         return (
-          <div style={{ paddingLeft: (category.depth || 0) * 20 }} className="flex items-center gap-1">
-            {hasChildren && (
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="w-6 h-6 p-0 text-gray-500 hover:text-primary"
-                onClick={() => row.toggleExpanded && row.toggleExpanded()}
-                aria-label={expanded ? t('admin.pages.category.collapse') : t('admin.pages.category.expand')}
-              >
-                {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-              </Button>
-            )}
+          <div className="flex items-center gap-1">
             <span className="font-medium">{category.name}</span>
           </div>
         );
@@ -92,29 +79,45 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
       filterFn: "includesString",
     },
     {
-      accessorKey: "isActive",
+      accessorKey: "parentCategoryId",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.pages.category.column.status")} />
+        <DataTableColumnHeader column={column} title={t("parentCategory")} />
       ),
       cell: ({ row }) => {
-        const isActive = row.getValue("isActive") as boolean;
+        const parentId = row.getValue("parentCategoryId");
         return (
-          <Badge variant={isActive ? "default" : "secondary"}>
-            {isActive ? t("admin.pages.category.statusActive") : t("admin.pages.category.statusInactive")}
-          </Badge>
+          <div>{parentId ? String(parentId) : t("noParent")}</div>
         );
       },
       enableSorting: true,
       enableHiding: true,
-      filterFn: (row, columnId, filterValue) => {
-        if (!filterValue) return true;
-        return String(row.getValue(columnId)) === filterValue;
+    },
+    {
+      accessorKey: "logo",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t("logo")} />
+      ),
+      cell: ({ row }) => {
+        const logo = row.getValue("logo") as string | null;
+        return logo ? (
+          <div className="h-10 w-10 relative">
+            <img
+              src={logo}
+              alt={row.getValue("name")}
+              className="h-full w-full object-contain rounded"
+            />
+          </div>
+        ) : (
+          <div className="text-muted-foreground italic">{t("noLogo")}</div>
+        );
       },
+      enableSorting: false,
+      enableHiding: true,
     },
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("admin.pages.category.column.createdAt")} />
+        <DataTableColumnHeader column={column} title={t("createdAt")} />
       ),
       cell: ({ row }) => (
         <div className="whitespace-nowrap">{format(new Date(row.getValue("createdAt")), "yyyy-MM-dd HH:mm")}</div>
@@ -129,38 +132,47 @@ export const CategoryColumns = (param: CategoryColumnsProps = {}, table?: any): 
     },
     {
       id: "actions",
-      header: () => <div>{t("admin.pages.category.column.actions")}</div>,
+      header: () => <div>{t("actions")}</div>,
       cell: ({ row }) => {
         const category = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {onView && (
-                <DropdownMenuItem onClick={() => onView(category)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  {t("admin.pages.category.actions.view")}
+          <div className="flex justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">{t("openMenu")}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[160px]">
+                <DropdownMenuItem
+                  onClick={() => onView(category)}
+                  className="cursor-pointer"
+                >
+                  <Eye className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                  {t("viewSubcategories")}
                 </DropdownMenuItem>
-              )}
-              {onEdit && (
-                <DropdownMenuItem onClick={() => onEdit(category)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  {t("admin.pages.category.actions.edit")}
+                <DropdownMenuItem
+                  onClick={() => onEdit(category)}
+                  className="cursor-pointer"
+                >
+                  <Edit className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                  {t("edit")}
                 </DropdownMenuItem>
-              )}
-              {onDelete && (
-                <DropdownMenuItem onClick={() => onDelete(category)} className="text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  {t("admin.pages.category.actions.delete")}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onDelete(category)}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-3.5 w-3.5" />
+                  {t("delete")}
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         );
       },
       enableSorting: false,

@@ -236,6 +236,29 @@
       }
     }
   },
+  "ModuleCategory":{
+     "title": "Quản lý danh mục",
+     "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
+    "Table":{
+      "searchPlaceholder": "Tìm kiếm theo tên danh mục",
+      "addCategory": "Thêm danh mục",
+      "name":"Tên danh mục",
+      "parentCategory": "Mã ID danh mục liên kết",
+      "logo": "Logo",
+      "createdAt":"Ngày tạo",
+      "updatedAt":"Ngày cập nhật",
+      "actions":"Hành động",
+      "edit":"Chỉnh sửa",
+      "delete": "Xóa danh mục",
+      "deleteTitle": "Xóa danh mục",
+      "deleteSubTitle": "Bạn có chắc chắn xóa danh mục này?",
+      "noParent": "Không có",
+      "noLogo": "Không có hình ảnh",
+      "deleteConfirmTitle":"Xác nhận xoá danh mục",
+      "notFound": "Không có danh mục",
+      "cancel": "Hủy bỏ"
+    }
+  },
     "ModuleUsers":{
       "Table":{
         "role": "Vai trò",
