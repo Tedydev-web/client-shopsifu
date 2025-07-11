@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { VariantInput } from "./form-Variant-Settings/form-VariantInput";
+import { VariantInput } from "./form-VariantInput";
 
 export function VariantSettingsForm() {
   const [options, setOptions] = useState<number[]>([]);
-  
+
   const handleAddOptions = () => {
     setOptions([...options, Date.now()]); // Use timestamp as unique ID
   };
@@ -19,32 +19,24 @@ export function VariantSettingsForm() {
   };
 
   const handleDone = (optionId: number) => {
-    // Handle done logic here - for now just keep the option
+    // Handle done logic here if needed
     console.log('Option done:', optionId);
   };
 
-  // Không cần hàm này nữa vì chúng ta đã có addOptionDirectly
-
-  // Hàm để thêm option mới, đảm bảo luôn tạo được function reference mới
-  function addOptionDirectly() {
+  const addOptionDirectly = () => {
     const newId = Date.now();
-    console.log('Directly adding new option with ID:', newId);
-    // Sử dụng callback form để đảm bảo luôn có state mới nhất
     setOptions(prevOptions => [...prevOptions, newId]);
-  }
-
-  // Hiển thị options trong console để debug
-  console.log('Current options:', options.length, options);
+  };
 
   return (
-    <Card>
+    <Card className="bg-white">
       <CardContent className="p-0">
-        <div className="p-4 pb-0">
+        <div className="p-6 pb-4">
           <Label className="text-sm font-medium">Variant Settings</Label>
         </div>
         
         {options.length === 0 ? (
-          <div className="p-4">
+          <div className="px-6 pb-6">
             <Button 
               type="button" 
               variant="outline" 
@@ -56,16 +48,13 @@ export function VariantSettingsForm() {
             </Button>
           </div>
         ) : (
-          <div className="border rounded-lg mx-4 mb-4 mt-4 overflow-hidden">
+          <div className="border rounded-lg mx-6 mb-6">
             {options.map((optionId, index) => (
               <VariantInput 
                 key={optionId}
                 onDelete={() => handleDelete(optionId)}
                 onDone={() => handleDone(optionId)}
-                onAddOption={() => {
-                  console.log('Adding option from parent component');
-                  addOptionDirectly();
-                }}
+                onAddOption={addOptionDirectly}
                 isLast={index === options.length - 1}
               />
             ))}

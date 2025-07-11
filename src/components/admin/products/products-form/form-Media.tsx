@@ -16,6 +16,8 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [showAllImages, setShowAllImages] = useState(false);
     const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(null);
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [dragCounter, setDragCounter] = useState(0);
 
     // Xử lý việc tải lên ảnh từ máy tính
     const handleImageUpload = useCallback(() => {
@@ -33,8 +35,10 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
 
         // Chuyển đổi từng file thành URL để hiển thị
         Array.from(files).forEach(file => {
-            const imageUrl = URL.createObjectURL(file);
-            newImages.push(imageUrl);
+            if (file.type.startsWith('image/')) {
+                const imageUrl = URL.createObjectURL(file);
+                newImages.push(imageUrl);
+            }
         });
 
         setImages(newImages);
@@ -43,6 +47,66 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+    }, [images, setImages]);
+
+    // Xử lý drag and drop với counter để tránh flicker
+    const handleDragEnter = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragCounter(prev => prev + 1);
+        
+        // Chỉ set isDragOver khi counter = 1 (lần đầu tiên enter)
+        if (dragCounter === 0) {
+            setIsDragOver(true);
+        }
+    }, [dragCounter]);
+
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Đảm bảo dropEffect được set
+        if (e.dataTransfer) {
+            e.dataTransfer.dropEffect = 'copy';
+        }
+    }, []);
+
+    const handleDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        setDragCounter(prev => {
+            const newCounter = prev - 1;
+            // Chỉ tắt isDragOver khi counter về 0
+            if (newCounter === 0) {
+                setIsDragOver(false);
+            }
+            return newCounter;
+        });
+    }, []);
+
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Reset state
+        setIsDragOver(false);
+        setDragCounter(0);
+
+        const files = e.dataTransfer.files;
+        if (!files || files.length === 0) return;
+
+        const newImages: string[] = [...images];
+
+        // Chuyển đổi từng file thành URL để hiển thị
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const imageUrl = URL.createObjectURL(file);
+                newImages.push(imageUrl);
+            }
+        });
+
+        setImages(newImages);
     }, [images, setImages]);
 
     // Xử lý xóa ảnh
@@ -74,28 +138,34 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
             
             {images.length === 0 ? (
                 <div
-                    className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+                    className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                        isDragOver 
+                            ? 'border-primary bg-primary/10' 
+                            : 'border-gray-300 hover:border-primary'
+                    }`}
                     onClick={handleImageUpload}
+                    onDragEnter={handleDragEnter}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                 >
-                    <UploadCloud className="w-8 h-8 text-gray-400" />
-                    <p className="mt-3 font-semibold text-sm">Tải lên hình ảnh sản phẩm</p>
-                    <p className="text-xs text-muted-foreground">Kéo thả hoặc chọn file từ máy tính</p>
-                    <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-3"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleImageUpload();
-                        }}
-                    >
-                        Chọn file
-                    </Button>
+                    <UploadCloud className={`w-8 h-8 ${isDragOver ? 'text-primary' : 'text-gray-400'}`} />
+                    <p className="mt-3 font-semibold text-sm">
+                        {isDragOver ? 'Thả file vào đây' : 'Tải lên hình ảnh sản phẩm'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        {isDragOver ? 'Thả để tải lên' : 'Kéo thả hoặc chọn file từ máy tính'}
+                    </p>
                 </div>
             ) : (
-                <div className="space-y-3">
-                    <div className="grid grid-cols-5 grid-rows-2 gap-3">
+                <div 
+                    className="space-y-3 relative"
+                    onDragEnter={handleDragEnter}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                >
+                    <div className={`grid grid-cols-5 grid-rows-2 gap-3 transition-opacity ${isDragOver ? 'opacity-50' : ''}`}>
                         {/* Ảnh chính */}
                         <div 
                             className="col-span-2 row-span-2 relative rounded-lg overflow-hidden border"
@@ -233,6 +303,17 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                           )
                         })()}
                     </div>
+                    
+                    {/* Drag overlay khi đang kéo file */}
+                    {isDragOver && (
+                        <div className="absolute inset-0 bg-primary/5 border-2 border-primary border-dashed rounded-lg flex items-center justify-center z-10 pointer-events-none">
+                            <div className="text-center bg-white/90 backdrop-blur-sm rounded-lg p-4 border shadow-lg">
+                                <UploadCloud className="w-12 h-12 text-primary mx-auto mb-2" />
+                                <p className="text-primary font-semibold">Thả file vào đây để tải lên</p>
+                                <p className="text-sm text-muted-foreground">Hỗ trợ nhiều file ảnh</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
