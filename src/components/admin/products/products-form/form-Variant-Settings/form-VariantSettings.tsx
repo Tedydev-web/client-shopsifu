@@ -7,25 +7,52 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { VariantInput } from "./form-VariantInput";
 
+interface OptionData {
+  id: number;
+  name: string;
+  values: string[];
+  isDone: boolean;
+}
+
 export function VariantSettingsForm() {
-  const [options, setOptions] = useState<number[]>([]);
+  const [options, setOptions] = useState<OptionData[]>([]);
 
   const handleAddOptions = () => {
-    setOptions([...options, Date.now()]); // Use timestamp as unique ID
+    const newOption = {
+      id: Date.now(),
+      name: '',
+      values: [],
+      isDone: false
+    };
+    setOptions([...options, newOption]);
   };
 
   const handleDelete = (optionId: number) => {
-    setOptions(options.filter(id => id !== optionId));
+    setOptions(prevOptions => prevOptions.filter(option => option.id !== optionId));
   };
 
   const handleDone = (optionId: number) => {
-    // Handle done logic here if needed
-    console.log('Option done:', optionId);
+    setOptions(prevOptions => prevOptions.map(option => 
+      option.id === optionId 
+        ? { ...option, isDone: true }
+        : option
+    ));
   };
 
-  const addOptionDirectly = () => {
-    const newId = Date.now();
-    setOptions(prevOptions => [...prevOptions, newId]);
+  const handleEdit = (optionId: number) => {
+    setOptions(prevOptions => prevOptions.map(option => 
+      option.id === optionId 
+        ? { ...option, isDone: false }
+        : option
+    ));
+  };
+
+  const handleUpdateOption = (optionId: number, name: string, values: string[]) => {
+    setOptions(prevOptions => prevOptions.map(option => 
+      option.id === optionId 
+        ? { ...option, name, values }
+        : option
+    ));
   };
 
   return (
@@ -49,15 +76,29 @@ export function VariantSettingsForm() {
           </div>
         ) : (
           <div className="border rounded-lg mx-6 mb-6">
-            {options.map((optionId, index) => (
+            {options.map((option, index) => (
               <VariantInput 
-                key={optionId}
-                onDelete={() => handleDelete(optionId)}
-                onDone={() => handleDone(optionId)}
-                onAddOption={addOptionDirectly}
+                key={option.id}
+                option={option}
+                onDelete={() => handleDelete(option.id)}
+                onDone={() => handleDone(option.id)}
+                onEdit={() => handleEdit(option.id)}
+                onUpdate={(name, values) => handleUpdateOption(option.id, name, values)}
                 isLast={index === options.length - 1}
               />
             ))}
+            <div className="py-2 border-t">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleAddOptions}
+                className="w-full justify-center gap-2 hover:bg-transparent"
+              >
+                <Plus className="h-4 w-4" />
+                Add another option
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>
