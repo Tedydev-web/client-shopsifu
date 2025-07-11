@@ -105,9 +105,17 @@ export default function ProductGalleryMobile({ media }: Props) {
     videoRefs.current.forEach((video, index) => {
       if (index !== currentIndex && video && !video.paused) {
         video.pause();
-        video.currentTime = 0; // reset về đầu luôn
       }
     });
+
+    const current = media[currentIndex];
+    if (current?.type === "video") {
+      setIsPaused(true);
+      setHasEnded(false);
+    } else {
+      setIsPaused(false);
+      setHasEnded(false);
+    }
   }, [currentIndex]);
 
   return (
