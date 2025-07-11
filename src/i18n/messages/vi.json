@@ -236,6 +236,50 @@
       }
     }
   },
+  "ModuleCategory":{
+     "title": "Quản lý danh mục",
+     "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
+    "Table":{
+      "searchPlaceholder": "Tìm kiếm theo tên danh mục",
+      "addCategory": "Thêm danh mục",
+      "name":"Tên danh mục",
+      "parentCategory": "Mã ID danh mục liên kết",
+      "logo": "Logo",
+      "createdAt":"Ngày tạo",
+      "updatedAt":"Ngày cập nhật",
+      "actions":"Hành động",
+      "edit":"Chỉnh sửa",
+      "delete": "Xóa danh mục",
+      "deleteTitle": "Xóa danh mục",
+      "deleteSubTitle": "Bạn có chắc chắn xóa danh mục này?",
+      "noParent": "Không có",
+      "noLogo": "Không có hình ảnh",
+      "deleteConfirmTitle":"Xác nhận xoá danh mục",
+      "notFound": "Không có danh mục",
+      "cancel": "Hủy bỏ",
+      "backToRoot": "Quay về",
+      "currentCategory": "Danh mục hiện tại",
+      "deleteConfirmMessage": "Bạn có chắc chắn xóa danh mục"
+    },
+    "ModalCreate":{
+      "noParent":"Không danh mục cha",
+      "logoSelect": "Chọn Logo",
+      "addCategory": "Thêm danh mục",
+      "editCategory":"Chỉnh sửa danh mục",
+      "name": "Tên danh mục",
+      "namePlaceholder": "Nhập tên danh mục...",
+      "parentCategory": "Danh mục cha",
+      "parentPlaceholder": "Chọn danh mục cha",
+      "logo": "Logo",
+      "logoPlaceholder": "Nhập Logo....",
+      "logoHelp": "",
+      "common":{
+        "cancel":"Hủy bỏ",
+        "create": "Tạo danh mục",
+        "save": "Lưu thông tin"
+      }
+    }
+  },
     "ModuleUsers":{
       "Table":{
         "role": "Vai trò",
