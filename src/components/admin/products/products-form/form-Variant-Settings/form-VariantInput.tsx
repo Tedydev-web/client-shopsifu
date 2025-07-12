@@ -5,9 +5,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GripVertical, Plus, X } from "lucide-react";
+import { GripVertical, Trash } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { SortableValueInput } from './SortableValueInput';
 
-interface OptionData {
+export interface OptionData {
   id: number;
   name: string;
   values: string[];
@@ -20,7 +36,8 @@ interface VariantInputProps {
   onDone: () => void;
   onEdit: () => void;
   onUpdate: (name: string, values: string[]) => void;
-  isLast: boolean;
+  isLast?: boolean;
+  dragHandleProps?: Record<string, any>;
 }
 
 export function VariantInput({ 
@@ -29,43 +46,67 @@ export function VariantInput({
   onDone,
   onEdit,
   onUpdate,
-  isLast = false 
+  isLast = false,
+  dragHandleProps = {}
 }: VariantInputProps) {
   const [localName, setLocalName] = useState(option.name);
-  const [currentValue, setCurrentValue] = useState("");
-  const [localValues, setLocalValues] = useState<string[]>(option.values);
+  const [localValues, setLocalValues] = useState<{id: string; value: string}[]>([]);
 
-  // Sync local state with props when option changes
   useEffect(() => {
     setLocalName(option.name);
-    setLocalValues(option.values);
+    const initialValues = option.values.map((value, index) => ({ 
+      id: `value-${option.id}-${index}`,
+      value 
+    }));
+
+    if (initialValues.length === 0 || initialValues[initialValues.length - 1].value !== "") {
+      initialValues.push({ id: `new-${option.id}-${Date.now()}`, value: "" });
+    }
+    setLocalValues(initialValues);
   }, [option]);
 
-  // Update parent only when local state is intentionally changed
+  const getValuesOnly = (items: typeof localValues) => items.map(item => item.value).filter(v => v.trim() !== "");
+
   const handleNameChange = (newName: string) => {
     setLocalName(newName);
-    onUpdate(newName, localValues);
+    onUpdate(newName, getValuesOnly(localValues));
   };
 
-  const handleAddValue = () => {
-    if (currentValue.trim() && !localValues.includes(currentValue.trim())) {
-      const newValues = [...localValues, currentValue.trim()];
-      setLocalValues(newValues);
-      setCurrentValue("");
-      onUpdate(localName, newValues);
+  const handleValueChange = (newValue: string, index: number) => {
+    const newValues = [...localValues];
+    newValues[index].value = newValue;
+
+    if (index === localValues.length - 1 && newValue.trim() !== "") {
+      newValues.push({ id: `new-${option.id}-${Date.now()}`, value: "" });
     }
-  };
 
-  const handleRemoveValue = (valueToRemove: string) => {
-    const newValues = localValues.filter(v => v !== valueToRemove);
     setLocalValues(newValues);
-    onUpdate(localName, newValues);
+    onUpdate(localName, getValuesOnly(newValues));
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddValue();
+  const handleRemoveValue = (indexToRemove: number) => {
+    const newValues = localValues.filter((_, index) => index !== indexToRemove);
+    setLocalValues(newValues);
+    onUpdate(localName, getValuesOnly(newValues));
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setLocalValues((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        const reorderedItems = arrayMove(items, oldIndex, newIndex);
+        onUpdate(localName, getValuesOnly(reorderedItems));
+        return reorderedItems;
+      });
     }
   };
 
@@ -74,7 +115,9 @@ export function VariantInput({
       <div className={`bg-white ${!isLast ? 'border-b border-border' : ''}`}>
         <div className="p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <GripVertical className="h-4 w-4 text-muted-foreground cursor-move" />
+            <div {...dragHandleProps} className="cursor-move touch-none">
+              <GripVertical className="h-5 w-5 text-muted-foreground" />
+            </div>
             <div 
             className="flex-1 cursor-pointer"
             onClick={onEdit}
@@ -98,10 +141,11 @@ export function VariantInput({
 
   return (
     <div className={`bg-white ${!isLast ? 'border-b border-border' : ''}`}>
-      <div className="p-6 space-y-4">
-        {/* Option with drag handle positioned to the left */}
+      <div className="p-6">
         <div className="flex items-start gap-3">
-          <GripVertical className="h-4 w-4 text-muted-foreground cursor-move mt-8" />
+          <div {...dragHandleProps} className="cursor-move touch-none mt-2.5">
+            <GripVertical className="h-5 w-5 text-muted-foreground" />
+          </div>
           <div className="flex-1 space-y-4">
             {/* Option name input */}
             <div className="space-y-2">
@@ -118,69 +162,59 @@ export function VariantInput({
             </div>
             
             {/* Option values input - indented */}
-            <div className="space-y-2 ml-6">
-              <Label htmlFor={`option-values-${option.id}`} className="text-sm font-medium">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
                 Option values
               </Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {localValues.map((value, idx) => (
-                  <Badge key={idx} variant="secondary" className="gap-1">
-                    {value}
-                    <button
-                      onClick={() => handleRemoveValue(value)}
-                      className="ml-1 hover:text-destructive"
-                      title={`Remove ${value}`}
-                      aria-label={`Remove ${value}`}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-              <Input
-                id={`option-values-${option.id}`}
-                placeholder="Add another value"
-                className="w-full"
-                value={currentValue}
-                onChange={(e) => setCurrentValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-              />
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext items={localValues} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-2">
+                    {localValues.map((item, index) => (
+                      <SortableValueInput
+                        key={item.id}
+                        id={item.id}
+                        value={item.value}
+                        index={index}
+                        handleValueChange={handleValueChange}
+                        handleRemoveValue={handleRemoveValue}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center justify-between pt-2">
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                onClick={handleAddValue}
-                className="mt-2"
+                onClick={onDelete}
+                className="text-destructive hover:text-destructive"
               >
-                Add value
+                Delete
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={onDone}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={!localName || localValues.filter(v => v.value.trim() !== '').length === 0}
+              >
+                Done
               </Button>
             </div>
+
           </div>
-        </div>
-        
-        {/* Action buttons */}
-        <div className="flex items-center justify-between pt-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onDelete}
-            className="text-destructive hover:text-destructive"
-          >
-            Delete
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={onDone}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={!localName || localValues.length === 0}
-          >
-            Done
-          </Button>
         </div>
       </div>
     </div>
   );
 }
+

@@ -5,17 +5,44 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { VariantInput } from "./form-VariantInput";
-
-interface OptionData {
-  id: number;
-  name: string;
-  values: string[];
-  isDone: boolean;
-}
+import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors, 
+  DragEndEvent 
+} from "@dnd-kit/core";
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  verticalListSortingStrategy 
+} from "@dnd-kit/sortable";
+import { SortableVariantInput } from "./SortableVariantInput";
+import type { OptionData } from "./form-VariantInput";
 
 export function VariantSettingsForm() {
   const [options, setOptions] = useState<OptionData[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setOptions((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   const handleAddOptions = () => {
     const newOption = {
@@ -75,31 +102,39 @@ export function VariantSettingsForm() {
             </Button>
           </div>
         ) : (
-          <div className="border rounded-lg mx-6 mb-6">
-            {options.map((option, index) => (
-              <VariantInput 
-                key={option.id}
-                option={option}
-                onDelete={() => handleDelete(option.id)}
-                onDone={() => handleDone(option.id)}
-                onEdit={() => handleEdit(option.id)}
-                onUpdate={(name, values) => handleUpdateOption(option.id, name, values)}
-                isLast={index === options.length - 1}
-              />
-            ))}
-            <div className="py-2 border-t">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleAddOptions}
-                className="w-full justify-center gap-2 hover:bg-transparent"
-              >
-                <Plus className="h-4 w-4" />
-                Add another option
-              </Button>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="border rounded-lg mx-6 mb-6">
+              <SortableContext items={options} strategy={verticalListSortingStrategy}>
+                {options.map((option, index) => (
+                  <SortableVariantInput 
+                    key={option.id}
+                    option={option}
+                    onDelete={() => handleDelete(option.id)}
+                    onDone={() => handleDone(option.id)}
+                    onEdit={() => handleEdit(option.id)}
+                    onUpdate={(name, values) => handleUpdateOption(option.id, name, values)}
+                    isLast={index === options.length - 1}
+                  />
+                ))}
+              </SortableContext>
+              <div className="py-2 border-t">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAddOptions}
+                  className="w-full justify-center gap-2 hover:bg-transparent"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add another option
+                </Button>
+              </div>
             </div>
-          </div>
+          </DndContext>
         )}
       </CardContent>
     </Card>
