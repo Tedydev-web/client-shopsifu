@@ -1,28 +1,27 @@
-'use client';
+// components/client/ProductPageClient.tsx
+"use client";
 
-import { useEffect, useState, use } from 'react';
-import { useCheckDevice } from '@/hooks/useCheckDevices';
-import ClientLayoutWrapper from '@/components/client/layout/ClientLayoutWrapper';
-import ProductDetail from '@/components/client/products/desktop/products-Index';
-import ProductDetailMobile from '@/components/client/products/mobile/products-IndexMobile';
-import { useResponsive } from '@/hooks/useResponsive';
+import { useCheckDevice } from "@/hooks/useCheckDevices";
+import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper";
+import ProductDetail from "@/components/client/products/desktop/products-Index";
+import ProductDetailMobile from "@/components/client/products/mobile/products-IndexMobile";
+import { useResponsive } from "@/hooks/useResponsive";
+import { useEffect, useState } from "react";
 
-interface Props {
-  params: Promise<{ slug: string }>; // 👈 `params` là Promise
-}
-
-export default function ProductPage(props: Props) {
-  const { slug } = use(props.params); // ✅ unwrap params using React.use()
+// ✅ Đúng chuẩn App Router
+export default function ProductPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
 
   const [mounted, setMounted] = useState(false);
   const deviceType = useCheckDevice();
   const { isMobile } = useResponsive();
 
   useEffect(() => {
+    console.log("✅ [Page] slug param:", slug);
     setMounted(true);
   }, []);
 
-  if (!mounted || deviceType === 'unknown') return null;
+  if (!mounted || deviceType === "unknown") return null;
 
   return (
     <ClientLayoutWrapper
@@ -32,7 +31,7 @@ export default function ProductPage(props: Props) {
       hideFooter={isMobile}
       topContent={isMobile}
     >
-      {deviceType === 'mobile' ? (
+      {deviceType === "mobile" ? (
         <ProductDetailMobile slug={slug} />
       ) : (
         <ProductDetail slug={slug} />
@@ -40,3 +39,4 @@ export default function ProductPage(props: Props) {
     </ClientLayoutWrapper>
   );
 }
+

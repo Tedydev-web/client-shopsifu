@@ -22,7 +22,6 @@ interface Props {
 }
 
 export default function ProductDetail({ slug }: Props) {
-  // ✅ Hook và logic xử lý data nên luôn ở đầu để tránh lỗi hook
   const sizes =
     productMock?.variants?.find((v) => v.value === "Kích thước")?.options || [];
   const colors =
@@ -42,11 +41,7 @@ export default function ProductDetail({ slug }: Props) {
 
   const brand = product.brand?.name || "";
 
-  const isMatch = slugify(productMock.name) === slug;
-
-  // ⚠️ Không return trước khi hook/data xử lý hoàn tất
-  // Giải pháp: Trả về fallback bên dưới cùng nếu không khớp
-  return isMatch ? (
+  return (
     <div className="bg-[#f5f5f5] py-4">
       {/* ✅ Breadcrumb */}
       <div className="max-w-[1200px] mx-auto px-4 mb-3">
@@ -122,10 +117,6 @@ export default function ProductDetail({ slug }: Props) {
           <ProductSuggestions products={[]} />
         </div>
       </div>
-    </div>
-  ) : (
-    <div className="text-center text-red-500 py-10">
-      Không tìm thấy sản phẩm
     </div>
   );
 }

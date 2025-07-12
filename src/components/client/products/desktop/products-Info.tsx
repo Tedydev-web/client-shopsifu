@@ -12,6 +12,8 @@ import {
   StarHalf,
   Star as StarOutline,
   Flag,
+  Truck,
+  RefreshCcw,
 } from "lucide-react";
 
 interface Product {
@@ -118,8 +120,14 @@ export default function ProductInfo({ product }: { product: Product }) {
 
       {/* Dịch vụ hỗ trợ */}
       <div className="flex items-center gap-4 text-sm mt-1">
-        <span className="text-green-600">🚚 Miễn phí vận chuyển</span>
-        <span className="text-blue-600">🔁 Đổi trả 7 ngày</span>
+        <span className="flex items-center gap-1">
+          <Truck className="w-4 h-4 text-green-600" />
+          <span className="text-black">Miễn phí vận chuyển</span>
+        </span>
+        <span className="flex items-center gap-1">
+          <RefreshCcw className="w-4 h-4 text-blue-600" />
+          <span className="text-black">Đổi trả 7 ngày</span>
+        </span>
       </div>
 
       {/* Đánh giá, bán, tố cáo */}
@@ -249,7 +257,7 @@ export default function ProductInfo({ product }: { product: Product }) {
       {/* Số lượng */}
       <div className="flex items-center gap-4">
         <span className="min-w-[90px] text-muted-foreground">Số lượng:</span>
-        <div className="flex items-center border rounded !items-center">
+        <div className="flex items-center border rounded">
           <Button
             variant="ghost"
             size="icon"
@@ -260,15 +268,17 @@ export default function ProductInfo({ product }: { product: Product }) {
             <Minus className="w-4 h-4" />
           </Button>
           <input
-              type="number"
-              min={1}
-              max={totalStock}
-              value={quantity}
-              onChange={handleQuantityInput}
-              disabled={!isVariantSelected}
-              className="w-14 text-center outline-none border-x [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              style={{ MozAppearance: "textfield" }}
-            />
+            type="number"
+            min={1}
+            max={totalStock}
+            value={quantity}
+            onChange={handleQuantityInput}
+            disabled={!isVariantSelected}
+            className="w-12 h-8 text-center outline-none border-x [appearance:textfield]
+        [&::-webkit-outer-spin-button]:appearance-none
+        [&::-webkit-inner-spin-button]:appearance-none"
+            style={{ MozAppearance: "textfield" }}
+          />
           <Button
             variant="ghost"
             size="icon"
@@ -290,14 +300,14 @@ export default function ProductInfo({ product }: { product: Product }) {
       {/* Nút thao tác */}
       <div className="flex gap-3 pt-2 w-full">
         <Button
-          className="w-full h-10 rounded-md bg-red-600 text-white hover:bg-red-700 text-base font-semibold flex items-center justify-center gap-2 transition-colors"
+          className="w-full h-10 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-700 hover:to-red-600 shadow-md text-base font-semibold flex items-center justify-center gap-2 transition-all duration-200"
           disabled={!isVariantSelected}
         >
           <ShoppingCart className="w-4 h-4" />
           Thêm vào giỏ
         </Button>
         <Button
-          className="w-full h-10 rounded-md bg-yellow-400 text-black hover:bg-yellow-500 text-base font-semibold flex items-center justify-center gap-2 transition-colors"
+          className="w-full h-10 rounded-lg bg-orange-500 hover:bg-orange-600 text-white shadow-lg text-base font-semibold flex items-center justify-center gap-2 transition-all duration-200"
           disabled={!isVariantSelected}
         >
           Mua ngay

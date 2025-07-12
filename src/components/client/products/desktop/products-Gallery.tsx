@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import { ChevronLeft, ChevronRight, PlayCircle, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight, PlayCircle, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface MediaItem {
-  type: 'image' | 'video';
+  type: "image" | "video";
   src: string;
 }
 
@@ -21,45 +21,33 @@ export default function ProductGallery({ media }: Props) {
   const thumbRef = useRef<HTMLDivElement>(null);
   const modalThumbRef = useRef<HTMLDivElement>(null);
 
-  // ✅ State theo từng video
-  const [pausedStates, setPausedStates] = useState<boolean[]>(
-    () => media.map(() => true)
+  const [pausedStates, setPausedStates] = useState<boolean[]>(() =>
+    media.map(() => true)
   );
-  const [endedStates, setEndedStates] = useState<boolean[]>(
-    () => media.map(() => false)
+  const [endedStates, setEndedStates] = useState<boolean[]>(() =>
+    media.map(() => false)
   );
 
-  const updateVideoState = (index: number, type: 'pause' | 'play' | 'ended') => {
+  const updateVideoState = (
+    index: number,
+    type: "pause" | "play" | "ended"
+  ) => {
     setPausedStates((prev) =>
-      prev.map((val, i) => (i === index ? type !== 'play' : val))
+      prev.map((val, i) => (i === index ? type !== "play" : val))
     );
     setEndedStates((prev) =>
-      prev.map((val, i) => (i === index ? type === 'ended' : val))
+      prev.map((val, i) => (i === index ? type === "ended" : val))
     );
   };
 
   const currentIndex = hoveredIndex ?? 0;
 
-  const handleVideoClick = (index: number) => {
-    const video = videoRefs.current[index];
-    if (!video) return;
-
-    if (video.ended) {
-      video.currentTime = 0;
-      video.play();
-    } else if (video.paused) {
-      video.play();
-    } else {
-      video.pause();
-    }
-  };
-
-  const scrollThumbnails = (direction: 'left' | 'right') => {
+  const scrollThumbnails = (direction: "left" | "right") => {
     if (!thumbRef.current) return;
     const scrollAmount = (80 + 12) * 4;
     thumbRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
     });
   };
 
@@ -68,7 +56,7 @@ export default function ProductGallery({ media }: Props) {
     if (!container) return;
     const item = container.children[index] as HTMLElement;
     if (item) {
-      item.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      item.scrollIntoView({ behavior: "smooth", inline: "center" });
     }
   };
 
@@ -88,40 +76,37 @@ export default function ProductGallery({ media }: Props) {
 
   useEffect(() => {
     if (selectedIndex !== null) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       scrollModalThumbIntoView(selectedIndex);
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [selectedIndex]);
 
   const renderMainMedia = (item: MediaItem, index: number) => {
-    if (item.type === 'video') {
+    if (item.type === "video") {
       return (
-        <div className="relative w-full aspect-square rounded-lg overflow-hidden border">
+        <div
+          className="relative w-full aspect-square rounded-lg overflow-hidden border cursor-pointer"
+          onClick={() => setSelectedIndex(index)}
+        >
           <video
             key={index}
             ref={(el) => {
               videoRefs.current[index] = el;
             }}
             src={item.src}
-            className="w-full h-full object-contain cursor-pointer"
-            onClick={() => handleVideoClick(index)}
-            onPlay={() => updateVideoState(index, 'play')}
-            onPause={() => updateVideoState(index, 'pause')}
-            onEnded={() => updateVideoState(index, 'ended')}
+            muted
+            autoPlay
+            playsInline
+            className="w-full h-full object-contain pointer-events-none"
+            onPlay={() => updateVideoState(index, "play")}
+            onPause={() => updateVideoState(index, "pause")}
+            onEnded={() => updateVideoState(index, "ended")}
           />
-
-          {(pausedStates[index] || endedStates[index]) && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-black/50 text-white rounded-full p-4">
-                <PlayCircle className="w-12 h-12 text-white" />
-              </div>
-            </div>
-          )}
         </div>
       );
     }
@@ -148,18 +133,18 @@ export default function ProductGallery({ media }: Props) {
         <Button
           variant="ghost"
           className="w-10 h-10 bg-white border shadow-sm rounded-full"
-          onClick={() => scrollThumbnails('left')}
+          onClick={() => scrollThumbnails("left")}
         >
           <ChevronLeft className="w-6 h-6" />
         </Button>
 
         <div
           ref={thumbRef}
-          className="flex gap-3 overflow-x-auto scroll-smooth px-1 w-full
-          [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-3 overflow-x-auto scroll-smooth px-1 w-full h-24
+          [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden items-center" 
         >
           {media.map((item, index) =>
-            item.type === 'video' ? (
+            item.type === "video" ? (
               <video
                 key={index}
                 src={item.src}
@@ -170,7 +155,7 @@ export default function ProductGallery({ media }: Props) {
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => setSelectedIndex(index)}
                 className={`w-20 h-20 object-cover rounded-lg border cursor-pointer shrink-0 ${
-                  hoveredIndex === index ? 'ring-2 ring-primary' : ''
+                  hoveredIndex === index ? "ring-2 ring-primary" : ""
                 }`}
               />
             ) : (
@@ -184,7 +169,7 @@ export default function ProductGallery({ media }: Props) {
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => setSelectedIndex(index)}
                 className={`w-20 h-20 object-cover rounded-lg border cursor-pointer shrink-0 ${
-                  hoveredIndex === index ? 'ring-2 ring-primary' : ''
+                  hoveredIndex === index ? "ring-2 ring-primary" : ""
                 }`}
               />
             )
@@ -194,7 +179,7 @@ export default function ProductGallery({ media }: Props) {
         <Button
           variant="ghost"
           className="w-10 h-10 bg-white border shadow-sm rounded-full"
-          onClick={() => scrollThumbnails('right')}
+          onClick={() => scrollThumbnails("right")}
         >
           <ChevronRight className="w-6 h-6" />
         </Button>
@@ -215,7 +200,7 @@ export default function ProductGallery({ media }: Props) {
               onClick={() => setSelectedIndex(null)}
               className="absolute top-6 right-6 w-10 h-10 bg-white shadow rounded-full z-20"
             >
-              <X className="w-6 h-6" />
+              <X className="w-9 h-9" />
             </Button>
 
             <Button
@@ -224,7 +209,7 @@ export default function ProductGallery({ media }: Props) {
               onClick={showPrev}
               className="absolute left-[max(1rem,calc(50%-450px))] top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow rounded-full z-20"
             >
-              <ChevronLeft className="w-7 h-7" />
+              <ChevronLeft className="w-9 h-9" />
             </Button>
 
             <Button
@@ -233,62 +218,79 @@ export default function ProductGallery({ media }: Props) {
               onClick={showNext}
               className="absolute right-[max(1rem,calc(50%-450px))] top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow rounded-full z-20"
             >
-              <ChevronRight className="w-7 h-7" />
+              <ChevronRight className="w-9 h-9" />
             </Button>
 
             <div className="flex w-full max-w-6xl h-[90vh] rounded-xl overflow-hidden relative items-center justify-center z-10">
               <div className="flex-1 flex items-center justify-center p-4">
-                {media[selectedIndex].type === 'video' ? (
-                  <div className="max-w-full max-h-[80vh] w-full h-full flex items-center justify-center">
-                    <video
-                      key={selectedIndex}
+                <div className="relative w-full max-w-[600px] aspect-square rounded-xl overflow-hidden bg-black">
+                  {media[selectedIndex].type === "video" ? (
+                    <>
+                      <video
+                        key={selectedIndex}
+                        ref={(el) => {
+                          videoRefs.current[selectedIndex] = el;
+                        }}
+                        src={media[selectedIndex].src}
+                        controls
+                        autoPlay
+                        className="w-full h-full object-contain"
+                        onPlay={() => updateVideoState(selectedIndex, "play")}
+                        onPause={() => updateVideoState(selectedIndex, "pause")}
+                        onEnded={() => updateVideoState(selectedIndex, "ended")}
+                      />
+                      {(pausedStates[selectedIndex] ||
+                        endedStates[selectedIndex]) && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                          <div className="bg-black/50 text-white rounded-full p-4">
+                            <PlayCircle className="w-12 h-12 text-white" />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Image
                       src={media[selectedIndex].src}
-                      controls
-                      autoPlay
-                      className="w-auto h-auto max-w-full max-h-full object-contain rounded-xl"
+                      alt="Preview"
+                      width={600}
+                      height={600}
+                      className="w-full h-full object-contain"
                     />
-                  </div>
-                ) : (
-                  <Image
-                    src={media[selectedIndex].src}
-                    alt="Preview"
-                    width={600}
-                    height={600}
-                    className="object-contain rounded-xl max-w-full max-h-[80vh]"
-                  />
-                )}
+                  )}
+                </div>
               </div>
 
               <div
                 ref={modalThumbRef}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 overflow-x-auto max-w-[90%] px-2
-                [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden z-10"
+                className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-3 overflow-x-auto max-w-[90%] px-2 h-24
+                [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden z-10 items-center"
               >
-                {media.map((item, index) =>
-                  item.type === 'video' ? (
-                    <video
-                      key={index}
-                      src={item.src}
-                      muted
-                      className={`w-20 h-20 object-cover rounded border cursor-pointer ${
-                        index === selectedIndex ? 'ring-2 ring-primary' : ''
-                      }`}
-                      onClick={() => setSelectedIndex(index)}
-                    />
-                  ) : (
-                    <Image
-                      key={index}
-                      src={item.src}
-                      alt={`Modal thumb ${index}`}
-                      width={80}
-                      height={80}
-                      onClick={() => setSelectedIndex(index)}
-                      className={`w-20 h-20 object-cover cursor-pointer rounded border ${
-                        index === selectedIndex ? 'ring-2 ring-primary' : ''
-                      }`}
-                    />
-                  )
-                )}
+                {media.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`w-20 h-20 rounded-lg bg-black cursor-pointer shrink-0 flex items-center justify-center overflow-hidden ${
+                      index === selectedIndex ? "ring-2 ring-primary" : ""
+                    }`}
+                    onClick={() => setSelectedIndex(index)}
+                  >
+                    {item.type === "video" ? (
+                      <video
+                        src={item.src}
+                        muted
+                        playsInline
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={item.src}
+                        alt={`Modal thumb ${index}`}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-contain"
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

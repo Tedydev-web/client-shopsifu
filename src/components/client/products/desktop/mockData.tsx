@@ -1,7 +1,7 @@
 export const productMock = {
   id: 1,
   publishedAt: "2025-07-05T16:07:17.000Z",
-  name: "Teelab 1",
+  name: "Teelab 1 kiểm tra tên dài xem giao diện có bị lỗi gì không hay vẫn đẹp ok la nè ahihi",
   basePrice: 10000,
   virtualPrice: 5000,
   brandId: 4,
