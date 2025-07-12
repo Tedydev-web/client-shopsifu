@@ -8,10 +8,9 @@ import { useResponsive } from "@/hooks/useResponsive";
 
 interface CartLayoutProps {
   children: React.ReactNode;
-  title?: string;
 }
 
-export default function CartLayout({ children, title = "" }: CartLayoutProps) {
+export default function CartLayout({ children}: CartLayoutProps) {
   const { isMobile } = useResponsive();
 
   const topContent = !isMobile ? (

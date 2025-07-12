@@ -1,7 +1,7 @@
 "use client";
 
 import { ScrollLock } from "@/components/client/layout/ScrollLock";
-import { Footer } from "@/components/client/layout/footer/Footer"
+import { Footer } from "@/components/client/layout/Footer/Footer"
 import HeroSectionWrapper from "@/components/client/landing-page/wrapper/hero-Wrapper";
 import HeaderWrapper from "@/components/client/layout/header/header-Wrapper";
 import DesktopCommit from "@/components/client/layout/header/desktop/desktop-Commit";
@@ -29,17 +29,17 @@ export default function ClientLayoutWrapper({
   return (
     <div className="min-h-screen w-full flex flex-col">
       <ScrollLock />
-      {!hideHeader && (
-        <>
-          <HeaderWrapper />
-        </>
-      )}
-      {!hideCommit && (
-        <>
-        <DesktopCommit />
-        </>
-      )}
+
+      {/* Header */}
+      {!hideHeader && <HeaderWrapper />}
+
+      {/* DesktopCommit: Chỉ hiện khi không bị ẩn và không phải mobile */}
+      {!hideCommit && deviceType !== "mobile" && <DesktopCommit />}
+
+      {/* Top content nếu có */}
       {topContent && <div className="w-full">{topContent}</div>}
+
+      {/* Main content */}
       <main className="flex-grow bg-[#F5F5FA]">
         {!hideHero && <HeroSectionWrapper />}
         <div
@@ -50,6 +50,8 @@ export default function ClientLayoutWrapper({
           {children}
         </div>
       </main>
+
+      {/* Footer */}
       {!hideFooter && <Footer />}
     </div>
   );

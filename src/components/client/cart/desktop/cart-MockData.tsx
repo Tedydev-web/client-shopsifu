@@ -25,7 +25,7 @@ export const mockCartItems: CartGroup[] = [
       {
         id: "1",
         name: "Vòi lavabo, Vòi chậu rửa mặt lavab...",
-        image: "/mock/voi.png",
+        image: "/images/client/product/Product-1.webp",
         variation: "Thân trúc 30 cm+dây",
         variations: ["Thân trúc 20 cm", "Thân trúc 30 cm+dây", "Thân trúc 40 cm"],
         price: 335000,
@@ -35,7 +35,7 @@ export const mockCartItems: CartGroup[] = [
       {
         id: "2",
         name: "Bộ 3 nồi inox đáy từ cao cấp",
-        image: "/mock/noi.png",
+        image: "/images/client/product/Product-1.webp",
         variation: "20cm - 24cm - 26cm",
         price: 820000,
         originalPrice: 1050000,
@@ -44,7 +44,7 @@ export const mockCartItems: CartGroup[] = [
       {
         id: "3",
         name: "Giá treo khăn nhà tắm đa năng",
-        image: "/mock/gia.png",
+        image: "/images/client/product/Product-1.webp",
         variation: "Kích thước 40cm",
         price: 195000,
         originalPrice: 260000,
@@ -58,7 +58,7 @@ export const mockCartItems: CartGroup[] = [
       {
         id: "4",
         name: "Khuyên tai nụ Hemera hạt trai nuôi",
-        image: "/mock/khuyen.png",
+        image: "/images/client/product/Product-1.webp",
         variation: "1 đôi, Hồng cam 9 - 9,5mm",
         price: 95000,
         quantity: 1,
@@ -67,7 +67,7 @@ export const mockCartItems: CartGroup[] = [
       {
         id: "5",
         name: "Lắc tay bạc Hemera ngọc trai tự nhiên",
-        image: "/mock/lactay.png",
+        image: "/images/client/product/Product-1.webp",
         variation: "Size M",
         price: 185000,
         originalPrice: 245000,
@@ -81,7 +81,7 @@ export const mockCartItems: CartGroup[] = [
       {
         id: "6",
         name: "Son dưỡng môi không màu Lipice",
-        image: "/mock/son.png",
+        image: "/images/client/product/Product-1.webp",
         variation: "Hương bạc hà",
         price: 42000,
         quantity: 3,
@@ -89,7 +89,7 @@ export const mockCartItems: CartGroup[] = [
       {
         id: "7",
         name: "Kem chống nắng Anessa SPF50",
-        image: "/mock/anessa.png",
+        image: "/images/client/product/Product-1.webp",
         variation: "60ml",
         price: 230000,
         originalPrice: 280000,
@@ -135,24 +135,24 @@ export const categories: Category[] = [
     id: '1',
     name: 'Điện thoại',
     children: [
-      { id: 'p1', name: 'iPhone 15 Pro', image: '/images/demo/1.webp' },
-      { id: 'p2', name: 'Samsung S24', image: '/images/demo/2.webp' },
+      { id: 'p1', name: 'iPhone 15 Pro', image: '/images/client/product/Product-1.webp' },
+      { id: 'p2', name: 'Samsung S24', image: '/images/client/product/Product-1.webp' },
     ],
   },
   {
     id: '2',
     name: 'Laptop',
     children: [
-      { id: 'p3', name: 'MacBook Pro', image: '/images/demo/3.webp' },
-      { id: 'p4', name: 'Dell XPS', image: '/images/demo/4.webp' },
+      { id: 'p3', name: 'MacBook Pro', image: '/images/client/product/Product-1.webp' },
+      { id: 'p4', name: 'Dell XPS', image: '/images/client/product/Product-1.webp' },
     ],
   },
   {
     id: '3',
     name: 'Phụ kiện',
     children: [
-      { id: 'p5', name: 'Tai nghe AirPods', image: '/images/demo/5.webp' },
-      { id: 'p6', name: 'Sạc dự phòng', image: '/images/demo/1.webp' },
+      { id: 'p5', name: 'Tai nghe AirPods', image: '/images/client/product/Product-1.webp' },
+      { id: 'p6', name: 'Sạc dự phòng', image: '/images/client/product/Product-1.webp' },
     ],
   },
 ];
