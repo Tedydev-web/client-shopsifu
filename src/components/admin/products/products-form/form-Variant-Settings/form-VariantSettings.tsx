@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -22,9 +22,18 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableVariantInput } from "./SortableVariantInput";
 import type { OptionData } from "./form-VariantInput";
+import { SKUList } from "./form-SKU";
+import type { Sku } from "@/utils/variantUtils";
 
 export function VariantSettingsForm() {
   const [options, setOptions] = useState<OptionData[]>([]);
+  const [skus, setSkus] = useState<Sku[]>([]);
+
+  const handleUpdateSkus = useCallback((updatedSkus: Sku[]) => {
+    setSkus(updatedSkus);
+    // This is where you would typically integrate with a form library like react-hook-form
+    console.log('SKUs updated in parent:', updatedSkus);
+  }, []); // Empty dependency array ensures the function is created only once
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -136,6 +145,7 @@ export function VariantSettingsForm() {
             </div>
           </DndContext>
         )}
+        <SKUList options={options} onUpdateSkus={handleUpdateSkus} />
       </CardContent>
     </Card>
   );
