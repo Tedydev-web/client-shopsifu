@@ -79,7 +79,7 @@
     "common": {
       "fullname": "Full name",
       "email": "Email",
-      "phone number": "Phone number",
+      "phonenumber": "Phone number",
       "password": "Password",
       "confirm password": "Confirm password",
       "logout": "Logout",

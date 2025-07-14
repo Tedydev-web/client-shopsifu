@@ -7,7 +7,11 @@ import { BaseResponse } from "../base.interface";
 export interface UserProfile {
   id: number;
   email: string;
-  role: string;
+  role: {
+    id: number;
+    name: string;
+    permissions: any[]; // hoặc định nghĩa kỹ hơn nếu cần
+  };
   status: string;
   twoFactorEnabled: boolean;
   googleId: string | null;
@@ -25,65 +29,67 @@ export interface UserProfile {
  * Chỉ sử dụng trong service và hook `useGetProfile` để chuyển đổi.
  */
 export interface UserProfileResponse extends BaseResponse {
-    data: {
-        id: number;
-        email: string;
-        role: string;
-        status: string;
-        twoFactorEnabled: boolean;
-        googleId: string | null;
-        createdAt: string;
-        updatedAt: string;
-        userProfile?: {
-            firstName: string;
-            lastName: string;
-            username: string;
-            phoneNumber: string | null;
-            avatar: string | null
-        }
-    },
-    createdAt: string,
-    updatedAt: string,
+  data: {
+    id: number;
+    email: string;
+    role: {
+      id: number;
+      name: string;
+      permissions: any[]; // hoặc định nghĩa kỹ hơn nếu cần
+    };
+    status: string;
+    twoFactorEnabled: boolean;
+    googleId: string | null;
+    createdAt: string;
+    updatedAt: string;
+    userProfile?: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      phoneNumber: string | null;
+      avatar: string | null;
+    };
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
-
 export interface UpdateProfileRequest {
-    firstName?: string;
-    lastName?: string;
-    username?: string;
-    phoneNumber?: string | null;
-    avatar?: string | null;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  phoneNumber?: string | null;
+  avatar?: string | null;
 }
 
 export interface UpdateProfileResponse extends BaseResponse {
-    data: {
-        id: number;
-        email: string;
-        role: string;
-        status: string;
-        twoFactorEnabled: boolean;
-        googleId: string | null;
-        createdAt: string;
-        updatedAt: string;
-        userProfile: {
-            firstName: string;
-            lastName: string;
-            username: string;
-            phoneNumber: string | null;
-            avatar: string | null
-        }
-    },
+  data: {
+    id: number;
+    email: string;
+    role: string;
+    status: string;
+    twoFactorEnabled: boolean;
+    googleId: string | null;
+    createdAt: string;
+    updatedAt: string;
+    userProfile: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      phoneNumber: string | null;
+      avatar: string | null;
+    };
+  };
 }
-
 
 // ĐỔI MẬT KHẨU TÀI KHOẢN ĐÃ ĐĂNG NHẬP - CHANGE PASSWORD
 export interface ChangePasswordRequest {
-    currentPassword: string
-    newPassword: string
-    confirmPassword: string
-    revokeOtherSessions?: boolean
-  }
-  export interface ChangePasswordResponse extends BaseResponse{
-    message: string
-    verificationType?: string
-  }
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  revokeOtherSessions?: boolean;
+}
+export interface ChangePasswordResponse extends BaseResponse {
+  message: string;
+  verificationType?: string;
+}

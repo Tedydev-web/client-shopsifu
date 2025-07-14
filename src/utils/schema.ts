@@ -34,6 +34,7 @@ export const UpdateProfileSchema = (t: Translate) =>
   z.object({
     firstName: z.string().min(1, { message: t('schema.validation.profile.firstNameRequired') }),
     lastName: z.string().min(1, { message: t('schema.validation.profile.lastNameRequired') }),
+    username: z.string().min(3, { message: t('schema.validation.user.usernameMinLength') }), // ✅ Thêm dòng này
     phoneNumber: z.string().optional(),
     address: z.string().optional(),
   });
