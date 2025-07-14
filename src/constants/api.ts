@@ -73,12 +73,23 @@ export const API_ENDPOINTS = {
     DELETE_BY_ID: `${API_BASE}/languages/:id`,
   },
   // QUẢN LÝ SẢN PHẨM - PRODUCTS
-  PRODUCTS: {
+  MANAGE_PRODUCTS: {
+    LIST: `${API_BASE}/manage-product/products`,
+    DETAIL: `${API_BASE}/manage-product/products/:id`,
+    CREATE: `${API_BASE}/manage-product/products`,
+    UPDATE: `${API_BASE}/manage-product/products/:id`,
+    DELETE: `${API_BASE}/manage-product/products/:id`
+  },
+  MANAGE_PRODUCTS_TRANSLATIONS:{
+    LIST: `${API_BASE}/manage-product/products/translations`,
+    DETAIL: `${API_BASE}/manage-product/products/translations/:id`,
+    CREATE: `${API_BASE}/manage-product/products/translations`,
+    UPDATE: `${API_BASE}/manage-product/products/translations/:id`,
+    DELETE: `${API_BASE}/manage-product/products/translations/:id`
+  },
+  PRODUCTS:{
     LIST: `${API_BASE}/products`,
-    DETAIL: `${API_BASE}/products/:id`,
-    CREATE: `${API_BASE}/products`,
-    UPDATE: `${API_BASE}/products/:id`,
-    DELETE: `${API_BASE}/products/:id`
+    DETAIL: `${API_BASE}/products/:id`
   },
   // THỐNG KÊ LOGS - AUDIT LOGS
   AUDIT_LOGS: {

@@ -10,7 +10,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { useEffect, useState, useRef } from "react";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, useDroppable } from "@dnd-kit/core";
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
@@ -69,7 +69,7 @@ export function CategoryModalUpsert({
 // Tối ưu: gom các state, hàm, component nhỏ vào 1 chỗ, rút gọn logic, giữ lại ý nghĩa và comment tiếng Việt.
 function CategoryModalUpsertContent({ isOpen, onClose, mode, category }: CategoryModalUpsertProps) {
   // State & i18n
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);

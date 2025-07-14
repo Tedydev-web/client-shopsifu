@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -78,7 +78,7 @@ export function DataTable<TData>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
-  const { t } = useTranslation()
+  const t  = useTranslations()
 
   return (
     <div className="space-y-4">

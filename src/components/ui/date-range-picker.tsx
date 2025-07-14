@@ -13,7 +13,7 @@
 //   PopoverContent,
 //   PopoverTrigger,
 // } from "@/components/ui/popover"
-// import { useTranslation } from "react-i18next"
+// import { useTranslations } from "next-intl"
 
 // export type DateRange = {
 //   from: Date
@@ -26,7 +26,7 @@
 // }
 
 // export function DateRangePicker({ date, onDateChange }: DateRangePickerProps) {
-//   const { t } = useTranslation("")
+//   const { t } = useTranslations("")
 //   return (
 //     <div className="grid gap-2">
 //       <Popover>

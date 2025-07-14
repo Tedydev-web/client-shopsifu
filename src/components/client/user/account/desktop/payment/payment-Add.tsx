@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CreditCard } from "lucide-react";
@@ -21,7 +21,7 @@ export default function PaymentAdd({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");

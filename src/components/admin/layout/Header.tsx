@@ -41,7 +41,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
   const { handleLogout, loading: logoutLoading } = useLogout()
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
-  const t = useTranslations()
+  const t  = useTranslations()
   const [notificationOpen, setNotificationOpen] = useState(false)
 
   return (

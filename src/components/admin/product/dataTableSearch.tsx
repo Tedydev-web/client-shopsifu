@@ -4,7 +4,7 @@ import * as React from "react"
 import type { Table } from "@tanstack/react-table"
 import { Search } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl";
 
 
 interface DataTableSearchProps<TData> {
@@ -22,7 +22,7 @@ export function DataTableSearch<TData>({
   className
 }: DataTableSearchProps<TData>) {
   const [value, setValue] = React.useState<string>("")
-  const { t } = useTranslation("")
+  const t = useTranslations()
   const translatedPlaceholder = placeholder ?? t("admin.dataTableSearch.placeholder")
 
   const debouncedSearch = React.useMemo(() => {

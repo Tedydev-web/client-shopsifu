@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 
 interface CategoryDetailProps {
@@ -14,7 +14,7 @@ interface CategoryDetailProps {
 }
 
 export function CategoryModalView({ open, onOpenChange, data }: CategoryDetailProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslations('admin');
 
   if (!data) return null;
   

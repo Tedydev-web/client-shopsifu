@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ChangePasswordModal } from "./profile-DesktopPasswordUpdate";
 import { ProfileUpdateSheet } from "./profile-DesktopUpdate";

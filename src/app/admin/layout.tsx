@@ -5,7 +5,6 @@ import { Sidebar } from '@/components/admin/layout/Sidebar'
 import { Header } from '@/components/admin/layout/Header'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
-// import { pagination } from '@/components/ui/pagination'
 
 export default function AdminLayout({
   children,

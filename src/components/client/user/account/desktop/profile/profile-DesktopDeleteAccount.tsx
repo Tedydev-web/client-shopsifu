@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 interface DeleteAccountModalProps {
   open: boolean;
@@ -18,7 +18,7 @@ interface DeleteAccountModalProps {
 }
 
 export function DeleteAccountModal({ open, onOpenChange, onConfirm }: DeleteAccountModalProps) {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

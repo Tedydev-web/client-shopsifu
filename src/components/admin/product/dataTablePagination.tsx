@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { type Table as TableInstance } from "@tanstack/react-table"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 interface DataTablePaginationProps<TData> {
   table: TableInstance<TData>
@@ -18,7 +18,7 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
-  const { t } = useTranslation("")
+  const { t } = useTranslations("")
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">

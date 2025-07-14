@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRef, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import {
   Drawer,
   DrawerContent,
@@ -40,7 +40,7 @@ export function ProfileUpdateSheet({
 }: ProfileUpdateSheetProps) {
   const [avatar, setAvatar] = useState(initialData.avatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const userData = useUserData();
   const formSchema = UpdateProfileSchema(t);
   const { updateProfile, loading } = useUpdateProfile(() =>

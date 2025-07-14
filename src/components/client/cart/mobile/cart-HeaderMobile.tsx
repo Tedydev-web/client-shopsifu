@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronLeft, Pencil, Check } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 interface MobileCartHeaderProps {
   title: string;
@@ -22,7 +22,7 @@ export default function MobileCartHeader({
   isEditingGlobal,
 }: MobileCartHeaderProps) {
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const isNestedRoute = pathname.split("/").length > 2;
   const backUrl = isNestedRoute ? "/user" : "/";
 

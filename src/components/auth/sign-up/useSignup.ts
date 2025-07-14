@@ -5,13 +5,13 @@ import { RegisterSchema } from '../schema/index'
 import { authService } from '@/services/auth/authService'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 
 export function useSignup() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const {t} = useTranslation()
+  const {t} = useTranslations()
   const Schema = RegisterSchema(t)
   const handleSignup = async (data: z.infer<typeof Schema>) => {
 

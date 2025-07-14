@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,7 +17,7 @@ interface DeleteAccountModalProps {
 }
 
 export function DeleteAccountModal({ open, onOpenChange, onConfirm }: DeleteAccountModalProps) {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
 
   if (!open) return null;
 

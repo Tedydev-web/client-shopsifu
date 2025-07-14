@@ -1,13 +1,13 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { ShieldCheck, HelpCircle, Lock, CreditCard } from "lucide-react"
 import { useState } from 'react'
 import PaymentAdd from './payment-Add'
 
 export default function PaymentTable() {
-  const { t } = useTranslation()
+  const t  = useTranslations()
   const [showAddCard, setShowAddCard] = useState(false);
 
   return (

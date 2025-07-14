@@ -1,9 +1,9 @@
 "use client";
 import { PasswordSecuritySession } from '@/components/client/user/account/desktop/security/security-Session';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 
 export default function ProfilePage() {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   return (
     <div>
       <div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { authService } from '@/services/auth/authService'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
@@ -8,7 +8,7 @@ import { useGetProfile } from '@/hooks/useGetProfile'
 import { useEffect } from 'react';
 
 export function usePasswordSecurity({ isEnabled }: { isEnabled: boolean }) {
-  const { t } = useTranslation()
+  const t  = useTranslations()
   const [is2FAEnabled, setIs2FAEnabled] = useState(isEnabled)
   const [show2FADialog, setShow2FADialog] = useState(false)
   const [showQRDialog, setShowQRDialog] = useState(false)
