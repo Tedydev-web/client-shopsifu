@@ -1,108 +1,63 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from "react"
-import { productsColumns, Product } from "./products-Columns"
-import SearchInput from "@/components/ui/data-table-component/search-input"
-// import ProductsModalUpsert from "./products-ModalUpsert" // Will be created later
-import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal"
-import { DataTable } from "@/components/ui/data-table-component/data-table"
-import { useProducts } from "./useProducts"
-import { useTranslations } from "next-intl"
-import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option"
-import { useDataTable } from "@/hooks/useDataTable"
-import { ProductsExportData } from "./products-ExportData" // Import component export
-import type { Table as TanstackTable } from '@tanstack/react-table' // Import type
-import { ProductsFilter } from "./products-Filter"
-import Link from "next/link"
-import { PlusCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useProducts, ProductColumn } from './useProducts';
+import { productsColumns } from './products-Columns';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { PlusCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DataTable } from '@/components/ui/data-table-component/data-table';
+import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal';
+import SearchInput from '@/components/ui/data-table-component/search-input';
+import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option';
+import { ProductsFilter } from './products-Filter';
+import { ProductsExportData } from './products-ExportData';
+import type { Table as TanstackTable } from '@tanstack/react-table';
+import { useDataTable } from '@/hooks/useDataTable';
 
 export function ProductsTable() {
-  const t = useTranslations('admin.ModuleProduct')
+  const t = useTranslations('admin.ModuleProduct');
+  const router = useRouter();
   const {
-    products,
+    data,
     loading,
-    isSearching,
-    search,
+    pagination,
     handleSearch,
-    isModalOpen,
-    selectedProduct,
-    getAllProducts,
-    deleteProduct,
-    createProduct,
-    updateProduct,
-    handleOpenModal,
-    handleCloseModal
-  } = useProducts()
+    handlePageChange,
+    handleLimitChange,
+    deleteOpen,
+    deleteLoading,
+    handleOpenDelete,
+    handleConfirmDelete,
+    handleCloseDeleteModal,
+  } = useProducts();
 
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
-  const [deleteLoading, setDeleteLoading] = useState(false)
+  const onEdit = (product: ProductColumn) => {
+    router.push(`/admin/products/edit/${product.id}`);
+  };
 
-  useEffect(() => {
-    getAllProducts()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const onView = (product: ProductColumn) => {
+    router.push(`/admin/products/view/${product.id}`);
+  };
 
-  const handleOpenDelete = (product: Product) => {
-    setProductToDelete(product)
-    setDeleteOpen(true)
-  }
+  const columns = productsColumns({ onEdit, onDelete: handleOpenDelete, onView });
+  const table = useDataTable({ data, columns });
 
-  const handleCloseDeleteModal = () => {
-    setDeleteOpen(false)
-    setProductToDelete(null)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!productToDelete) return
-    setDeleteLoading(true)
-    try {
-      const success = await deleteProduct(productToDelete.id)
-      if (success) {
-        handleCloseDeleteModal()
-        getAllProducts()
-      }
-    } catch (error) {
-      console.error('Error deleting product:', error)
-    } finally {
-      setDeleteLoading(false)
-    }
-  }
-
-  const handleSubmit = async (formData: any) => {
-    try {
-      if (selectedProduct) {
-        await updateProduct(selectedProduct.id, formData)
-      } else {
-        await createProduct(formData)
-      }
-      handleCloseModal()
-      getAllProducts()
-    } catch (error) {
-      console.error('Error handling product:', error)
-    }
-  }
-
-  const table = useDataTable({
-    data: products,
-    columns: productsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal, onView: handleOpenModal }),
-  })
-
-  // Định nghĩa Toolbar component để truyền vào DataTable
-  const ProductsTableToolbar = ({ table }: { table: TanstackTable<Product> }) => (
+  // Toolbar component to pass into DataTable
+  const ProductsTableToolbar = ({ table }: { table: TanstackTable<ProductColumn> }) => (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <SearchInput
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder={t("searchPlaceholder")}
+          value={pagination.search || ''}
+          onValueChange={handleSearch}
+          placeholder={t('searchPlaceholder')}
           className="w-full md:max-w-sm"
         />
-        <ProductsFilter table={table} /> 
+        <ProductsFilter table={table} />
       </div>
       <div className="flex items-center gap-2">
-        <ProductsExportData data={products} table={table} />
+        <ProductsExportData data={data} table={table} />
         <DataTableViewOption table={table} />
       </div>
     </div>
@@ -110,29 +65,37 @@ export function ProductsTable() {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between items-center mb-4">
         <Link href="/admin/products/new">
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />
-            {t("AddNew.page.breadcrumb.newPage")}
+            {t('AddNew.page.breadcrumb.newPage')}
           </Button>
         </Link>
       </div>
-      <DataTable
-        table={table}
-        columns={productsColumns({ onDelete: handleOpenDelete, onEdit: handleOpenModal, onView: handleOpenModal })}
-        loading={loading || isSearching}
-        notFoundMessage={t('DataTable.notFound')}
-        Toolbar={ProductsTableToolbar} // Truyền component Toolbar vào đây
-      />
+      <div className="rounded-md border p-4 bg-white shadow">
+        <DataTable
+          table={table}
+          columns={columns}
+          loading={loading}
+          notFoundMessage={t('DataTable.notFound')}
+          Toolbar={ProductsTableToolbar}
+          pagination={{
+            metadata: pagination,
+            onPageChange: handlePageChange,
+            onLimitChange: handleLimitChange,
+          }}
+        />
+      </div>
+
       <ConfirmDeleteModal
         open={deleteOpen}
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         loading={deleteLoading}
-        title={t("DeleteModal.title")}
-        description={t("DeleteModal.description")}
+        title={t('DeleteModal.title')}
+        description={t('DeleteModal.description')}
       />
     </div>
-  )
+  );
 }

@@ -1,12 +1,12 @@
 import { privateAxios } from "@/lib/api";
 import { API_ENDPOINTS } from "@/constants/api";
 import { PaginationRequest } from "@/types/base.interface";
-import { Product, ProductsResponse } from "@/types/products.interface";
-
-// For now, we can use a partial product for create/update requests.
-// We can define more specific interfaces later if needed.
-export type ProductCreateRequest = Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'createdById' | 'updatedById' | 'deletedById' | 'productTranslations'>;
-export type ProductUpdateRequest = Partial<ProductCreateRequest>;
+import {
+  Product,
+  ProductsResponse,
+  ProductCreateRequest,
+  ProductUpdateRequest,
+} from "@/types/products.interface";
 
 export const productsService = {
   // Lấy danh sách sản phẩm

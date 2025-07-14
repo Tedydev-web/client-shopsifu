@@ -56,3 +56,25 @@ export interface ProductsResponse {
     data: Product[];
     metadata: PaginationMetadata;
 }
+
+/**
+ * @interface ProductCreateRequest
+ * @description Represents the payload for creating a new product.
+ */
+export interface ProductCreateRequest {
+    name: string;
+    publishedAt?: string | null;
+    basePrice: number;
+    virtualPrice?: number;
+    brandId: number;
+    images: string[];
+    categories: number[];
+    variants: Variant[];
+    skus: Sku[];
+}
+
+/**
+ * @interface ProductUpdateRequest
+ * @description Represents the payload for updating an existing product. It's a partial of the create request.
+ */
+export type ProductUpdateRequest = Partial<ProductCreateRequest>;

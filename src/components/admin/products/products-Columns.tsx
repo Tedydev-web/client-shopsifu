@@ -10,7 +10,8 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { format } from "date-fns";
 import { FilterFn } from "@tanstack/react-table";
-
+import { Product } from "@/types/products.interface";
+import { ProductColumn } from "./useProducts";
 
 const priceInRange: FilterFn<any> = (row, columnId, value, addMeta) => {
   const price = row.getValue(columnId) as number;
@@ -18,27 +19,13 @@ const priceInRange: FilterFn<any> = (row, columnId, value, addMeta) => {
   return price >= min && price <= max;
 };
 
-// Define the Product type based on your data structure
-export type Product = {
-  id: string;
-  name: string;
-  slug: string;
-  images: { url: string }[];
-  price: number;
-  stock: number;
-  status: 'active' | 'inactive' | 'archived';
-  category: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
 const getProductActions = (
-  product: Product,
-  onDelete: (product: Product) => void,
-  onEdit: (product: Product) => void,
-  onView: (product: Product) => void,
+  product: ProductColumn,
+  onDelete: (product: ProductColumn) => void,
+  onEdit: (product: ProductColumn) => void,
+  onView: (product: ProductColumn) => void,
   t: (key: string) => string
-): ActionItem<Product>[] => [
+): ActionItem<ProductColumn>[] => [
   {
     type: "command",
     label: t("DataTable.view"),
@@ -66,10 +53,10 @@ export const productsColumns = ({
   onEdit,
   onView,
 }: {
-  onDelete: (product: Product) => void;
-  onEdit: (product: Product) => void;
-  onView: (product: Product) => void;
-}): ColumnDef<Product>[] => {
+  onDelete: (product: ProductColumn) => void;
+  onEdit: (product: ProductColumn) => void;
+  onView: (product: ProductColumn) => void;
+}): ColumnDef<ProductColumn>[] => {
   const t = useTranslations('admin.ModuleProduct');
 
   return [
@@ -98,14 +85,14 @@ export const productsColumns = ({
       enableHiding: false,
     },
     {
-        accessorKey: "image",
+        accessorKey: "images",
         header: () => t("DataTable.image"),
         cell: ({ row }) => {
-            const imageUrl = row.original.images?.[0]?.url || '/images/image-placeholder.jpg';
+            const imageUrl = row.original.image || '/images/image-placeholder.jpg';
             return (
                 <Image
                     src={imageUrl}
-                    alt={row.original.name}
+                    alt={row.original.name ?? 'Product image'}
                     width={65}
                     height={65}
                     className="rounded-sm object-cover"
@@ -124,14 +111,7 @@ export const productsColumns = ({
         enableSorting: true,
         enableHiding: true,
     },
-    {
-        accessorKey: "slug",
-        header: () => t("DataTable.slug"),
-        cell: ({ row }) => <div className="w-[150px] line-clamp-3 whitespace-normal">{row.original.slug}</div>,
-        enableSorting: true,
-        enableHiding: true,
 
-    },
     {
         accessorKey: "category",
         header: () => t("DataTable.category"),
@@ -145,22 +125,14 @@ export const productsColumns = ({
           <DataTableColumnHeader column={column} title={t("DataTable.price")} />
         ),
         cell: ({ row }) => {
-            const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(row.original.price);
+            const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(row.original.price || 0);
             return <div className="w-[100px]">{formattedPrice}</div>;
         },
         enableSorting: true,
         enableHiding: true,
         filterFn: priceInRange,
     },
-    {
-        accessorKey: "stock",
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title={t("DataTable.stock")} />
-        ),
-        cell: ({ row }) => <div className="w-[80px] text-center">{row.original.stock}</div>,
-        enableSorting: true,
-        enableHiding: true,
-    },
+
     {
         accessorKey: "status",
         header: () => t("DataTable.status"),
@@ -169,7 +141,6 @@ export const productsColumns = ({
             const statusVariant = {
                 active: 'bg-green-100 text-green-800',
                 inactive: 'bg-yellow-100 text-yellow-800',
-                archived: 'bg-gray-100 text-gray-800',
             }[status] || 'bg-gray-100 text-gray-800';
             return (
                 <Badge variant="outline" className={`capitalize ${statusVariant}`}>
@@ -186,7 +157,7 @@ export const productsColumns = ({
             <DataTableColumnHeader column={column} title={t("DataTable.createdAt")} />
         ),
         cell: ({ row }) => (
-            <div>{format(new Date(row.original.createdAt), "dd/MM/yyyy")}</div>
+            <div>{format(new Date(row.original.createdAt), "dd/MM/yyyy HH:mm:ss")}</div>
         ),
         enableSorting: true,
         enableHiding: true,
@@ -197,7 +168,7 @@ export const productsColumns = ({
             <DataTableColumnHeader column={column} title={t("DataTable.updatedAt")} />
         ),
         cell: ({ row }) => (
-            <div>{format(new Date(row.original.updatedAt), "dd/MM/yyyy")}</div>
+            <div>{format(new Date(row.original.updatedAt), "dd/MM/yyyy HH:mm:ss")}</div>
         ),
         enableSorting: true,
         enableHiding: true,
