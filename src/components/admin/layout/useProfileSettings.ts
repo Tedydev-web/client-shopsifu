@@ -1,5 +1,5 @@
 // import { useState } from 'react'
-// import { useTranslation } from 'react-i18next'
+// import { useTranslations } from 'next-intl'
 // import { authService } from '@/services/auth/authService'
 // import { showToast } from '@/components/ui/toastify'
 // import { parseApiError } from '@/utils/error'
@@ -12,7 +12,7 @@
 // }
 
 // export function useProfileSettings() {
-//   const { t } = useTranslation()
+//   const t  = useTranslations()
 //   const [open, setOpen] = useState(false)
 //   const [is2FAEnabled, setIs2FAEnabled] = useState(false)
 //   const [formData, setFormData] = useState<FormData>({

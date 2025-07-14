@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export default function AddressesTable() {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
 
   return (
     <div className="min-h-[400px] bg-white p-6 flex flex-col items-center justify-center text-center">

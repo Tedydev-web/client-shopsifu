@@ -7,7 +7,7 @@ import { DataTableFacetedFilter } from "./dataTableFacetedFilter"
 import { DataTableExport } from "./dataTableExport"
 import { DataTableSearch } from "./dataTableSearch"
 // import { DateRangePicker, type DateRange } from "@/components/ui/date-range-picker"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 interface DataTableToolbarProps<TData> {
   table: TableInstance<TData>
@@ -16,7 +16,7 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({ table, categories }: DataTableToolbarProps<TData>) {
   // const [date, setDate] = React.useState<DateRange>()
-  const { t } = useTranslation()
+  const t  = useTranslations()
 
   return (
     <div className="flex items-center justify-between">      <div className="flex flex-1 items-center space-x-2">

@@ -7,7 +7,7 @@ import { authService } from '@/services/auth/authService'
 import { ResetPasswordRequest } from '@/types/auth/auth.interface'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 
 const RESET_PASSWORD_TOKEN_KEY = 'token_verify_code'
 
@@ -16,7 +16,7 @@ export function useReset() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const {t} = useTranslation('')
+  const {t} = useTranslations('')
   const schema = resetPasswordSchema(t)
 
   const handleResetPassword = async (data: z.infer<typeof schema>) => {

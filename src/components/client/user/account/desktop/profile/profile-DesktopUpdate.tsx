@@ -13,7 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useRef, useState } from "react";
 import { SheetRework } from "@/components/ui/component/sheet-rework";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import { Camera } from "lucide-react";
 import { showToast } from "@/components/ui/toastify";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,7 +46,7 @@ export function ProfileUpdateSheet({
   const [phoneNumber, setPhoneNumber] = useState(initialData.phoneNumber);
   const [avatar, setAvatar] = useState(initialData.avatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const userData = useUserData();
   const formSchema = UpdateProfileSchema(t);
   const { updateProfile, loading } = useUpdateProfile(() =>

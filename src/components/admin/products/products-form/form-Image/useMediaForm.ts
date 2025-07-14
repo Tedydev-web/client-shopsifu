@@ -1,4 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
+import { DragEndEvent } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 
 interface UseMediaFormProps {
     images: string[];
@@ -11,6 +13,7 @@ export function useMediaForm({ images, setImages }: UseMediaFormProps) {
     const [isDragOver, setIsDragOver] = useState(false);
     const [dragCounter, setDragCounter] = useState(0);
     const [selectedImages, setSelectedImages] = useState<number[]>([]);
+    const [showAllImages, setShowAllImages] = useState(false);
 
     const handleImageUpload = useCallback(() => {
         fileInputRef.current?.click();
@@ -115,21 +118,41 @@ export function useMediaForm({ images, setImages }: UseMediaFormProps) {
         setSelectedImages([]);
     }, [images, selectedImages, setImages]);
 
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            const oldIndex = images.findIndex(img => img === active.id);
+            const newIndex = images.findIndex(img => img === over.id);
+
+            if (oldIndex !== -1 && newIndex !== -1) {
+                const newImages = arrayMove(images, oldIndex, newIndex);
+                setImages(newImages);
+            }
+        }
+    }, [images, setImages]);
+
     return {
+        images,
+        setImages,
         fileInputRef,
-        hoveredImageIndex,
-        isDragOver,
-        selectedImages,
-        setHoveredImageIndex,
         handleImageUpload,
         handleFileChange,
+        isDragOver,
+        dragCounter,
         handleDragEnter,
-        handleDragOver,
         handleDragLeave,
+        handleDragOver,
         handleDrop,
         handleRemoveImage,
+        hoveredImageIndex,
+        setHoveredImageIndex,
+        selectedImages,
         handleToggleSelect,
         handleSelectAll,
         handleRemoveSelected,
+        showAllImages,
+        setShowAllImages,
+        handleDragEnd
     };
 }

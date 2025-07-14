@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import {
   ChevronDown,
   ChevronUp,
@@ -14,7 +14,7 @@ import { sidebarItems } from './desktop-MockData'
 export default function DesktopSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { t } = useTranslation()
+  const t  = useTranslations()
   const [openIndex, setOpenIndex] = useState<null | number>(null)
   const [activeSubItem, setActiveSubItem] = useState<string | null>(null)
 

@@ -13,10 +13,10 @@ import {
   Repeat2,
   CreditCard,
 } from 'lucide-react'
-import { useTranslation } from 'react-i18next' // Add this import
+import { useTranslations } from 'next-intl' // Add this import
 
 export const useSettingsMockData = () => { // Convert to a hook
-  const { t, i18n } = useTranslation() // Add translation hook
+  const { t, i18n } = useTranslations() // Add translation hook
 
   const langLabel = i18n.language === "vi" ? "Tiếng Việt" : "English";
 

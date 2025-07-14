@@ -1,9 +1,9 @@
 "use client";
 import PaymentTable from "@/components/client/user/account/desktop/payment/payment-Table"
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 
 export default function AuditLogsPage() {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   return (
     <div className="space-y-6">
       {/* <div>

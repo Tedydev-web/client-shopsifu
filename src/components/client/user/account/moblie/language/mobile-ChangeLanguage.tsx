@@ -1,7 +1,7 @@
 "use client";
 
 import { useChangeLang } from "@/hooks/useChangeLang";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 import AccountLayout from "@/app/(client)/user/layout";
 import { Check, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,7 @@ const LANGUAGES = [
 ];
 
 export default function MobileChangeLanguage() {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const { changeLanguage, currentSelectedLang } = useChangeLang();
   const router = useRouter();
 

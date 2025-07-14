@@ -1,6 +1,6 @@
 // 'use client'
 
-// import { useTranslation } from 'react-i18next'
+// import { useTranslations } from 'next-intl'
 // import { Button } from '@/components/ui/button'
 // import { Input } from '@/components/ui/input'
 // import { Label } from '@/components/ui/label'
@@ -38,7 +38,7 @@
 // import { useProfileSettings } from './useProfileSettings'
 
 // export function ProfileSetting() {
-//   const { t } = useTranslation()
+//   const t  = useTranslations()
 //   const {
 //     open,
 //     setOpen,

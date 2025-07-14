@@ -7,7 +7,7 @@ import { authService } from '@/services/auth/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
 import { Verify2faResponse, VerifyOTPResponse } from '@/types/auth/auth.interface'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { useGetProfile } from '@/hooks/useGetProfile'
 import { useUserData } from '@/hooks/useGetData-UserLogin'
 import { useGetAbility } from '@/hooks/useGetAbility'
@@ -28,7 +28,7 @@ export function useVerify2FA() {
   const userData = useUserData();
 
   const role = userData?.role;
-  const {t} = useTranslation()
+  const {t} = useTranslations()
   
   // Khóa lưu trữ trạng thái thiết bị trong session storage
   // Được cập nhật từ kết quả API sau khi xác thực thành công

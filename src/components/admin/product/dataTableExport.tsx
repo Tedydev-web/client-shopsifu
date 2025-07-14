@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Download } from "lucide-react"
 
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 interface DataTableExportProps<TData> {
   table: Table<TData>
@@ -22,7 +22,7 @@ interface DataTableExportProps<TData> {
 
 export function DataTableExport<TData>({ table }: DataTableExportProps<TData>) {
   const [isExporting, setIsExporting] = React.useState(false)
-  const { t } = useTranslation()
+  const t  = useTranslations()
 
   const handleExport = async (type: "csv" | "excel") => {
     try {

@@ -6,7 +6,7 @@ import { authService } from '@/services/auth/authService'
 import { ROUTES } from '@/constants/route'
 import { showToast } from '@/components/ui/toastify'
 import { parseApiError } from '@/utils/error'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { useGetProfile } from '@/hooks/useGetProfile'
 import { useUserData } from '@/hooks/useGetData-UserLogin'
 import { useGetAbility } from '@/hooks/useGetAbility'
@@ -16,7 +16,7 @@ export function useSignin() {
   const router = useRouter()
   const { fetchProfile } = useGetProfile()
   const { fetchAbility } = useGetAbility();
-  const { t } = useTranslation()
+  const t  = useTranslations()
   const Schema = LoginSchema(t)  
   const userData = useUserData();
 

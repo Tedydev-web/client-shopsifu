@@ -6,7 +6,7 @@ import { otpSchema } from '../schema/index'
 import { authService } from '@/services/auth/authService'
 import { ROUTES } from '@/constants/route'
 import { parseApiError } from '@/utils/error'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 
 type ActionType = 'signup' | 'forgot'
 
@@ -15,7 +15,7 @@ export function useVerify() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const action = (searchParams.get('action') as ActionType) || 'signup'
-  const { t } = useTranslation()
+  const t  = useTranslations()
   const otp = otpSchema(t)
     const verifyOTP = async (code: string) => {
     try {

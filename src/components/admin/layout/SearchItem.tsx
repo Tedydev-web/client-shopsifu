@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSidebarConfig, SidebarItem } from '@/constants/sidebarConfig';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 
 export function SearchItem() {
   const sidebarConfig = useSidebarConfig();
@@ -14,7 +14,7 @@ export function SearchItem() {
   const router = useRouter();
   const [expanded, setExpanded] = React.useState<string[]>([]);
 
-  const {t} = useTranslation('')
+  const t = useTranslations()
 
   // Focus input when modal opens
   React.useEffect(() => {

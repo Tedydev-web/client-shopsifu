@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { SheetRework } from '@/components/ui/component/sheet-rework';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -21,7 +21,7 @@ interface ProfileUpdateSheetProps {
 }
 
 export function ProfileUpdateSheet({ open, onOpenChange }: ProfileUpdateSheetProps) {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const userData = useUserData();
   const formSchema = UpdateProfileSchema(t);
   const { updateProfile, loading } = useUpdateProfile(() => onOpenChange(false));

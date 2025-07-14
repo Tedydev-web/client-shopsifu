@@ -29,7 +29,7 @@ import { useLogout } from '@/hooks/useLogout'
 import { Button } from '@/components/ui/button'
 import { useChangeLang } from '@/hooks/useChangeLang'
 import { SearchItem } from './SearchItem'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { NotificationSheet } from './Notification-Sheet'
 import { useState } from 'react'
 
@@ -41,7 +41,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const { isMobile } = useResponsive()
   const { handleLogout, loading: logoutLoading } = useLogout()
   const { changeLanguage, currentLangName, currentSelectedLang } = useChangeLang()
-  const { t } = useTranslation()
+  const t  = useTranslations()
   const [notificationOpen, setNotificationOpen] = useState(false)
 
   return (

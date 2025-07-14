@@ -43,6 +43,19 @@ export interface PaginationMetadata {
   sortOrder?: string;
 }
 
+/**
+ * @interface BaseEntity
+ * @description A base interface for all entities, containing common properties.
+ */
+export interface BaseEntity {
+    id: number;
+    createdById: number;
+    updatedById: number | null;
+    deletedById: number | null;
+    deletedAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
 
 export interface MediaUploadResponse {
   data: {

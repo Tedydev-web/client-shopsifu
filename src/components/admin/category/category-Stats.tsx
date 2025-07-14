@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { mockCategoryData } from './category-MockData';
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 export function CategoryStats() {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const [stats, setStats] = useState({
     totalCategories: 0,
     activeCategories: 0,

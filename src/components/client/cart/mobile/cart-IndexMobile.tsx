@@ -8,7 +8,7 @@ import MobileCartHeader from "@/components/client/cart/mobile/cart-HeaderMobile"
 import { ArrowUpToLine, Edit } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "next-intl";
 
 function getIsMobile(breakpoint = 768) {
   if (typeof window === "undefined") return false;
@@ -20,7 +20,7 @@ function getIsMobile(breakpoint = 768) {
 }
 
 export default function CartPageMobile() {
-  const { t } = useTranslation();
+  const  t  = useTranslations();
   const [cartItems, setCartItems] = useState(mockCartItems);
   const [selectedShops, setSelectedShops] = useState<Record<string, boolean>>(
     {}

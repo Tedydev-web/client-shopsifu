@@ -1,7 +1,7 @@
 "use client"
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from 'next-intl'
 import { Bell } from 'lucide-react'
 
 interface NotificationSheetProps {
@@ -10,7 +10,7 @@ interface NotificationSheetProps {
 }
 
 export function NotificationSheet({ open, onOpenChange }: NotificationSheetProps) {
-  const { t } = useTranslation()
+  const t  = useTranslations()
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
