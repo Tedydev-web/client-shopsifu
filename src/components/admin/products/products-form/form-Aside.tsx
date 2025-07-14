@@ -56,7 +56,7 @@ export default function AsideForm() {
           View
         </Button>
         <Button className="flex-1 flex items-center gap-2">
-          Lưu ngay
+          Thêm mới
         </Button>
       </div>
 

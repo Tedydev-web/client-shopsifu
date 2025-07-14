@@ -11,6 +11,7 @@ interface SortableValueInputProps {
   index: number;
   handleValueChange: (newValue: string, index: number) => void;
   handleRemoveValue: (index: number) => void;
+  handleValueBlur: () => void;
 }
 
 export function SortableValueInput({
@@ -19,6 +20,7 @@ export function SortableValueInput({
   index,
   handleValueChange,
   handleRemoveValue,
+  handleValueBlur,
 }: SortableValueInputProps) {
   const {
     attributes,
@@ -50,6 +52,7 @@ export function SortableValueInput({
           placeholder="Add another value"
           value={value}
           onChange={(e) => handleValueChange(e.target.value, index)}
+          onBlur={handleValueBlur}
         />
         {value.trim() !== '' && (
           <Button

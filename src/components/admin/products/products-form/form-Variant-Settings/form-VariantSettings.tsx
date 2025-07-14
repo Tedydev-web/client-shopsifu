@@ -26,7 +26,20 @@ import { SKUList } from "./form-SKU";
 import type { Sku } from "@/utils/variantUtils";
 
 export function VariantSettingsForm() {
-  const [options, setOptions] = useState<OptionData[]>([]);
+  const [options, setOptions] = useState<OptionData[]>([
+    {
+      id: 1,
+      name: 'Color',
+      values: ['Yellow', 'Black'],
+      isDone: true
+    },
+    {
+      id: 2,
+      name: 'Size',
+      values: ['S', 'M', 'L'],
+      isDone: true
+    }
+  ]);
   const [skus, setSkus] = useState<Sku[]>([]);
 
   const handleUpdateSkus = useCallback((updatedSkus: Sku[]) => {
@@ -92,7 +105,7 @@ export function VariantSettingsForm() {
   };
 
   return (
-    <Card className="bg-white">
+    <Card className="bg-white border-slate-200">
       <CardContent className="p-0">
         <div className="p-6 pb-4">
           <Label className="text-sm font-medium">Variant Settings</Label>
@@ -116,7 +129,7 @@ export function VariantSettingsForm() {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <div className="border rounded-lg mx-6 mb-6">
+            <div className="border border-slate-300 rounded-lg mx-6 mb-6">
               <SortableContext items={options} strategy={verticalListSortingStrategy}>
                 {options.map((option, index) => (
                   <SortableVariantInput 
@@ -130,7 +143,7 @@ export function VariantSettingsForm() {
                   />
                 ))}
               </SortableContext>
-              <div className="py-2 border-t">
+              <div className="py-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="ghost"

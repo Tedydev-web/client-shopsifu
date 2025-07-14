@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,7 @@ export function VariantInput({
 }: VariantInputProps) {
   const [localName, setLocalName] = useState(option.name);
   const [localValues, setLocalValues] = useState<{id: string; value: string}[]>([]);
+  const newValueCounter = useRef(0);
 
   useEffect(() => {
     setLocalName(option.name);
@@ -60,7 +61,7 @@ export function VariantInput({
     }));
 
     if (initialValues.length === 0 || initialValues[initialValues.length - 1].value !== "") {
-      initialValues.push({ id: `new-${option.id}-${Date.now()}`, value: "" });
+      initialValues.push({ id: `new-${option.id}-${newValueCounter.current++}`, value: "" });
     }
     setLocalValues(initialValues);
   }, [option]);
@@ -69,7 +70,10 @@ export function VariantInput({
 
   const handleNameChange = (newName: string) => {
     setLocalName(newName);
-    onUpdate(newName, getValuesOnly(localValues));
+  };
+
+  const handleNameBlur = () => {
+    onUpdate(localName, getValuesOnly(localValues));
   };
 
   const handleValueChange = (newValue: string, index: number) => {
@@ -77,11 +81,13 @@ export function VariantInput({
     newValues[index].value = newValue;
 
     if (index === localValues.length - 1 && newValue.trim() !== "") {
-      newValues.push({ id: `new-${option.id}-${Date.now()}`, value: "" });
+      newValues.push({ id: `new-${option.id}-${newValueCounter.current++}`, value: "" });
     }
-
     setLocalValues(newValues);
-    onUpdate(localName, getValuesOnly(newValues));
+  };
+
+  const handleValueBlur = () => {
+    onUpdate(localName, getValuesOnly(localValues));
   };
 
   const handleRemoveValue = (indexToRemove: number) => {
@@ -112,7 +118,7 @@ export function VariantInput({
 
   if (option.isDone) {
     return (
-      <div className={`bg-white ${!isLast ? 'border-b border-border' : ''}`}>
+      <div className={'bg-white ' + (!isLast ? 'border-b border-slate-200' : '')}>
         <div className="p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div {...dragHandleProps} className="cursor-move touch-none">
@@ -122,8 +128,8 @@ export function VariantInput({
             className="flex-1 cursor-pointer"
             onClick={onEdit}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{option.name}</span>
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold">{option.name}</span>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {option.values.map((value, idx) => (
@@ -140,7 +146,7 @@ export function VariantInput({
   }
 
   return (
-    <div className={`bg-white ${!isLast ? 'border-b border-border' : ''}`}>
+    <div className={'bg-white ' + (!isLast ? 'border-b border-slate-200' : '')}>
       <div className="p-6">
         <div className="flex items-start gap-3">
           <div {...dragHandleProps} className="cursor-move touch-none mt-2.5">
@@ -158,6 +164,7 @@ export function VariantInput({
                 className="w-full"
                 value={localName}
                 onChange={(e) => handleNameChange(e.target.value)}
+                onBlur={handleNameBlur}
               />
             </div>
             
@@ -181,6 +188,7 @@ export function VariantInput({
                         index={index}
                         handleValueChange={handleValueChange}
                         handleRemoveValue={handleRemoveValue}
+                        handleValueBlur={handleValueBlur}
                       />
                     ))}
                   </div>

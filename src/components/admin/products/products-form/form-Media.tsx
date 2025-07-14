@@ -1,10 +1,12 @@
 "use client";
 
-import { UploadCloud, X, Plus } from "lucide-react";
+import { UploadCloud, X, Plus, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { useRef, useCallback, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useMediaForm } from "./useMediaForm";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface MediaFormProps {
     images: string[];
@@ -12,117 +14,57 @@ interface MediaFormProps {
 }
 
 export const MediaForm = ({ images, setImages }: MediaFormProps) => {
-    // const t = useTranslations("admin.ModuleProduct.mainDetails.media");
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [showAllImages, setShowAllImages] = useState(false);
-    const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(null);
-    const [isDragOver, setIsDragOver] = useState(false);
-    const [dragCounter, setDragCounter] = useState(0);
+    const {
+        fileInputRef,
+        hoveredImageIndex,
+        isDragOver,
+        selectedImages,
+        setHoveredImageIndex,
+        handleImageUpload,
+        handleFileChange,
+        handleDragEnter,
+        handleDragOver,
+        handleDragLeave,
+        handleDrop,
+        handleToggleSelect,
+        handleSelectAll,
+        handleRemoveSelected,
+    } = useMediaForm({ images, setImages });
 
-    // Xử lý việc tải lên ảnh từ máy tính
-    const handleImageUpload = useCallback(() => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
-        }
-    }, []);
+    const handleShowMoreImages = () => setShowAllImages(true);
 
-    // Xử lý khi người dùng chọn file
-    const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
-        const newImages: string[] = [...images];
-
-        // Chuyển đổi từng file thành URL để hiển thị
-        Array.from(files).forEach(file => {
-            if (file.type.startsWith('image/')) {
-                const imageUrl = URL.createObjectURL(file);
-                newImages.push(imageUrl);
-            }
-        });
-
-        setImages(newImages);
-        
-        // Reset input để có thể chọn lại cùng một file
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    }, [images, setImages]);
-
-    // Xử lý drag and drop với counter để tránh flicker
-    const handleDragEnter = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragCounter(prev => prev + 1);
-        
-        // Chỉ set isDragOver khi counter = 1 (lần đầu tiên enter)
-        if (dragCounter === 0) {
-            setIsDragOver(true);
-        }
-    }, [dragCounter]);
-
-    const handleDragOver = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Đảm bảo dropEffect được set
-        if (e.dataTransfer) {
-            e.dataTransfer.dropEffect = 'copy';
-        }
-    }, []);
-
-    const handleDragLeave = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        setDragCounter(prev => {
-            const newCounter = prev - 1;
-            // Chỉ tắt isDragOver khi counter về 0
-            if (newCounter === 0) {
-                setIsDragOver(false);
-            }
-            return newCounter;
-        });
-    }, []);
-
-    const handleDrop = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Reset state
-        setIsDragOver(false);
-        setDragCounter(0);
-
-        const files = e.dataTransfer.files;
-        if (!files || files.length === 0) return;
-
-        const newImages: string[] = [...images];
-
-        // Chuyển đổi từng file thành URL để hiển thị
-        Array.from(files).forEach(file => {
-            if (file.type.startsWith('image/')) {
-                const imageUrl = URL.createObjectURL(file);
-                newImages.push(imageUrl);
-            }
-        });
-
-        setImages(newImages);
-    }, [images, setImages]);
-
-    // Xử lý xóa ảnh
-    const handleRemoveImage = useCallback((indexToRemove: number) => {
-        setImages(images.filter((_, index) => index !== indexToRemove));
-        setShowAllImages(false);
-    }, [images, setImages]);
-    
-    // Xử lý khi click vào ô hiển thị số ảnh còn lại
-    const handleShowMoreImages = useCallback(() => {
-        setShowAllImages(true);
-    }, []);
+    const isSelectionMode = selectedImages.length > 0;
+    const allSelected = selectedImages.length === images.length;
 
     return (
         <div className="grid gap-3">
-            <Label>Hình ảnh sản phẩm</Label>
+            <div className="flex justify-between items-center">
+                {!isSelectionMode ? (
+                    <Label>Hình ảnh sản phẩm</Label>
+                ) : (
+                    <div className="flex items-center gap-3 w-full">
+                        <Checkbox
+                            id="select-all-images"
+                            checked={allSelected}
+                            onCheckedChange={handleSelectAll}
+                            aria-label="Chọn tất cả ảnh"
+                        />
+                        <Label htmlFor="select-all-images" className="text-sm font-medium cursor-pointer">
+                            Đã chọn {selectedImages.length} / {images.length}
+                        </Label>
+                        <Button 
+                            variant="ghost"
+                            size="sm"
+                            className="ml-auto text-red-500 hover:text-red-600 hover:bg-red-50"
+                            onClick={handleRemoveSelected}
+                        >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Xóa mục đã chọn
+                        </Button>
+                    </div>
+                )}
+            </div>
             
             {/* Input ẩn để chọn file */}
             <input 
@@ -167,8 +109,9 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                 >
                     <div className={`grid grid-cols-5 grid-rows-2 gap-3 transition-opacity ${isDragOver ? 'opacity-50' : ''}`}>
                         {/* Ảnh chính */}
+                                                {/* Ảnh chính */}
                         <div 
-                            className="col-span-2 row-span-2 relative rounded-lg overflow-hidden border"
+                            className={`col-span-2 row-span-2 relative rounded-lg overflow-hidden border transition-all duration-200`}
                             onMouseEnter={() => setHoveredImageIndex(0)}
                             onMouseLeave={() => setHoveredImageIndex(null)}
                         >
@@ -178,37 +121,31 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                                 className="object-contain w-full h-full aspect-square"
                                 width={500}
                                 height={500}
-                                objectFit="contain"
                             />
-                            {hoveredImageIndex === 0 && (
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveImage(0)}
-                                    className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70"
-                                    title="Xóa ảnh chính"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
+                            <div className={`absolute inset-0 bg-slate-900/20 transition-opacity duration-200 ${hoveredImageIndex === 0 || selectedImages.includes(0) ? 'opacity-100' : 'opacity-0'}`}></div>
+                            {(hoveredImageIndex === 0 || selectedImages.includes(0)) && (
+                                <Checkbox
+                                    checked={selectedImages.includes(0)}
+                                    onCheckedChange={() => handleToggleSelect(0)}
+                                    className="absolute top-2 left-2 bg-white/80 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                                    aria-label="Chọn ảnh chính"
+                                />
                             )}
                         </div>
                         
                         {(() => {
-                          const canAddMore = images.length < 10
-                          const extraImages = images.slice(5)
-                          const showSeeMore = !showAllImages && extraImages.length > 0
-                          const displayedImages = showAllImages
-                            ? images.slice(1) // hiển thị toàn bộ ảnh phụ khi showAllImages
-                            : images.slice(1, 5) // chỉ 4 ảnh phụ đầu nếu chưa show all
+                          const hasMoreImages = images.length > 5;
+                          const canAddMore = images.length < 12;
 
                           return (
                             <>
-                              {/* Ảnh phụ hiện tại (1 → 4 hoặc toàn bộ nếu showAllImages) */}
-                              {displayedImages.map((img, index) => {
-                                const actualIndex = index + 1
+                              {/* Render all other images */}
+                              {images.slice(1, showAllImages ? 12 : 5).map((img, index) => {
+                                const actualIndex = index + 1;
                                 return (
                                   <div
                                     key={actualIndex}
-                                    className="relative rounded-lg overflow-hidden border aspect-square h-full w-full"
+                                    className={`relative rounded-lg overflow-hidden border aspect-square h-full w-full transition-all duration-200`}
                                     onMouseEnter={() => setHoveredImageIndex(actualIndex)}
                                     onMouseLeave={() => setHoveredImageIndex(null)}
                                   >
@@ -219,64 +156,30 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                                       width={250}
                                       height={250}
                                     />
-                                    {hoveredImageIndex === actualIndex && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleRemoveImage(actualIndex)}
-                                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70"
-                                        title={`Xóa ảnh ${actualIndex}`}
-                                      >
-                                        <X className="w-3 h-3" />
-                                      </button>
+                                    <div className={`absolute inset-0 bg-slate-900/20 transition-opacity duration-200 ${hoveredImageIndex === actualIndex || selectedImages.includes(actualIndex) ? 'opacity-100' : 'opacity-0'}`}></div>
+                                    {(hoveredImageIndex === actualIndex || selectedImages.includes(actualIndex)) && (
+                                        <Checkbox
+                                            checked={selectedImages.includes(actualIndex)}
+                                            onCheckedChange={() => handleToggleSelect(actualIndex)}
+                                            className="absolute top-2 left-2 bg-white/80 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                                            aria-label={`Chọn ảnh ${actualIndex}`}
+                                        />
                                     )}
                                   </div>
                                 )
                               })}
 
-                              {/* Nếu chưa show all → hiển thị nút xem thêm */}
-                              {showSeeMore && (
+                              {/* "Show More" button placeholder */}
+                              {!showAllImages && hasMoreImages && (
                                 <div
-                                  onClick={handleShowMoreImages}
-                                  className="flex flex-col items-center justify-center border rounded-lg text-center cursor-pointer hover:border-primary transition-colors aspect-square h-full w-full bg-gray-50"
+                                  onClick={() => setShowAllImages(true)}
+                                  className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-primary transition-colors aspect-square h-full w-full"
                                 >
-                                  <div className="font-semibold text-lg">+{extraImages.length}</div>
-                                  <p className="text-xs text-gray-500">Xem thêm</p>
+                                  <span className="text-sm font-medium">+{images.length - 5}</span>
                                 </div>
                               )}
 
-                              {/* Nếu đã show full và ảnh còn lại > 0 → hiển thị các ảnh còn lại thay thế cho xem thêm + thêm ảnh */}
-                              {showAllImages &&
-                                extraImages.map((img, index) => {
-                                  const actualIndex = index + 5
-                                  return (
-                                    <div
-                                      key={actualIndex}
-                                      className="relative rounded-lg overflow-hidden border aspect-square h-full w-full"
-                                      onMouseEnter={() => setHoveredImageIndex(actualIndex)}
-                                      onMouseLeave={() => setHoveredImageIndex(null)}
-                                    >
-                                      <Image
-                                        src={img}
-                                        alt={`Ảnh phụ ${actualIndex}`}
-                                        className="object-contain w-full h-full"
-                                        width={250}
-                                        height={250}
-                                      />
-                                      {hoveredImageIndex === actualIndex && (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleRemoveImage(actualIndex)}
-                                          className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70"
-                                          title={`Xóa ảnh ${actualIndex}`}
-                                        >
-                                          <X className="w-3 h-3" />
-                                        </button>
-                                      )}
-                                    </div>
-                                  )
-                                })}
-
-                              {/* Ô thêm ảnh chỉ khi tổng số ảnh < 10 */}
+                              {/* Add image button */}
                               {canAddMore && (
                                 <div
                                   onClick={handleImageUpload}
@@ -287,7 +190,7 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                                 </div>
                               )}
 
-                              {/* Nút Ẩn nếu đã mở toàn bộ */}
+                              {/* Hide button */}
                               {showAllImages && (
                                 <div className="col-span-5 flex justify-end">
                                   <Button

@@ -52,8 +52,17 @@ export const generateSKUs = (options: OptionData[]): Sku[] => {
       id,
       name,
       price: 0,
-      stock: 100,
+      stock: 0,
       variantValues,
     };
   });
+};
+
+/**
+ * Generates a URL-friendly and API-friendly variant name from its values.
+ * @param variantValues - An array of variant value objects.
+ * @returns A lowercase string with values joined by hyphens.
+ */
+export const generateApiVariantName = (variantValues: { value: string }[]): string => {
+  return variantValues.map(v => v.value).join('-').toLowerCase();
 };
