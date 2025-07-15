@@ -11,31 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { Eye, Plus } from "lucide-react";
-
-// Mock data - sẽ thay thế bằng API sau
-const mockBrands = [
-  { id: "1", name: "Apple" },
-  { id: "2", name: "Samsung" },
-  { id: "3", name: "BLACK WHITE" },
-  { id: "4", name: "Nike" },
-  { id: "5", name: "Adidas" },
-];
-
-const mockCategories = [
-  { id: "1", name: "Điện thoại" },
-  { id: "2", name: "Laptop" },
-  { id: "3", name: "Phụ kiện" },
-  { id: "4", name: "Thời trang" },
-  { id: "5", name: "Giày dép" },
-];
+import { Eye, ChevronsUpDown } from "lucide-react";
+import { BrandCbb } from "@/components/ui/combobox/BrandCbb";
+import { CategoryModal } from "./form-ModalCategory";
 
 export default function AsideForm() {
   const t = useTranslations("admin.ModuleProduct");
@@ -44,8 +22,11 @@ export default function AsideForm() {
   const [productStatus, setProductStatus] = useState("published");
   
   // State for selections
-  const [selectedBrand, setSelectedBrand] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState<number | null>(null);
+  const [isCategoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  // Giả sử chúng ta có cách để lấy tên từ ID, tạm thời để trống
+  const [selectedCategoryName, setSelectedCategoryName] = useState('');
 
   return (
     <div className="sticky top-4 grid auto-rows-max items-start gap-4 md:gap-8">
@@ -92,40 +73,42 @@ export default function AsideForm() {
           <div className="grid gap-6">
             {/* Vendor/Brand */}
             <div className="grid gap-3">
-              <Label htmlFor="vendor">Vendor</Label>
-              <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Chọn thương hiệu" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockBrands.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="vendor">Thương hiệu</Label>
+              <BrandCbb value={selectedBrand} onChange={setSelectedBrand} />
             </div>
 
             {/* Category */}
             <div className="grid gap-3">
               <Label htmlFor="category">Danh mục</Label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Chọn danh mục" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockCategories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Button 
+                type="button"
+                variant="outline" 
+                className="w-full justify-between font-normal" 
+                onClick={() => setCategoryModalOpen(true)}
+              >
+                {selectedCategoryName || 'Chọn danh mục'}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      <CategoryModal 
+        open={isCategoryModalOpen}
+        onOpenChange={setCategoryModalOpen}
+        onConfirm={(id) => {
+          setSelectedCategoryId(id);
+          // TODO: Fetch the full category details to get the name
+          // For now, we'll just use the ID as a placeholder name
+          if (id) {
+            setSelectedCategoryName(`ID Danh mục: ${id}`);
+          }
+          else {
+            setSelectedCategoryName('');
+          }
+        }}
+      />
     </div>
   );
 }

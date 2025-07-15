@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/component/rich-text-editor";
-import { MediaForm } from "./form-Image/form-Media"; // Import the MediaForm component
-import AsideForm from "./form-Aside"; // Import the AsideForm component
+import { MediaForm } from "./form-Image/Media-Index";
+import AsideForm from "./form-Aside/Aside-Index";
 import { VariantSettingsForm } from "./form-Variant-Settings/form-VariantSettings"; // Import the VariantSettingsForm component
 
 export function ProductForm() {
