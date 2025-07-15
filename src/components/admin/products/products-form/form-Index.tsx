@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/component/rich-text-editor";
-import { MediaForm } from "./form-Image/Media-Index";
+import { MediaForm } from "./form-Media/Media-Index";
 import AsideForm from "./form-Aside/Aside-Index";
-import { VariantSettingsForm } from "./form-Variant-Settings/form-VariantSettings"; // Import the VariantSettingsForm component
+import { VariantSettingsForm } from "./form-Variant-Settings/variantSettings-Index"; // Import the VariantSettingsForm component
 
 export function ProductForm() {
   const t = useTranslations("admin.ModuleProduct");
@@ -22,7 +22,7 @@ export function ProductForm() {
   const formatCurrency = (value: string): string => {
     const number = value.replace(/[^\d]/g, '');
     if (!number) return '';
-    return new Intl.NumberFormat('vi-VN').format(parseInt(number));
+    return new Intl.NumberFormat('en-US').format(parseInt(number));
   };
 
   // Handle price input change

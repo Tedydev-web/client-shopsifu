@@ -29,7 +29,7 @@ function SkuImageUploader({ skuId, imageUrl, onUploadComplete }: SkuImageUploade
   useEffect(() => {
     // Khi có URL mới được tải lên, gọi callback để cập nhật state cha
     if (uploadedUrls.length > 0) {
-      onUploadComplete(skuId, uploadedUrls[0]);
+      onUploadComplete(skuId, uploadedUrls[0].url);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadedUrls]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { baseService } from '@/services/baseService';
 import { toast } from 'sonner';
 import imageCompression from 'browser-image-compression';
@@ -15,7 +15,7 @@ export const FILE_SIZE_MB = 1024 * 1024; // Convert to bytes
 
 export interface UploadState {
   files: FileWithPreview[];
-  uploadedUrls: string[];
+  uploadedUrls: { url: string; fileName: string }[];
   isUploading: boolean;
   progress: number;
   error: string | null;
@@ -117,10 +117,13 @@ export function useUploadMedia() {
       setState(prev => ({ 
         ...prev, 
         files: [...prev.files, ...processedFiles], 
-        isUploading: false,
+        isUploading: false, // Will be set to true by uploadFiles
         progress: 0,
         error: null 
       }));
+
+      // Directly call uploadFiles with the newly processed files
+      uploadFiles(processedFiles);
     } catch (error: any) {
       console.error('File processing error:', error);
       setState(prev => ({ 
@@ -137,16 +140,20 @@ export function useUploadMedia() {
   }, [compressImage]);
 
   // Xử lý xóa file
-  const handleRemoveFile = useCallback((index: number) => {
+  const handleRemoveFile = useCallback((fileName: string) => {
     setState((prev) => {
+      const fileIndex = prev.files.findIndex(f => f.name === fileName);
+      if (fileIndex === -1) return prev; // File not found
+
       const newFiles = [...prev.files];
-      
+      const fileToRemove = newFiles[fileIndex];
+
       // Revoke object URL để tránh memory leak
-      if (newFiles[index]?.preview) {
-        URL.revokeObjectURL(newFiles[index].preview!);
+      if (fileToRemove?.preview) {
+        URL.revokeObjectURL(fileToRemove.preview);
       }
       
-      newFiles.splice(index, 1);
+      newFiles.splice(fileIndex, 1);
       
       return {
         ...prev,
@@ -172,23 +179,19 @@ export function useUploadMedia() {
     });
   }, []);
 
-  // Upload tất cả files
-  const uploadFiles = useCallback(async () => {
-    if (state.files.length === 0) {
-      toast.error('Vui lòng chọn ít nhất một tệp để tải lên');
+  // Upload a specific set of files
+  const uploadFiles = useCallback(async (filesToUpload: FileWithPreview[]) => {
+    if (filesToUpload.length === 0) {
       return [];
     }
 
-    setState((prev) => ({
-      ...prev,
-      isUploading: true,
-      progress: 0,
-      error: null,
-    }));
+    setState(prev => ({ ...prev, isUploading: true, progress: 0, error: null }));
+
+    let progressInterval: NodeJS.Timeout | undefined = undefined;
 
     try {
       // Giả lập tiến trình upload
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setState((prev) => ({
           ...prev,
           progress: Math.min(prev.progress + 10, 90),
@@ -196,26 +199,32 @@ export function useUploadMedia() {
       }, 200);
 
       // Files are already compressed when added, upload directly
-      const response = await baseService.uploadMedia(state.files);
+      const response = await baseService.uploadMedia(filesToUpload);
       
       clearInterval(progressInterval);
 
       // Lấy các URLs từ response
-      const urls = response.data.map((item) => item.url);
+      const newUrls = response.data.map((item: any) => ({ url: item.url, fileName: item.originalName }));
       
       setState((prev) => ({
         ...prev,
-        uploadedUrls: urls,
+        uploadedUrls: [...prev.uploadedUrls, ...newUrls],
         isUploading: false,
         progress: 100,
       }));
 
-      toast.success(`Đã tải lên ${urls.length} tệp thành công`);
-      return urls;
+      toast.success(`Đã tải lên ${newUrls.length} tệp thành công`);
+      return newUrls;
     } catch (error: any) {
+      // Stop the progress bar on error
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+
       setState((prev) => ({
         ...prev,
-        isUploading: false,
+        isUploading: false, // Stop upload process
+        progress: 0, // Reset progress
         error: error.message || 'Lỗi khi tải tệp lên',
       }));
       
@@ -225,7 +234,9 @@ export function useUploadMedia() {
       
       return [];
     }
-  }, [state.files]);
+  }, []);
+
+
 
   // Reset state
   const reset = useCallback(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadCloud, X, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useMediaForm } from './useMediaForm';
@@ -32,6 +32,7 @@ interface MediaFormProps {
 
 export const MediaForm = ({ images, setImages }: MediaFormProps) => {
     const {
+        imageObjects,
         fileInputRef,
         handleImageUpload,
         handleFileChange,
@@ -46,10 +47,19 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
         handleToggleSelect,
         handleSelectAll,
         handleRemoveSelected,
-        showAllImages,
-        setShowAllImages,
-        handleDragEnd: onDragEnd
-    } = useMediaForm({ images, setImages });
+        handleDragEnd: onDragEnd,
+        isUploading,
+    } = useMediaForm({ initialImageUrls: images });
+
+    // This is the key fix: Sync the internal state back to the parent component.
+    // This breaks the infinite re-render loop.
+    useEffect(() => {
+        const newUrls = imageObjects.map(img => img.url);
+        // Only call setImages if the URLs have actually changed.
+        if (JSON.stringify(newUrls) !== JSON.stringify(images)) {
+            setImages(newUrls);
+        }
+    }, [imageObjects, images, setImages]);
 
     const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -64,15 +74,7 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
         setActiveId(event.active.id as string);
     };
 
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-        if (over && active.id !== over.id) {
-            onDragEnd(event);
-        }
-        setActiveId(null);
-    };
 
-    const handleShowMoreImages = () => setShowAllImages(true);
 
     const isSelectionMode = selectedImages.length > 0;
     const allSelected = selectedImages.length === images.length && images.length > 0;
@@ -145,7 +147,10 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
+                    onDragEnd={(event) => {
+                        onDragEnd(event);
+                        setActiveId(null);
+                    }}
                 >
                     <div className="relative"
                         onDragEnter={handleDragEnter}
@@ -153,25 +158,27 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                     >
-                        <SortableContext items={images} strategy={rectSortingStrategy}>
-                            <div className="grid grid-cols-5 gap-4">
-                                {images.map((img, index) => (
+                        <SortableContext items={imageObjects} strategy={rectSortingStrategy}>
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                                {imageObjects.map((img, index) => (
                                     <SortableImage
-                                        key={img} // Use image URL as key, assuming it's unique
-                                        id={img}
-                                        src={img}
+                                        key={img.id}
+                                        id={img.id}
+                                        src={img.url}
                                         index={index}
                                         isMainImage={index === 0}
-                                        isDragging={activeId === img}
+                                        isDragging={activeId === img.id}
                                         hoveredImageIndex={hoveredImageIndex}
                                         selectedImages={selectedImages}
                                         setHoveredImageIndex={setHoveredImageIndex}
                                         handleToggleSelect={handleToggleSelect}
+                                        isUploading={img.progress < 100 && isUploading}
+                                        progress={img.progress}
                                     />
                                 ))}
 
                                 {/* Add image button */}
-                                {images.length < 12 && (
+                                {images.length < 12 && !isUploading && (
                                     <div
                                         onClick={handleImageUpload}
                                         className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-primary transition-colors aspect-square h-full w-full"
@@ -185,15 +192,19 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
 
                         <DragOverlay>
                             {activeId ? (
-                                <div className="w-full h-full rounded-lg overflow-hidden shadow-2xl">
-                                    <Image
-                                        src={activeId}
-                                        alt="Ảnh đang kéo"
-                                        className="object-contain w-full h-full"
-                                        width={250}
-                                        height={250}
-                                    />
-                                </div>
+                                <SortableImage
+                                    id={activeId}
+                                    src={imageObjects.find(img => img.id === activeId)?.url || ''}
+                                    index={imageObjects.findIndex(img => img.id === activeId)}
+                                    isDragging={true}
+                                    isMainImage={false} // Overlay image is never the main one
+                                    hoveredImageIndex={null}
+                                    selectedImages={[]}
+                                    setHoveredImageIndex={() => {}}
+                                    handleToggleSelect={() => {}}
+                                    isUploading={false} // Don't show progress on overlay
+                                    progress={0}
+                                />
                             ) : null}
                         </DragOverlay>
 
