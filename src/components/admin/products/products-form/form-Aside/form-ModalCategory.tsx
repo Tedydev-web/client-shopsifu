@@ -20,10 +20,16 @@ import { cn } from '@/lib/utils';
 interface CategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (categoryId: number | null) => void;
+  onConfirm: (categoryIds: number[], selectionPath: string) => void;
+  initialSelectedIds?: number[];
 }
 
-export function CategoryModal({ open, onOpenChange, onConfirm }: CategoryModalProps) {
+export function CategoryModal({ 
+  open, 
+  onOpenChange, 
+  onConfirm, 
+  initialSelectedIds = [] 
+}: CategoryModalProps) {
   const [parentCategories, setParentCategories] = useState<Category[]>([]);
   const [childCategories, setChildCategories] = useState<Category[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
@@ -38,12 +44,42 @@ export function CategoryModal({ open, onOpenChange, onConfirm }: CategoryModalPr
       const params = { page: 1, limit: 100 };
       const response = await categoryService.getAll(params);
       setParentCategories(response.data);
+      
+      // Nếu có initialSelectedIds, tìm parent category và set selected
+      if (initialSelectedIds && initialSelectedIds.length > 0) {
+        // Tìm trong parent categories
+        const parentId = initialSelectedIds[0];
+        const parent = response.data.find(p => p.id === parentId);
+        
+        if (parent) {
+          setSelectedParent(parent);
+          // Nếu có parent, load child categories
+          fetchChildCategories(parentId);
+        } else {
+          // Tìm xem nó có phải là child category không
+          for (const parent of response.data) {
+            if (parent.id) {
+              const childParams = { page: 1, limit: 100, parentCategoryId: parent.id.toString() };
+              const childResponse = await categoryService.getAll(childParams);
+              const child = childResponse.data.find(c => c.id === parentId);
+              
+              if (child) {
+                // Tìm thấy trong child categories
+                setSelectedParent(parent);
+                setChildCategories(childResponse.data);
+                setSelectedChildId(parentId);
+                break;
+              }
+            }
+          }
+        }
+      }
     } catch (error) {
       toast.error('Lỗi khi tải danh mục cha');
     } finally {
       setLoadingParents(false);
     }
-  }, []);
+  }, [initialSelectedIds]);
 
   const fetchChildCategories = useCallback(async (parentId: number) => {
     setLoadingChildren(true);
@@ -52,12 +88,22 @@ export function CategoryModal({ open, onOpenChange, onConfirm }: CategoryModalPr
       const params = { page: 1, limit: 100, parentCategoryId: parentId.toString() };
       const response = await categoryService.getAll(params);
       setChildCategories(response.data);
+      
+      // Nếu có initialSelectedIds và có child category trong initialSelectedIds
+      if (initialSelectedIds && initialSelectedIds.length > 1) {
+        const childId = initialSelectedIds[1];
+        const isChildInResponse = response.data.some(c => c.id === childId);
+        
+        if (isChildInResponse) {
+          setSelectedChildId(childId);
+        }
+      }
     } catch (error) {
       toast.error('Lỗi khi tải danh mục con');
     } finally {
       setLoadingChildren(false);
     }
-  }, []);
+  }, [initialSelectedIds]);
 
   useEffect(() => {
     if (open) {
@@ -74,7 +120,18 @@ export function CategoryModal({ open, onOpenChange, onConfirm }: CategoryModalPr
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedChildId || selectedParent?.id || null);
+    // Tạo mảng categoryIds để gửi về
+    const categoryIds: number[] = [];
+    
+    if (selectedParent?.id) {
+      categoryIds.push(selectedParent.id);
+    }
+    
+    if (selectedChildId) {
+      categoryIds.push(selectedChildId);
+    }
+    
+    onConfirm(categoryIds, selectionPath);
     onOpenChange(false);
   };
 

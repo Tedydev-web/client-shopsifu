@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadCloud, X, Plus, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useMediaForm } from './useMediaForm';
@@ -31,6 +31,7 @@ interface MediaFormProps {
 }
 
 export const MediaForm = ({ images, setImages }: MediaFormProps) => {
+    // Các state hiện tại
     const {
         imageObjects,
         fileInputRef,
@@ -50,17 +51,25 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
         handleDragEnd: onDragEnd,
         isUploading,
     } = useMediaForm({ initialImageUrls: images });
-
-    // This is the key fix: Sync the internal state back to the parent component.
-    // This breaks the infinite re-render loop.
+    
+    // Thêm ref để theo dõi thay đổi
+    const prevImagesRef = useRef<string[]>([]);
+    
+    // Thay thế useEffect hiện tại
     useEffect(() => {
         const newUrls = imageObjects.map(img => img.url);
-        // Only call setImages if the URLs have actually changed.
-        if (JSON.stringify(newUrls) !== JSON.stringify(images)) {
+        const prevUrls = prevImagesRef.current;
+        
+        // Chỉ cập nhật khi thực sự thay đổi và không phải do parent truyền xuống
+        const urlsChanged = JSON.stringify(newUrls) !== JSON.stringify(prevUrls);
+        const differentFromProps = JSON.stringify(newUrls) !== JSON.stringify(images);
+        
+        if (urlsChanged && differentFromProps) {
+            prevImagesRef.current = newUrls;
             setImages(newUrls);
         }
-    }, [imageObjects, images, setImages]);
-
+    }, [imageObjects]);
+    
     const [activeId, setActiveId] = useState<string | null>(null);
 
     const sensors = useSensors(

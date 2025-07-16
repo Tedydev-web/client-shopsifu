@@ -15,11 +15,12 @@ import { showToast } from '@/components/ui/toastify';
 type FormSku = Partial<SkuDetail>;
 
 // Định nghĩa kiểu dữ liệu cho state của form
-export type FormState = Omit<ProductCreateRequest, 'skus' | 'categories' | 'brandId'> & {
+export type FormState = Omit<ProductCreateRequest, 'skus' | 'categories' | 'brandId' | 'publishedAt'> & {
   skus: FormSku[];
   categories: number[];
   brandId: number | null; // Cho phép brandId là null
   description: string;
+  publishedAt: string | null; // Thêm trường publishedAt
 };
 
 const INITIAL_STATE: FormState = {
@@ -32,6 +33,7 @@ const INITIAL_STATE: FormState = {
   categories: [],
   variants: [],
   skus: [],
+  publishedAt: null, // Mặc định là null (chưa công khai)
 };
 
 interface UseProductsFormProps {
@@ -56,6 +58,7 @@ export const useProductsForm = ({ initialData }: UseProductsFormProps) => {
         categories: initialData.categories?.map(c => c.id) || [], // Map từ object CategoryDetail sang mảng ID
         variants: initialData.variants || [],
         skus: initialData.skus || [], // Gán trực tiếp mảng SkuDetail
+        publishedAt: initialData.publishedAt, // Lấy trường publishedAt từ dữ liệu ban đầu
       });
     }
   }, [initialData, isEditMode]);

@@ -19,30 +19,38 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
   const [imageObjects, setImageObjects] = useState<ImageObject[]>(() => 
     initialImageUrls.map(url => ({ id: url, url, progress: 100 }))
   );
-
+  
+  const prevUrlsRef = useRef<string[]>([]);
+  
+  // Thay thế useEffect đồng bộ với initialImageUrls
+  useEffect(() => {
+      const currentUrls = imageObjects.map(img => img.url);
+      const initialUrlsChanged = JSON.stringify(initialImageUrls) !== JSON.stringify(prevUrlsRef.current);
+      
+      if (initialUrlsChanged) {
+          prevUrlsRef.current = initialImageUrls;
+          
+          setImageObjects(currentObjects => {
+              // Giữ lại các files đang upload
+              const uploadingObjects = currentObjects.filter(o => o.file);
+              const uploadingUrls = new Set(uploadingObjects.map(o => o.url));
+              
+              // Lọc ra URLs mới từ parent
+              const newObjectsFromUrls = initialImageUrls
+                  .filter(url => !uploadingUrls.has(url))
+                  .map(url => ({ id: url, url, progress: 100 }));
+              
+              return [...uploadingObjects, ...newObjectsFromUrls];
+          });
+      }
+  }, [initialImageUrls]);
+  
   const { uploadedUrls, isUploading, progress: overallProgress, handleAddFiles, uploadFiles, handleRemoveFile } = useUploadMedia();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImageIds, setSelectedImageIds] = useState<string[]>([]);
-
-  // Sync parent's URL changes back to our internal state (more robustly)
-  useEffect(() => {
-    setImageObjects(currentObjects => {
-      // Keep files that are currently uploading
-      const uploadingObjects = currentObjects.filter(o => o.file);
-      const uploadingUrls = new Set(uploadingObjects.map(o => o.url));
-
-      // Filter out any URLs from the parent that are already being uploaded
-      const newObjectsFromUrls = initialImageUrls
-        .filter(url => !uploadingUrls.has(url))
-        .map(url => ({ id: url, url, progress: 100 }));
-
-      // Combine uploading objects with new/updated objects from parent
-      return [...uploadingObjects, ...newObjectsFromUrls];
-    });
-  }, [initialImageUrls]);
 
   useEffect(() => {
     setImageObjects(currentObjects => 
