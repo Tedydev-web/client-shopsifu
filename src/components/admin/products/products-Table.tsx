@@ -73,7 +73,6 @@ export function ProductsTable() {
           </Button>
         </Link>
       </div>
-      <div className="rounded-md border p-4 bg-white shadow">
         <DataTable
           table={table}
           columns={columns}
@@ -86,7 +85,6 @@ export function ProductsTable() {
             onLimitChange: handleLimitChange,
           }}
         />
-      </div>
 
       <ConfirmDeleteModal
         open={deleteOpen}

@@ -95,7 +95,7 @@ export function useProducts() {
   const addProduct = async (data: ProductCreateRequest) => {
     try {
       const response = await productsService.create(data);
-      showToast('Product created successfully.', 'success');
+      showToast(response.message, 'success');
       serverDataTable.refreshData();
       handleCloseUpsertModal();
       return response;
@@ -108,7 +108,7 @@ export function useProducts() {
   const editProduct = async (id: number, data: ProductUpdateRequest) => {
     try {
       const response = await productsService.update(String(id), data);
-      showToast('Product updated successfully.', 'success');
+      showToast(response.message, 'success');
       serverDataTable.refreshData();
       handleCloseUpsertModal();
       return response;
@@ -122,8 +122,8 @@ export function useProducts() {
     if (productToDelete) {
       setDeleteLoading(true);
       try {
-        await productsService.delete(String(productToDelete.id));
-        showToast('Product deleted successfully.', 'success');
+        const response = await productsService.delete(String(productToDelete.id));
+        showToast(response.message, 'success');
         serverDataTable.refreshData();
         handleCloseDeleteModal();
       } catch (error) {

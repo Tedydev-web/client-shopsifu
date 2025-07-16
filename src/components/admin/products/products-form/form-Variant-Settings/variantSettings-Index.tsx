@@ -25,7 +25,7 @@ import type { OptionData } from "./form-VariantInput";
 import { SKUList } from "./form-SKU";
 import type { Sku } from "@/utils/variantUtils";
 
-export function VariantSettingsForm() {
+export function VariantSettingsIndex() {
   const [options, setOptions] = useState<OptionData[]>([
     {
       id: 1,

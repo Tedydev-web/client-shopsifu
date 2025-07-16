@@ -61,6 +61,8 @@ export interface BaseEntity {
 
 export interface MediaUploadResponse {
   data: {
-    url: string;
-  }[];
+    data: {
+      url: string;
+    }[];
+  };
 }

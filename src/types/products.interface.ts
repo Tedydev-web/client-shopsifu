@@ -1,4 +1,4 @@
-import { BaseEntity, PaginationMetadata } from "./base.interface";
+import { BaseEntity, PaginationMetadata, BaseResponse } from "./base.interface";
 
 /**
  * @interface Variant
@@ -35,7 +35,7 @@ export interface ProductTranslation extends BaseEntity {
  * @interface Product
  * @description Represents the main product entity, extending the base entity.
  */
-export interface Product extends BaseEntity {
+export interface Product extends BaseEntity{
     publishedAt: string | null;
     name: string;
     basePrice: number;
@@ -46,6 +46,7 @@ export interface Product extends BaseEntity {
     skus?: Sku[]; // Optional as it's not in the list response
     categories?: number[]; // Optional as it's not in the list response
     productTranslations: ProductTranslation[];
+    message: string;
 }
 
 /**
@@ -55,6 +56,7 @@ export interface Product extends BaseEntity {
 export interface ProductsResponse {
     data: Product[];
     metadata: PaginationMetadata;
+    message: string;
 }
 
 /**
@@ -65,7 +67,7 @@ export interface ProductCreateRequest {
     name: string;
     publishedAt?: string | null;
     basePrice: number;
-    virtualPrice?: number;
+    virtualPrice: number;
     brandId: number;
     images: string[];
     categories: number[];
@@ -78,3 +80,63 @@ export interface ProductCreateRequest {
  * @description Represents the payload for updating an existing product. It's a partial of the create request.
  */
 export type ProductUpdateRequest = Partial<ProductCreateRequest>;
+
+// --- Interfaces for Product Detail Response ---
+
+/**
+ * @interface SkuDetail
+ * @description Represents a detailed Sku object from the product detail API endpoint.
+ */
+export interface SkuDetail extends BaseEntity {
+  value: string;
+  price: number;
+  stock: number;
+  image: string | null;
+  productId: number;
+}
+
+/**
+ * @interface CategoryDetail
+ * @description Represents a detailed Category object from the product detail API endpoint.
+ */
+export interface CategoryDetail extends BaseEntity {
+  name: string;
+  parentCategoryId: number | null;
+  logo: string | null;
+}
+
+/**
+ * @interface BrandDetail
+ * @description Represents a detailed Brand object from the product detail API endpoint.
+ */
+export interface BrandDetail extends BaseEntity {
+  name: string;
+  logo: string | null;
+}
+
+/**
+ * @interface ProductDetail
+ * @description Represents the detailed product entity from the API, including nested objects.
+ */
+export interface ProductDetail extends BaseEntity {
+  publishedAt: string | null;
+  name: string;
+  description?: string | null;
+  basePrice: number;
+  virtualPrice: number;
+  brandId: number;
+  images: string[];
+  variants: Variant[];
+  skus: SkuDetail[];
+  categories: CategoryDetail[];
+  brand: BrandDetail;
+  productTranslations: ProductTranslation[];
+}
+
+/**
+ * @interface ProductDetailResponse
+ * @description Represents the full API response for a single product detail.
+ */
+export interface ProductDetailResponse extends BaseResponse {
+  data: ProductDetail;
+}

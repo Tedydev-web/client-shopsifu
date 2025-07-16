@@ -204,7 +204,10 @@ export function useUploadMedia() {
       clearInterval(progressInterval);
 
       // Lấy các URLs từ response
-      const newUrls = response.data.map((item: any) => ({ url: item.url, fileName: item.originalName }));
+      const newUrls = response.data.data.map((item: { url: string }, index: number) => ({
+        url: item.url,
+        fileName: filesToUpload[index]?.name || `file-${index}`,
+      }));
       
       setState((prev) => ({
         ...prev,
