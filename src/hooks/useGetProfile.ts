@@ -15,6 +15,7 @@ export const useGetProfile = () => {
     setError(null);
     try {
       const response: UserProfileResponse = await profileService.getProfile();
+      console.log('PROFILE RESPONSE:', response);
 
       // Validate response data
       if (!response?.data) {
@@ -27,6 +28,7 @@ export const useGetProfile = () => {
         email: response.data?.email,
         role: response.data?.role,
         status: response.data?.status,
+        name: response.data?.name,
         twoFactorEnabled: response.data?.twoFactorEnabled ?? false,
         googleId: response.data?.googleId ?? null,
         createdAt: response.data?.createdAt,
@@ -34,7 +36,7 @@ export const useGetProfile = () => {
         firstName: response.data?.userProfile?.firstName ?? '',
         lastName: response.data?.userProfile?.lastName ?? '',
         username: response.data?.userProfile?.username ?? '',
-        phoneNumber: response.data?.userProfile?.phoneNumber ?? null,
+        phoneNumber: response.data?.phoneNumber ?? null,
         avatar: response.data?.userProfile?.avatar ?? null,
       };
 

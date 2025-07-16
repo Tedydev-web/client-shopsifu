@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { EyeOff, Info, Eye } from "lucide-react";
-import { t } from "i18next";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { usePasswordChangePassword } from "../../profile/useProfile-ChangePassword";
@@ -31,41 +32,58 @@ interface ChangePasswordModalProps {
   onOpenChange: (open: boolean) => void;
   firstName: string;
   lastName: string;
-  username: string;
-  revokeOtherSessions: boolean;
+  name: string;
 }
-
-type PasswordFormData = z.infer<ReturnType<typeof passwordSchema>> & {
-  revokeOtherSessions: boolean;
-};
 
 export function ChangePasswordModal({
   open,
   onOpenChange,
   firstName,
   lastName,
-  username,
+  name,
 }: ChangePasswordModalProps) {
-  const { loading, handleChangePassword } = usePasswordChangePassword();
   const user = useUserData();
+  const { loading, handleChangePassword } = usePasswordChangePassword();
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
+
+  const t = useTranslations();
+
   const getFullName = () => {
     return [firstName, lastName].filter(Boolean).join(" ");
   };
-  const currentPasswordSchema = passwordSchema(t);
-  type PasswordFormData = z.infer<typeof currentPasswordSchema>;
+
+  const schema = passwordSchema(t);
+  type PasswordFormData = z.infer<typeof schema>;
 
   const form = useForm<PasswordFormData>({
-    resolver: zodResolver(currentPasswordSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     },
   });
+
+  const onSubmit = async (data: PasswordFormData) => {
+    if (!user) return;
+
+    const result = await handleChangePassword({
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword,
+      revokeOtherSessions,
+    });
+
+    if (result) {
+      form.reset();
+      setRevokeOtherSessions(false);
+      onOpenChange(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -78,9 +96,10 @@ export function ChangePasswordModal({
             {getFullName() && (
               <div className="text-sm text-gray-500">{getFullName()}</div>
             )}
-            <div className="font-medium text-sm">@{username}</div>
+            <div className="font-medium text-sm">@{name}</div>
           </div>
         </DialogHeader>
+
         <div className="py-4">
           <div className="flex items-center gap-2 p-3 mb-4 bg-blue-50 rounded-lg">
             <Info className="w-4 h-4 text-blue-600" />
@@ -90,25 +109,7 @@ export function ChangePasswordModal({
           </div>
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(async (data: PasswordFormData) => {
-                if (!user) return;
-
-                const result = await handleChangePassword({
-                  currentPassword: data.currentPassword,
-                  newPassword: data.newPassword,
-                  confirmPassword: data.confirmPassword,
-                  revokeOtherSessions: revokeOtherSessions,
-                });
-
-                if (result) {
-                  form.reset();
-                  setRevokeOtherSessions(false);
-                  onOpenChange(false);
-                }
-              })}
-              className="space-y-4"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="currentPassword"
@@ -134,9 +135,9 @@ export function ChangePasswordModal({
                           className="absolute inset-y-0 right-0 flex items-center pr-3"
                         >
                           {showCurrentPassword ? (
-                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            <EyeOff className="h-5 w-5 text-gray-600 hover:text-primary" />
                           ) : (
-                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            <Eye className="h-5 w-5 text-gray-600 hover:text-primary" />
                           )}
                         </button>
                       </div>
@@ -169,9 +170,9 @@ export function ChangePasswordModal({
                           className="absolute inset-y-0 right-0 flex items-center pr-3"
                         >
                           {showNewPassword ? (
-                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            <EyeOff className="h-5 w-5 text-gray-600 hover:text-primary" />
                           ) : (
-                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            <Eye className="h-5 w-5 text-gray-600 hover:text-primary" />
                           )}
                         </button>
                       </div>
@@ -206,9 +207,9 @@ export function ChangePasswordModal({
                           className="absolute inset-y-0 right-0 flex items-center pr-3"
                         >
                           {showConfirmPassword ? (
-                            <EyeOff className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            <EyeOff className="h-5 w-5 text-gray-600 hover:text-primary" />
                           ) : (
-                            <Eye className="h-5 w-5 text-gray-600 cursor-pointer hover:text-primary transition-colors" />
+                            <Eye className="h-5 w-5 text-gray-600 hover:text-primary" />
                           )}
                         </button>
                       </div>
@@ -218,7 +219,6 @@ export function ChangePasswordModal({
                 )}
               />
 
-              {/* Revoke other sessions checkbox */}
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="revokeOtherSessions"
@@ -229,7 +229,7 @@ export function ChangePasswordModal({
                 />
                 <label
                   htmlFor="revokeOtherSessions"
-                  className="text-sm text-gray-600 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm text-gray-600"
                 >
                   {t("user.account.password.revokeOtherSessions")}
                 </label>

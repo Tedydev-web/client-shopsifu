@@ -25,7 +25,6 @@ export const useUserData = () => {
     // Trả về một đối tượng mới bao gồm tất cả các thuộc tính của user và thuộc tính 'name'
     return {
       ...user,
-      name,
     };
   }, [user]);
 

@@ -7,6 +7,7 @@ import { BaseResponse } from "../base.interface";
 export interface UserProfile {
   id: number;
   email: string;
+  name: string;
   role: {
     id: number;
     name: string;
@@ -32,6 +33,7 @@ export interface UserProfileResponse extends BaseResponse {
   data: {
     id: number;
     email: string;
+    name: string;
     role: {
       id: number;
       name: string;
@@ -42,11 +44,11 @@ export interface UserProfileResponse extends BaseResponse {
     googleId: string | null;
     createdAt: string;
     updatedAt: string;
+    phoneNumber: string | null;
     userProfile?: {
       firstName: string;
       lastName: string;
       username: string;
-      phoneNumber: string | null;
       avatar: string | null;
     };
   };
@@ -57,7 +59,7 @@ export interface UserProfileResponse extends BaseResponse {
 export interface UpdateProfileRequest {
   firstName?: string;
   lastName?: string;
-  username?: string;
+  name?: string;
   phoneNumber?: string | null;
   avatar?: string | null;
 }
@@ -66,6 +68,7 @@ export interface UpdateProfileResponse extends BaseResponse {
   data: {
     id: number;
     email: string;
+    name: string;
     role: string;
     status: string;
     twoFactorEnabled: boolean;

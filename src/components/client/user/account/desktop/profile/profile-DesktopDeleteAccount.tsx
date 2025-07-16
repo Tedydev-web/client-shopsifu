@@ -25,9 +25,9 @@ export function DeleteAccountModal({ open, onOpenChange, onConfirm }: DeleteAcco
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("user.account.profile.deleteAccount")}</DialogTitle>
-          <DialogDescription>
+          {/* <DialogDescription>
             {t("user.account.profile.deleteAccountDescription")}
-          </DialogDescription>
+          </DialogDescription> */}
         </DialogHeader>
         <DialogFooter className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>

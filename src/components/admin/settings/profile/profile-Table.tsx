@@ -27,21 +27,22 @@ export function ProfileSettingsTable() {
   }
 
   const fullName = `${user.lastName} ${user.firstName}`.trim();
+  console.log("user in ProfileSettingsTable:", user);
 
   const columns: SettingTableColumn[] = [
     {
       label: "Avatar",
       value: (
         <Avatar>
-          <AvatarImage src={user.avatar || ""} alt={user.username} />
+          <AvatarImage src={user.avatar || ""} alt={user.name} />
           <AvatarFallback>
-            {user.username.charAt(0).toUpperCase()}
+            {user.name.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
       ),
     },
-    { label: "Tên người dùng", value: user.username || "Chưa có" },
-    { label: "Họ và tên", value: fullName || "Chưa có" },
+    { label: "Tên người dùng", value: user.name || "Chưa có" },
+    // { label: "Họ và tên", value: fullName || "Chưa có" },
     { label: "Email", value: user.email },
     { label: "Số điện thoại", value: user.phoneNumber || "Chưa có" },
     {
