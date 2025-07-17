@@ -1,12 +1,14 @@
 import { privateAxios } from "@/lib/api";
 import { API_ENDPOINTS } from "@/constants/api";
 import { PaginationRequest } from "@/types/base.interface";
-import { Product, ProductsResponse } from "@/types/products.interface";
-
-// For now, we can use a partial product for create/update requests.
-// We can define more specific interfaces later if needed.
-export type ProductCreateRequest = Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'createdById' | 'updatedById' | 'deletedById' | 'productTranslations'>;
-export type ProductUpdateRequest = Partial<ProductCreateRequest>;
+import {
+  Product,
+  ProductsResponse,
+  ProductCreateRequest,
+  ProductUpdateRequest,
+  ProductDetailResponse,
+  ProductDetail
+} from "@/types/products.interface";
 
 export const productsService = {
   // Lấy danh sách sản phẩm
@@ -23,11 +25,11 @@ export const productsService = {
   },
 
   // Lấy chi tiết sản phẩm theo ID
-  getById: async (id: string): Promise<Product> => {
+  getById: async (id: string): Promise<ProductDetail> => {
     try {
       const url = API_ENDPOINTS.MANAGE_PRODUCTS.DETAIL.replace(":id", id);
-      const response = await privateAxios.get(url);
-      return response.data.data; // Assuming the response is { data: Product }
+      const response = await privateAxios.get<ProductDetailResponse>(url);
+      return response.data.data; // Trả về đối tượng ProductDetail từ trong key 'data'
     } catch (error) {
       console.error(`Error fetching product with id ${id}:`, error);
       throw error;
@@ -61,10 +63,11 @@ export const productsService = {
   },
 
   // Xoá sản phẩm theo ID
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: string): Promise<Product> => {
     try {
       const url = API_ENDPOINTS.MANAGE_PRODUCTS.DELETE.replace(":id", id);
-      await privateAxios.delete(url);
+      const response = await privateAxios.delete(url);
+      return response.data;
     } catch (error) {
       console.error(`Error deleting product with id ${id}:`, error);
       throw error;

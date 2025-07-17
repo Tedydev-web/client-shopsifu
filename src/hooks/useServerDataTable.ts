@@ -13,6 +13,7 @@ interface UseServerDataTableProps<T, U> {
   initialSort?: {
     sortBy: string;
     sortOrder: 'asc' | 'desc';
+    createdById?: number;
   };
   defaultLimit?: number;
 }
@@ -32,6 +33,7 @@ export function useServerDataTable<T, U = T>({
     search: '',
     sortBy: initialSort.sortBy,
     sortOrder: initialSort.sortOrder,
+    createdById: initialSort.createdById,
     totalPages: 1,
     totalItems: 0,
     hasNext: false,
@@ -83,6 +85,7 @@ export function useServerDataTable<T, U = T>({
           search: debouncedSearch,
           sortBy: pagination.sortBy,
           sortOrder: pagination.sortOrder,
+          createdById: pagination.createdById,
         };
         
         // Gọi API và lấy response với AbortSignal

@@ -44,7 +44,7 @@ export function ProductsFilter<TData>({ table }: ProductsFilterProps<TData>) {
 
   const categoryColumn = table.getColumn("category");
   const priceColumn = table.getColumn("price");
-  const sizeColumn = table.getColumn("size");
+  // const sizeColumn = table.getColumn("size");
 
   const [priceRange, setPriceRange] = React.useState<[number, number]>([0, 1000]);
 
@@ -58,7 +58,7 @@ export function ProductsFilter<TData>({ table }: ProductsFilterProps<TData>) {
   };
 
   const selectedCategories = new Set(categoryColumn?.getFilterValue() as string[]);
-  const selectedSizes = new Set(sizeColumn?.getFilterValue() as string[]);
+  // const selectedSizes = new Set(sizeColumn?.getFilterValue() as string[]);
 
   return (
     <div className="flex items-center space-x-2">
@@ -178,7 +178,7 @@ export function ProductsFilter<TData>({ table }: ProductsFilterProps<TData>) {
       )}
 
       {/* --- Bộ lọc Kích cỡ --- */}
-      {sizeColumn && (
+      {/* {sizeColumn && (
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 border-dashed">
@@ -239,7 +239,7 @@ export function ProductsFilter<TData>({ table }: ProductsFilterProps<TData>) {
             </div>
           </PopoverContent>
         </Popover>
-      )}
+      )} */}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { generateSKUs, Sku } from '@/utils/variantUtils';
 import type { OptionData } from './form-VariantInput';
 
@@ -17,47 +17,242 @@ const parsePrice = (value: string) => {
   return numericString === '' ? 0 : parseInt(numericString, 10);
 };
 
+// Interface cho SKU từ API
+interface ApiSku {
+  id: string;
+  value: string;
+  price: number;
+  stock: number;
+  image: string;
+  productId?: string;
+  createdById?: string;
+  updatedById?: string;
+  deletedById?: string;
+  deletedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Hook Props
 interface UseSkuProps {
   options: OptionData[];
+  initialSkus?: ApiSku[]; // Thêm prop để nhận skus từ API
   onUpdateSkus: (skus: Sku[]) => void;
 }
 
-export function useSku({ options, onUpdateSkus }: UseSkuProps) {
+// Helper function to map API SKUs to component SKUs
+function mapApiSkusToComponentSkus(apiSkus: ApiSku[], options: OptionData[]): Sku[] {
+  console.log('mapApiSkusToComponentSkus called with:');
+  console.log('API SKUs:', apiSkus);
+  console.log('Options:', options);
+  
+  if (!apiSkus?.length) {
+    console.log('No API SKUs provided');
+    return [];
+  }
+  
+  if (!options?.length) {
+    console.log('No options provided');
+    return [];
+  }
+  
+  // Kiểm tra dữ liệu API
+  if (apiSkus.some(sku => !sku.value)) {
+    console.warn('Some API SKUs are missing value property:', 
+      apiSkus.filter(sku => !sku.value).map(sku => sku.id));
+  }
+  
+  return apiSkus.map(apiSku => {
+    try {
+      // Đảm bảo apiSku.value là string
+      const skuValue = apiSku.value || '';
+      
+      // Split value: "Đen-L" -> ["Đen", "L"]
+      const valueParts = skuValue.split('-');
+      console.log(`Processing SKU ${apiSku.id}, value: ${skuValue}, parts:`, valueParts);
+      
+      // Tạo variantValues từ valueParts và options
+      const variantValues = options.map((option, index) => {
+        // Đảm bảo rằng chúng ta có một giá trị cho mỗi option, ngay cả khi valueParts thiếu
+        return {
+          optionName: option.name,
+          value: index < valueParts.length ? valueParts[index] : ''
+        };
+      });
+      
+      // Tạo name từ các valueParts để hiển thị thân thiện hơn
+      const name = valueParts.join(' / ');
+      
+      // Tạo một SKU mới với dữ liệu từ API
+      const mappedSku = {
+        id: apiSku.id || `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, 
+        name: name, // Thêm name theo yêu cầu của interface Sku
+        price: typeof apiSku.price === 'number' ? apiSku.price : 0,
+        stock: typeof apiSku.stock === 'number' ? apiSku.stock : 0,
+        image: apiSku.image || '',
+        variantValues
+      };
+      
+      console.log('Mapped SKU:', mappedSku);
+      
+      return mappedSku;
+    } catch (error) {
+      console.error(`Error processing SKU ${apiSku.id}:`, error);
+      
+      // Trả về một SKU mặc định trong trường hợp lỗi
+      return {
+        id: apiSku.id || `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name: apiSku.value || 'Unknown',
+        price: typeof apiSku.price === 'number' ? apiSku.price : 0,
+        stock: typeof apiSku.stock === 'number' ? apiSku.stock : 0,
+        image: apiSku.image || '',
+        variantValues: options.map(option => ({
+          optionName: option.name,
+          value: ''
+        }))
+      };
+    }
+  });
+}
+
+export function useSku({ options, initialSkus, onUpdateSkus }: UseSkuProps) {
   const [skus, setSkus] = useState<Sku[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
+  // Tham chiếu để theo dõi xem update đến từ bên trong hay bên ngoài
+  const isInternalUpdate = useRef(false);
+  
+  // Thêm ref để theo dõi trạng thái khởi tạo
+  const isInitialized = useRef(false);
+  
   useEffect(() => {
-    const newSkus = generateSKUs(options);
-    // Preserve existing price/stock/image data if possible
-    const preservedSkus = newSkus.map(newSku => {
-      const oldSku = skus.find(s => s.id === newSku.id);
-      return oldSku ? { ...newSku, price: oldSku.price, stock: oldSku.stock, image: oldSku.image } : newSku;
+    console.log('useSku effect triggered:', { 
+      optionsLength: options.length, 
+      initialSkusLength: initialSkus?.length, 
+      isInternalUpdate: isInternalUpdate.current,
+      isInitialized: isInitialized.current
     });
-    setSkus(preservedSkus);
-    onUpdateSkus(preservedSkus);
-
-    // Reset expanded state only if the primary option changes
-    const oldFirstOption = skus[0]?.variantValues[0]?.optionName;
-    const newFirstOption = options[0]?.name;
-    if (oldFirstOption !== newFirstOption) {
-        setExpandedGroups({});
+    
+    // Nếu đã khởi tạo và là update từ bên trong, bỏ qua
+    if (isInitialized.current && isInternalUpdate.current) {
+      console.log('Skipping effect due to internal update');
+      isInternalUpdate.current = false;
+      return;
+    }
+    
+    // Kiểm tra điều kiện để quyết định nguồn dữ liệu SKU
+    const hasOptions = options && options.length > 0 && options.some(opt => opt.values && opt.values.length > 0);
+    const hasInitialSkus = initialSkus && initialSkus.length > 0;
+    
+    // Log trạng thái
+    console.log('SKU data source conditions:', { hasOptions, hasInitialSkus });
+    
+    let newSkus: Sku[] = [];
+    
+    try {
+      if (hasInitialSkus && hasOptions) {
+        // Có cả SKUs từ API và options -> dùng initialSkus
+        console.log('Using initialSkus from API', initialSkus);
+        newSkus = mapApiSkusToComponentSkus(initialSkus, options);
+      } else if (hasOptions) {
+        // Chỉ có options -> tạo mới SKUs từ options
+        console.log('Generating new SKUs from options', options);
+        newSkus = generateSKUs(options);
+      } else {
+        console.log('Not enough data to create SKUs');
+        // Không có đủ dữ liệu để tạo SKUs
+        newSkus = [];
+      }
+      
+      console.log('Generated new SKUs:', newSkus);
+      
+      // Bảo toàn giá trị price, stock, image của SKUs hiện tại nếu có
+      const preservedSkus = newSkus.map(newSku => {
+        // Tìm theo name hoặc id
+        const oldSku = skus.find(s => s.name === newSku.name || s.id === newSku.id);
+        if (oldSku) {
+          return { 
+            ...newSku, 
+            price: oldSku.price || newSku.price,
+            stock: oldSku.stock || newSku.stock,
+            image: oldSku.image || newSku.image
+          };
+        }
+        return newSku;
+      });
+      
+      console.log('Setting skus state with preservedSkus:', preservedSkus.length);
+      
+      // Cập nhật state
+      setSkus(preservedSkus);
+      
+      // Reset expanded state only if the primary option changes
+      const oldFirstOption = skus[0]?.variantValues[0]?.optionName;
+      const newFirstOption = options[0]?.name;
+      if (oldFirstOption !== newFirstOption) {
+          setExpandedGroups({});
+      }
+      
+      // Đánh dấu đã khởi tạo sau lần đầu tiên
+      isInitialized.current = true;
+    } catch (error) {
+      console.error('Error processing SKUs:', error);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options]);
+  }, [options, initialSkus]);
 
   const groupedSkus = useMemo<GroupedSkus>(() => {
-    if (!skus || skus.length === 0 || skus[0].variantValues.length === 0) {
+    if (!skus || skus.length === 0) {
       return {};
     }
-    return skus.reduce((acc, sku) => {
-      const groupKey = sku.variantValues[0].value;
-      if (!acc[groupKey]) {
-        acc[groupKey] = [];
+    
+    try {
+      // Kiểm tra xem mỗi SKU có variantValues không trước khi sử dụng
+      const hasValidVariantValues = skus.every(sku => 
+        sku.variantValues && 
+        Array.isArray(sku.variantValues) && 
+        sku.variantValues.length > 0
+      );
+      
+      if (!hasValidVariantValues) {
+        console.error('Some SKUs have invalid variantValues', skus);
+        return {};
       }
-      acc[groupKey].push(sku);
-      return acc;
-    }, {} as GroupedSkus);
+      
+      return skus.reduce((acc, sku) => {
+        try {
+          // Bảo vệ truy cập vào variantValues[0]
+          const groupKey = sku.variantValues[0]?.value || 'Unknown';
+          
+          if (!acc[groupKey]) {
+            acc[groupKey] = [];
+          }
+          acc[groupKey].push(sku);
+          return acc;
+        } catch (error) {
+          console.error('Error processing SKU in grouping:', sku, error);
+          return acc;
+        }
+      }, {} as GroupedSkus);
+    } catch (error) {
+      console.error('Error grouping SKUs:', error);
+      return {};
+    }
+  }, [skus]);
+
+  // Thêm useEffect để xử lý cập nhật skus lên component cha
+  useEffect(() => {
+    // Bỏ qua lần mount đầu tiên
+    if (!isInitialized.current) {
+      return;
+    }
+    
+    // Chỉ thông báo cập nhật khi thay đổi đến từ các hàm xử lý sự kiện nội bộ
+    if (isInternalUpdate.current && skus.length > 0) {
+      console.log('Notifying parent of SKU update:', skus.length);
+      onUpdateSkus(skus);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [skus]);
 
   const handleSkuChange = (skuId: string, field: 'price' | 'stock', value: string) => {
@@ -71,11 +266,15 @@ export function useSku({ options, onUpdateSkus }: UseSkuProps) {
 
     if (isNaN(numericValue)) return;
 
+    // Đánh dấu cập nhật nội bộ
+    isInternalUpdate.current = true;
+    console.log(`handleSkuChange - Updating SKU ${skuId}, field: ${field}, value: ${value}`);
+    
     const updatedSkus = skus.map(sku =>
       sku.id === skuId ? { ...sku, [field]: numericValue } : sku
     );
     setSkus(updatedSkus);
-    onUpdateSkus(updatedSkus);
+    // Không gọi onUpdateSkus ở đây, để useEffect xử lý
   };
 
   const toggleGroup = (groupKey: string) => {
@@ -83,11 +282,16 @@ export function useSku({ options, onUpdateSkus }: UseSkuProps) {
   };
 
   const handleImageUpdate = (skuId: string, newUrl: string) => {
+    console.log(`handleImageUpdate - Updating image for SKU ${skuId} to ${newUrl}`);
+    
+    // Đánh dấu cập nhật nội bộ
+    isInternalUpdate.current = true;
+    
     const updatedSkus = skus.map(sku => 
       sku.id === skuId ? { ...sku, image: newUrl } : sku
     );
     setSkus(updatedSkus);
-    onUpdateSkus(updatedSkus);
+    // Không gọi onUpdateSkus ở đây, để useEffect xử lý
   };
 
   return {

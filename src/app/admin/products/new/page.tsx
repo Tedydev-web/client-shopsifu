@@ -1,5 +1,8 @@
+"use client";
+
 import { SlArrowLeft } from "react-icons/sl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +17,7 @@ import {
 import { ProductForm } from "@/components/admin/products/products-form/form-Index";
 
 export default function NewProductPage() {
+  const router = useRouter();
   const t = useTranslations("admin.ModuleProduct.AddNew");
 
   return (
@@ -42,7 +46,12 @@ export default function NewProductPage() {
       </div>
 
       <div className="mx-auto grid w-full max-w-7xl items-start gap-6">
-        <ProductForm />
+        <ProductForm 
+          onCreateSuccess={(productId: string) => {
+            console.log('Navigating to edit page:', `/admin/products/${productId}`);
+            router.push(`/admin/products/${productId}`);
+          }}
+        />
       </div>
     </main>
   );
