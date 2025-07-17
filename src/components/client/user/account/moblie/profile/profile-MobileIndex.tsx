@@ -197,14 +197,14 @@ export default function ProfileMobileIndex() {
       <div className="pt-3">
         <div className="flex justify-between items-center">
           <p className="text-sm text-gray-700 font-medium">
-            {t("user.account.profile.deleteAccount")}
+            {t("user.account.profile.accountTermination")}
           </p>
           <button
             onClick={() => setIsDeleteModalOpen(true)}
             disabled={isGuest}
             className="text-red-600 text-sm font-medium hover:underline disabled:opacity-50"
           >
-            {t("user.account.profile.delete")}
+            {t("user.account.profile.deleteAccount")}
           </button>
         </div>
       </div>

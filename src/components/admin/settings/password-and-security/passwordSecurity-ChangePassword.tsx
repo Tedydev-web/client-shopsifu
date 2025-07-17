@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
 import { useUserData } from '@/hooks/useGetData-UserLogin';
-import { passwordSchema } from '@/utils/schema';
+import { useUpdatePasswordSchema } from '@/utils/schema';
 import { usePasswordSecurityChangePassword } from './usePasswordSecurity-ChangePassword';
 
 interface ChangePasswordModalProps {
@@ -44,15 +44,15 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Create the schema dynamically with the translation function
-  const currentPasswordSchema = passwordSchema(t);
+  const currentPasswordSchema = useUpdatePasswordSchema(t);
   type PasswordFormData = z.infer<typeof currentPasswordSchema>;
 
   const form = useForm<PasswordFormData>({
     resolver: zodResolver(currentPasswordSchema),
     defaultValues: {
-      currentPassword: '',
+      password: '',
       newPassword: '',
-      confirmPassword: '',
+      confirmNewPassword: '',
     },
   });
 
@@ -82,10 +82,10 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
               if (!user) return;
 
               const result = await handleChangePassword({
-                currentPassword: data.currentPassword,
+                password: data.password,
                 newPassword: data.newPassword,
-                confirmPassword: data.confirmPassword,
-                revokeOtherSessions: revokeOtherSessions,
+                confirmNewPassword: data.confirmNewPassword,
+                // revokeOtherSessions: revokeOtherSessions,
               });
 
               if (result) {
@@ -96,7 +96,7 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
             })} className="space-y-4">
               <FormField
                 control={form.control}
-                name="currentPassword"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
@@ -160,7 +160,7 @@ export const ChangePasswordModal = ({ open, onOpenChange }: ChangePasswordModalP
               />
               <FormField
                 control={form.control}
-                name="confirmPassword"
+                name="confirmNewPassword"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>

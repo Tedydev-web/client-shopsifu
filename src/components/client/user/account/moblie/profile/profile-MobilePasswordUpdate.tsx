@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { passwordSchema } from "@/utils/schema";
+import { useUpdatePasswordSchema } from "@/utils/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Info, Lock, X, Eye, EyeOff } from "lucide-react";
-import { t } from "i18next";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { usePasswordChangePassword } from "../../profile/useProfile-ChangePassword";
@@ -42,21 +42,22 @@ export function ChangePasswordModal({
 }: ChangePasswordModalProps) {
   const { loading, handleChangePassword } = usePasswordChangePassword();
   const user = useUserData();
+  const t = useTranslations();
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
 
-  const schema = passwordSchema(t);
+  const schema = useUpdatePasswordSchema(t);
   type PasswordFormData = z.infer<typeof schema>;
 
   const form = useForm<PasswordFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      currentPassword: "",
+      password: "",
       newPassword: "",
-      confirmPassword: "",
+      confirmNewPassword: "",
     },
   });
 
@@ -98,10 +99,10 @@ export function ChangePasswordModal({
                   if (!user) return;
 
                   const result = await handleChangePassword({
-                    currentPassword: data.currentPassword,
+                    password: data.password, // đổi field name
                     newPassword: data.newPassword,
-                    confirmPassword: data.confirmPassword,
-                    revokeOtherSessions,
+                    confirmNewPassword: data.confirmNewPassword, // đổi field name
+                    // bỏ revokeOtherSessions nếu backend không dùng
                   });
 
                   if (result) {
@@ -115,7 +116,7 @@ export function ChangePasswordModal({
                 {/* Current Password */}
                 <FormField
                   control={form.control}
-                  name="currentPassword"
+                  name="password"
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <div className="flex items-center justify-between">
@@ -204,7 +205,7 @@ export function ChangePasswordModal({
                 {/* Confirm Password */}
                 <FormField
                   control={form.control}
-                  name="confirmPassword"
+                  name="confirmNewPassword"
                   render={({ field }) => (
                     <FormItem className="space-y-1">
                       <FormLabel className="text-sm font-medium">

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { passwordSchema } from "@/utils/schema";
+import { useUpdatePasswordSchema } from "@/utils/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -56,15 +56,15 @@ export function ChangePasswordModal({
     return [firstName, lastName].filter(Boolean).join(" ");
   };
 
-  const schema = passwordSchema(t);
+  const schema = useUpdatePasswordSchema(t);
   type PasswordFormData = z.infer<typeof schema>;
 
   const form = useForm<PasswordFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      currentPassword: "",
+      password: "",
       newPassword: "",
-      confirmPassword: "",
+      confirmNewPassword: "",
     },
   });
 
@@ -72,10 +72,10 @@ export function ChangePasswordModal({
     if (!user) return;
 
     const result = await handleChangePassword({
-      currentPassword: data.currentPassword,
+      password: data.password,
       newPassword: data.newPassword,
-      confirmPassword: data.confirmPassword,
-      revokeOtherSessions,
+      confirmNewPassword: data.confirmNewPassword,
+      // revokeOtherSessions,
     });
 
     if (result) {
@@ -112,7 +112,7 @@ export function ChangePasswordModal({
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="currentPassword"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
@@ -184,7 +184,7 @@ export function ChangePasswordModal({
 
               <FormField
                 control={form.control}
-                name="confirmPassword"
+                name="confirmNewPassword"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>

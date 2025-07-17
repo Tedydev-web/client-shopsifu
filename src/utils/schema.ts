@@ -81,3 +81,14 @@ export const userUpdateSchema = (t: Translate) => z.object({
   status: z.string(),
   // Cho phép password trống hoặc phải dài tối thiểu 8 ký tự nếu có giá trị
 });
+
+// ✅ Có return schema rõ ràng
+export const useUpdatePasswordSchema = (t: Translate) => z.object({
+  password: z.string().min(1, { message: t('schema.validation.password.currentRequired') }),
+  newPassword: passwordValidation(t),
+  confirmNewPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmNewPassword, {
+  message: t('schema.validation.password.match'),
+  path: ["confirmPassword"]
+});
+

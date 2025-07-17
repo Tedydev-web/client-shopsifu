@@ -19,6 +19,7 @@ import { UpdateProfileSchema } from "@/utils/schema";
 import { z } from "zod";
 import { showToast } from "@/components/ui/toastify";
 import { useUpdateProfile } from "./../../profile/useProfile-Update";
+import { useUserData } from "@/hooks/useGetData-UserLogin";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
@@ -37,6 +38,7 @@ export function ProfileUpdateSheet({
 }: ProfileUpdateSheetProps) {
   const [avatar, setAvatar] = useState(initialData.avatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const userData = useUserData();
   const t = useTranslations();
   const formSchema = UpdateProfileSchema(t);
   const { updateProfile, loading } = useUpdateProfile(() =>
@@ -50,18 +52,22 @@ export function ProfileUpdateSheet({
     defaultValues: {
       name: "",
       phoneNumber: "",
+      address: "",
+      avatar: "",
     },
   });
 
   useEffect(() => {
-    if (open && initialData) {
+    if (userData && open) {
       form.reset({
-        name: initialData.name || "",
-        phoneNumber: initialData.phoneNumber || "",
+        name: userData.name || "",
+        phoneNumber: userData.phoneNumber || "",
+        // address: userData.address || "",
+        avatar: userData.avatar || "",
       });
-      setAvatar(initialData.avatar || "");
+      setAvatar(userData.avatar || "");
     }
-  }, [open, initialData, form]);
+  }, [open, initialData, form, userData]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -78,24 +84,38 @@ export function ProfileUpdateSheet({
     }
   };
 
+  // const onSubmit = (data: ProfileFormData) => {
+  //   const dirtyFields = form.formState.dirtyFields;
+  //   const changedData: Partial<ProfileFormData & { avatar?: string }> = {};
+
+  //   (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach((key) => {
+  //     changedData[key] = data[key];
+  //   });
+
+  //   if (avatar !== initialData.avatar) {
+  //     changedData.avatar = avatar;
+  //   }
+
+  //   if (Object.keys(changedData).length === 0) {
+  //     showToast("Không có thay đổi nào để lưu.", "info");
+  //     return;
+  //   }
+
+  //   updateProfile(changedData);
+  // };
+
   const onSubmit = (data: ProfileFormData) => {
-    const dirtyFields = form.formState.dirtyFields;
-    const changedData: Partial<ProfileFormData & { avatar?: string }> = {};
+    const hasChanges =
+      data.name !== userData?.name ||
+      data.phoneNumber !== userData?.phoneNumber ||
+      data.avatar !== userData?.avatar;
 
-    (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach((key) => {
-      changedData[key] = data[key];
-    });
-
-    if (avatar !== initialData.avatar) {
-      changedData.avatar = avatar;
-    }
-
-    if (Object.keys(changedData).length === 0) {
+    if (!hasChanges) {
       showToast("Không có thay đổi nào để lưu.", "info");
       return;
     }
 
-    updateProfile(changedData);
+    updateProfile(data);
   };
 
   const name = form.watch("name");
@@ -199,9 +219,7 @@ export function ProfileUpdateSheet({
                 type="submit"
                 disabled={loading}
               >
-                {loading
-                  ? t("common.saving")
-                  : t("user.account.profile.save")}
+                {loading ? t("common.saving") : t("user.account.profile.save")}
               </Button>
             </form>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,6 +31,7 @@ export function ProfileUpdateSheet({
   open,
   onOpenChange,
 }: ProfileUpdateSheetProps) {
+  // const [avatar, setAvatar] = useState(initialData.avatar);
   const t = useTranslations();
   const userData = useUserData();
   const formSchema = UpdateProfileSchema(t);
@@ -46,6 +47,7 @@ export function ProfileUpdateSheet({
     defaultValues: {
       name: "",
       phoneNumber: "",
+      avatar: "",
     },
   });
 
@@ -54,26 +56,25 @@ export function ProfileUpdateSheet({
       form.reset({
         name: userData.name || "",
         phoneNumber: userData.phoneNumber || "",
+        // address: userData.address || "",
+        avatar: userData.avatar || "",
       });
+      // setAvatar(userData.avatar || "");
     }
   }, [userData, open, form]);
 
   const onSubmit = (data: ProfileFormData) => {
-    const dirtyFields = form.formState.dirtyFields;
-    const changedData: Partial<ProfileFormData> = {};
+    const hasChanges =
+      data.name !== userData?.name ||
+      data.phoneNumber !== userData?.phoneNumber ||
+      data.avatar !== userData?.avatar;
 
-    (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach(
-      (key) => {
-        changedData[key] = data[key];
-      }
-    );
-
-    if (Object.keys(changedData).length === 0) {
+    if (!hasChanges) {
       showToast("Không có thay đổi nào để lưu.", "info");
       return;
     }
 
-    updateProfile(changedData);
+    updateProfile(data);
   };
 
   return (

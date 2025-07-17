@@ -72,26 +72,40 @@ export function ProfileUpdateSheet({
     }
   }, [userData, open, form]);
 
+  // const handleSubmit = (data: ProfileFormData) => {
+  //   const dirtyFields = form.formState.dirtyFields;
+  //   const changedData: Partial<ProfileFormData> = {};
+
+  //   (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach(
+  //     (key) => {
+  //       changedData[key] = data[key];
+  //     }
+  //   );
+
+  //   if (data.avatar && data.avatar !== userData?.avatar) {
+  //     changedData.avatar = data.avatar;
+  //   }
+
+  //   if (Object.keys(changedData).length === 0) {
+  //     showToast("Không có thay đổi nào để lưu.", "info");
+  //     return;
+  //   }
+
+  //   updateProfile(changedData);
+  // };
+
   const handleSubmit = (data: ProfileFormData) => {
-    const dirtyFields = form.formState.dirtyFields;
-    const changedData: Partial<ProfileFormData> = {};
+    const hasChanges =
+      data.name !== userData?.name ||
+      data.phoneNumber !== userData?.phoneNumber ||
+      data.avatar !== userData?.avatar;
 
-    (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach(
-      (key) => {
-        changedData[key] = data[key];
-      }
-    );
-
-    if (data.avatar && data.avatar !== userData?.avatar) {
-      changedData.avatar = data.avatar;
-    }
-
-    if (Object.keys(changedData).length === 0) {
+    if (!hasChanges) {
       showToast("Không có thay đổi nào để lưu.", "info");
       return;
     }
 
-    updateProfile(changedData);
+    updateProfile(data);
   };
 
   const handleAvatarClick = () => {

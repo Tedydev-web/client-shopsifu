@@ -96,3 +96,15 @@ export interface ChangePasswordResponse extends BaseResponse {
   message: string;
   verificationType?: string;
 }
+
+//Đổi mật khẩu profile
+export interface ChangePasswordProfileRequest {
+  password: string;
+  newPassword: string;
+  confirmNewPassword: string;
+  revokeOtherSessions?: boolean;
+}
+export interface ChangePasswordProfileResponse extends BaseResponse {
+  message: string;
+  verificationType?: string;
+}
