@@ -14,7 +14,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { ProductForm } from "@/components/admin/products/products-form/form-Index";
+import ProductFormWrapper from "@/components/admin/products/products-form/products-form-Wrapper";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -46,7 +46,7 @@ export default function NewProductPage() {
       </div>
 
       <div className="mx-auto grid w-full max-w-7xl items-start gap-6">
-        <ProductForm 
+        <ProductFormWrapper 
           onCreateSuccess={(productId: string) => {
             console.log('Navigating to edit page:', `/admin/products/${productId}`);
             router.push(`/admin/products/${productId}`);

@@ -13,7 +13,7 @@ interface ProductFormProps {
   onCreateSuccess?: (newProductId: string) => void;
 }
 
-export function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
+function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
   const {
     productData,
     isEditMode,
@@ -61,3 +61,6 @@ export function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) 
     </div>
   );
 }
+
+// Export component để có thể import động
+export { ProductForm };

@@ -18,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 
 interface ProductAsideFormProps {
   brandId: string | null;
-  categories: number[];
+  categories: string[];
   publishedAt?: string | null; 
   handleInputChange: (field: keyof ProductCreateRequest, value: any) => void;
   handleSubmit: () => void;
@@ -41,7 +41,7 @@ export function ProductAsideForm({
   
   // State for category modal
   const [isCategoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [selectedCategoryPath, setSelectedCategoryPath] = useState<string>('');
   const [isLoadingCategory, setIsLoadingCategory] = useState<boolean>(false);
 
@@ -89,13 +89,13 @@ export function ProductAsideForm({
         // Xử lý từng category ID trong mảng categories
         for (const categoryId of categories) {
           // Tìm category theo ID trong danh sách đã fetch
-          const category = allCategories.find(c => c.id === categoryId);
+          const category = allCategories.find(c => c.id && c.id.toString() === categoryId);
           
           if (category) {
             // Nếu tìm thấy category
             if (category.parentCategoryId) {
               // Tìm parent category nếu có parentCategoryId
-              const parentCategory = allCategories.find(c => c.id === category.parentCategoryId);
+              const parentCategory = allCategories.find(c => c.id && category.parentCategoryId && c.id.toString() === category.parentCategoryId.toString());
               
               if (parentCategory) {
                 // Hiển thị dạng "Parent > Child"
@@ -213,7 +213,7 @@ export function ProductAsideForm({
   };
 
   // Handle category selection from modal
-  const handleCategoryConfirm = (categoryIds: number[], selectionPath: string) => {
+  const handleCategoryConfirm = (categoryIds: string[], selectionPath: string) => {
     // Cập nhật cả ID và path từ modal
     setSelectedCategoryIds(categoryIds);
     setSelectedCategoryPath(selectionPath);

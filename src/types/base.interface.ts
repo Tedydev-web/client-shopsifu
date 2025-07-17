@@ -50,7 +50,7 @@ export interface PaginationMetadata {
  * @description A base interface for all entities, containing common properties.
  */
 export interface BaseEntity {
-    id: number;
+    id: string;
     createdById: number;
     updatedById: number | null;
     deletedById: number | null;
