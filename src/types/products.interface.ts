@@ -68,8 +68,8 @@ export interface ProductCreateRequest {
     publishedAt?: string | null;
     basePrice: number;
     virtualPrice: number;
-    brandId: number;
-    images: string[];
+    brandId: string; // Cập nhật sang string để phù hợp với UUID từ API
+    images: string[]; // Mảng string URLs trực tiếp
     categories: number[];
     variants: Variant[];
     skus: Sku[];

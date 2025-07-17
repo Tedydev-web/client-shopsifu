@@ -14,7 +14,7 @@ export interface BrandTranslation {
 
 // Interface chính cho Brand
 export interface Brand {
-  id: number;
+  id: string;
   name: string;
   logo?: string;
   createdById?: number;

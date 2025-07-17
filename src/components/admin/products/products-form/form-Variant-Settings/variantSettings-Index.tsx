@@ -25,14 +25,36 @@ import type { OptionData } from "./form-VariantInput";
 import { SKUList } from "./form-SKU";
 import type { Sku } from "@/utils/variantUtils";
 
+// Interface cho SKU từ API - giữ đồng bộ với useSKU.ts
+interface ApiSku {
+  id: string;
+  value: string;
+  price: number;
+  stock: number;
+  image: string;
+  productId?: string;
+  createdById?: string;
+  updatedById?: string;
+  deletedById?: string;
+  deletedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface VariantSettingsProps {
   variants: {
     value: string;
     options: string[];
   }[];
-  skus: any[]; // Sẽ định nghĩa chi tiết sau
-  setVariants: (variants: any[]) => void;
-  updateSingleSku: (index: number, updates: any) => void;
+  skus: ApiSku[]; // Định nghĩa cụ thể kiểu dữ liệu
+  setVariants: (variants: {value: string; options: string[]}[]) => void;
+  updateSingleSku: (index: number, updates: {
+    price?: number;
+    stock?: number;
+    image?: string;
+    value?: string;
+    id?: string;
+  }) => void;
 }
 
 export function VariantSettingsIndex({
@@ -44,33 +66,102 @@ export function VariantSettingsIndex({
   // Thêm ref để theo dõi nguồn thay đổi
   const isInternalChange = useRef(false);
   
-  // THÊM HÀM HANDLEUPDATESKUS VÀO ĐÂY
+  // Debug logs để xem data
+  console.log('VariantSettingsIndex - Received variants:', variants);
+  console.log('VariantSettingsIndex - Received skus:', skus);
+  
+  // Hàm xử lý cập nhật SKUs
   const handleUpdateSkus = useCallback((updatedSkus: Sku[]) => {
     // Đánh dấu đây là thay đổi nội bộ
     isInternalChange.current = true;
     
-    // Với mỗi SKU được cập nhật, gọi hàm updateSingleSku từ props
-    updatedSkus.forEach((sku) => {
-      // Lưu ý: Sử dụng sku.id thay vì index để cập nhật đúng SKU
-      // API SKU có id riêng, không phụ thuộc vào vị trí trong mảng
-      updateSingleSku(sku.id, {
-        price: sku.price,
-        stock: sku.stock,
-        image: sku.image || '',
-        value: sku.value
-      });
+    console.log('handleUpdateSkus - START');
+    console.log('handleUpdateSkus - Updating SKUs:', updatedSkus);
+    console.log('handleUpdateSkus - Current API SKUs:', skus);
+    
+    if (!Array.isArray(updatedSkus) || updatedSkus.length === 0) {
+      console.warn('handleUpdateSkus: No SKUs to update');
+      return;
+    }
+    
+    // Tạo bản sao của SKUs để theo dõi những SKUs đã cập nhật
+    let updatedApiSkus: Array<any> = Array.isArray(skus) ? [...skus] : [];
+    
+    // Đảm bảo updatedApiSkus có độ dài đủ
+    if (updatedApiSkus.length < updatedSkus.length) {
+      const extraNeeded = updatedSkus.length - updatedApiSkus.length;
+      console.log(`Adding ${extraNeeded} empty SKUs to match length`);
+      
+      for (let i = 0; i < extraNeeded; i++) {
+        updatedApiSkus.push({
+          id: `temp-${Date.now()}-${i}`,
+          value: '',
+          price: 0,
+          stock: 0,
+          image: ''
+        });
+      }
+    }
+    
+    // Với mỗi SKU được cập nhật, tìm index tương ứng trong mảng skus và cập nhật
+    updatedSkus.forEach((sku, index) => {
+      try {
+        // Tạo value từ variantValues để đảm bảo đúng định dạng API cần
+        // Format: "Color-Size" (ví dụ: "Đen-L")
+        const value = sku.variantValues.map(v => v.value).join('-');
+        
+        // Tìm index trong mảng skus bằng ID
+        let skuIndex = -1;
+        
+        if (Array.isArray(skus) && skus.length > 0) {
+          skuIndex = skus.findIndex(apiSku => apiSku.id === sku.id);
+          
+          // Nếu không tìm thấy bằng ID, sử dụng value để tìm
+          if (skuIndex < 0) {
+            skuIndex = skus.findIndex(apiSku => apiSku.value === value);
+          }
+        }
+        
+        // Nếu vẫn không tìm thấy, sử dụng index hiện tại
+        const indexToUpdate = skuIndex >= 0 ? skuIndex : index;
+        
+        console.log(`Updating SKU at index ${indexToUpdate}, id: ${sku.id}, value: ${value}`);
+        
+        // Gọi hàm cập nhật
+        updateSingleSku(indexToUpdate, {
+          price: sku.price,
+          stock: sku.stock,
+          image: sku.image || '',
+          value: value, // Sử dụng value được tạo từ variantValues
+          id: sku.id // Đảm bảo ID được giữ nguyên
+        });
+      } catch (error) {
+        console.error(`Error updating SKU at index ${index}:`, error);
+      }
     });
-  }, [updateSingleSku]);
+    
+    console.log('handleUpdateSkus - END');
+  }, [updateSingleSku, skus]);
   // Mapping functions
   const mapVariantsToOptions = useCallback((apiVariants: any[]): OptionData[] => {
-    if (!apiVariants || !apiVariants.length) return [];
+    if (!apiVariants || !apiVariants.length) {
+      console.log('mapVariantsToOptions: No variants provided');
+      return [];
+    }
     
-    return apiVariants.map((variant, index) => ({
-      id: index + 1, // Generate ID
-      name: variant.value || '',
-      values: variant.options || [],
-      isDone: true
-    }));
+    console.log('mapVariantsToOptions: Mapping variants', apiVariants);
+    
+    return apiVariants.map((variant, index) => {
+      // Kiểm tra và đảm bảo variant.options là một mảng
+      const options = Array.isArray(variant.options) ? variant.options : [];
+      
+      return {
+        id: index + 1, // Generate ID
+        name: variant.value || '',
+        values: options,
+        isDone: true
+      };
+    });
   }, []);
 
   const mapOptionsToVariants = useCallback((options: OptionData[]): any[] => {
@@ -87,30 +178,38 @@ export function VariantSettingsIndex({
     mapVariantsToOptions(variants || [])
   );
 
-  // Sửa useEffect đầu tiên - Chỉ cập nhật từ props khi không phải thay đổi nội bộ
+  // Thêm ref để theo dõi xem options đã được khởi tạo từ variants chưa
+  const initializedFromProps = useRef(false);
+  
+  // useEffect đầu tiên - Chỉ cập nhật từ props khi khởi tạo hoặc khi variants thay đổi từ bên ngoài
   useEffect(() => {
-    // Nếu đây là thay đổi từ bên ngoài (không phải do component này gây ra)
-    if (!isInternalChange.current) {
+    // Nếu chưa khởi tạo hoặc là thay đổi từ bên ngoài (không phải do component này gây ra)
+    if (!initializedFromProps.current || !isInternalChange.current) {
+      console.log('Updating options from variants props');
       setOptions(mapVariantsToOptions(variants || []));
+      initializedFromProps.current = true; // Đánh dấu đã khởi tạo
     }
-    // Reset flag sau mỗi lần render
+    
+    // Reset flag sau mỗi lần xử lý
     isInternalChange.current = false;
   }, [variants, mapVariantsToOptions]);
 
-  // Sửa useEffect thứ hai - Sử dụng ref để đánh dấu thay đổi nội bộ
+  // useEffect thứ hai - CHỈ cập nhật lên parent khi options thay đổi do user thao tác
   useEffect(() => {
-    // So sánh trạng thái options hiện tại với variants từ props
-    const currentVariants = mapOptionsToVariants(options);
-    const currentVariantsJSON = JSON.stringify(currentVariants);
-    const propsVariantsJSON = JSON.stringify(variants);
-    
-    // Chỉ cập nhật parent nếu có sự khác biệt thực sự
-    if (currentVariantsJSON !== propsVariantsJSON) {
-      // Đánh dấu đây là thay đổi nội bộ
-      isInternalChange.current = true;
-      setVariants(currentVariants);
+    // Bỏ qua lần mount đầu tiên và khi options thay đổi do update từ variants props
+    if (!initializedFromProps.current) {
+      return;
     }
-  }, [options, setVariants, mapOptionsToVariants, variants]);
+    
+    // Chỉ cập nhật khi thay đổi đến từ các hàm xử lý sự kiện nội bộ
+    // Các hàm đó sẽ set isInternalChange.current = true
+    if (isInternalChange.current) {
+      const currentVariants = mapOptionsToVariants(options);
+      console.log('Updating parent variants from options:', currentVariants);
+      setVariants(currentVariants);
+      // KHÔNG reset flag ở đây, để useEffect đầu tiên xử lý
+    }
+  }, [options, setVariants, mapOptionsToVariants]);
 
   // Sửa lại các hàm xử lý để đánh dấu thay đổi nội bộ
   const handleAddOptions = () => {
@@ -121,17 +220,23 @@ export function VariantSettingsIndex({
       isDone: false
     };
     
-    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    // Đánh dấu là thay đổi nội bộ TRƯỚC khi cập nhật state
+    isInternalChange.current = true;
+    console.log('handleAddOptions - Adding new option');
     setOptions([...options, newOption]);
   };
 
   const handleDelete = (optionId: number) => {
-    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    // Đánh dấu là thay đổi nội bộ TRƯỚC khi cập nhật state
+    isInternalChange.current = true;
+    console.log(`handleDelete - Deleting option ${optionId}`);
     setOptions(prevOptions => prevOptions.filter(option => option.id !== optionId));
   };
 
   const handleDone = (optionId: number) => {
-    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    // Đánh dấu là thay đổi nội bộ TRƯỚC khi cập nhật state
+    isInternalChange.current = true;
+    console.log(`handleDone - Marking option ${optionId} as done`);
     setOptions(prevOptions => prevOptions.map(option => 
       option.id === optionId 
         ? { ...option, isDone: true }
@@ -140,7 +245,9 @@ export function VariantSettingsIndex({
   };
 
   const handleEdit = (optionId: number) => {
-    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    // Đánh dấu là thay đổi nội bộ TRƯỚC khi cập nhật state
+    isInternalChange.current = true;
+    console.log(`handleEdit - Editing option ${optionId}`);
     setOptions(prevOptions => prevOptions.map(option => 
       option.id === optionId 
         ? { ...option, isDone: false }
@@ -149,7 +256,9 @@ export function VariantSettingsIndex({
   };
 
   const handleUpdateOption = (optionId: number, name: string, values: string[]) => {
-    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    // Đánh dấu là thay đổi nội bộ TRƯỚC khi cập nhật state
+    isInternalChange.current = true;
+    console.log(`handleUpdateOption - Updating option ${optionId} with name "${name}" and ${values.length} values`);
     setOptions(prevOptions => prevOptions.map(option => 
       option.id === optionId 
         ? { ...option, name, values }
@@ -167,6 +276,10 @@ export function VariantSettingsIndex({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
+      // Đánh dấu là thay đổi nội bộ TRƯỚC khi cập nhật state
+      isInternalChange.current = true;
+      console.log(`handleDragEnd - Reordering options: ${active.id} -> ${over.id}`);
+      
       setOptions((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
@@ -229,7 +342,11 @@ export function VariantSettingsIndex({
             </div>
           </DndContext>
         )}
-        <SKUList options={options} onUpdateSkus={handleUpdateSkus} />
+        <SKUList 
+          options={options} 
+          initialSkus={skus} // Truyền SKUs từ API vào
+          onUpdateSkus={handleUpdateSkus} 
+        />
       </CardContent>
     </Card>
   );

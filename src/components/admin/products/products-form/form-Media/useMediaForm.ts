@@ -60,16 +60,54 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
     );
   }, [overallProgress]);
 
+  // Xử lý khi có URLs mới được upload
   useEffect(() => {
     if (uploadedUrls.length > 0) {
+      // Map từ các file đã tải lên đến các đối tượng imageObjects
       setImageObjects(currentObjects => {
-        return currentObjects.map(obj => {
-          const uploadedFile = uploadedUrls.find(u => u.fileName === obj.file?.name);
-          if (uploadedFile) {
-            return { ...obj, url: uploadedFile.url, id: uploadedFile.url, file: undefined, progress: 100 };
+        // Tạo map để lưu trữ thông tin về file names đang tải lên
+        const fileNameMap = new Map();
+        currentObjects.forEach(obj => {
+          if (obj.file) {
+            fileNameMap.set(obj.file.name, obj);
           }
-          return obj;
         });
+        
+        // Tạo một mảng mới với các đối tượng không thay đổi
+        const unmodifiedObjects = currentObjects.filter(obj => !obj.file);
+        
+        // Tạo một mảng mới chứa các đối tượng đã được cập nhật từ uploadedUrls
+        const updatedObjects: ImageObject[] = [];
+        
+        // Đối chiếu uploadedUrls với fileNameMap
+        // Đây chỉ là một mảng các chuỗi URL
+        console.log('Received uploadedUrls:', uploadedUrls);
+        
+        // Lặp qua từng URL và tạo đối tượng imageObject mới
+        uploadedUrls.forEach((url, index) => {
+          // Chúng ta không có cách nào để ánh xạ URL với file gốc
+          // nên gán cho URL đầu tiên với đối tượng đầu tiên và tiếp tục
+          const files = Array.from(fileNameMap.values());
+          if (index < files.length) {
+            const originalObj = files[index];
+            updatedObjects.push({
+              id: url, // Dùng URL làm ID
+              url: url, // URL được trả về từ API
+              progress: 100,
+              file: undefined // Không cần file nữa vì đã tải lên thành công
+            });
+          } else {
+            // Nếu có nhiều URL hơn file, thêm các URL đó vào
+            updatedObjects.push({
+              id: url,
+              url: url,
+              progress: 100
+            });
+          }
+        });
+        
+        // Kết hợp các đối tượng chưa được cập nhật với các đối tượng đã được cập nhật
+        return [...unmodifiedObjects, ...updatedObjects];
       });
     }
   }, [uploadedUrls]);
@@ -126,6 +164,9 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
 
     setImageObjects(prev => prev.filter(img => !selectedImageIds.includes(img.id)));
     setSelectedImageIds([]);
+    
+    // Log để debug việc xóa ảnh
+    console.log('Images after removal:', imageObjects.filter(img => !selectedImageIds.includes(img.id)).map(img => img.url));
   }, [imageObjects, selectedImageIds, handleRemoveFile]);
 
   const handleToggleSelect = useCallback((idToToggle: string) => {

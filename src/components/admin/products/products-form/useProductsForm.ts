@@ -7,6 +7,7 @@ import {
   ProductUpdateRequest,
   SkuDetail,
 } from '@/types/products.interface';
+import { BaseEntity } from '@/types/base.interface';
 import { productsService } from '@/services/productsService';
 import { showToast } from '@/components/ui/toastify';
 
@@ -15,12 +16,13 @@ import { showToast } from '@/components/ui/toastify';
 type FormSku = Partial<SkuDetail>;
 
 // Định nghĩa kiểu dữ liệu cho state của form
-export type FormState = Omit<ProductCreateRequest, 'skus' | 'categories' | 'brandId' | 'publishedAt'> & {
+export type FormState = Omit<ProductCreateRequest, 'skus' | 'categories' | 'brandId' | 'publishedAt' | 'images'> & {
   skus: FormSku[];
   categories: number[];
-  brandId: number | null; // Cho phép brandId là null
+  brandId: string | null; // Cho phép brandId là null, sử dụng string vì API trả về UUID
   description: string;
   publishedAt: string | null; // Thêm trường publishedAt
+  images: string[]; // Giữ mảng URLs đơn giản cho state nội bộ
 };
 
 const INITIAL_STATE: FormState = {
@@ -28,8 +30,8 @@ const INITIAL_STATE: FormState = {
   description: '',
   basePrice: 0,
   virtualPrice: 0,
-  brandId: null,
-  images: [],
+  brandId: null, // Sử dụng string | null
+  images: [], // Mảng URLs dạng string
   categories: [],
   variants: [],
   skus: [],
@@ -38,9 +40,10 @@ const INITIAL_STATE: FormState = {
 
 interface UseProductsFormProps {
   initialData?: ProductDetail | null;
+  onCreateSuccess?: (newProductId: string) => void; // Callback để chuyển hướng sau khi tạo thành công
 }
 
-export const useProductsForm = ({ initialData }: UseProductsFormProps) => {
+export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFormProps) => {
   const [productData, setProductData] = useState<FormState>(INITIAL_STATE);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -48,18 +51,30 @@ export const useProductsForm = ({ initialData }: UseProductsFormProps) => {
 
   useEffect(() => {
     if (isEditMode && initialData) {
-      setProductData({
+      console.log('useProductsForm - Initializing with data:', initialData);
+      
+      // Xử lý images từ API, chuyển từ mảng objects { url: string } sang mảng string URLs
+      const processedImages = initialData.images?.map((img: any) => {
+        if (typeof img === 'string') return img;
+        if (img && typeof img === 'object' && 'url' in img) return img.url;
+        return '';
+      }).filter(Boolean) || [];
+      
+      const mappedData = {
         name: initialData.name || '',
         description: initialData.description || '',
         basePrice: initialData.basePrice || 0,
         virtualPrice: initialData.virtualPrice || 0,
-        brandId: initialData.brand?.id || null, // Lấy id từ object brand lồng nhau
-        images: initialData.images || [],
+        brandId: initialData.brand?.id?.toString() || null, // Lấy id từ object brand lồng nhau và chuyển sang string
+        images: processedImages, // Lưu mảng URLs dạng string để dễ xử lý trong state
         categories: initialData.categories?.map(c => c.id) || [], // Map từ object CategoryDetail sang mảng ID
         variants: initialData.variants || [],
         skus: initialData.skus || [], // Gán trực tiếp mảng SkuDetail
         publishedAt: initialData.publishedAt, // Lấy trường publishedAt từ dữ liệu ban đầu
-      });
+      };
+      
+      console.log('useProductsForm - Processed data:', mappedData);
+      setProductData(mappedData);
     }
   }, [initialData, isEditMode]);
 
@@ -68,35 +83,87 @@ export const useProductsForm = ({ initialData }: UseProductsFormProps) => {
   }, []);
 
   const setVariants = useCallback((newVariants: Variant[]) => {
+      console.log('setVariants called with:', newVariants);
+      
+      // Kiểm tra xem có variant nào có options không
       const variantsWithOptions = newVariants.filter(v => v.options && v.options.length > 0);
+      console.log('Variants with options:', variantsWithOptions);
 
+      // Nếu không có variants có options, đặt variants và xóa SKUs
       if (variantsWithOptions.length === 0) {
+          console.log('No variants with options, clearing SKUs');
           setProductData(prev => ({ ...prev, variants: newVariants, skus: [] }));
           return;
       }
 
+      // Tạo các kết hợp có thể từ variants
       const combinations = variantsWithOptions.reduce<string[]>((acc, variant) => {
           if (acc.length === 0) {
               return variant.options.map(opt => opt);
           }
           return acc.flatMap(combination => variant.options.map(opt => `${combination}-${opt}`));
       }, []);
+      
+      console.log('Generated combinations:', combinations);
+      
+      // Giữ lại các SKUs hiện tại dựa trên ID
+      const currentSkus = productData.skus || [];
+      console.log('Current SKUs:', currentSkus);
 
-      const newSkus: Omit<Sku, 'id'>[] = combinations.map(combo => ({
-          value: combo,
-          price: productData.basePrice,
-          stock: 0,
-          image: '',
-      }));
+      // Tạo SKUs mới từ combinations
+      const newSkus: Omit<Sku, 'id'>[] = combinations.map(combo => {
+          // Tìm SKU hiện tại có cùng value
+          const existingSku = currentSkus.find(sku => sku.value === combo);
+          
+          // Nếu tìm thấy SKU cũ, giữ lại các giá trị
+          if (existingSku) {
+              console.log(`Found existing SKU for combination ${combo}:`, existingSku);
+              return {
+                  value: combo,
+                  price: existingSku.price || productData.basePrice,
+                  stock: existingSku.stock || 0,
+                  image: existingSku.image || '',
+                  id: existingSku.id, // Giữ lại ID của SKU hiện tại
+              };
+          }
+          
+          // Nếu không, tạo mới
+          return {
+              value: combo,
+              price: productData.basePrice,
+              stock: 0,
+              image: '',
+          };
+      });
+      
+      console.log('New SKUs to set:', newSkus);
 
+      // Cập nhật state
       setProductData(prev => ({ ...prev, variants: newVariants, skus: newSkus }));
-  }, [productData.basePrice]);
+  }, [productData.basePrice, productData.skus]);
 
 
   const updateSingleSku = useCallback((index: number, updatedSku: Partial<FormSku>) => {
+    console.log(`updateSingleSku - Updating SKU at index ${index}:`, updatedSku);
+    
     setProductData(prev => {
+      // Đảm bảo mảng skus đủ lớn
       const newSkus = [...prev.skus];
-      newSkus[index] = { ...newSkus[index], ...updatedSku };
+      
+      // Kiểm tra xem index có hợp lệ không
+      if (index < 0 || index >= newSkus.length) {
+        console.error(`updateSingleSku - Invalid index: ${index}, skus length: ${newSkus.length}`);
+        return prev; // Không thực hiện cập nhật nếu index không hợp lệ
+      }
+      
+      // Ghi log SKU hiện tại và SKU sau khi cập nhật
+      console.log('updateSingleSku - Current SKU:', newSkus[index]);
+      const updatedSkuObject = { ...newSkus[index], ...updatedSku };
+      console.log('updateSingleSku - After update:', updatedSkuObject);
+      
+      // Cập nhật SKU
+      newSkus[index] = updatedSkuObject;
+      
       return { ...prev, skus: newSkus };
     });
   }, []);
@@ -104,37 +171,141 @@ export const useProductsForm = ({ initialData }: UseProductsFormProps) => {
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
 
-    // Chuyển đổi brandId về 0 nếu nó là null để phù hợp với interface request
+    // Chuẩn bị dữ liệu gửi lên API theo đúng thứ tự
+    // Tách các thuộc tính ra để sắp xếp lại theo đúng thứ tự mong muốn
+    const { description, ...rest } = productData;
+    
+    // Xử lý SKUs để loại bỏ các trường không cần thiết (id, createdAt, updatedAt)
+    const processedSkus = productData.skus.map(({ id, createdAt, updatedAt, ...skuRest }) => ({
+      value: skuRest.value || '',
+      price: skuRest.price || 0,
+      stock: skuRest.stock || 0,
+      image: skuRest.image || '',
+    }));
+    
+    // Truyền thẳng mảng string URLs cho images theo yêu cầu API
+    const filteredImages = productData.images.filter(url => url && url.trim() !== '');
+    console.log('Product images từ form state:', productData.images);
+    console.log('Images đã lọc (bỏ rỗng):', filteredImages);
+    
     const submissionData = {
-        ...productData,
-        brandId: productData.brandId ?? 0,
-        // API yêu cầu skus không có id khi tạo mới
-        // Logic này cần được xác nhận lại với backend để xử lý update (thêm/sửa/xóa SKU)
-        skus: productData.skus.map(({ id, createdAt, updatedAt, ...rest }) => rest) as Sku[],
+      name: productData.name,
+      publishedAt: productData.publishedAt,
+      basePrice: productData.basePrice,
+      virtualPrice: productData.virtualPrice,
+      brandId: productData.brandId || '', // Dùng string rỗng nếu null
+      images: filteredImages.length > 0 ? filteredImages : [], // Truyền mảng string URLs trực tiếp
+      categories: productData.categories,
+      variants: productData.variants,
+      skus: processedSkus,
     };
+    
+    console.log('Submitting product data:', submissionData);
 
+    // Kiểm tra các điều kiện hợp lệ trước khi gửi
     if (!submissionData.brandId) {
         showToast('Vui lòng chọn thương hiệu.', 'error');
         setIsSubmitting(false);
         return;
     }
-
+    
+    // Kiểm tra bắt buộc phải có tên sản phẩm
+    if (!submissionData.name || submissionData.name.trim() === '') {
+        showToast('Vui lòng nhập tên sản phẩm.', 'error');
+        setIsSubmitting(false);
+        return;
+    }
+    
+    // Kiểm tra SKUs nếu có variants
+    if (submissionData.variants && submissionData.variants.length > 0) {
+      // Kiểm tra xem có SKUs không
+      if (!submissionData.skus || submissionData.skus.length === 0) {
+        showToast('Bạn đã thêm biến thể nhưng không có SKU nào được tạo.', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Kiểm tra xem tất cả SKUs có giá không
+      const skusWithoutPrice = submissionData.skus.filter(sku => !sku.price || sku.price <= 0);
+      if (skusWithoutPrice.length > 0) {
+        showToast(`Có ${skusWithoutPrice.length} SKU chưa có giá. Vui lòng cập nhật giá cho tất cả SKU.`, 'error');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Log chi tiết của submission để debug
+      console.log('Submitting product with variants:', submissionData.variants.length);
+      console.log('SKUs being submitted:', submissionData.skus.length);
+    }
 
     try {
+      // Double-check đảm bảo images luôn là mảng (không phải null/undefined)
+      if (!submissionData.images) submissionData.images = [];
+      
+      // Log dữ liệu request trước khi gửi đi
+      console.log('Final request data (images):', submissionData.images);
+      
       if (isEditMode && initialData) {
-        await productsService.update(String(initialData.id), submissionData as ProductUpdateRequest);
+        // Gửi yêu cầu cập nhật không bao gồm description
+        await productsService.update(String(initialData.id), submissionData as unknown as ProductUpdateRequest);
+        console.log('Product updated successfully');
         showToast('Sản phẩm đã được cập nhật.', 'success');
       } else {
-        await productsService.create(submissionData as ProductCreateRequest);
+        // Gửi yêu cầu tạo mới không bao gồm description
+        const response = await productsService.create(submissionData as unknown as ProductCreateRequest);
+        console.log('Product created successfully, response:', response);
+        
+        // Lấy ID sản phẩm mới từ response
+        // Sử dụng type assertion để tránh các lỗi TypeScript
+        let newProductId: string | number | null = null;
+        
+        try {
+          // Kiểm tra cấu trúc response để lấy ID
+          const responseAny = response as any;
+          
+          if (responseAny.data && responseAny.data.id) {
+            // Cấu trúc { data: { id: ... } }
+            newProductId = responseAny.data.id;
+          } else if (responseAny.id) {
+            // Cấu trúc { id: ... }
+            newProductId = responseAny.id;
+          } else if (typeof response === 'object' && response) {
+            // Trường hợp response là đối tượng Product trực tiếp
+            newProductId = (response as BaseEntity).id;
+          }
+          
+          console.log('Extracted product ID from response:', newProductId);
+        } catch (err) {
+          console.error('Error extracting product ID from response:', err);
+        }
+          
+        console.log('New product ID:', newProductId);
+        
         showToast('Sản phẩm đã được tạo mới.', 'success');
+        
+        // Gọi callback để chuyển hướng nếu có
+        if (onCreateSuccess && newProductId) {
+          console.log('Redirecting to edit page with ID:', newProductId);
+          onCreateSuccess(String(newProductId));
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit product:', error);
-      showToast('Đã có lỗi xảy ra.', 'error');
+      // Hiển thị thông báo lỗi chi tiết hơn nếu có
+      const errorMessage = error?.response?.data?.message || error?.message || 'Đã có lỗi xảy ra khi lưu sản phẩm';
+      showToast(errorMessage, 'error');
+      
+      // Log chi tiết lỗi để debug
+      console.log('Request data was:', submissionData);
+      console.log('Error details:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message
+      });
     } finally {
       setIsSubmitting(false);
     }
-  }, [isEditMode, productData, initialData]);
+  }, [isEditMode, productData, initialData, onCreateSuccess]);
 
   return {
     productData,

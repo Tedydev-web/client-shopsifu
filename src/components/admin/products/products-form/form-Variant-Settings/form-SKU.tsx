@@ -10,8 +10,25 @@ import { Sku, generateApiVariantName } from '@/utils/variantUtils';
 import type { OptionData } from './form-VariantInput';
 import { useSku, formatPrice } from './useSKU';
 
+// Interface cho SKU từ API
+interface ApiSku {
+  id: string;
+  value: string;
+  price: number;
+  stock: number;
+  image: string;
+  productId?: string;
+  createdById?: string;
+  updatedById?: string;
+  deletedById?: string;
+  deletedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface SKUListProps {
   options: OptionData[];
+  initialSkus?: ApiSku[]; // Thêm prop để nhận skus từ API
   onUpdateSkus: (skus: Sku[]) => void;
 }
 
@@ -29,7 +46,13 @@ function SkuImageUploader({ skuId, imageUrl, onUploadComplete }: SkuImageUploade
   useEffect(() => {
     // Khi có URL mới được tải lên, gọi callback để cập nhật state cha
     if (uploadedUrls.length > 0) {
-      onUploadComplete(skuId, uploadedUrls[0].url);
+      // Kiểm tra kiểu dữ liệu của uploadedUrls
+      const newUrl = typeof uploadedUrls[0] === 'string' 
+        ? uploadedUrls[0] 
+        : (uploadedUrls[0] as any).url || '';
+        
+      console.log('Image uploaded:', newUrl);
+      onUploadComplete(skuId, newUrl);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploadedUrls]);
@@ -55,6 +78,7 @@ function SkuImageUploader({ skuId, imageUrl, onUploadComplete }: SkuImageUploade
         onChange={handleFileChange}
         className="hidden"
         accept="image/*"
+        aria-label={`Upload image for variant ${skuId}`}
       />
       {isUploading ? (
         <Loader2 className="h-4 w-4 text-slate-400 animate-spin" />
@@ -68,7 +92,39 @@ function SkuImageUploader({ skuId, imageUrl, onUploadComplete }: SkuImageUploade
 }
 
 
-export function SKUList({ options, onUpdateSkus }: SKUListProps) {
+// Thêm memo để tránh render lại không cần thiết
+import React from 'react';
+
+export const SKUList = React.memo(function SKUList({ options, initialSkus, onUpdateSkus }: SKUListProps) {
+  console.log('SKUList rendered with:'); 
+  console.log('Options length:', options?.length);
+  console.log('Initial SKUs length:', initialSkus?.length);
+  
+  // In chi tiết về initialSkus (giới hạn log để tránh quá tải console)
+  if (initialSkus?.length) {
+    console.log(`Initial SKUs details (showing ${Math.min(5, initialSkus.length)} of ${initialSkus.length}):`);
+    initialSkus.slice(0, 5).forEach((sku, index) => {
+      console.log(`SKU ${index}:`, {
+        id: sku.id,
+        value: sku.value,
+        price: sku.price,
+        stock: sku.stock,
+        image: sku.image ? 'has image' : 'no image'
+      });
+    });
+  } else {
+    console.log('No initial SKUs provided');
+  }
+  
+  const skuHook = useSku({ 
+    options, 
+    initialSkus, 
+    onUpdateSkus: React.useCallback((updatedSkus) => {
+      console.log('SKUList - onUpdateSkus callback with', updatedSkus.length, 'SKUs');
+      onUpdateSkus(updatedSkus);
+    }, [onUpdateSkus])
+  });
+  
   const {
     skus,
     groupedSkus,
@@ -76,7 +132,11 @@ export function SKUList({ options, onUpdateSkus }: SKUListProps) {
     handleSkuChange,
     toggleGroup,
     handleImageUpdate,
-  } = useSku({ options, onUpdateSkus });
+  } = skuHook;
+  
+  // In chi tiết về skus sau khi xử lý
+  console.log('Processed SKUs length:', skus.length);
+  console.log('Grouped SKUs keys:', Object.keys(groupedSkus));
 
   if (skus.length === 0) {
     return null;
@@ -150,4 +210,4 @@ export function SKUList({ options, onUpdateSkus }: SKUListProps) {
       </div>
     </div>
   );
-}
+});

@@ -4,8 +4,9 @@ import { showToast } from '@/components/ui/toastify';
 import { parseApiError } from '@/utils/error';
 
 interface BrandOption {
-  value: number;
+  value: string;
   label: string;
+  image?: string | null;
 }
 
 export const useCbbBrand = () => {
@@ -19,8 +20,9 @@ export const useCbbBrand = () => {
         const response = await getAllBrands({ page: 1, limit: 100 });
         if (response.data) {
           const formattedBrands = response.data.map((brand) => ({
-            value: brand.id,
+            value: brand.id, // Giữ nguyên id dạng string từ API
             label: brand.name,
+            image: brand.logo || null
           }));
           setBrands(formattedBrands);
         }

@@ -57,7 +57,11 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
     
     // Thay thế useEffect hiện tại
     useEffect(() => {
-        const newUrls = imageObjects.map(img => img.url);
+        // Lọc các URLs có giá trị (loại bỏ null, undefined, chuỗi rỗng)
+        const newUrls = imageObjects
+            .map(img => img.url)
+            .filter(url => url && url.trim() !== '');
+            
         const prevUrls = prevImagesRef.current;
         
         // Chỉ cập nhật khi thực sự thay đổi và không phải do parent truyền xuống
@@ -66,7 +70,9 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
         
         if (urlsChanged && differentFromProps) {
             prevImagesRef.current = newUrls;
-            setImages(newUrls);
+            // Khi xóa hết ảnh, truyền mảng rỗng thay vì null
+            setImages(newUrls.length > 0 ? newUrls : []);
+            console.log('Media component - Cập nhật images:', newUrls.length > 0 ? newUrls : []);
         }
     }, [imageObjects]);
     

@@ -108,9 +108,10 @@ import { VariantSettingsIndex } from "./form-Variant-Settings/variantSettings-In
 
 interface ProductFormProps {
   initialData?: ProductDetail | null;
+  onCreateSuccess?: (newProductId: string) => void;
 }
 
-export function ProductForm({ initialData }: ProductFormProps) {
+export function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
   const {
     productData,
     isEditMode,
@@ -119,7 +120,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
     setVariants,
     updateSingleSku,
     handleSubmit,
-  } = useProductsForm({ initialData });
+  } = useProductsForm({ initialData, onCreateSuccess });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
