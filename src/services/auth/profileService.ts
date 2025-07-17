@@ -1,6 +1,6 @@
 import { publicAxios, privateAxios, refreshAxios } from '@/lib/api';
 import { API_ENDPOINTS } from '@/constants/api';
-import { UserProfileResponse, UpdateProfileRequest, ChangePasswordRequest, ChangePasswordResponse } from '@/types/auth/profile.interface';
+import { UserProfileResponse, UpdateProfileRequest, ChangePasswordRequest, ChangePasswordResponse, ChangePasswordProfileRequest, ChangePasswordProfileResponse } from '@/types/auth/profile.interface';
 
 
 export const profileService = {
@@ -9,12 +9,19 @@ export const profileService = {
     return response.data;
   },
   updateProfile: async (data: UpdateProfileRequest): Promise<UserProfileResponse> => {
-    const response = await privateAxios.patch<UserProfileResponse>(API_ENDPOINTS.AUTH.UPDATE_PROFILE, data);
+    const response = await privateAxios.put<UserProfileResponse>(API_ENDPOINTS.AUTH.UPDATE_PROFILE, data);
     return response.data;
   },
   changePassword: async (data: ChangePasswordRequest): Promise<ChangePasswordResponse> => {
-      const response = await privateAxios.post<ChangePasswordResponse>(
-        API_ENDPOINTS.AUTH.CHANGE_PASSWORD,
+      const response = await privateAxios.put<ChangePasswordResponse>(
+        API_ENDPOINTS.AUTH.CHANGE_PASSWORD_PROFILE,
+        data
+      )
+      return response.data
+    },
+  changePasswordProfile: async (data: ChangePasswordProfileRequest): Promise<ChangePasswordProfileResponse> => {
+      const response = await privateAxios.put<ChangePasswordResponse>(
+        API_ENDPOINTS.AUTH.CHANGE_PASSWORD_PROFILE,
         data
       )
       return response.data

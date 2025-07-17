@@ -1,17 +1,14 @@
-"use client"
-
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { useUserMobileHeader } from '@/contexts/UserMobileHeaderContext'
 
-interface MobileHeaderProps {
-  title: string;
-}
-
-export default function MobileHeader({ title }: MobileHeaderProps) {
+export default function MobileHeader() {
   const pathname = usePathname()
-  const isNestedRoute = pathname.split('/').length > 2
-  const backUrl = isNestedRoute ? '/user' : '/'
+  const isNested = pathname.split('/').length > 2
+  const backUrl = isNested ? '/user' : '/'
+
+  const { title } = useUserMobileHeader()
 
   return (
     <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
@@ -20,7 +17,7 @@ export default function MobileHeader({ title }: MobileHeaderProps) {
           <ChevronLeft className="w-6 h-7 text-gray-600" />
         </Link>
         <h1 className="text-lg font-bold flex-1 text-center">{title}</h1>
-        <div className="w-9" /> {/* Spacer to center title */}
+        <div className="w-9" />
       </div>
     </div>
   )

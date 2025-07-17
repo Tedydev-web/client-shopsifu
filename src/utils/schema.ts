@@ -32,17 +32,19 @@ export const EmailSchema = (t: Translate) => z.object({
 // Schema for updating a user's profile information
 export const UpdateProfileSchema = (t: Translate) =>
   z.object({
-    firstName: z.string().min(1, { message: t('schema.validation.profile.firstNameRequired') }),
-    lastName: z.string().min(1, { message: t('schema.validation.profile.lastNameRequired') }),
+    // firstName: z.string().min(1, { message: t('schema.validation.profile.firstNameRequired') }),
+    // lastName: z.string().min(1, { message: t('schema.validation.profile.lastNameRequired') }),
+    name: z.string().min(3, { message: t('schema.validation.user.usernameMinLength') }), // ✅ Thêm dòng này
     phoneNumber: z.string().optional(),
     address: z.string().optional(),
+    avatar: z.string().optional(),
   });
 
 // Schema for Step 1 of the user creation modal
 export const userStepOneSchema = (t: Translate) => z.object({
   firstName: z.string().min(1, { message: t('schema.validation.user.firstNameRequired') }),
   lastName: z.string().min(1, { message: t('schema.validation.user.lastNameRequired') }),
-  username: z.string().min(3, { message: t('schema.validation.user.usernameMinLength') }),
+  name: z.string().min(3, { message: t('schema.validation.user.usernameMinLength') }),
   email: z.string().email({ message: t('schema.validation.email.invalid') }),
   roleId: z.number().min(1, { message: t('schema.validation.user.roleRequired') }),
 });
@@ -79,3 +81,14 @@ export const userUpdateSchema = (t: Translate) => z.object({
   status: z.string(),
   // Cho phép password trống hoặc phải dài tối thiểu 8 ký tự nếu có giá trị
 });
+
+// ✅ Có return schema rõ ràng
+export const useUpdatePasswordSchema = (t: Translate) => z.object({
+  password: z.string().min(1, { message: t('schema.validation.password.currentRequired') }),
+  newPassword: passwordValidation(t),
+  confirmNewPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmNewPassword, {
+  message: t('schema.validation.password.match'),
+  path: ["confirmPassword"]
+});
+

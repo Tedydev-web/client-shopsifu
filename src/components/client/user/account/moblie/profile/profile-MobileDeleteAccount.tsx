@@ -31,9 +31,9 @@ export function DeleteAccountModal({ open, onOpenChange, onConfirm }: DeleteAcco
           <DialogClose className="text-gray-500 hover:text-gray-700" />
         </DialogHeader>
         <div className="py-3 space-y-4">
-          <p className="text-sm text-gray-600">
+          {/* <p className="text-sm text-gray-600">
             {t("user.account.profile.deleteAccountDescription")}
-          </p>
+          </p> */}
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t("user.account.profile.cancel")}

@@ -12,7 +12,7 @@ export interface UserProfile {
   id: number;
   firstName: string;
   lastName: string;
-  username?: string;
+  name?: string;
   phoneNumber: string;
   bio: string;
   avatar: string;

@@ -18,16 +18,14 @@ import Image from "next/image";
 import { UpdateProfileSchema } from "@/utils/schema";
 import { z } from "zod";
 import { showToast } from "@/components/ui/toastify";
-import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { useUpdateProfile } from "./../../profile/useProfile-Update";
+import { useUserData } from "@/hooks/useGetData-UserLogin";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialData: {
-    firstName: string;
-    lastName: string;
-    username: string;
+    name: string;
     phoneNumber: string;
     avatar: string;
   };
@@ -40,8 +38,8 @@ export function ProfileUpdateSheet({
 }: ProfileUpdateSheetProps) {
   const [avatar, setAvatar] = useState(initialData.avatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const  t  = useTranslations();
   const userData = useUserData();
+  const t = useTranslations();
   const formSchema = UpdateProfileSchema(t);
   const { updateProfile, loading } = useUpdateProfile(() =>
     onOpenChange(false)
@@ -52,26 +50,25 @@ export function ProfileUpdateSheet({
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      username: "",
+      name: "",
       phoneNumber: "",
+      address: "",
+      avatar: "",
     },
   });
 
-  // Reset form khi mở hoặc initialData thay đổi
   useEffect(() => {
-    if (open && initialData) {
+    if (userData && open) {
       form.reset({
-        firstName: initialData.firstName || "",
-        lastName: initialData.lastName || "",
-        username: initialData.username || "",
-        phoneNumber: initialData.phoneNumber || "",
+        name: userData.name || "",
+        phoneNumber: userData.phoneNumber || "",
+        // address: userData.address || "",
+        avatar: userData.avatar || "",
       });
+      setAvatar(userData.avatar || "");
     }
-  }, [open, initialData, form]);
+  }, [open, initialData, form, userData]);
 
-  // Xử lý chọn avatar
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
@@ -87,29 +84,42 @@ export function ProfileUpdateSheet({
     }
   };
 
-  // Submit chỉ gửi trường thay đổi
+  // const onSubmit = (data: ProfileFormData) => {
+  //   const dirtyFields = form.formState.dirtyFields;
+  //   const changedData: Partial<ProfileFormData & { avatar?: string }> = {};
+
+  //   (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach((key) => {
+  //     changedData[key] = data[key];
+  //   });
+
+  //   if (avatar !== initialData.avatar) {
+  //     changedData.avatar = avatar;
+  //   }
+
+  //   if (Object.keys(changedData).length === 0) {
+  //     showToast("Không có thay đổi nào để lưu.", "info");
+  //     return;
+  //   }
+
+  //   updateProfile(changedData);
+  // };
+
   const onSubmit = (data: ProfileFormData) => {
-    const dirtyFields = form.formState.dirtyFields;
-    const changedData: Partial<ProfileFormData> = {};
+    const hasChanges =
+      data.name !== userData?.name ||
+      data.phoneNumber !== userData?.phoneNumber ||
+      data.avatar !== userData?.avatar;
 
-    // Lặp qua các trường đã bị thay đổi và thêm chúng vào đối tượng changedData
-    (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach(
-      (key) => {
-        changedData[key] = data[key];
-      }
-    );
-
-    // Nếu không có gì thay đổi, hiển thị thông báo và không làm gì cả
-    if (Object.keys(changedData).length === 0) {
+    if (!hasChanges) {
       showToast("Không có thay đổi nào để lưu.", "info");
       return;
     }
-    // Chỉ gửi những dữ liệu đã thay đổi
-    updateProfile(changedData);
+
+    updateProfile(data);
   };
 
-  const username = form.watch("username");
-  const avatarText = username ? username[0].toUpperCase() : "U";
+  const name = form.watch("name");
+  const avatarText = name ? name[0].toUpperCase() : "U";
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -149,7 +159,6 @@ export function ProfileUpdateSheet({
                     </span>
                   </div>
                 )}
-                {/* Camera icon button */}
                 <label
                   htmlFor="avatar-upload"
                   className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center shadow hover:bg-gray-100 transition cursor-pointer"
@@ -169,52 +178,27 @@ export function ProfileUpdateSheet({
               <button
                 type="button"
                 onClick={handleAvatarClick}
-                className="text-sm text-blue-500 hover:text-blue-700 hover:underline-offset-2  transition-colors"
+                className="text-sm text-blue-500 hover:text-blue-700 hover:underline-offset-2 transition-colors"
               >
                 {t("user.account.profile.clickToChange")}
               </button>
             </div>
+
             <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
               <div>
                 <label
-                  htmlFor="firstName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  {t("user.account.profile.firstName")}
-                </label>
-                <Input
-                  id="firstName"
-                  {...form.register("firstName")}
-                  autoFocus
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="lastName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  {t("user.account.profile.lastName")}
-                </label>
-                <Input
-                  id="lastName"
-                  {...form.register("lastName")}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="userName"
+                  htmlFor="name"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   {t("user.account.profile.username")}
                 </label>
                 <Input
-                  id="userName"
-                  {...form.register("username")}
+                  id="name"
+                  {...form.register("name")}
                   className="w-full"
                 />
               </div>
+
               <div>
                 <label
                   htmlFor="phoneNumber"
@@ -229,6 +213,7 @@ export function ProfileUpdateSheet({
                   className="w-full"
                 />
               </div>
+
               <Button
                 className="bg-red-600 text-white w-full mt-4"
                 type="submit"

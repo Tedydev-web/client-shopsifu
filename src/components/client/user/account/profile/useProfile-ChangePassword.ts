@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { profileService } from '@/services/auth/profileService';
-import { ChangePasswordRequest } from '@/types/auth/profile.interface';
+import { ChangePasswordProfileRequest, ChangePasswordRequest } from '@/types/auth/profile.interface';
 import { showToast } from '@/components/ui/toastify';
 import { parseApiError } from '@/utils/error';
 import { useRouter } from 'next/navigation';
@@ -10,10 +10,10 @@ export const usePasswordChangePassword = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleChangePassword = async (data: ChangePasswordRequest) => {
+  const handleChangePassword = async (data: ChangePasswordProfileRequest) => {
     setLoading(true);
     try {
-      const response = await profileService.changePassword(data);
+      const response = await profileService.changePasswordProfile(data);
       showToast(response.message, 'success');
       if (response.verificationType === 'OTP') {
       router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);

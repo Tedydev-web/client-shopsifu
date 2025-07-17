@@ -1,4 +1,4 @@
-// components/client/ProductPageClient.tsx
+// components/client/products/ProductPageClientWrapper.tsx
 "use client";
 
 import { useCheckDevice } from "@/hooks/useCheckDevices";
@@ -8,10 +8,11 @@ import ProductDetailMobile from "@/components/client/products/mobile/products-In
 import { useResponsive } from "@/hooks/useResponsive";
 import { useEffect, useState } from "react";
 
-// ✅ Đúng chuẩn App Router
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+interface Props {
+  slug: string;
+}
 
+export default function ProductPageClientWrapper({ slug }: Props) {
   const [mounted, setMounted] = useState(false);
   const deviceType = useCheckDevice();
   const { isMobile } = useResponsive();
@@ -19,7 +20,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   useEffect(() => {
     console.log("✅ [Page] slug param:", slug);
     setMounted(true);
-  }, []);
+  }, [slug]);
 
   if (!mounted || deviceType === "unknown") return null;
 
@@ -39,4 +40,3 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     </ClientLayoutWrapper>
   );
 }
-

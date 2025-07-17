@@ -79,7 +79,7 @@
     "common": {
       "full name": "Họ và tên",
       "email": "Email",
-      "phone number": "Số điện thoại",
+      "phonenumber": "Số điện thoại",
       "password": "Mật khẩu",
       "confirm password": "Xác nhận mật khẩu",
       "logout": "Đăng xuất",
@@ -1228,7 +1228,6 @@
         "enable2FADescription": "Bạn có chắc chắn muốn bật xác thực hai yếu tố không? Bạn sẽ cần quét mã QR bằng ứng dụng xác thực.",
         "enable": "Bật",
 
-        "delete": "Xóa tài khoản",
         "deleteAccount": "Xóa tài khoản",
         "confirmDelete": "Xác nhận xóa",
         "accountTermination": "Xóa tài khoản",

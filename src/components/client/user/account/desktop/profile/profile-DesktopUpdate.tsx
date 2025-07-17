@@ -27,11 +27,10 @@ interface ProfileUpdateSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialData: {
-    firstName: string;
-    lastName: string;
-    username: string;
+    name: string;
     phoneNumber: string;
     avatar: string;
+    address?: string;
   };
 }
 
@@ -40,13 +39,9 @@ export function ProfileUpdateSheet({
   onOpenChange,
   initialData,
 }: ProfileUpdateSheetProps) {
-  const [firstName, setFirstName] = useState(initialData.firstName);
-  const [lastName, setLastName] = useState(initialData.lastName);
-  const [userName, setUserName] = useState(initialData.username);
-  const [phoneNumber, setPhoneNumber] = useState(initialData.phoneNumber);
   const [avatar, setAvatar] = useState(initialData.avatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const  t  = useTranslations();
+  const t = useTranslations();
   const userData = useUserData();
   const formSchema = UpdateProfileSchema(t);
   const { updateProfile, loading } = useUpdateProfile(() =>
@@ -58,10 +53,9 @@ export function ProfileUpdateSheet({
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      username: "",
+      name: "",
       phoneNumber: "",
+      address: "",
       avatar: "",
     },
   });
@@ -69,33 +63,49 @@ export function ProfileUpdateSheet({
   useEffect(() => {
     if (userData && open) {
       form.reset({
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        username: userData.username || "",
+        name: userData.name || "",
         phoneNumber: userData.phoneNumber || "",
+        // address: userData.address || "",
         avatar: userData.avatar || "",
       });
+      setAvatar(userData.avatar || "");
     }
   }, [userData, open, form]);
 
+  // const handleSubmit = (data: ProfileFormData) => {
+  //   const dirtyFields = form.formState.dirtyFields;
+  //   const changedData: Partial<ProfileFormData> = {};
+
+  //   (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach(
+  //     (key) => {
+  //       changedData[key] = data[key];
+  //     }
+  //   );
+
+  //   if (data.avatar && data.avatar !== userData?.avatar) {
+  //     changedData.avatar = data.avatar;
+  //   }
+
+  //   if (Object.keys(changedData).length === 0) {
+  //     showToast("Không có thay đổi nào để lưu.", "info");
+  //     return;
+  //   }
+
+  //   updateProfile(changedData);
+  // };
+
   const handleSubmit = (data: ProfileFormData) => {
-    const dirtyFields = form.formState.dirtyFields;
-    const changedData: Partial<ProfileFormData> = {};
+    const hasChanges =
+      data.name !== userData?.name ||
+      data.phoneNumber !== userData?.phoneNumber ||
+      data.avatar !== userData?.avatar;
 
-    // Lặp qua các trường đã bị thay đổi và thêm chúng vào đối tượng changedData
-    (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach(
-      (key) => {
-        changedData[key] = data[key];
-      }
-    );
-
-    // Nếu không có gì thay đổi, hiển thị thông báo và không làm gì cả
-    if (Object.keys(changedData).length === 0) {
+    if (!hasChanges) {
       showToast("Không có thay đổi nào để lưu.", "info");
       return;
     }
-    // Chỉ gửi những dữ liệu đã thay đổi
-    updateProfile(changedData);
+
+    updateProfile(data);
   };
 
   const handleAvatarClick = () => {
@@ -107,12 +117,13 @@ export function ProfileUpdateSheet({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatar(reader.result as string);
+        const base64 = reader.result as string;
+        setAvatar(base64);
+        form.setValue("avatar", base64, { shouldDirty: true });
       };
       reader.readAsDataURL(file);
     }
   };
-  const avatarText = userName ? userName[0].toUpperCase() : "U";
 
   return (
     <SheetRework
@@ -130,13 +141,14 @@ export function ProfileUpdateSheet({
         <form className="space-y-6" onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="flex justify-center">
             <div className="relative">
-              <Avatar className="w-24 h-24 border" onClick={handleAvatarClick} style={{ cursor: "pointer" }}>
-                <AvatarImage
-                  src={userData?.avatar || ""}
-                  alt={userData?.username}
-                />
+              <Avatar
+                className="w-24 h-24 border"
+                onClick={handleAvatarClick}
+                style={{ cursor: "pointer" }}
+              >
+                <AvatarImage src={avatar} alt={userData?.name} />
                 <AvatarFallback>
-                  {userData?.username?.charAt(0).toUpperCase()}
+                  {userData?.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <label
@@ -149,13 +161,13 @@ export function ProfileUpdateSheet({
                   type="file"
                   className="hidden"
                   accept="image/*"
-                  ref={fileInputRef} // <-- Thêm dòng này
+                  ref={fileInputRef}
                   onChange={handleFileChange}
                 />
               </label>
             </div>
           </div>
-          {/* Thêm nút đổi ảnh đại diện ở đây */}
+
           <div className="flex justify-center mt-2">
             <button
               type="button"
@@ -165,37 +177,10 @@ export function ProfileUpdateSheet({
               {t("user.account.profile.clickToChange")}
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("user.account.profile.lastName")}</FormLabel>
-                  <FormControl>
-                    <Input {...field} autoFocus />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("user.account.profile.firstName")}</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+
           <FormField
             control={form.control}
-            name="username"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("user.account.profile.username")}</FormLabel>
@@ -206,6 +191,7 @@ export function ProfileUpdateSheet({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="phoneNumber"
@@ -219,6 +205,20 @@ export function ProfileUpdateSheet({
               </FormItem>
             )}
           />
+
+          {/* <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("user.account.profile.address")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
         </form>
       </Form>
     </SheetRework>

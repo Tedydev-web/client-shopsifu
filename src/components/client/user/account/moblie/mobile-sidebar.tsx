@@ -5,16 +5,25 @@ import Link from "next/link";
 import { ChevronRight, Home } from "lucide-react";
 import MobileHeader from "./moblie-Header";
 import { useLogout } from "@/hooks/useLogout";
+import { useUserMobileHeader } from "@/contexts/UserMobileHeaderContext";
+import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export default function MobileSettings() {
   const { header, sections, signOut } = useSettingsMockData();
   const { handleLogout, loading: logoutLoading } = useLogout();
+  const t = useTranslations()
+  const { setTitle } = useUserMobileHeader()
+
+  useEffect(() => {
+    setTitle(t("admin.profileSettings.title")) // hoặc lấy từ mock/header.title
+  }, [setTitle])
 
   return (
     <div className="fixed inset-0 bg-white">
       <div className="h-full flex flex-col overflow-y-auto pb-safe">
         {/* Header - Fixed at top */}
-        <MobileHeader title={header.title} />
+        <MobileHeader/>
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
