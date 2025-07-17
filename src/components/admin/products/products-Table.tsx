@@ -34,7 +34,7 @@ export function ProductsTable() {
   } = useProducts();
 
   const onEdit = (product: ProductColumn) => {
-    router.push(`/admin/products/edit/${product.id}`);
+    router.push(`/admin/products/${product.id}`);
   };
 
   const onView = (product: ProductColumn) => {

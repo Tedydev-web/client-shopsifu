@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { baseService } from '@/services/baseService';
 import { toast } from 'sonner';
 import imageCompression from 'browser-image-compression';
@@ -15,7 +15,7 @@ export const FILE_SIZE_MB = 1024 * 1024; // Convert to bytes
 
 export interface UploadState {
   files: FileWithPreview[];
-  uploadedUrls: { url: string; fileName: string }[];
+  uploadedUrls: string[];
   isUploading: boolean;
   progress: number;
   error: string | null;
@@ -180,8 +180,10 @@ export function useUploadMedia() {
   }, []);
 
   // Upload a specific set of files
-  const uploadFiles = useCallback(async (filesToUpload: FileWithPreview[]) => {
-    if (filesToUpload.length === 0) {
+  const uploadFiles = useCallback(async (filesToUpload?: FileWithPreview[]) => {
+    const filesToProcess = filesToUpload || state.files;
+    
+    if (filesToProcess.length === 0) {
       return [];
     }
 
@@ -199,15 +201,23 @@ export function useUploadMedia() {
       }, 200);
 
       // Files are already compressed when added, upload directly
-      const response = await baseService.uploadMedia(filesToUpload);
+      const response = await baseService.uploadMedia(filesToProcess);
       
       clearInterval(progressInterval);
 
-      // Lấy các URLs từ response
-      const newUrls = response.data.data.map((item: { url: string }, index: number) => ({
-        url: item.url,
-        fileName: filesToUpload[index]?.name || `file-${index}`,
-      }));
+      // CẤU TRÚC RESPONSE MỚI:
+      // {
+      //   statusCode: 201,
+      //   message: "Thành công",
+      //   timestamp: "2025-07-17T04:53:03.079Z",
+      //   data: [{ url: "https://..." }]
+      // }
+      
+      // Lấy các URLs từ response.data trực tiếp (không cần response.data.data nữa)
+      const urls = response.data || [];
+      const newUrls = urls.map((item: { url: string }, index: number) => 
+        item.url
+      );
       
       setState((prev) => ({
         ...prev,
@@ -224,10 +234,12 @@ export function useUploadMedia() {
         clearInterval(progressInterval);
       }
 
+      console.error("Upload error:", error);
+
       setState((prev) => ({
         ...prev,
-        isUploading: false, // Stop upload process
-        progress: 0, // Reset progress
+        isUploading: false,
+        progress: 0,
         error: error.message || 'Lỗi khi tải tệp lên',
       }));
       
@@ -237,9 +249,7 @@ export function useUploadMedia() {
       
       return [];
     }
-  }, []);
-
-
+  }, [state.files]);
 
   // Reset state
   const reset = useCallback(() => {
@@ -270,8 +280,8 @@ export function useUploadMedia() {
     handleRemoveAllFiles,
     uploadFiles,
     reset,
-    validateFileSize, // Export the validation function for external use
-    fileSizeLimit: FILE_SIZE_LIMIT, // Export the size limit constant
+    validateFileSize,
+    fileSizeLimit: FILE_SIZE_LIMIT,
   };
 }
 

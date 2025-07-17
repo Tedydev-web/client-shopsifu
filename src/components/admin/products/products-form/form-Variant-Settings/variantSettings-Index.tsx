@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -25,28 +25,137 @@ import type { OptionData } from "./form-VariantInput";
 import { SKUList } from "./form-SKU";
 import type { Sku } from "@/utils/variantUtils";
 
-export function VariantSettingsIndex() {
-  const [options, setOptions] = useState<OptionData[]>([
-    {
-      id: 1,
-      name: 'Color',
-      values: ['Yellow', 'Black'],
-      isDone: true
-    },
-    {
-      id: 2,
-      name: 'Size',
-      values: ['S', 'M', 'L'],
-      isDone: true
-    }
-  ]);
-  const [skus, setSkus] = useState<Sku[]>([]);
+interface VariantSettingsProps {
+  variants: {
+    value: string;
+    options: string[];
+  }[];
+  skus: any[]; // Sẽ định nghĩa chi tiết sau
+  setVariants: (variants: any[]) => void;
+  updateSingleSku: (index: number, updates: any) => void;
+}
 
+export function VariantSettingsIndex({
+  variants,
+  skus,
+  setVariants,
+  updateSingleSku
+}: VariantSettingsProps) {
+  // Thêm ref để theo dõi nguồn thay đổi
+  const isInternalChange = useRef(false);
+  
+  // THÊM HÀM HANDLEUPDATESKUS VÀO ĐÂY
   const handleUpdateSkus = useCallback((updatedSkus: Sku[]) => {
-    setSkus(updatedSkus);
-    // This is where you would typically integrate with a form library like react-hook-form
-    console.log('SKUs updated in parent:', updatedSkus);
-  }, []); // Empty dependency array ensures the function is created only once
+    // Đánh dấu đây là thay đổi nội bộ
+    isInternalChange.current = true;
+    
+    // Với mỗi SKU được cập nhật, gọi hàm updateSingleSku từ props
+    updatedSkus.forEach((sku) => {
+      // Lưu ý: Sử dụng sku.id thay vì index để cập nhật đúng SKU
+      // API SKU có id riêng, không phụ thuộc vào vị trí trong mảng
+      updateSingleSku(sku.id, {
+        price: sku.price,
+        stock: sku.stock,
+        image: sku.image || '',
+        value: sku.value
+      });
+    });
+  }, [updateSingleSku]);
+  // Mapping functions
+  const mapVariantsToOptions = useCallback((apiVariants: any[]): OptionData[] => {
+    if (!apiVariants || !apiVariants.length) return [];
+    
+    return apiVariants.map((variant, index) => ({
+      id: index + 1, // Generate ID
+      name: variant.value || '',
+      values: variant.options || [],
+      isDone: true
+    }));
+  }, []);
+
+  const mapOptionsToVariants = useCallback((options: OptionData[]): any[] => {
+    return options
+      .filter(option => option.isDone && option.name && option.values.length > 0)
+      .map(option => ({
+        value: option.name,
+        options: option.values.filter(v => v.trim() !== '')
+      }));
+  }, []);
+
+  // Khởi tạo state từ props
+  const [options, setOptions] = useState<OptionData[]>(() => 
+    mapVariantsToOptions(variants || [])
+  );
+
+  // Sửa useEffect đầu tiên - Chỉ cập nhật từ props khi không phải thay đổi nội bộ
+  useEffect(() => {
+    // Nếu đây là thay đổi từ bên ngoài (không phải do component này gây ra)
+    if (!isInternalChange.current) {
+      setOptions(mapVariantsToOptions(variants || []));
+    }
+    // Reset flag sau mỗi lần render
+    isInternalChange.current = false;
+  }, [variants, mapVariantsToOptions]);
+
+  // Sửa useEffect thứ hai - Sử dụng ref để đánh dấu thay đổi nội bộ
+  useEffect(() => {
+    // So sánh trạng thái options hiện tại với variants từ props
+    const currentVariants = mapOptionsToVariants(options);
+    const currentVariantsJSON = JSON.stringify(currentVariants);
+    const propsVariantsJSON = JSON.stringify(variants);
+    
+    // Chỉ cập nhật parent nếu có sự khác biệt thực sự
+    if (currentVariantsJSON !== propsVariantsJSON) {
+      // Đánh dấu đây là thay đổi nội bộ
+      isInternalChange.current = true;
+      setVariants(currentVariants);
+    }
+  }, [options, setVariants, mapOptionsToVariants, variants]);
+
+  // Sửa lại các hàm xử lý để đánh dấu thay đổi nội bộ
+  const handleAddOptions = () => {
+    const newOption = {
+      id: Date.now(), // Unique ID
+      name: '',
+      values: [],
+      isDone: false
+    };
+    
+    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    setOptions([...options, newOption]);
+  };
+
+  const handleDelete = (optionId: number) => {
+    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    setOptions(prevOptions => prevOptions.filter(option => option.id !== optionId));
+  };
+
+  const handleDone = (optionId: number) => {
+    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    setOptions(prevOptions => prevOptions.map(option => 
+      option.id === optionId 
+        ? { ...option, isDone: true }
+        : option
+    ));
+  };
+
+  const handleEdit = (optionId: number) => {
+    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    setOptions(prevOptions => prevOptions.map(option => 
+      option.id === optionId 
+        ? { ...option, isDone: false }
+        : option
+    ));
+  };
+
+  const handleUpdateOption = (optionId: number, name: string, values: string[]) => {
+    isInternalChange.current = true; // Đánh dấu là thay đổi nội bộ
+    setOptions(prevOptions => prevOptions.map(option => 
+      option.id === optionId 
+        ? { ...option, name, values }
+        : option
+    ));
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -64,44 +173,6 @@ export function VariantSettingsIndex() {
         return arrayMove(items, oldIndex, newIndex);
       });
     }
-  };
-
-  const handleAddOptions = () => {
-    const newOption = {
-      id: Date.now(),
-      name: '',
-      values: [],
-      isDone: false
-    };
-    setOptions([...options, newOption]);
-  };
-
-  const handleDelete = (optionId: number) => {
-    setOptions(prevOptions => prevOptions.filter(option => option.id !== optionId));
-  };
-
-  const handleDone = (optionId: number) => {
-    setOptions(prevOptions => prevOptions.map(option => 
-      option.id === optionId 
-        ? { ...option, isDone: true }
-        : option
-    ));
-  };
-
-  const handleEdit = (optionId: number) => {
-    setOptions(prevOptions => prevOptions.map(option => 
-      option.id === optionId 
-        ? { ...option, isDone: false }
-        : option
-    ));
-  };
-
-  const handleUpdateOption = (optionId: number, name: string, values: string[]) => {
-    setOptions(prevOptions => prevOptions.map(option => 
-      option.id === optionId 
-        ? { ...option, name, values }
-        : option
-    ));
   };
 
   return (
