@@ -2,13 +2,13 @@ import { BaseResponse, PaginationRequest } from "../base.interface";
 
 // Category data model
 export interface Category {
-  id: number;
-  parentCategoryId: number | null;
+  id: string;
+  parentCategoryId: string | null;
   name: string;
   logo: string | null;
-  createdById: number | null;
-  updatedById: number | null;
-  deletedById: number | null;
+  createdById: string | null;
+  updatedById: string | null;
+  deletedById: string | null;
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -18,13 +18,13 @@ export interface Category {
 export interface CategoryCreateRequest {
   name: string;
   logo?: string | null;
-  parentCategoryId?: number | null;
+  parentCategoryId?: string | null;
 }
 
 export interface CategoryUpdateRequest {
   name?: string;
   logo?: string | null;
-  parentCategoryId?: number | null;
+  parentCategoryId?: string | null;
 }
 
 // Response interfaces
