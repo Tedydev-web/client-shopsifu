@@ -7,23 +7,38 @@ import ProductDetail from "@/components/client/products/desktop/products-Index";
 import ProductDetailMobile from "@/components/client/products/mobile/products-IndexMobile";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useEffect, useState } from "react";
+import { useProduct } from "./hooks/useProduct";
+import { ClientProductDetail } from "@/types/client.products.interface";
 
 interface Props {
   slug: string;
+  initialData?: ClientProductDetail;
+  error?: any;
 }
 
-export default function ProductPageClientWrapper({ slug }: Props) {
+export default function ProductPageClientWrapper({ slug, initialData, error: initialError }: Props) {
   const [mounted, setMounted] = useState(false);
   const deviceType = useCheckDevice();
   const { isMobile } = useResponsive();
+  
+  // Sử dụng hook useProduct để quản lý data
+  const { product, isLoading, error } = useProduct(slug, initialData);
 
   useEffect(() => {
     console.log("✅ [Page] slug param:", slug);
+    console.log("✅ [Page] initialData:", initialData ? `Received (${initialData.id})` : "None");
     setMounted(true);
-  }, [slug]);
+  }, [slug, initialData]);
 
   if (!mounted || deviceType === "unknown") return null;
 
+  // Xử lý error state
+  const productError = error || initialError;
+  if (productError) {
+    console.error("❌ [ProductPage] Error:", productError);
+    // TODO: Thêm component hiển thị lỗi
+  }
+  
   return (
     <ClientLayoutWrapper
       hideHeader={isMobile}
@@ -33,9 +48,17 @@ export default function ProductPageClientWrapper({ slug }: Props) {
       topContent={isMobile}
     >
       {deviceType === "mobile" ? (
-        <ProductDetailMobile slug={slug} />
+        <ProductDetailMobile 
+          slug={slug} 
+          product={product}
+          isLoading={isLoading}
+        />
       ) : (
-        <ProductDetail slug={slug} />
+        <ProductDetail 
+          slug={slug} 
+          product={product}
+          isLoading={isLoading}
+        />
       )}
     </ClientLayoutWrapper>
   );

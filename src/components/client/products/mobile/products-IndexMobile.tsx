@@ -8,24 +8,29 @@ import ProductSuggestionsMobile from './products-SuggestionMobile';
 import ProductsFooter from './products-Footer';
 import { productMock } from './mockData';
 import { slugify } from '@/utils/slugify';
+import { ClientProductDetail } from "@/types/client.products.interface";
 
 interface Props {
   readonly slug: string;
+  product?: ClientProductDetail | null;
+  isLoading?: boolean;
 }
 
-export default function ProductDetailMobile({ slug }: Props) {
-  // const isMatch = slugify(productMock.name) === slug;
-
-  // if (!isMatch) {
-  //   return (
-  //     <div className="text-center text-red-500 py-10">
-  //       Không tìm thấy sản phẩm
-  //     </div>
-  //   );
-  // }
+export default function ProductDetailMobile({ slug, product: productData, isLoading = false }: Props) {
+  // Fallback to mock data if product is not loaded yet
+  const productToUse = productData || productMock;
+  
+  // Show loading state if needed
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Đang tải sản phẩm...</p>
+      </div>
+    );
+  }
 
   const sizes =
-    productMock?.variants?.find((v) => v.value === "Kích thước")?.options || [];
+    productToUse?.variants?.find((v: any) => v.value === "Kích thước")?.options || [];
 
   const colors =
     productMock?.variants?.find((v) => v.value === "Màu sắc")?.options || [];

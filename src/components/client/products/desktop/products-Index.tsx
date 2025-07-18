@@ -10,6 +10,7 @@ import ProductReviews from "./products-Reviews";
 import ProductSuggestions from "./products-Suggestion";
 import { productMock } from "./mockData";
 import { slugify } from "@/utils/slugify";
+import { ClientProductDetail } from "@/types/client.products.interface";
 
 import {
   Breadcrumb,
@@ -19,19 +20,33 @@ import {
 
 interface Props {
   slug: string;
+  product?: ClientProductDetail | null;
+  isLoading?: boolean;
 }
 
-export default function ProductDetail({ slug }: Props) {
+export default function ProductDetail({ slug, product: productData, isLoading = false }: Props) {
+  // Fallback to mock data if product is not loaded yet
+  const productToUse = productData || productMock;
+  
+  // Show loading state if needed
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <p>Đang tải sản phẩm...</p>
+      </div>
+    );
+  }
+
   const sizes =
-    productMock?.variants?.find((v) => v.value === "Kích thước")?.options || [];
+    productToUse?.variants?.find((v: any) => v.value === "Kích thước")?.options || [];
   const colors =
-    productMock?.variants?.find((v) => v.value === "Màu sắc")?.options || [];
+    productToUse?.variants?.find((v: any) => v.value === "Màu sắc")?.options || [];
 
   const product = {
-    ...productMock,
+    ...productToUse,
     sizes,
     colors,
-    media: productMock.media as { type: "image" | "video"; src: string }[],
+    media: productToUse.media as { type: "image" | "video"; src: string }[],
   };
 
   const category =
