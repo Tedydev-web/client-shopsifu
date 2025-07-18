@@ -7,6 +7,8 @@ import {
   RoleGetAllResponse,
   RoleCreateRequest,
   RoleUpdateRequest,
+  Permission,
+  RoleGetByIdResponse
 } from "@/types/auth/role.interface"
 import { PerGetAllResponse, PermissionDetail } from "@/types/auth/permission.interface"
 import { Role } from "./roles-Columns"
@@ -49,7 +51,7 @@ export function useRoles() {
   const mapResponseToData = useCallback((role: any): Role => {
     return {
       ...role,
-      id: Number(role.id),
+      id: role.id, // Giữ nguyên id dạng string/UUID từ API
       description: role.description || "",
       isActive: role.isActive ?? true,
     }
@@ -72,22 +74,38 @@ export function useRoles() {
     mapResponseToData,
     initialSort: { sortBy: "createdAt", sortOrder: "asc" },
     defaultLimit: 10,
+     requestConfig: {
+      includeSearch: false, // Không gửi tham số search trong request API
+      includeSort: false,   // Không gửi các tham số sắp xếp (sortBy, sortOrder)
+      includeCreatedById: true // Vẫn gửi tham số createdById nếu có
+    },
   })
 
   // Fetch permissions for the modal
   const fetchPermissions = useCallback(async () => {
     try {
       setIsPermissionsLoading(true)
-      // Truyền limit=1000 để lấy tất cả permissions
+      // Truyền limit=1000 để lấy tất cả permissions mà không cần sắp xếp từ API
       const response = await permissionService.getAll({ 
         page: 1, 
-        limit: 1000, 
-        sortBy: 'module', 
-        sortOrder: 'asc' 
+        limit: 1000
       })
       
+      // Kiểm tra cấu trúc dữ liệu trả về
+      const responseData = Array.isArray(response.data) ? response.data : [];
+      console.log("Permissions API response data:", responseData.length ? "Có dữ liệu" : "Không có dữ liệu");
+      
+      // Nếu API không hỗ trợ sort, chúng ta có thể sắp xếp mảng kết quả ở client
+      // Sắp xếp data theo module trước khi tiếp tục xử lý
+      const sortedData = [...responseData].sort((a, b) => {
+        const moduleA = a.module || "OTHERS";
+        const moduleB = b.module || "OTHERS";
+        return moduleA.localeCompare(moduleB);
+      });
+      
       // Tạo cấu trúc dữ liệu phù hợp dựa trên module (vì API không còn gộp sẵn)
-      const groupedPermissions = response.data.reduce((acc: Record<string, PermissionDetail[]>, item) => {
+      // Sử dụng sortedData thay vì response.data để dữ liệu đã được sắp xếp
+      const groupedPermissions = sortedData.reduce((acc: Record<string, PermissionDetail[]>, item) => {
         // Lấy module làm key để gộp permissions
         const moduleKey = item.module || "OTHERS";
         
@@ -105,8 +123,14 @@ export function useRoles() {
         return acc;
       }, {});
       
+      // Lưu dữ liệu đã nhóm vào state
       setPermissionsData(groupedPermissions)
+      
+      // Log thông tin để debug
+      console.log("Permissions grouped by modules:", Object.keys(groupedPermissions));
+      console.log("Total permissions count:", sortedData.length);
     } catch (error) {
+      console.error("Error fetching permissions:", error);
       showToast(parseApiError(error), "error")
     } finally {
       setIsPermissionsLoading(false)
@@ -132,9 +156,9 @@ export function useRoles() {
     }
   }
 
-  const editRole = async (id: number, data: RoleUpdateRequest) => {
+  const editRole = async (id: string, data: RoleUpdateRequest) => {
     try {
-      const response = await roleService.update(String(id), data)
+      const response = await roleService.update(id, data) // id đã là string nên không cần chuyển đổi
       showToast(response.message || "Cập nhật vai trò thành công", "success")
       refreshData()
       handleCloseUpsertModal()
@@ -150,7 +174,7 @@ export function useRoles() {
     if (roleToDelete) {
       setDeleteLoading(true)
       try {
-        const response = await roleService.delete(String(roleToDelete.id))
+        const response = await roleService.delete(roleToDelete.id) // id đã là string nên không cần String()
         showToast(response.message || "Xóa vai trò thành công", "success")
         refreshData()
         handleCloseDeleteModal()
@@ -175,39 +199,63 @@ export function useRoles() {
   }
 
   // Fetch role details by ID including permissions
-  const fetchRoleDetails = async (roleId: number) => {
+  const fetchRoleDetails = async (roleId: string) => {
     try {
       setIsPermissionsLoading(true)
-      const response = await roleService.getById(String(roleId))
+      const response = await roleService.getById(roleId) // roleId đã là string
+      
+      // Kiểm tra và log API response để debug
+      console.log("Role API response structure:", response);
       
       // Update roleToEdit with full details including permissions
       if (response) {
-        // Extract the necessary data from the response and explicitly type as Role
-        const roleData: Role = {
-          id: Number(response.id),
-          name: response.name,
-          description: response.description || "",
-          isActive: response.isActive ?? true,
-          createdById: response.createdById,
-          updatedById: response.updatedById,
-          deletedById: response.deletedById,
-          deletedAt: response.deletedAt,
-          createdAt: response.createdAt,
-          updatedAt: response.updatedAt,
-          // Make sure permissions are properly mapped with correct ID type
-          permissions: Array.isArray(response.permissions) 
-            ? response.permissions.map(p => ({
-                ...p,
-                id: Number(p.id) // Ensure permission IDs are numbers
-              }))
-            : []
+        // API có thể trả về dữ liệu trong cấu trúc khác nhau
+        // Cần kiểm tra cấu trúc phản hồi từ API
+        let roleDetails: any;
+        
+        if (typeof response === 'object' && response !== null) {
+          // Kiểm tra nếu response có trường data và data chứa thông tin role
+          if ('data' in response && response.data && typeof response.data === 'object') {
+            roleDetails = response.data;
+            console.log("Using response.data as role details");
+          } else {
+            // Sử dụng trực tiếp response nếu nó chứa thông tin role
+            roleDetails = response;
+            console.log("Using direct response as role details");
+          }
+          
+          console.log("API Response for role details:", roleDetails);
+          
+          // Extract the necessary data and explicitly type as Role
+          const roleData: Role = {
+            id: roleDetails.id,
+            name: roleDetails.name,
+            description: roleDetails.description || "",
+            isActive: roleDetails.isActive ?? true,
+            createdById: roleDetails.createdById,
+            updatedById: roleDetails.updatedById,
+            deletedById: roleDetails.deletedById,
+            deletedAt: roleDetails.deletedAt,
+            createdAt: roleDetails.createdAt,
+            updatedAt: roleDetails.updatedAt,
+            // Làm phong phú permissions với trường action để phù hợp với UI
+            permissions: Array.isArray(roleDetails.permissions) 
+              ? roleDetails.permissions.map((p: any) => ({
+                  ...p,
+                  id: p.id.toString(), // Đảm bảo id là string
+                  action: `${p.method} - ${p.path}` // Thêm trường action cho UI
+                }))
+              : []
+          }
+          
+          // Lưu roleData vào state và log thông tin
+          setRoleToEdit(roleData)
+          
+          // Log for debugging
+          console.log("Processed role data:", roleData)
+          console.log("Permissions count:", roleData.permissions?.length || 0)
+          console.log("Role permissions:", roleData.permissions)
         }
-        
-        setRoleToEdit(roleData)
-        
-        // Log for debugging
-        console.log("Fetched role details:", roleData)
-        console.log("Permissions count:", roleData.permissions?.length || 0)
       }
     } catch (error) {
       showToast(parseApiError(error), "error")
@@ -225,6 +273,7 @@ export function useRoles() {
       setRoleToEdit(role)
       // Fetch detailed role info including permissions
       fetchRoleDetails(role.id)
+      // Lưu ý: role.id đã là string, phù hợp với UUID từ API
     } else {
       console.log("Opening add modal")
       setRoleToEdit(null)

@@ -31,7 +31,7 @@ interface RolesModalUpsertProps {
     name: string
     description: string
     isActive: boolean
-    permissionIds: number[]
+    permissionIds: string[]  // Thay đổi từ number[] sang string[] cho UUID
   }) => Promise<void>
   permissionsData: Record<string, PermissionDetail[]> | PermissionDetail[];
   isPermissionsLoading: boolean;
@@ -52,7 +52,7 @@ export default function RolesModalUpsert({
   const [description, setDescription] = useState("")
   const [isActive, setIsActive] = useState(true)
   const [loading, setLoading] = useState(false)
-  const [selectedPermissionIds, setSelectedPermissionIds] = useState<Set<number>>(new Set());
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (mode === 'edit' && role) {
@@ -63,28 +63,38 @@ export default function RolesModalUpsert({
       
       // Set permission IDs from the fetched role data
       if (role.permissions && role.permissions.length > 0) {
-        const initialPermissionIds = role.permissions.map((p: Permission) => Number(p.id)) || []
+        const initialPermissionIds = role.permissions.map((p: Permission) => p.id.toString()) || []
         console.log("Setting initial permission IDs:", initialPermissionIds)
-        setSelectedPermissionIds(new Set<number>(initialPermissionIds))
+        console.log("Role permissions data:", role.permissions)
+        setSelectedPermissionIds(new Set<string>(initialPermissionIds))
       } else {
         console.log("No permissions found in role data")
-        setSelectedPermissionIds(new Set<number>())
+        setSelectedPermissionIds(new Set<string>())
       }
     } else {
       // Reset fields for "add" mode or when role is not available
       setName('')
       setDescription('')
       setIsActive(true)
-      setSelectedPermissionIds(new Set<number>())
+      setSelectedPermissionIds(new Set<string>())
     }
   }, [mode, role, open])
 
   // Additional effect to update selected permissions when data changes
   useEffect(() => {
+    // Log permissions data whenever it changes
+    console.log("Current permissionsData:", permissionsData);
+    console.log("isPermissionsLoading:", isPermissionsLoading);
+    
     if (mode === 'edit' && role?.permissions && !isPermissionsLoading) {
       console.log("Updating permissions from useEffect due to permissionsData change");
-      const initialPermissionIds = role.permissions.map((p: Permission) => Number(p.id)) || []
-      setSelectedPermissionIds(new Set<number>(initialPermissionIds))
+      const initialPermissionIds = role.permissions.map((p: Permission) => {
+        console.log("Processing permission:", p);
+        return p.id.toString();
+      }) || []
+      
+      console.log("Final permissions IDs to select:", initialPermissionIds);
+      setSelectedPermissionIds(new Set<string>(initialPermissionIds))
     }
   }, [permissionsData, isPermissionsLoading, mode, role])
 
@@ -99,32 +109,32 @@ export default function RolesModalUpsert({
     }
     
     const subjectPermissions = permissionsData[subject] || [];
-    const subjectPermissionIds = subjectPermissions.map((p: PermissionDetail) => Number(p.id));
+    const subjectPermissionIds = subjectPermissions.map((p: PermissionDetail) => p.id.toString());
     
     console.log(`${checked ? 'Selecting' : 'Deselecting'} all permissions for module ${subject}:`, subjectPermissionIds);
 
     setSelectedPermissionIds(prev => {
-      const newSet = new Set<number>(prev);
+      const newSet = new Set<string>(prev);
       if (checked) {
-        subjectPermissionIds.forEach((id: number) => newSet.add(id));
+        subjectPermissionIds.forEach((id: string) => newSet.add(id));
       } else {
-        subjectPermissionIds.forEach((id: number) => newSet.delete(id));
+        subjectPermissionIds.forEach((id: string) => newSet.delete(id));
       }
       return newSet;
     });
   };
 
-  const handleChildSwitchChange = (id: number, checked: boolean) => {
+  const handleChildSwitchChange = (id: string, checked: boolean) => {
     console.log(`${checked ? 'Selecting' : 'Deselecting'} permission:`, id);
     
     setSelectedPermissionIds(prev => {
-      const newSet = new Set(prev);
-      const numericId = Number(id);
+      const newSet = new Set<string>(prev);
+      const stringId = id.toString();
       
       if (checked) {
-        newSet.add(numericId);
+        newSet.add(stringId);
       } else {
-        newSet.delete(numericId);
+        newSet.delete(stringId);
       }
       
       console.log("New selected permission IDs:", Array.from(newSet));
@@ -156,23 +166,24 @@ export default function RolesModalUpsert({
     setLoading(true)
     try {
       // Tạo request data khác nhau cho add và edit
+      // Lấy danh sách permissionIds đã chọn
+      const permissionIds = Array.from(selectedPermissionIds)
+      console.log("Submitting with permission IDs:", permissionIds)
+      
       if (mode === 'add') {
         await onSubmit({
           name,
           description,
           isActive,
-          permissionIds: [],  // Không gửi permissionIds khi tạo mới
+          permissionIds: permissionIds, // Gửi permissionIds đã chọn khi tạo mới
         })
       } else {
         // Mode edit
-        const permissionIds = Array.from(selectedPermissionIds)
-        console.log("Submitting with permission IDs:", permissionIds)
-        
         await onSubmit({
           name,
           description,
           isActive,
-          permissionIds: permissionIds,
+          permissionIds: permissionIds, // permissionIds đã là string[] nên không cần chuyển đổi
         })
       }
       
@@ -226,9 +237,8 @@ export default function RolesModalUpsert({
               <Switch checked={isActive} onCheckedChange={setIsActive} />
             </div>
 
-            {/* Chỉ hiển thị phần permission khi đang ở chế độ Edit */}
-            {mode === 'edit' && (
-              <div className="space-y-2 pt-2">
+            {/* Hiển thị phần permission cho cả Add và Edit */}
+            <div className="space-y-2 pt-2">
                 <div>
                   <h3 className="font-semibold leading-none tracking-tight">{t("admin.roles.modal.permissions")}</h3>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -253,7 +263,25 @@ export default function RolesModalUpsert({
                   ) : (
                     <Accordion type="multiple" className="w-full">
                       {Object.entries(permissionsData || {}).map(([subject, items]) => {
-                        const allSelected = items.every((item: PermissionDetail) => selectedPermissionIds.has(Number(item.id)));
+                        // Kiểm tra xem có items hay không
+                        if (!items || items.length === 0) {
+                          console.log("No items for subject:", subject);
+                          return null;
+                        }
+                        
+                        console.log(`Processing ${subject} with ${items.length} items`, items);
+                        
+                        // Kiểm tra xem mọi quyền trong module này đã được chọn chưa
+                        const allSelected = items.every((item: PermissionDetail) => {
+                          const isSelected = selectedPermissionIds.has(item.id.toString());
+                          console.log(`Permission ${item.id} (${item.action}) selected: ${isSelected}`);
+                          return isSelected;
+                        });
+                        
+                        // Đếm số quyền đã chọn
+                        const selectedCount = items.filter((item: PermissionDetail) => 
+                          selectedPermissionIds.has(item.id.toString())).length;
+                          
                         return (
                           <AccordionItem value={subject} key={subject}>
                             <AccordionTrigger className="bg-slate-50 hover:bg-slate-100 px-4 data-[state=open]:bg-slate-100 rounded-t-lg">
@@ -261,7 +289,7 @@ export default function RolesModalUpsert({
                                 <span className="font-semibold uppercase tracking-wider">
                                   {subject} 
                                   <span className="text-xs text-muted-foreground ml-2 normal-case">
-                                    ({items.filter(item => selectedPermissionIds.has(Number(item.id))).length}/{items.length} quyền)
+                                    ({selectedCount}/{items.length} quyền)
                                   </span>
                                 </span>
                                 <Switch
@@ -273,32 +301,37 @@ export default function RolesModalUpsert({
                             </AccordionTrigger>
                             <AccordionContent className="bg-white p-4">
                               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4">
-                                {items.map((item: PermissionDetail) => (                                   
-                                   <div key={item.id} className="space-y-1">
-                                    <div className="flex items-center justify-between gap-2">
-                                      <div className="flex-1 min-w-0">
-                                        <Label 
-                                          htmlFor={`perm-${item.id}`} 
-                                          className={`
-                                            ${getActionColor(item.action)} 
-                                            line-clamp-2 
-                                            text-sm
-                                            ${selectedPermissionIds.has(Number(item.id)) ? 'font-semibold' : 'font-normal'}
-                                          `}
-                                        >
-                                          {item.action}
-                                        </Label>
-                                      </div>
-                                      <div className="flex-shrink-0">
-                                        <Switch
-                                          id={`perm-${item.id}`}
-                                          checked={selectedPermissionIds.has(Number(item.id))}
-                                          onCheckedChange={(checked) => handleChildSwitchChange(Number(item.id), checked)}
-                                        />
+                                {items.map((item: PermissionDetail) => {
+                                  const isSelected = selectedPermissionIds.has(item.id.toString());
+                                  console.log(`Rendering permission ${item.id} - Selected: ${isSelected}`);
+                                  
+                                  return (
+                                    <div key={item.id} className="space-y-1">
+                                      <div className="flex items-center justify-between gap-2">
+                                        <div className="flex-1 min-w-0">
+                                          <Label 
+                                            htmlFor={`perm-${item.id}`} 
+                                            className={`
+                                              ${getActionColor(item.action)} 
+                                              line-clamp-2 
+                                              text-sm
+                                              ${isSelected ? 'font-semibold' : 'font-normal'}
+                                            `}
+                                          >
+                                            {item.action || `${item.method} - ${item.path}`}
+                                          </Label>
+                                        </div>
+                                        <div className="flex-shrink-0">
+                                          <Switch
+                                            id={`perm-${item.id}`}
+                                            checked={isSelected}
+                                            onCheckedChange={(checked) => handleChildSwitchChange(item.id, checked)}
+                                          />
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             </AccordionContent>
                           </AccordionItem>
@@ -308,7 +341,6 @@ export default function RolesModalUpsert({
                   )}
                 </div>
               </div>
-            )}
           </div>
 
           <DialogFooter className="pt-4 border-t mt-4 flex-shrink-0">

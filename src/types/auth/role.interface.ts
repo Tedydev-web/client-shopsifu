@@ -2,7 +2,7 @@ import { BaseResponse, PaginationRequest } from "../base.interface";
 
 
 export interface Permission {
-    id: number;
+    id: string;  // Thay đổi từ number sang string cho UUID
     name: string;
     description: string;
     module: string;
@@ -38,7 +38,7 @@ export interface RoleResponse {
 
 export interface RoleGetAllResponse extends BaseResponse, PaginationRequest {
   data: Array<{
-    id: number;
+    id: string;  // Thay đổi từ number sang string cho UUID
     name: string;
     description: string;
     isActive: boolean;
@@ -52,7 +52,7 @@ export interface RoleGetAllResponse extends BaseResponse, PaginationRequest {
 }
 
 export interface RoleGetByIdResponse {
-    id: number;
+    id: string;  // Thay đổi từ number sang string cho UUID
     name: string;
     description: string;
     isActive: boolean;
@@ -71,12 +71,12 @@ export interface RoleCreateRequest {
     isActive?: boolean;
     isSystemRole?: boolean;
     isSuperAdmin?: boolean;
-    // permissionIds are not needed for create request, they are only set in update
+    permissionIds?: string[];  // Thêm permissionIds cho phép tạo vai trò với quyền
 }
 
 export interface RoleCreateResponse extends BaseResponse {
     data:{
-        id: number,
+        id: string,  // Thay đổi từ number sang string cho UUID
         name: string,
         description: string,
         createdById: string,
@@ -98,7 +98,7 @@ export interface RoleUpdateRequest {
     isActive?: boolean;
     isSystemRole?: boolean;
     isSuperAdmin?: boolean;
-    permissionIds?: number[];
+    permissionIds?: string[];  // Thay đổi từ number[] sang string[] cho UUID
 }
 
 export interface RoleUpdateResponse extends BaseResponse {
@@ -144,7 +144,7 @@ export interface RoleAssignPermissionResponse {
 }
 
 export interface Role {
-  id: number;
+  id: string;  // Thay đổi từ number sang string cho UUID
   name: string;
   description?: string;
   isActive: boolean;

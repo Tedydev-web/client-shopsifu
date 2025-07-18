@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 
 // Extend Role type với đầy đủ thuộc tính cần thiết
 export interface Role {
-  id: number;
+  id: string;
   name: string;
   description: string;
   isActive: boolean;

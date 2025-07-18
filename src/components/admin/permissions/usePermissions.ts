@@ -54,6 +54,11 @@ export function usePermissions() {
     mapResponseToData,
     initialSort: { sortBy: "createdAt", sortOrder: "asc" },
     defaultLimit: 10,
+     requestConfig: {
+      includeSearch: false, // Không gửi tham số search trong request API
+      includeSort: false,   // Không gửi các tham số sắp xếp (sortBy, sortOrder)
+      includeCreatedById: true // Vẫn gửi tham số createdById nếu có
+    },
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
