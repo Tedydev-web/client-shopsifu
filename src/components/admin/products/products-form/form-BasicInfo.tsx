@@ -42,13 +42,13 @@ export function ProductBasicInfoForm({ productData, handleInputChange }: Product
         </div>
 
         {/* Mô tả sản phẩm */}
-        {/* <div className="grid gap-3">
+        <div className="grid gap-3">
           <Label htmlFor="product-description">Mô tả</Label>
           <RichTextEditor 
             value={productData.description || ''} 
             onChange={(value) => handleInputChange('description', value)} 
           />
-        </div> */}
+        </div>
 
         {/* Hình ảnh sản phẩm */}
         <div className="grid gap-3">

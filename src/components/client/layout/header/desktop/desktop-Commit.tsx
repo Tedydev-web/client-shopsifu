@@ -37,22 +37,19 @@ const DesktopCommit = () => {
         <div className="flex items-center justify-start h-12 gap-6">
         <span className="text-sm font-semibold text-primary">Cam kết</span>
           <div className="flex flex-1 items-center justify-between cursor-pointer">
-            {commitments.map((commit, index) => (
-              <>
-                <div
-                  key={index}
-                  className="flex flex-1 items-center justify-center gap-2"
-                >
-                  {commit.icon}
-                  <span className="font-medium text-[12px] text-black">
-                    {commit.text}
-                  </span>
-                </div>
-                {index < commitments.length - 1 && (
-                  <div className="h-5 w-px bg-gray-300" />
-                )}
-              </>
-            ))}
+           {commitments.map((commit, index) => (
+            <div key={index} className="flex flex-1 items-center">
+              <div className="flex flex-1 items-center justify-center gap-2">
+                {commit.icon}
+                <span className="font-medium text-[12px] text-black">
+                  {commit.text}
+                </span>
+              </div>
+              {index < commitments.length - 1 && (
+                <div className="h-5 w-px bg-gray-300" />
+              )}
+            </div>
+          ))}
           </div>
         </div>
       </div>

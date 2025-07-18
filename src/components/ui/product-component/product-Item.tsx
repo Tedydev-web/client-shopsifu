@@ -1,13 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Product } from '@/types/product.interface';
-import { formatCurrency, formatSold } from '@/utils/formatter';
+import { ClientProduct } from '@/types/client.products.interface';
+import { formatCurrency } from '@/utils/formatter';
 import { ROUTES } from '@/constants/route';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProductItemProps {
-  product?: Product; // Dữ liệu sản phẩm, có thể không có khi đang loading
-  isLoading?: boolean; // Trạng thái loading
+  product?: ClientProduct; // Sử dụng ClientProduct interface thay vì Product
+  isLoading?: boolean;
 }
 
 // Skeleton UI cho ProductItem
@@ -35,15 +35,20 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, isLoading }) => {
     return <ProductItemSkeleton />;
   }
 
-  const hasDiscount = product.discount > 0;
-  const displayPrice = product.salePrice > 0 ? product.salePrice : product.price;
+  // Tính toán giá hiển thị và giảm giá
+  const originalPrice = product.basePrice;
+  const salePrice = product.virtualPrice;
+  const hasDiscount = originalPrice > salePrice;
+  const discountPercent = hasDiscount 
+    ? Math.round(((originalPrice - salePrice) / originalPrice) * 100) 
+    : 0;
 
   return (
-    <Link href={`${ROUTES.PRODUCT}/${product.id}`} passHref>
+    <Link href={`${ROUTES.PRODUCT.DETAIL.replace(':id', product.id)}`} passHref>
       <div className="group block w-full bg-white border border-gray-200 rounded-sm shadow-sm hover:shadow-xl transition-shadow duration-200 ease-in-out cursor-pointer overflow-hidden">
         <div className="relative">
           <Image
-            src={product.image}
+            src={product.images[0] || '/images/placeholder-product.png'} // Sử dụng ảnh đầu tiên trong mảng images
             alt={product.name}
             width={200}
             height={200}
@@ -51,25 +56,27 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, isLoading }) => {
           />
           {hasDiscount && (
             <div className="absolute top-0 right-0 bg-[#FEEEEA] text-red-600 text-[10px] font-semibold px-2 py-1 flex flex-col items-center justify-center">
-              <span>{`-${product.discount}%`}</span>
+              <span>{`-${discountPercent}%`}</span>
             </div>
           )}
         </div>
         <div className="p-2 flex flex-col justify-between" style={{ minHeight: '100px' }}>
           <h3 className="text-sm text-gray-800 line-clamp-2 mb-1">
-            {product.Isfavorite && (
-              <span className="bg-[#EE4D2D] text-white text-[10px] font-semibold mr-1.5 px-1 py-0.5 rounded-xs">
-                Yêu thích+
-              </span>
-            )}
             {product.name}
           </h3>
           <div className="mt-auto">
             <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="text-base font-medium text-red-600">
-                {formatCurrency(displayPrice)}
-              </span>
-              <span>Đã bán {formatSold(product.sold)}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-base font-medium text-red-600">
+                  {formatCurrency(salePrice)}
+                </span>
+                {hasDiscount && (
+                  <span className="text-xs line-through text-gray-500">
+                    {formatCurrency(originalPrice)}
+                  </span>
+                )}
+              </div>
+              {/* ClientProduct không có trường sold, có thể thêm nếu API trả về */}
             </div>
           </div>
         </div>
