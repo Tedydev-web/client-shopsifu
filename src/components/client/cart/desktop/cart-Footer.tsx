@@ -3,7 +3,8 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Ticket, Coins } from "lucide-react";
-import { t } from "i18next"
+import { useTranslations } from "next-intl";
+
 
 interface CartFooterProps {
   total: number;
@@ -22,6 +23,8 @@ export default function CartFooter({
   allSelected,
   onToggleAll,
 }: CartFooterProps) {
+  const t = useTranslations();
+
   return (
     <div className="w-full sticky bottom-0 bg-white border-t text-sm text-muted-foreground">
       {/* Voucher */}

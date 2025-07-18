@@ -32,7 +32,7 @@ export default function MobileCartHeader({
         <Link href={backUrl} className="p-1 -ml-2">
           <ChevronLeft className="w-6 h-7 text-gray-600" />
         </Link>
-        <h1 className="text-lg font-bold flex-1 text-center">{title}</h1>
+        <h1 className="text-lg font-bold flex-1 text-start">{title}</h1>
         <Button
           variant="ghost"
           size="sm"

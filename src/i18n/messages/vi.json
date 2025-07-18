@@ -183,15 +183,15 @@
       "resendOtp": "Gửi lại OTP"
     }
   },
-  "system":{
-    "toasts":{
+  "system": {
+    "toasts": {
       "createSuccess": "Thêm thành công!",
       "editSuccess": "Cập nhật thành công",
       "deleteSuccess": "Xóa thành công"
     }
   },
   "admin": {
-     "pages": {
+    "pages": {
       "category": {
         "title": "Quản lý danh mục",
         "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
@@ -221,203 +221,202 @@
         "treeTitle": "Cây danh mục",
         "treeDescription": "Kéo thả để sắp xếp hoặc phân cấp danh mục. Chỉ hỗ trợ 1 cấp cha - 1 cấp con.",
         "deleteConfirmTitle": "Xác nhận xoá danh mục",
-        "deleteConfirmDescription": "Bạn có chắc chắn muốn xoá danh mục này? Hành động này không thể hoàn tác."
-      ,
-      "column": {
+        "deleteConfirmDescription": "Bạn có chắc chắn muốn xoá danh mục này? Hành động này không thể hoàn tác.",
+        "column": {
+          "name": "Tên danh mục",
+          "status": "Trạng thái",
+          "createdAt": "Ngày tạo",
+          "actions": "Thao tác"
+        },
+        "actions": {
+          "view": "Xem chi tiết",
+          "edit": "Chỉnh sửa",
+          "delete": "Xóa"
+        }
+      }
+    },
+    "ModuleCategory": {
+      "title": "Quản lý danh mục",
+      "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
+      "Table": {
+        "searchPlaceholder": "Tìm kiếm theo tên danh mục",
+        "addCategory": "Thêm danh mục",
         "name": "Tên danh mục",
+        "parentCategory": "Mã ID danh mục liên kết",
+        "logo": "Logo",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "actions": "Hành động",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa danh mục",
+        "deleteTitle": "Xóa danh mục",
+        "deleteSubTitle": "Bạn có chắc chắn xóa danh mục này?",
+        "noParent": "Không có",
+        "noLogo": "Không có hình ảnh",
+        "deleteConfirmTitle": "Xác nhận xoá danh mục",
+        "notFound": "Không có danh mục",
+        "cancel": "Hủy bỏ",
+        "backToRoot": "Quay về",
+        "currentCategory": "Danh mục hiện tại",
+        "deleteConfirmMessage": "Bạn có chắc chắn xóa danh mục"
+      },
+      "ModalCreate": {
+        "noParent": "Không danh mục cha",
+        "logoSelect": "Chọn Logo",
+        "addCategory": "Thêm danh mục",
+        "editCategory": "Chỉnh sửa danh mục",
+        "name": "Tên danh mục",
+        "namePlaceholder": "Nhập tên danh mục...",
+        "parentCategory": "Danh mục cha",
+        "parentPlaceholder": "Chọn danh mục cha",
+        "logo": "Logo",
+        "logoPlaceholder": "Nhập Logo....",
+        "logoHelp": "",
+        "common": {
+          "cancel": "Hủy bỏ",
+          "create": "Tạo danh mục",
+          "save": "Lưu thông tin"
+        }
+      }
+    },
+    "ModuleUsers": {
+      "Table": {
+        "role": "Vai trò",
+        "name": "Tên người dùng",
+        "Email": "Email",
         "status": "Trạng thái",
         "createdAt": "Ngày tạo",
-        "actions": "Thao tác"
-      },
-      "actions": {
-        "view": "Xem chi tiết",
-        "edit": "Chỉnh sửa",
-        "delete": "Xóa"
-      }
-    }
-  },
-  "ModuleCategory":{
-     "title": "Quản lý danh mục",
-     "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
-    "Table":{
-      "searchPlaceholder": "Tìm kiếm theo tên danh mục",
-      "addCategory": "Thêm danh mục",
-      "name":"Tên danh mục",
-      "parentCategory": "Mã ID danh mục liên kết",
-      "logo": "Logo",
-      "createdAt":"Ngày tạo",
-      "updatedAt":"Ngày cập nhật",
-      "actions":"Hành động",
-      "edit":"Chỉnh sửa",
-      "delete": "Xóa danh mục",
-      "deleteTitle": "Xóa danh mục",
-      "deleteSubTitle": "Bạn có chắc chắn xóa danh mục này?",
-      "noParent": "Không có",
-      "noLogo": "Không có hình ảnh",
-      "deleteConfirmTitle":"Xác nhận xoá danh mục",
-      "notFound": "Không có danh mục",
-      "cancel": "Hủy bỏ",
-      "backToRoot": "Quay về",
-      "currentCategory": "Danh mục hiện tại",
-      "deleteConfirmMessage": "Bạn có chắc chắn xóa danh mục"
-    },
-    "ModalCreate":{
-      "noParent":"Không danh mục cha",
-      "logoSelect": "Chọn Logo",
-      "addCategory": "Thêm danh mục",
-      "editCategory":"Chỉnh sửa danh mục",
-      "name": "Tên danh mục",
-      "namePlaceholder": "Nhập tên danh mục...",
-      "parentCategory": "Danh mục cha",
-      "parentPlaceholder": "Chọn danh mục cha",
-      "logo": "Logo",
-      "logoPlaceholder": "Nhập Logo....",
-      "logoHelp": "",
-      "common":{
-        "cancel":"Hủy bỏ",
-        "create": "Tạo danh mục",
-        "save": "Lưu thông tin"
-      }
-    }
-  },
-    "ModuleUsers":{
-      "Table":{
-        "role": "Vai trò",
-        "name":"Tên người dùng",
-        "Email": "Email",
-        "status":"Trạng thái",
-        "createdAt":"Ngày tạo",
         "updatedAt": "Ngày cập nhật",
         "notFound": "Không tìm thấy người dùng",
         "addAction": "Thêm người dùng",
         "searchPlaceholder": "Tìm theo tên hoặc mô tả vai trò....",
-        "deleteConfirm":{
+        "deleteConfirm": {
           "title": "Xác nhận xóa người dùng",
-          "description":"Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không thể hoàn tác.",
+          "description": "Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không thể hoàn tác.",
           "deleteAction": "Xóa ngay",
-          "cancel":"Hủy bỏ"
+          "cancel": "Hủy bỏ"
         },
-        "actions":{
+        "actions": {
           "edit": "Chỉnh sửa người dùng",
           "delete": "Xóa người dùng"
         }
       }
     },
-    "ModuleProduct":{
-      "title":"Quản lý sản phẩm",
-      "subtitle":"Quản lý tất cả sản phẩm tại đây",
-      "DataTable":{
-        "name":"Tên sản phẩm",
-        "price":"Giá",
-        "category":"Danh mục",
-        "stock":"Tồn kho",
-        "status":"Trạng thái",
-        "action":"Hành động",
-        "image":"Hình ảnh",
-        "description":"Mô tả",
-        "slug":"Slug",
-        "createdAt":"Ngày tạo",
-        "updatedAt":"Ngày cập nhật",
-        "edit":"Sửa thông tin",
-        "delete":"Xóa sản phẩm",
-        "view":"Xem sản phẩm",
+    "ModuleProduct": {
+      "title": "Quản lý sản phẩm",
+      "subtitle": "Quản lý tất cả sản phẩm tại đây",
+      "DataTable": {
+        "name": "Tên sản phẩm",
+        "price": "Giá",
+        "category": "Danh mục",
+        "stock": "Tồn kho",
+        "status": "Trạng thái",
+        "action": "Hành động",
+        "image": "Hình ảnh",
+        "description": "Mô tả",
+        "slug": "Slug",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "edit": "Sửa thông tin",
+        "delete": "Xóa sản phẩm",
+        "view": "Xem sản phẩm",
         "notFound": "Không tìm thấy sản phẩm"
       },
-      "Status":{
-        "active":"Hoạt động",
-        "inactive":"Không hoạt động",
-        "archived":"Đã lưu trữ"
+      "Status": {
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "archived": "Đã lưu trữ"
       },
-      "searchPlaceholder":"Tìm kiếm theo tên sản phẩm",
-      "DeleteModal":{
-        "title":"Xác nhận xóa",
-        "description":"Bạn có chắc chắn muốn xóa sản phẩm này?",
-        "confirmText":"Xóa",
-        "cancelText":"Hủy"
+      "searchPlaceholder": "Tìm kiếm theo tên sản phẩm",
+      "DeleteModal": {
+        "title": "Xác nhận xóa",
+        "description": "Bạn có chắc chắn muốn xóa sản phẩm này?",
+        "confirmText": "Xóa",
+        "cancelText": "Hủy"
       },
-      "ExportData":{
-        "title":"Xuất dữ liệu",
-        "description":"Xuất dữ liệu sản phẩm",
-        "confirmText":"Xuất",
-        "cancelText":"Hủy",
-        "pickDate":"Chọn ngày",
-        "selectFormat":"Chọn định dạng",
-        "fileFormat":"Định dạng file",
-        "dateRange":"Khoảng thời gian"
+      "ExportData": {
+        "title": "Xuất dữ liệu",
+        "description": "Xuất dữ liệu sản phẩm",
+        "confirmText": "Xuất",
+        "cancelText": "Hủy",
+        "pickDate": "Chọn ngày",
+        "selectFormat": "Chọn định dạng",
+        "fileFormat": "Định dạng file",
+        "dateRange": "Khoảng thời gian"
       },
-      "Filter":{
-        "category":"Danh mục",
-        "price":"Giá",
-        "stock":"Tồn kho",
-        "status":"Trạng thái",
-        "action":"Hành động",
-        "image":"Hình ảnh",
-        "description":"Mô tả",
-        "slug":"Slug",
-        "createdAt":"Ngày tạo",
-        "updatedAt":"Ngày cập nhật",
-        "edit":"Sửa thông tin",
-        "delete":"Xóa sản phẩm",
+      "Filter": {
+        "category": "Danh mục",
+        "price": "Giá",
+        "stock": "Tồn kho",
+        "status": "Trạng thái",
+        "action": "Hành động",
+        "image": "Hình ảnh",
+        "description": "Mô tả",
+        "slug": "Slug",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "edit": "Sửa thông tin",
+        "delete": "Xóa sản phẩm",
         "notFound": "Không tìm thấy sản phẩm",
-        "priceRange":"Khoảng giá"
+        "priceRange": "Khoảng giá"
       },
-      "AddNew":{
-        "page":{
-          "breadcrumb":{
-            "products":"Sản phẩm",
-            "newPage":"Thêm mới sản phẩm"
+      "AddNew": {
+        "page": {
+          "breadcrumb": {
+            "products": "Sản phẩm",
+            "newPage": "Thêm mới sản phẩm"
           },
-          "title":"Thêm sản phẩm",
-          "formPlaceholder":""
+          "title": "Thêm sản phẩm",
+          "formPlaceholder": ""
         }
       },
-      "mainDetails":{
-        "title":"Chi tiết sản phẩm",
-        "productTitle":"Tên sản phẩm",
-        "productTitlePlaceholder":"Nhập tên sản phẩm",
-        "content":"Nội dung",
-        "contentPlaceholder":"Nhập nội dung"
+      "mainDetails": {
+        "title": "Chi tiết sản phẩm",
+        "productTitle": "Tên sản phẩm",
+        "productTitlePlaceholder": "Nhập tên sản phẩm",
+        "content": "Nội dung",
+        "contentPlaceholder": "Nhập nội dung"
       }
     },
-    "ModuleBrands":{
-      "Table":{
+    "ModuleBrands": {
+      "Table": {
         "id": "ID",
         "logo": "Logo",
         "name": "Tên thương hiệu",
         "createdAt": "Ngày tạo",
-        "updatedAt":"Ngày cập nhật",
+        "updatedAt": "Ngày cập nhật",
         "addAction": "Thêm thương hiệu",
         "notFound": "Không tìm thấy thương hiệu",
-        "deleteConfirm":{
+        "deleteConfirm": {
           "title": "Xác nhận xóa thương hiệu",
           "description": "Bạn có chắc chắn muốn xóa thương hiệu {name} này không?",
           "deleteAction": "Xóa ngay",
           "cancel": "Hủy bỏ"
         },
-        "actions":{
+        "actions": {
           "edit": "Chỉnh sửa thương hiệu",
           "delete": "Xóa thương hiệu"
-        }, 
+        },
         "searchPlaceholder": "Tìm kiếm theo tên thương hiệu..."
       },
-      "modal":{
-          "addTitle": "Thêm mới thương hiệu",
-          "editTitle":"Chỉnh sửa thương hiệu",
-          "addDescription": "Nhập thông tin thương hiệu bên dưới",
-          "editDescription": "Cập nhật thông tin thương hiệu",
-          "name": "Tên thương hiệu",
-          "namePlaceholder": "Nhập tên thương hiệu",
-          "logo": "Logo",
-          "logoPlaceholder": "Nhập Logo",
-          "cancel": "Hủy bỏ",
-          "adding": "Đang thêm...",
-          "saving": "Đang lưu...",
-          "add": "Thêm mới",
-          "save":"Lưu thay đổi",
-          "uploadImage":"Tải ảnh lên",
-          "uploading": "",
-          "selectImage": "Chọn ảnh lên"
-        }
+      "modal": {
+        "addTitle": "Thêm mới thương hiệu",
+        "editTitle": "Chỉnh sửa thương hiệu",
+        "addDescription": "Nhập thông tin thương hiệu bên dưới",
+        "editDescription": "Cập nhật thông tin thương hiệu",
+        "name": "Tên thương hiệu",
+        "namePlaceholder": "Nhập tên thương hiệu",
+        "logo": "Logo",
+        "logoPlaceholder": "Nhập Logo",
+        "cancel": "Hủy bỏ",
+        "adding": "Đang thêm...",
+        "saving": "Đang lưu...",
+        "add": "Thêm mới",
+        "save": "Lưu thay đổi",
+        "uploadImage": "Tải ảnh lên",
+        "uploading": "",
+        "selectImage": "Chọn ảnh lên"
+      }
     },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
@@ -428,25 +427,25 @@
         "newOrders": "Đơn hàng mới",
         "processedOrders": "Đơn hàng đã xử lý"
       },
-      "permission":{
+      "permission": {
         "permissionManager": "Quản lý quyền"
       },
-      "role":{
+      "role": {
         "roleManager": "Quản lý vai trò"
       },
-      "user":{
+      "user": {
         "userManager": "Quản lý người dùng"
       },
-      "device":{
+      "device": {
         "deviceManager": "Quản lý thiết bị"
       },
-      "brand":{
+      "brand": {
         "brandManager": "Quản lý thương hiệu"
       },
-      "audit-logs":{
+      "audit-logs": {
         "auditLogManager": "Quản lý nhật ký"
       },
-      "category":{
+      "category": {
         "category": "Danh mục"
       },
       "products": {
@@ -629,7 +628,7 @@
       "backToHome": "Về trang chủ"
     },
     "profileSettings": {
-      "changePassword":{
+      "changePassword": {
         "title": "Đổi mật khẩu",
         "subtitle": "Nhập mật khẩu mới bên dưới.",
         "currentPassword": "Mật khẩu hiện tại",
@@ -659,7 +658,7 @@
       "regenerateCodesTitle": "Tạo lại mã khôi phục",
       "regenerateCodesDescription": "Nhập mã 6 chữ số từ ứng dụng xác thực để tạo lại mã khôi phục.",
       "confirm": "Xác nhận",
-      "2fa":{
+      "2fa": {
         "enable2FAFirst": "Vui lòng bật xác thực hai yếu tố trước khi tạo lại mã khôi phục.",
         "copyAllRecoveryCodes": "Đã sao chép mã khôi phục vào clipboard",
         "downloadRecoveryCodes": "Đã tải xuống mã khôi phục",
@@ -671,7 +670,7 @@
         "recoveryCodes": "Lưu các mã này để khôi phục tài khoản nếu bạn mất quyền truy cập 2FA.",
         "scanQRCode": "Quét mã QR"
       },
-      "QrCode":{
+      "QrCode": {
         "title": "Mã khôi phục của bạn",
         "description": "Lưu trữ các mã này ở nơi an toàn. Bạn sẽ cần chúng nếu mất quyền truy cập vào thiết bị xác thực.",
         "nofound": "Không tìm thấy mã khôi phục",
@@ -756,7 +755,7 @@
       "confirm": "Lưu thay đổi",
       "cancel": "Hủy"
     },
-    
+
     "auditLogs": {
       "title": "Nhật ký hệ thống",
       "subtitle": "Quản lý tất cả nhật ký hệ thống của bạn",
@@ -832,7 +831,7 @@
         "namePlaceholder": "Nhập tên vai trò",
         "module": "Module",
         "createdAt": "Ngày tạo",
-        "updatedAt":"Ngày cập nhật"
+        "updatedAt": "Ngày cập nhật"
       },
       "toast": {
         "addSuccess": "Thêm vai trò thành công",
@@ -903,13 +902,13 @@
         "namePlaceholder": "Nhập tên quyền",
         "module": "Module",
         "createdAt": "Ngày tạo",
-        "updatedAt":"Ngày cập nhật",
+        "updatedAt": "Ngày cập nhật",
         "ID": "ID",
         "editAction": "Chỉnh sửa quyền",
         "deleteAction": "Xóa quyền",
         "Name": "Tên quyền"
       },
-      "deleteModal":{
+      "deleteModal": {
         "deleteTitle": "Thực hiện xóa quyền",
         "deleteDescription": "Bạn có chắc chắn xóa quyền hạn này không?"
       },
@@ -1018,10 +1017,10 @@
         "avatar": "Ảnh đại diện",
         "passwordStepDescription": "Mật khẩu phải chứa ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
         "confirmPasswordStepDescription": "Xác nhận mật khẩu phải khớp với mật khẩu",
-        "statusActive":"Hoạt động",
-        "statusInactive":"Không hoạt động",
+        "statusActive": "Hoạt động",
+        "statusInactive": "Không hoạt động",
         "avatarUrl": "Đường dẫn Url avatar của bạn....",
-        "add":"Thêm mới",
+        "add": "Thêm mới",
         "uploadImage": "Tải ảnh lên",
         "selectImage": "Chọn ảnh lên"
       },
@@ -1098,7 +1097,7 @@
         "error": "Đã xảy ra lỗi",
         "edit": "Chỉnh sửa ngôn ngữ"
       },
-      "modalDelete":{
+      "modalDelete": {
         "deleteConfirmTitle": "Xóa ngôn ngữ",
         "deleteConfirmMessage": "Bạn có chắc chắn xóa ngôn ngữ",
         "cancelAction": "Hủy"
@@ -1320,6 +1319,54 @@
 
       "myPurchase": {
         "myPurchase": "Đơn mua của tôi"
+      }
+    },
+
+    "cart": {
+      "title": "Giỏ hàng",
+      "edit": "Chỉnh sửa",
+      "done": "Hoàn tất",
+      "emptyCart": "Giỏ hàng của bạn đang trống",
+      "continueShopping": "Tiếp tục mua sắm",
+      "checkout": "Thanh toán",
+      "itemsInCart": "{{count}} sản phẩm trong giỏ hàng",
+      "totalPrice": "Tổng giá",
+      "removeItem": "Xóa sản phẩm",
+      "updateQuantity": "Cập nhật số lượng",
+      "quantity": "Số lượng",
+      "subtotal": "Tạm tính",
+      "taxesAndFees": "Thuế & Phí",
+      "shippingCost": "Phí vận chuyển",
+      "totalAmount": "Tổng cộng",
+      "proceedToCheckout": "Tiến hành thanh toán",
+
+      "topbar": {
+        "notifications": "Thông báo",
+        "help": "Trợ giúp",
+        "language": "Ngôn ngữ",
+        "saleRegister": "Đăng ký bán hàng"
+      },
+
+      "productTitle": {
+        "product": "Sản phẩm",
+        "unitPrice": "Đơn giá",
+        "quantity": "Số lượng",
+        "totalPrice": "Tổng cộng",
+        "actions": "Hành động"
+      },
+
+      "footer": {
+        "platformVoucher": "Mã giảm giá sàn",
+        "selectOrEnterCode": "Chọn hoặc nhập mã",
+        "noItemSelected": "Chưa chọn sản phẩm nào",
+        "selectAll": "Chọn tất cả",
+        "delete": "Xóa",
+        "removeInactive": "Xóa sản phẩm không còn hoạt động",
+        "moveToLikes": "Chuyển vào Mục yêu thích",
+        "total": "Tổng",
+        "items": "sản phẩm",
+        "youSaved": "Bạn đã tiết kiệm ₫{{amount}}",
+        "checkout": "Thanh toán"
       }
     }
   }

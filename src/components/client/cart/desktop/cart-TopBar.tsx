@@ -5,12 +5,15 @@ import {
   Bell,
   HelpCircle,
   ShoppingCart,
-  Globe,
   User
 } from 'lucide-react';
 import LanguageDropdown from "@/components/ui/languagedropdown";
+import { useTranslations } from 'next-intl';
 
 export function CartTopBar() {
+  const t = useTranslations();
+
+
   return (
     <div className="bg-white border-b">
       <div className="max-w-[1200px] mx-auto px-4">
@@ -20,15 +23,15 @@ export function CartTopBar() {
           <div className="flex items-center gap-4 text-[13px]">
             <Link href="#" className="flex items-center gap-1.5 hover:opacity-70 hover:underline transition-opacity">
               <Bell className="h-4 w-4" />
-              <span>Thông báo</span>
+              <span>{t('user.cart.topbar.notifications')}</span>
             </Link>
             <Link href="#" className="flex items-center gap-1.5 hover:opacity-70 hover:underline transition-opacity">
               <HelpCircle className="h-4 w-4" />
-              <span>Hỗ trợ</span>
+              <span>{t('user.cart.topbar.help')}</span>
             </Link>
             <Link href="#" className="flex items-center gap-1.5 hover:opacity-70 hover:underline transition-opacity">
               <ShoppingCart className="h-4 w-4" />
-              <span>Đăng ký bán hàng</span>
+              <span>{t('user.cart.topbar.saleRegister')}</span>
             </Link>
           </div>
 
