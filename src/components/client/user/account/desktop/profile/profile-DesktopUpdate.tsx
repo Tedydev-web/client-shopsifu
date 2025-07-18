@@ -22,6 +22,7 @@ import { useUpdateProfile } from "./../../profile/useProfile-Update";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
+import { useUploadMedia } from "@/hooks/useUploadMedia";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
@@ -44,6 +45,8 @@ export function ProfileUpdateSheet({
   const t = useTranslations();
   const userData = useUserData();
   const formSchema = UpdateProfileSchema(t);
+  const { handleAddFiles, uploadedUrls, isUploading, reset } = useUploadMedia();
+
   const { updateProfile, loading } = useUpdateProfile(() =>
     onOpenChange(false)
   );
@@ -71,6 +74,14 @@ export function ProfileUpdateSheet({
       setAvatar(userData.avatar || "");
     }
   }, [userData, open, form]);
+
+  useEffect(() => {
+    if (uploadedUrls.length > 0) {
+      const newUrl = uploadedUrls[0];
+      setAvatar(newUrl);
+      form.setValue("avatar", newUrl, { shouldDirty: true });
+    }
+  }, [uploadedUrls, form]);
 
   // const handleSubmit = (data: ProfileFormData) => {
   //   const dirtyFields = form.formState.dirtyFields;
@@ -112,17 +123,14 @@ export function ProfileUpdateSheet({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-        setAvatar(base64);
-        form.setValue("avatar", base64, { shouldDirty: true });
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    reset(); // clear state của hook upload
+    await handleAddFiles([file]);
   };
 
   return (
@@ -146,14 +154,19 @@ export function ProfileUpdateSheet({
                 onClick={handleAvatarClick}
                 style={{ cursor: "pointer" }}
               >
-                <AvatarImage src={avatar} alt={userData?.name} />
+                <AvatarImage
+                  src={avatar}
+                  alt={userData?.name}
+                  className="object-cover"
+                />
+
                 <AvatarFallback>
                   {userData?.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <label
                 htmlFor="avatar-upload"
-                className="absolute bottom-0 right-0 flex items-center justify-center w-8 h-8 bg-background border rounded-full cursor-pointer hover:bg-muted"
+                className="absolute bottom-0 right-0 flex items-center justify-center w-8 h-8 bg-background border rounded-full cursor-pointer hover:bg-muted object-contain"
               >
                 <Camera className="w-4 h-4 text-muted-foreground" />
                 <input
@@ -163,6 +176,7 @@ export function ProfileUpdateSheet({
                   accept="image/*"
                   ref={fileInputRef}
                   onChange={handleFileChange}
+                  disabled={isUploading}
                 />
               </label>
             </div>

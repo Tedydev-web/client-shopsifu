@@ -34,10 +34,12 @@ export function ProfileSettingsTable() {
       label: "Avatar",
       value: (
         <Avatar>
-          <AvatarImage src={user.avatar || ""} alt={user.name} />
-          <AvatarFallback>
-            {user.name.charAt(0).toUpperCase()}
-          </AvatarFallback>
+          <AvatarImage
+            src={user.avatar || ""}
+            alt={user.name}
+            className="object-cover"
+          />
+          <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
       ),
     },
@@ -55,7 +57,11 @@ export function ProfileSettingsTable() {
     },
     {
       label: "Vai trò tài khoản",
-      value: <Badge variant="outline">{typeof user.role === 'string' ? user.role : user.role?.name}</Badge> // ✅ // ✅ sửa ở đây
+      value: (
+        <Badge variant="outline">
+          {typeof user.role === "string" ? user.role : user.role?.name}
+        </Badge>
+      ), // ✅ // ✅ sửa ở đây
     },
     {
       label: "Ngày tạo tài khoản",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
 import { showToast } from "@/components/ui/toastify";
 import { UpdateProfileSchema } from "@/utils/schema";
+import { useUploadMedia } from "@/hooks/useUploadMedia";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
@@ -31,10 +32,12 @@ export function ProfileUpdateSheet({
   open,
   onOpenChange,
 }: ProfileUpdateSheetProps) {
-  // const [avatar, setAvatar] = useState(initialData.avatar);
   const t = useTranslations();
   const userData = useUserData();
   const formSchema = UpdateProfileSchema(t);
+  const { handleAddFiles, uploadedUrls, isUploading, reset } = useUploadMedia();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatar, setAvatar] = useState<string>(userData?.avatar || "");
 
   const { updateProfile, loading } = useUpdateProfile(() =>
     onOpenChange(false)
@@ -62,6 +65,28 @@ export function ProfileUpdateSheet({
       // setAvatar(userData.avatar || "");
     }
   }, [userData, open, form]);
+
+  useEffect(() => {
+    if (uploadedUrls.length > 0) {
+      const newUrl = uploadedUrls[0];
+      setAvatar(newUrl);
+      form.setValue("avatar", newUrl, { shouldDirty: true });
+    }
+  }, [uploadedUrls, form]);
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    reset(); // clear state của hook upload
+    await handleAddFiles([file]);
+  };
 
   const onSubmit = (data: ProfileFormData) => {
     const hasChanges =
@@ -92,11 +117,12 @@ export function ProfileUpdateSheet({
       <Form {...form}>
         <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex justify-center">
-            <div className="relative">
-              <Avatar className="w-24 h-24 border">
+            <div className="relative" onClick={handleAvatarClick}>
+              <Avatar className="w-24 h-24 border cursor-pointer">
                 <AvatarImage
-                  src={userData?.avatar || ""}
+                  src={avatar}
                   alt={userData?.name}
+                  className="object-cover"
                 />
                 <AvatarFallback>
                   {userData?.name?.charAt(0).toUpperCase()}
@@ -109,9 +135,11 @@ export function ProfileUpdateSheet({
                 <Camera className="w-4 h-4 text-muted-foreground" />
                 <input
                   id="avatar-upload"
+                  ref={fileInputRef}
                   type="file"
                   className="hidden"
                   accept="image/*"
+                  onChange={handleFileChange} // ✅ gắn xử lý sự kiện chọn ảnh
                 />
               </label>
             </div>

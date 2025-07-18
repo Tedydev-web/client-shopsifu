@@ -39,6 +39,7 @@ export interface UserProfileResponse extends BaseResponse {
       name: string;
       permissions: any[]; // hoặc định nghĩa kỹ hơn nếu cần
     };
+    avatar: string | null;
     status: string;
     twoFactorEnabled: boolean;
     googleId: string | null;
@@ -71,6 +72,7 @@ export interface UpdateProfileResponse extends BaseResponse {
     name: string;
     role: string;
     status: string;
+    avatar: string | null;
     twoFactorEnabled: boolean;
     googleId: string | null;
     createdAt: string;

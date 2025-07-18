@@ -37,7 +37,7 @@ export const useGetProfile = () => {
         lastName: response.data?.userProfile?.lastName ?? '',
         username: response.data?.userProfile?.username ?? '',
         phoneNumber: response.data?.phoneNumber ?? null,
-        avatar: response.data?.userProfile?.avatar ?? null,
+        avatar: response.data?.avatar ?? '',
       };
 
       // Validate required fields
