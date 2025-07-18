@@ -59,6 +59,13 @@ export const useUsers = () => {
     mapResponseToData,
     initialSort: { sortBy: "createdAt", sortOrder: "asc" },
     defaultLimit: 10,
+    // Cấu hình để không gửi các tham số search và sort
+    // Điều này giúp tránh lỗi khi API không hỗ trợ các tham số này
+    requestConfig: {
+      includeSearch: false, // Không gửi tham số search trong request API
+      includeSort: false,   // Không gửi các tham số sắp xếp (sortBy, sortOrder)
+      includeCreatedById: true // Vẫn gửi tham số createdById nếu có
+    },
   });
 
   // Fetch roles data

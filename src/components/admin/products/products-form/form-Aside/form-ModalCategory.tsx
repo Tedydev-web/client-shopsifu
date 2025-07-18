@@ -20,8 +20,8 @@ import { cn } from '@/lib/utils';
 interface CategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (categoryIds: number[], selectionPath: string) => void;
-  initialSelectedIds?: number[];
+  onConfirm: (categoryIds: string[], selectionPath: string) => void;
+  initialSelectedIds?: string[];
 }
 
 export function CategoryModal({ 
@@ -36,7 +36,7 @@ export function CategoryModal({
   const [loadingChildren, setLoadingChildren] = useState(false);
 
   const [selectedParent, setSelectedParent] = useState<Category | null>(null);
-  const [selectedChildId, setSelectedChildId] = useState<number | null>(null);
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
 
   const fetchParentCategories = useCallback(async () => {
     setLoadingParents(true);
@@ -49,19 +49,19 @@ export function CategoryModal({
       if (initialSelectedIds && initialSelectedIds.length > 0) {
         // Tìm trong parent categories
         const parentId = initialSelectedIds[0];
-        const parent = response.data.find(p => p.id === parentId);
+        const parent = response.data.find(p => p.id && p.id.toString() === parentId);
         
         if (parent) {
           setSelectedParent(parent);
           // Nếu có parent, load child categories
-          fetchChildCategories(parentId);
+          fetchChildCategories(parent.id);
         } else {
           // Tìm xem nó có phải là child category không
           for (const parent of response.data) {
             if (parent.id) {
               const childParams = { page: 1, limit: 100, parentCategoryId: parent.id.toString() };
               const childResponse = await categoryService.getAll(childParams);
-              const child = childResponse.data.find(c => c.id === parentId);
+              const child = childResponse.data.find(c => c.id && c.id.toString() === parentId);
               
               if (child) {
                 // Tìm thấy trong child categories
@@ -81,7 +81,7 @@ export function CategoryModal({
     }
   }, [initialSelectedIds]);
 
-  const fetchChildCategories = useCallback(async (parentId: number) => {
+  const fetchChildCategories = useCallback(async (parentId: string | number) => {
     setLoadingChildren(true);
     setChildCategories([]);
     try {
@@ -92,7 +92,7 @@ export function CategoryModal({
       // Nếu có initialSelectedIds và có child category trong initialSelectedIds
       if (initialSelectedIds && initialSelectedIds.length > 1) {
         const childId = initialSelectedIds[1];
-        const isChildInResponse = response.data.some(c => c.id === childId);
+        const isChildInResponse = response.data.some(c => c.id && c.id.toString() === childId);
         
         if (isChildInResponse) {
           setSelectedChildId(childId);
@@ -115,16 +115,16 @@ export function CategoryModal({
     setSelectedParent(parent);
     setSelectedChildId(null);
     if (parent.id) {
-      fetchChildCategories(parent.id);
+      fetchChildCategories(parent.id.toString());
     }
   };
 
   const handleConfirm = () => {
     // Tạo mảng categoryIds để gửi về
-    const categoryIds: number[] = [];
+    const categoryIds: string[] = [];
     
     if (selectedParent?.id) {
-      categoryIds.push(selectedParent.id);
+      categoryIds.push(selectedParent.id.toString());
     }
     
     if (selectedChildId) {
@@ -137,7 +137,7 @@ export function CategoryModal({
 
   const selectionPath = useMemo(() => {
     if (!selectedParent) return '';
-    const child = childCategories.find((c) => c.id === selectedChildId);
+    const child = childCategories.find((c) => c.id && c.id.toString() === selectedChildId);
     return child ? `${selectedParent.name} > ${child.name}` : selectedParent.name;
   }, [selectedParent, selectedChildId, childCategories]);
 
@@ -182,10 +182,10 @@ export function CategoryModal({
                 childCategories.map((child) => (
                   <button
                     key={child.id}
-                    onClick={() => setSelectedChildId(child.id)}
+                    onClick={() => setSelectedChildId(child.id?.toString() || '')}
                     className={cn(
                       'w-full text-left p-2 rounded-md text-sm',
-                      selectedChildId === child.id ? 'text-primary font-semibold' : 'hover:bg-muted/50'
+                      child.id && selectedChildId === child.id.toString() ? 'text-primary font-semibold' : 'hover:bg-muted/50'
                     )}
                   >
                     {child.name}

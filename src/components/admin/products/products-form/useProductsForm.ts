@@ -18,7 +18,7 @@ type FormSku = Partial<SkuDetail>;
 // Định nghĩa kiểu dữ liệu cho state của form
 export type FormState = Omit<ProductCreateRequest, 'skus' | 'categories' | 'brandId' | 'publishedAt' | 'images'> & {
   skus: FormSku[];
-  categories: number[];
+  categories: string[];
   brandId: string | null; // Cho phép brandId là null, sử dụng string vì API trả về UUID
   description: string;
   publishedAt: string | null; // Thêm trường publishedAt
@@ -61,6 +61,7 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
       }).filter(Boolean) || [];
       
       const mappedData = {
+        id: initialData.id,
         name: initialData.name || '',
         description: initialData.description || '',
         basePrice: initialData.basePrice || 0,

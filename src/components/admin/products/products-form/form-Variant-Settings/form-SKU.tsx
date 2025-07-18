@@ -10,25 +10,15 @@ import { Sku, generateApiVariantName } from '@/utils/variantUtils';
 import type { OptionData } from './form-VariantInput';
 import { useSku, formatPrice } from './useSKU';
 
-// Interface cho SKU từ API
-interface ApiSku {
-  id: string;
-  value: string;
-  price: number;
-  stock: number;
-  image: string;
-  productId?: string;
-  createdById?: string;
-  updatedById?: string;
-  deletedById?: string;
-  deletedAt?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Import SkuDetail từ products interface
+import { SkuDetail } from '@/types/products.interface';
+
+// Sử dụng Partial<SkuDetail> để phù hợp với FormSku trong useProductsForm
+type FormSku = Partial<SkuDetail>;
 
 interface SKUListProps {
   options: OptionData[];
-  initialSkus?: ApiSku[]; // Thêm prop để nhận skus từ API
+  initialSkus?: FormSku[]; // Cập nhật kiểu dữ liệu để phù hợp
   onUpdateSkus: (skus: Sku[]) => void;
 }
 

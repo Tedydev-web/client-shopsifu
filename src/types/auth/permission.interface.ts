@@ -2,7 +2,7 @@ import { BaseResponse, PaginationRequest } from "../base.interface";
 
 // Định nghĩa chi tiết dữ liệu permission
 export interface PermissionDetail {
-    id: number;
+    id: string; // Thay đổi từ number sang string cho UUID
     name: string;
     description: string;
     module: string;
@@ -67,7 +67,7 @@ export interface PerDeleteRequest {
 }
 
 export interface PermissionItem {
-    id: number;
+    id: string; // Thay đổi từ number sang string cho UUID
     action: string;
     description: string;
 }

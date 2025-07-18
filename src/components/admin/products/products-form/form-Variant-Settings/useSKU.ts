@@ -17,31 +17,21 @@ const parsePrice = (value: string) => {
   return numericString === '' ? 0 : parseInt(numericString, 10);
 };
 
-// Interface cho SKU từ API
-interface ApiSku {
-  id: string;
-  value: string;
-  price: number;
-  stock: number;
-  image: string;
-  productId?: string;
-  createdById?: string;
-  updatedById?: string;
-  deletedById?: string;
-  deletedAt?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Import SkuDetail từ products interface
+import { SkuDetail } from '@/types/products.interface';
+
+// Sử dụng Partial<SkuDetail> để phù hợp với FormSku trong useProductsForm
+type FormSku = Partial<SkuDetail>;
 
 // Hook Props
 interface UseSkuProps {
   options: OptionData[];
-  initialSkus?: ApiSku[]; // Thêm prop để nhận skus từ API
+  initialSkus?: FormSku[]; // Cập nhật kiểu dữ liệu để phù hợp
   onUpdateSkus: (skus: Sku[]) => void;
 }
 
 // Helper function to map API SKUs to component SKUs
-function mapApiSkusToComponentSkus(apiSkus: ApiSku[], options: OptionData[]): Sku[] {
+function mapApiSkusToComponentSkus(apiSkus: FormSku[], options: OptionData[]): Sku[] {
   console.log('mapApiSkusToComponentSkus called with:');
   console.log('API SKUs:', apiSkus);
   console.log('Options:', options);
@@ -85,7 +75,7 @@ function mapApiSkusToComponentSkus(apiSkus: ApiSku[], options: OptionData[]): Sk
       
       // Tạo một SKU mới với dữ liệu từ API
       const mappedSku = {
-        id: apiSku.id || `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, 
+        id: apiSku.id ? String(apiSku.id) : `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, 
         name: name, // Thêm name theo yêu cầu của interface Sku
         price: typeof apiSku.price === 'number' ? apiSku.price : 0,
         stock: typeof apiSku.stock === 'number' ? apiSku.stock : 0,

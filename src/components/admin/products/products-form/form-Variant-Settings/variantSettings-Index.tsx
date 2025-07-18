@@ -25,36 +25,17 @@ import type { OptionData } from "./form-VariantInput";
 import { SKUList } from "./form-SKU";
 import type { Sku } from "@/utils/variantUtils";
 
-// Interface cho SKU từ API - giữ đồng bộ với useSKU.ts
-interface ApiSku {
-  id: string;
-  value: string;
-  price: number;
-  stock: number;
-  image: string;
-  productId?: string;
-  createdById?: string;
-  updatedById?: string;
-  deletedById?: string;
-  deletedAt?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Import các interface cần thiết từ products.interface.ts
+import { Variant, SkuDetail } from "@/types/products.interface";
+
+// Sử dụng Partial<SkuDetail> để phù hợp với FormSku trong useProductsForm
+type FormSku = Partial<SkuDetail>;
 
 interface VariantSettingsProps {
-  variants: {
-    value: string;
-    options: string[];
-  }[];
-  skus: ApiSku[]; // Định nghĩa cụ thể kiểu dữ liệu
-  setVariants: (variants: {value: string; options: string[]}[]) => void;
-  updateSingleSku: (index: number, updates: {
-    price?: number;
-    stock?: number;
-    image?: string;
-    value?: string;
-    id?: string;
-  }) => void;
+  variants: Variant[];
+  skus: FormSku[]; // Cập nhật kiểu dữ liệu để phù hợp với FormState.skus
+  setVariants: (variants: Variant[]) => void;
+  updateSingleSku: (index: number, updates: Partial<FormSku>) => void;
 }
 
 export function VariantSettingsIndex({

@@ -76,7 +76,7 @@ export function CategoryModalUpsert({
   // Define form schema with Zod
   const formSchema = z.object({
     name: z.string().min(1, t("validation.required", { field: t("name") })),
-    parentCategoryId: z.union([z.number().nullable(), z.string().nullable()]),
+    parentCategoryId: z.string().nullable(),
     logo: z.string().nullable().optional(),
   });
 
@@ -168,10 +168,10 @@ export function CategoryModalUpsert({
     setLoading(true);
     
     try {
-      // Convert parentCategoryId from string to number if needed
+      // No need to convert parentCategoryId anymore as it's already a string
       const processedData = {
         ...data,
-        parentCategoryId: data.parentCategoryId ? Number(data.parentCategoryId) : null,
+        parentCategoryId: data.parentCategoryId || null,
       };
       
       await onSubmit(processedData);

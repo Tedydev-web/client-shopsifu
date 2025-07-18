@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { productsService } from "@/services/productsService";
-import { ProductForm } from "@/components/admin/products/products-form/form-Index";
+import ProductFormWrapper from "@/components/admin/products/products-form/products-form-Wrapper";
 import { ProductDetail } from "@/types/products.interface";
 import {
   Breadcrumb,
@@ -14,7 +14,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const data = await productsService.getById(params.id);
+        // Đợi params giải quyết vì đây là Promise trong Next.js 15
+        const resolvedParams = await params;
+        const data = await productsService.getById(resolvedParams.id);
         setProduct(data);
       } catch (error) {
         console.error("Failed to fetch product:", error);
@@ -33,7 +35,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     };
 
     fetchProduct();
-  }, [params.id]);
+  }, [params]);
 
   // Loading và error states
   if (loading) return (
@@ -80,7 +82,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       </div>
 
       <div className="mx-auto grid w-full max-w-7xl items-start gap-6">
-        <ProductForm initialData={product} />
+        <ProductFormWrapper initialData={product} />
       </div>
     </main>
   );

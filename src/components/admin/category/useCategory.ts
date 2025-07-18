@@ -9,7 +9,7 @@ import { showToast } from "@/components/ui/toastify";
 type ModalMode = 'add' | 'edit';
 
 type BreadcrumbItem = {
-  id: number;
+  id: string;
   name: string;
 };
 
@@ -27,7 +27,7 @@ export const useCategory = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Navigation state
-  const [currentParentId, setCurrentParentId] = useState<number | null>(null);
+  const [currentParentId, setCurrentParentId] = useState<string | null>(null);
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItem[]>([]);
   const [currentCategoryTitle, setCurrentCategoryTitle] = useState<string>("");
 
@@ -53,7 +53,7 @@ export const useCategory = () => {
   }, []);
 
   // Ref để store currentParentId để có thể access trong fetchData
-  const currentParentIdRef = useRef<number | null>(null);
+  const currentParentIdRef = useRef<string | null>(null);
   currentParentIdRef.current = currentParentId;
 
   // Static fetch function với support cho parentCategoryId
