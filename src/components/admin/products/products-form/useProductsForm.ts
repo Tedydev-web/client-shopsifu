@@ -173,9 +173,6 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
     setIsSubmitting(true);
 
     // Chuẩn bị dữ liệu gửi lên API theo đúng thứ tự
-    // Tách các thuộc tính ra để sắp xếp lại theo đúng thứ tự mong muốn
-    const { description, ...rest } = productData;
-    
     // Xử lý SKUs để loại bỏ các trường không cần thiết (id, createdAt, updatedAt)
     const processedSkus = productData.skus.map(({ id, createdAt, updatedAt, ...skuRest }) => ({
       value: skuRest.value || '',
@@ -191,6 +188,7 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
     
     const submissionData = {
       name: productData.name,
+      description: productData.description, // Thêm trường description vào dữ liệu gửi đi
       publishedAt: productData.publishedAt,
       basePrice: productData.basePrice,
       virtualPrice: productData.virtualPrice,
@@ -238,6 +236,9 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
       console.log('Submitting product with variants:', submissionData.variants.length);
       console.log('SKUs being submitted:', submissionData.skus.length);
     }
+    
+    // Log description để xác nhận nó đã được đưa vào dữ liệu gửi đi
+    console.log('Description being submitted:', submissionData.description);
 
     try {
       // Double-check đảm bảo images luôn là mảng (không phải null/undefined)
