@@ -14,15 +14,15 @@ interface Props {
 }
 
 export default function ProductDetailMobile({ slug }: Props) {
-  const isMatch = slugify(productMock.name) === slug;
+  // const isMatch = slugify(productMock.name) === slug;
 
-  if (!isMatch) {
-    return (
-      <div className="text-center text-red-500 py-10">
-        Không tìm thấy sản phẩm
-      </div>
-    );
-  }
+  // if (!isMatch) {
+  //   return (
+  //     <div className="text-center text-red-500 py-10">
+  //       Không tìm thấy sản phẩm
+  //     </div>
+  //   );
+  // }
 
   const sizes =
     productMock?.variants?.find((v) => v.value === "Kích thước")?.options || [];

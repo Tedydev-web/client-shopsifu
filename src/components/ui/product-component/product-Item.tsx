@@ -44,7 +44,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, isLoading }) => {
     : 0;
 
   return (
-    <Link href={`${ROUTES.PRODUCT}/${product.id}`} passHref>
+    <Link href={`${ROUTES.PRODUCT.DETAIL.replace(':id', product.id)}`} passHref>
       <div className="group block w-full bg-white border border-gray-200 rounded-sm shadow-sm hover:shadow-xl transition-shadow duration-200 ease-in-out cursor-pointer overflow-hidden">
         <div className="relative">
           <Image

@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { categories } from './landing-Mockdata';
+import { useCbbCategory } from '@/hooks/combobox/useCbbCategory';
 import { BannerSection } from './banner-Section';
+import { ROUTES } from '@/constants/route';
 import {
 	Carousel,
 	CarouselContent,
@@ -11,8 +12,12 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function CategoriesSection() {
+	// Sử dụng hook để lấy danh mục cấp cao nhất (parentCategoryId = null)
+	const { categories, loading } = useCbbCategory(null);
+
 	return (
 		<section className="w-full pt-8">
 			<div className="container mx-auto">
@@ -34,22 +39,38 @@ export function CategoriesSection() {
 							className="w-full relative group"
 						>
 							<CarouselContent className="-ml-4">
-								{categories.map((category) => (
-									<CarouselItem key={category.title} className="pl-4 basis-auto">
+								{loading ? (
+									// Hiển thị skeleton loading khi đang tải danh mục
+									Array.from({ length: 8 }).map((_, index) => (
+										<CarouselItem key={`skeleton-${index}`} className="pl-4 basis-auto">
+											<div className="px-6 py-3 rounded-full border border-gray-300">
+												<Skeleton className="h-4 w-20" />
+											</div>
+										</CarouselItem>
+									))
+								) : categories.length === 0 ? (
+									<CarouselItem className="pl-4 basis-auto">
+										<div className="px-6 py-3 text-gray-500">
+											Không có danh mục nào
+										</div>
+									</CarouselItem>
+								) : (
+									categories.map((category) => (
+									<CarouselItem key={category.value} className="pl-4 basis-auto">
 										<Link
-											href={category.link}
+											href={`${ROUTES.PRODUCT.LIST}?categoryId=${category.value}`}
 											className="group/item transition-transform duration-300 block"
 										>
 											<motion.div
 												className="px-6 py-3 rounded-full border border-gray-300 hover:border-red-500 hover:bg-white hover:shadow-md transition-all duration-300"
 											>
 												<span className="text-sm font-medium text-gray-600 whitespace-nowrap group-hover/item:text-red-500 transition-colors duration-300 tracking-wide">
-													{category.title}
+													{category.label}
 												</span>
 											</motion.div>
 										</Link>
 									</CarouselItem>
-								))}
+								)))}
 							</CarouselContent>
 							<div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 								<CarouselPrevious className="absolute top-1/2 -translate-y-1/2 -left-4 bg-white/80 backdrop-blur-sm shadow-md hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed" />

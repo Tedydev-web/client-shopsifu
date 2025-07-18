@@ -5,15 +5,17 @@ import { parseApiError } from '@/utils/error';
 import { PaginationRequest } from '@/types/base.interface';
 
 interface CategoryOption {
-  value: number;
+  value: string;
   label: string;
+  icon?: string | null;
+  parentCategoryId?: string | null;
 }
 
 interface CategoryParams extends PaginationRequest {
-  parentCategoryId?: number | null;
+  parentCategoryId?: string | null;
 }
 
-export const useCbbCategory = (parentCategoryId?: number | null) => {
+export const useCbbCategory = (parentCategoryId?: string | null) => {
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -33,6 +35,8 @@ export const useCbbCategory = (parentCategoryId?: number | null) => {
           const formattedCategories = response.data.map((category) => ({
             value: category.id,
             label: category.name,
+            icon: category.logo,
+            parentCategoryId: category.parentCategoryId
           }));
           setCategories(formattedCategories);
         }
