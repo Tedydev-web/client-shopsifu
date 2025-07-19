@@ -6,7 +6,7 @@ import Underline from "@tiptap/extension-underline"
 import Link from "@tiptap/extension-link"
 import Image from "@tiptap/extension-image"
 import TextAlign from "@tiptap/extension-text-align"
-import { useCallback, useState, useRef } from "react"
+import { useCallback, useState, useRef, useEffect } from "react"
 import {
   Bold,
   Strikethrough,
@@ -393,6 +393,11 @@ export const RichTextEditor = ({ value, onChange, placeholder = "Type your conte
     },
   })
 
+  useEffect(() => {
+  if (editor && value !== editor.getHTML()) {
+    editor.commands.setContent(value || '')
+  }
+}, [editor, value])
   // Add keyboard shortcuts functionality
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!editor) return;
@@ -428,7 +433,7 @@ export const RichTextEditor = ({ value, onChange, placeholder = "Type your conte
         />
         {editor && (
           <div className="text-xs text-gray-500 absolute bottom-2 right-2 bg-white/80 px-2 py-1 rounded">
-            {editor.getHTML().length} characters
+            {editor.getHTML().length} ký tự
           </div>
         )}
       </div>

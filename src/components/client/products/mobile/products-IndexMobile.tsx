@@ -9,6 +9,7 @@ import ProductsFooter from './products-Footer';
 import { productMock } from './mockData';
 import { slugify } from '@/utils/slugify';
 import { ClientProductDetail } from "@/types/client.products.interface";
+import { MediaItem, transformProductImagesToMedia } from '../shared/productTransformers';
 
 interface Props {
   readonly slug: string;
@@ -17,9 +18,6 @@ interface Props {
 }
 
 export default function ProductDetailMobile({ slug, product: productData, isLoading = false }: Props) {
-  // Fallback to mock data if product is not loaded yet
-  const productToUse = productData || productMock;
-  
   // Show loading state if needed
   if (isLoading) {
     return (
@@ -28,19 +26,37 @@ export default function ProductDetailMobile({ slug, product: productData, isLoad
       </div>
     );
   }
+  
+  // Sử dụng real data hoặc fallback về mock data
+  let productToUse;
+  let media: MediaItem[];
+  
+  if (productData) {
+    // Case 1: Có real data từ API
+    productToUse = productData;
+    // Biến đổi images từ API thành media format
+    media = transformProductImagesToMedia(productData);
+  } else {
+    // Case 2: Sử dụng mock data
+    productToUse = productMock;
+    // Chuyển đổi mock data media sang đúng kiểu MediaItem
+    media = (productMock.media || []).map(item => ({
+      type: item.type === "video" ? "video" : "image",
+      src: item.src
+    })) as MediaItem[];
+  }
 
   const sizes =
     productToUse?.variants?.find((v: any) => v.value === "Kích thước")?.options || [];
-
   const colors =
-    productMock?.variants?.find((v) => v.value === "Màu sắc")?.options || [];
+    productToUse?.variants?.find((v: any) => v.value === "Màu sắc")?.options || [];
 
-  // Bổ sung origin, material mặc định nếu thiếu
+  // Tạo product object hoàn chỉnh cho UI
   const product = {
-    ...productMock,
+    ...productToUse,
     sizes,
     colors,
-    media: productMock.media as { type: "image" | "video"; src: string }[],
+    media,
   };
 
   return (

@@ -10,11 +10,8 @@ import {
   PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface MediaItem {
-  type: "image" | "video";
-  src: string;
-}
+import { MediaItem } from "../shared/productTransformers";
+import styles from "./products-GalleryMobile.module.css";
 
 interface Props {
   media: MediaItem[];
@@ -33,30 +30,39 @@ export default function ProductGalleryMobile({ media }: Props) {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     dragStartX.current = e.touches[0].clientX;
-    if (wrapperRef.current) wrapperRef.current.style.transition = "none";
+    if (wrapperRef.current) {
+      // Dùng CSS class thay vì style
+      wrapperRef.current.classList.remove(styles.galleryWrapper);
+      wrapperRef.current.classList.add(styles.galleryWrapperNoTransition);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!wrapperRef.current || dragStartX.current === null) return;
     const deltaX = e.touches[0].clientX - dragStartX.current;
-    wrapperRef.current.style.transform = `translateX(calc(${
-      -currentIndex * 100
-    }% + ${deltaX}px))`;
+    
+    // Sử dụng CSS variable thay cho trực tiếp style.transform
+    wrapperRef.current.style.setProperty(
+      '--translate-x', 
+      `calc(${-currentIndex * 100}% + ${deltaX}px)`
+    );
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!wrapperRef.current || dragStartX.current === null) return;
     const deltaX = e.changedTouches[0].clientX - dragStartX.current;
-    wrapperRef.current.style.transition = "transform 0.3s ease-in-out";
+    
+    // Thêm lại transition khi touch kết thúc
+    wrapperRef.current.classList.add(styles.galleryWrapper);
+    wrapperRef.current.classList.remove(styles.galleryWrapperNoTransition);
 
     if (deltaX < -40 && currentIndex < media.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else if (deltaX > 40 && currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
     } else {
-      wrapperRef.current.style.transform = `translateX(-${
-        currentIndex * 100
-      }%)`;
+      // Reset về vị trí hiện tại nếu không thay đổi slide
+      wrapperRef.current.style.setProperty('--translate-x', `-${currentIndex * 100}%`);
     }
 
     dragStartX.current = null;
@@ -118,15 +124,21 @@ export default function ProductGalleryMobile({ media }: Props) {
     }
   }, [currentIndex]);
 
+  // Sử dụng custom CSS module và CSS variables
+  useEffect(() => {
+    if (wrapperRef.current) {
+      wrapperRef.current.style.setProperty('--translate-x', `-${currentIndex * 100}%`);
+    }
+  }, [currentIndex]);
+
   return (
     <div className="w-full aspect-square bg-white relative overflow-hidden">
       <div
-        className="flex h-full w-full"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        className={`flex h-full w-full ${styles.galleryWrapper}`}
+        ref={wrapperRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        ref={wrapperRef}
       >
         {media.map((item, index) => (
           <div

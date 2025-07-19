@@ -11,6 +11,7 @@ import ProductSuggestions from "./products-Suggestion";
 import { productMock } from "./mockData";
 import { slugify } from "@/utils/slugify";
 import { ClientProductDetail } from "@/types/client.products.interface";
+import { MediaItem, transformProductImagesToMedia } from "../shared/productTransformers";
 
 import {
   Breadcrumb,
@@ -25,9 +26,6 @@ interface Props {
 }
 
 export default function ProductDetail({ slug, product: productData, isLoading = false }: Props) {
-  // Fallback to mock data if product is not loaded yet
-  const productToUse = productData || productMock;
-  
   // Show loading state if needed
   if (isLoading) {
     return (
@@ -36,17 +34,38 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
       </div>
     );
   }
+  
+  // Sử dụng real data hoặc fallback về mock data
+  let productToUse;
+  let media: MediaItem[];
+  
+  if (productData) {
+    // Case 1: Có real data từ API
+    productToUse = productData;
+    // Biến đổi images từ API thành media format
+    media = transformProductImagesToMedia(productData);
+  } else {
+    // Case 2: Sử dụng mock data
+    productToUse = productMock;
+    // Chuyển đổi mock data media sang đúng kiểu MediaItem
+    media = (productMock.media || []).map(item => ({
+      type: item.type === "video" ? "video" : "image",
+      src: item.src
+    })) as MediaItem[];
+  }
 
+  // Extract các variant để hiển thị
   const sizes =
     productToUse?.variants?.find((v: any) => v.value === "Kích thước")?.options || [];
   const colors =
     productToUse?.variants?.find((v: any) => v.value === "Màu sắc")?.options || [];
-
+  
+  // Tạo product object hoàn chỉnh cho UI
   const product = {
     ...productToUse,
     sizes,
     colors,
-    media: productToUse.media as { type: "image" | "video"; src: string }[],
+    media,
   };
 
   const category =
@@ -108,14 +127,14 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
 
       {/* ✅ Chi tiết sản phẩm */}
       <div className="max-w-[1200px] mx-auto bg-white p-4 rounded">
-        <div className="grid md:grid-cols-[minmax(0,500px)_1fr] gap-4 md:items-start">
-          <div className="w-full max-w-[500px]">
-            <ProductGallery media={product.media} />
-          </div>
-          <div className="w-full">
-            <ProductInfo product={product} />
-          </div>
+       <div className="grid md:grid-cols-[450px_1fr] gap-4 md:items-start">
+        <div className="w-full">
+          <ProductGallery media={product.media} />
         </div>
+        <div className="w-full">
+          <ProductInfo product={product} />
+        </div>
+      </div>
 
         {/* ✅ Thông số kỹ thuật */}
         <div className="mt-6">

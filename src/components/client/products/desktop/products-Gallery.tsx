@@ -4,11 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, PlayCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface MediaItem {
-  type: "image" | "video";
-  src: string;
-}
+import { MediaItem } from "../shared/productTransformers";
 
 interface Props {
   media: MediaItem[];
@@ -190,9 +186,8 @@ export default function ProductGallery({ media }: Props) {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-hidden">
           <div className="relative z-50 w-full h-full flex items-center justify-center px-4">
             <div
-              className="absolute inset-0 pointer-events-auto"
+              className="absolute inset-0 pointer-events-auto z-0"
               onClick={() => setSelectedIndex(null)}
-              style={{ zIndex: 0 }}
             />
             <Button
               size="icon"
