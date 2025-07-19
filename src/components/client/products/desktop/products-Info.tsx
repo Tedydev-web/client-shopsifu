@@ -160,9 +160,9 @@ export default function ProductInfo({ product }: { product: Product }) {
   return (
     <div className="w-full flex flex-col gap-4 text-[15px] leading-relaxed">
       {/* Tên sản phẩm */}
-      <h1 className="text-2xl font-semibold text-gray-900">{product.name}</h1>
+      <h1 className="text-2xl font-medium text-gray-900">{product.name}</h1>
       {/* Dịch vụ hỗ trợ */}
-      {/* <div className="flex items-center gap-4 text-sm mt-1">
+      <div className="flex items-center gap-4 text-sm mt-1">
         <span className="flex items-center gap-1">
           <Truck className="w-4 h-4 text-green-600" />
           <span className="text-black">Miễn phí vận chuyển</span>
@@ -171,7 +171,7 @@ export default function ProductInfo({ product }: { product: Product }) {
           <RefreshCcw className="w-4 h-4 text-blue-600" />
           <span className="text-black">Đổi trả 7 ngày</span>
         </span>
-      </div> */}
+      </div>
 
       {/* Đánh giá, bán, tố cáo */}
      <div className="flex items-center w-full text-sm text-muted-foreground mb-1">

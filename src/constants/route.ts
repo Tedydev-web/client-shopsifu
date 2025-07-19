@@ -16,7 +16,7 @@ export const ROUTES = {
     SETTINGS_SECURITY: '/admin/settings/security'
   },
   PRODUCT: {
-    DETAIL: '/products/:id',
+    DETAIL: '/products/:slug',
     LIST: '/products'
   }
 }

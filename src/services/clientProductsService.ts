@@ -24,7 +24,7 @@ export const clientProductsService = {
 
   /**
    * Get detailed information about a specific product
-   * @param id - The product ID
+   * @param id - The product ID (extracted from slug or direct ID)
    * @returns Promise with the product detail
    */
   getProductDetail: async (id: string): Promise<ClientProductDetail> => {

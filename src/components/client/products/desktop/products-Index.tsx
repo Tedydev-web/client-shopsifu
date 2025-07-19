@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react";
 import ProductGallery from "./products-Gallery";
 import ProductInfo from "./products-Info";
 import ProductSpecs from "./products-Spec";
+import ProductShopInfo from "./products-ShopInfo";
 import ProductReviews from "./products-Reviews";
 import ProductSuggestions from "./products-Suggestion";
 import { productMock } from "./mockData";
@@ -82,7 +83,7 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
         <Breadcrumb className="mb-3 flex flex-wrap items-center text-sm text-muted-foreground">
           <BreadcrumbItem className="flex items-center gap-1">
             <BreadcrumbLink asChild>
-              <Link href="/" className="text-black hover:underline">
+              <Link href="/" className="text-[#05a] hover:underline">
                 Shopsifu
               </Link>
             </BreadcrumbLink>
@@ -94,7 +95,7 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
               <BreadcrumbLink asChild>
                 <Link
                   href={`/category/${slugify(category.name)}`}
-                  className="text-black hover:underline"
+                  className="text-[#05a] hover:underline"
                 >
                   {category.name}
                 </Link>
@@ -108,7 +109,7 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
               <BreadcrumbLink asChild>
                 <Link
                   href={`/brand/${slugify(brand)}`}
-                  className="text-black hover:underline"
+                  className="text-[#05a] hover:underline"
                 >
                   {brand}
                 </Link>
@@ -127,27 +128,47 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
 
       {/* ✅ Chi tiết sản phẩm */}
       <div className="max-w-[1200px] mx-auto bg-white p-4 rounded">
-       <div className="grid md:grid-cols-[450px_1fr] gap-4 md:items-start">
-        <div className="w-full">
-          <ProductGallery media={product.media} />
+        <div className="grid md:grid-cols-[450px_1fr] gap-4 md:items-start">
+          <div className="w-full">
+            <ProductGallery media={product.media} />
+          </div>
+          <div className="w-full">
+            <ProductInfo product={product as any} />
+          </div>
         </div>
-        <div className="w-full">
-          <ProductInfo product={product} />
-        </div>
+
+        {/* ✅ Block thông tin chi tiết riêng biệt */}
       </div>
+      <div className="max-w-[1200px] mx-auto mt-6 rounded space-y-6">
+        {/* ✅ Thông tin Shop */}
+        <div>
+          <ProductShopInfo shop={{
+            id: "cool-crew-12345",
+            name: "Cool Crew",
+            avatar: "/assets/demo/shop-avatar.png",
+            isOnline: true,
+            lastActive: "1 Giờ Trước",
+            rating: 3.7,
+            responseRate: 100,
+            responseTime: "trong vài giờ",
+            followers: 5500,
+            joinedDate: "9 tháng trước",
+            productsCount: 86
+          }} />
+        </div>
 
         {/* ✅ Thông số kỹ thuật */}
-        <div className="mt-6">
-          <ProductSpecs product={product} />
+        <div>
+          <ProductSpecs product={product as any} />
         </div>
 
         {/* ✅ Đánh giá */}
-        <div className="mt-6">
+        <div>
           <ProductReviews reviews={[]} />
         </div>
 
         {/* ✅ Gợi ý sản phẩm */}
-        <div className="mt-6">
+        <div>
           <ProductSuggestions products={[]} />
         </div>
       </div>
