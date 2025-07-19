@@ -1,10 +1,10 @@
 // components/client/products/ProductPageClientWrapper.tsx
 "use client";
 
-import { useCheckDevice } from "@/hooks/useCheckDevices";
 import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper";
 import ProductDetail from "@/components/client/products/desktop/products-Index";
 import ProductDetailMobile from "@/components/client/products/mobile/products-IndexMobile";
+import { useCheckDevice } from "@/hooks/useCheckDevices";
 import { useResponsive } from "@/hooks/useResponsive";
 import { useEffect, useState } from "react";
 
