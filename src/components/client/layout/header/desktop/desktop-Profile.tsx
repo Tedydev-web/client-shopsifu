@@ -54,7 +54,7 @@ export function ProfileDropdown() {
     );
   }
   const name = user.username;
-  const role = user.role;
+  const role = user.role.name;
   const email = user.email;
   const avatar = user.avatar;
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh

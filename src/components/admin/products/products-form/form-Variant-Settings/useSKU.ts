@@ -156,10 +156,36 @@ export function useSku({ options, initialSkus, onUpdateSkus }: UseSkuProps) {
       
       console.log('Generated new SKUs:', newSkus);
       
-      // Bảo toàn giá trị price, stock, image của SKUs hiện tại nếu có
+      // Bảo toàn giá trị price, stock, image của SKUs hiện tại một cách thông minh hơn
       const preservedSkus = newSkus.map(newSku => {
-        // Tìm theo name hoặc id
-        const oldSku = skus.find(s => s.name === newSku.name || s.id === newSku.id);
+        // Tìm SKU cũ theo nhiều tiêu chí khác nhau
+        let oldSku = null;
+        
+        // 1. Tìm theo ID (cho SKUs đã có từ API)
+        oldSku = skus.find(s => s.id === newSku.id);
+        
+        // 2. Nếu không tìm thấy bằng ID, thử tìm bằng name
+        if (!oldSku) {
+          oldSku = skus.find(s => s.name === newSku.name);
+        }
+        
+        // 3. Nếu vẫn không tìm thấy, thử tìm bằng pattern của variantValues
+        if (!oldSku) {
+          // Tạo mảng các giá trị variant để so sánh
+          const newValues = newSku.variantValues.map(v => v.value);
+          
+          oldSku = skus.find(s => {
+            if (!s.variantValues || !Array.isArray(s.variantValues)) return false;
+            
+            // Kiểm tra xem có bao nhiêu giá trị giống nhau
+            const oldValues = s.variantValues.map(v => v.value);
+            const matchCount = newValues.filter(val => oldValues.includes(val)).length;
+            
+            // Nếu có ít nhất 1 giá trị trùng khớp và số lượng variantValues bằng nhau
+            return matchCount > 0 && oldValues.length === newValues.length;
+          });
+        }
+        
         if (oldSku) {
           return { 
             ...newSku, 
@@ -168,6 +194,8 @@ export function useSku({ options, initialSkus, onUpdateSkus }: UseSkuProps) {
             image: oldSku.image || newSku.image
           };
         }
+        
+        // Sử dụng basePrice từ product làm giá mặc định nếu có thể
         return newSku;
       });
       

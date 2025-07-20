@@ -42,7 +42,7 @@ function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
           setVariants={setVariants}
           updateSingleSku={updateSingleSku}
         />
-
+    
       </div>
 
       {/* === CỘT PHỤ BÊN PHẢI === */}
