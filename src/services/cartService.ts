@@ -15,9 +15,9 @@ export const cartService = {
    * Lấy thông tin giỏ hàng của người dùng hiện tại
    * @returns Promise với thông tin giỏ hàng
    */
-  getCart: async (): Promise<CartResponse> => {
+  getCart: async (params?: string): Promise<CartResponse> => {
     try {
-      const response = await privateAxios.get(API_ENDPOINTS.CART.GET_CART);
+      const response = await privateAxios.get(API_ENDPOINTS.CART.GET_CART, { params });
       return response.data;
     } catch (error) {
       console.error("Error fetching cart:", error);

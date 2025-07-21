@@ -13,20 +13,20 @@ interface CartLayoutProps {
 export default function CartLayout({ children}: CartLayoutProps) {
   const { isMobile } = useResponsive();
 
-  const topContent = !isMobile ? (
-    <>
-      <CartTopBar />
-      <CartHeader />
-    </>
-  ) : null;
+  // const topContent = !isMobile ? (
+  //   <>
+  //     <CartTopBar />
+  //     <CartHeader />
+  //   </>
+  // ) : null;
 
   return (
     <ClientLayoutWrapper
-      hideHeader
-      hideCommit
+      hideHeader={isMobile}
+      hideCommit={isMobile}
       hideHero
       hideFooter={isMobile}
-      topContent={topContent}
+      // topContent={topContent}
     >
       <div className={`w-full ${isMobile ? "min-h-screen flex flex-col" : "min-h-screen"}`}>
         <main className={`flex-1 ${isMobile ? "" : "pb-4"}`}>

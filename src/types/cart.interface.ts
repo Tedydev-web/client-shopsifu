@@ -1,54 +1,108 @@
 import { BaseResponse, BaseEntity, PaginationMetadata } from "./base.interface"
 
 /**
+ * @interface ShopInfo
+ * @description Thông tin về shop trong giỏ hàng
+ */
+export interface ShopInfo {
+    id: string;
+    name: string;
+    avatar?: string;
+}
+
+/**
+ * @interface ProductInfo
+ * @description Thông tin về sản phẩm trong SKU
+ */
+export interface ProductInfo {
+    id: string;
+    publishedAt: string;
+    name: string;
+    description: string;
+    basePrice: number;
+    virtualPrice: number;
+    brandId: string;
+    images: string[];
+    variants: Array<{
+        value: string;
+        options: string[];
+    }>;
+    productTranslations: any[];
+}
+
+/**
+ * @interface SkuInfo
+ * @description Thông tin về SKU trong giỏ hàng
+ */
+export interface SkuInfo {
+    id: string;
+    value: string;
+    price: number;
+    stock: number;
+    image: string;
+    productId: string;
+    product: ProductInfo;
+}
+
+/**
  * @interface CartItem
  * @description Đại diện cho một mặt hàng trong giỏ hàng
  */
-export interface CartItem extends BaseEntity {
-    skuId: string;
-    productId: string;
-    name: string;
-    price: number;
+export interface CartItem extends Partial<BaseEntity> {
+    id: string;
     quantity: number;
-    image?: string;
-    variant?: string;
-    stock?: number;
-    isSelected?: boolean;
+    skuId: string;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+    sku: SkuInfo;
+    isSelected?: boolean; // Thêm trường này để hỗ trợ chọn mặt hàng
 }
 
 /**
- * @interface Cart
- * @description Đại diện cho toàn bộ giỏ hàng của người dùng
+ * @interface ShopCart
+ * @description Đại diện cho giỏ hàng của một shop
  */
-export interface Cart extends BaseEntity {
-    userId?: string;
-    items: CartItem[];
-    totalItems: number;
-    totalPrice: number;
-    totalSelectedItems?: number;
-    totalSelectedPrice?: number;
-}
-
-/**
- * @interface CartResponse
- * @description Đại diện cho response API khi lấy thông tin giỏ hàng
- */
-export interface CartResponse extends BaseResponse {
-    data: Cart;
+export interface ShopCart {
+    shop: ShopInfo;
+    cartItems: CartItem[];
+    isSelected?: boolean; // Thêm trường này để hỗ trợ chọn tất cả mặt hàng của shop
 }
 
 /**
  * @interface CartListResponse
- * @description Đại diện cho response API khi lấy danh sách giỏ hàng (nếu cần)
+ * @description Response API khi lấy danh sách giỏ hàng
  */
 export interface CartListResponse extends BaseResponse {
-    data: Cart[];
+    data: ShopCart[];
     metadata?: PaginationMetadata;
 }
 
 /**
+ * @interface Cart
+ * @description Tổng hợp giỏ hàng (được tính toán ở client)
+ */
+export interface Cart {
+    shops: ShopCart[];
+    totalItems: number;
+    totalPrice: number;
+    totalSelectedItems: number;
+    totalSelectedPrice: number;
+}
+
+/**
+ * @interface CartResponse
+ * @description Response API khi thực hiện các thao tác với giỏ hàng
+ */
+export interface CartResponse extends BaseResponse {
+    data: {
+        cartItem?: CartItem;
+    };
+}
+
+/**
  * @interface CartItemRequest
- * @description Request để thêm hoặc cập nhật sản phẩm vào giỏ hàng
+ * @description Request để thêm sản phẩm vào giỏ hàng
  */
 export interface CartItemRequest {
     skuId: string;
@@ -70,4 +124,25 @@ export interface UpdateCartItemRequest {
  */
 export interface DeleteCartRequest {
     itemIds: string[];
+}
+
+/**
+ * @interface SelectCartItemsRequest
+ * @description Request để chọn/bỏ chọn nhiều sản phẩm trong giỏ hàng
+ */
+export interface SelectCartItemsRequest {
+    itemIds: string[];
+    isSelected: boolean;
+}
+
+/**
+ * @interface CartSummary
+ * @description Tóm tắt thông tin giỏ hàng (được tính toán ở client)
+ */
+export interface CartSummary {
+    totalItems: number;
+    totalSelectedItems: number;
+    totalPrice: number;
+    totalSelectedPrice: number;
+    totalShops: number;
 }
