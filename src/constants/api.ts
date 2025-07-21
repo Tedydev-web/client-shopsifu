@@ -92,6 +92,13 @@ export const API_ENDPOINTS = {
     LIST: `${API_BASE}/products`,
     DETAIL: `${API_BASE}/products/:id`
   },
+  // QUẢN LÝ GIỎ HÀNG - CART
+  CART:{
+    GET_CART: `${API_BASE}/cart`,
+    ADD_TO_CART: `${API_BASE}/cart`,
+    UPDATE_CART_ITEM: `${API_BASE}/cart/:id`,
+    DELETE_CART: `${API_BASE}/cart/delete`,
+  },
   // THỐNG KÊ LOGS - AUDIT LOGS
   AUDIT_LOGS: {
     GETALL: `${API_BASE}/audit-logs`,

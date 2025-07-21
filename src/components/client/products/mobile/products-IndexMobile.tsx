@@ -6,6 +6,7 @@ import ProductSpecsMobile from './products-SpecMobile';
 import ProductReviewsMobile from './products-ReviewsMobile';
 import ProductSuggestionsMobile from './products-SuggestionMobile';
 import ProductsFooter from './products-Footer';
+import ProductShopInfo from '../products-ShopInfo'
 import { productMock } from './mockData';
 import { slugify } from '@/utils/slugify';
 import { ClientProductDetail } from "@/types/client.products.interface";
@@ -59,14 +60,49 @@ export default function ProductDetailMobile({ slug, product: productData, isLoad
     media,
   };
 
+   const defaultShop = {
+    id: "cool-crew-12345",
+    name: "Cool Crew",
+    avatar: "/images/logo/coolcrew-logo.png", // Đường dẫn hình ảnh mặc định
+    isOnline: true,
+    lastActive: "1 giờ trước",
+    rating: 3.7,
+    responseRate: 100,
+    responseTime: "trong vài giờ",
+    followers: 5500,
+    joinedDate: "9 tháng trước",
+    productsCount: 86
+  };
+
+  const handleAddToCart = (skuId: string, quantity: number) => {
+    console.log('Thêm vào giỏ hàng:', { skuId, quantity });
+    // Thêm logic thực tế ở đây để thêm vào giỏ hàng
+  };
+
+  const handleBuyNow = () => {
+    console.log('Mua ngay');
+    // Thêm logic thực tế ở đây để mua ngay
+  };
+
+  const handleChat = () => {
+    console.log('Chat với shop');
+    // Thêm logic thực tế ở đây để chat với shop
+  };
+
   return (
     <div className="bg-[#f5f5f5] pb-20">
       <ProductGalleryMobile media={product.media} />
-      <ProductInfoMobile product={product} />
-      <ProductSpecsMobile product={product} />
+      <ProductInfoMobile product={product as any} />
+      <ProductShopInfo shop={defaultShop}/>
+      <ProductSpecsMobile product={product as any} />
       <ProductReviewsMobile reviews={[]} />
       <ProductSuggestionsMobile products={[]} />
-      <ProductsFooter />
+      <ProductsFooter 
+        product={product as any}
+        onAddToCart={handleAddToCart}
+        onBuyNow={handleBuyNow}
+        onChat={handleChat}
+      />
     </div>
   );
 }

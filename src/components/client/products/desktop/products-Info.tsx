@@ -250,56 +250,56 @@ export default function ProductInfo({ product }: { product: Product }) {
 
       {/* Variants - Dynamic rendering based on API */}
       {variantGroups.map((variantGroup) => (
-  <div key={variantGroup.value} className="flex flex-wrap items-center gap-3">
-    <span className="w-24 text-muted-foreground">{variantGroup.value}:</span>
-    <div className="flex gap-2 flex-wrap">
-      {variantGroup.options.map((option) => {
-        const isSelected = selectedVariants[variantGroup.value] === option;
+      <div key={variantGroup.value} className="flex flex-wrap items-center gap-3">
+        <span className="w-24 text-muted-foreground">{variantGroup.value}:</span>
+        <div className="flex gap-2 flex-wrap">
+          {variantGroup.options.map((option) => {
+            const isSelected = selectedVariants[variantGroup.value] === option;
 
-        // Sử dụng hàm tiện ích để kiểm tra xem variant này có sẵn không
-        const isAvailable = isOptionAvailable(
-          variantGroup.value,
-          option,
-          selectedVariants,
-          product.skus
-        );
+            // Sử dụng hàm tiện ích để kiểm tra xem variant này có sẵn không
+            const isAvailable = isOptionAvailable(
+              variantGroup.value,
+              option,
+              selectedVariants,
+              product.skus
+            );
 
-        return (
-          <button
-            key={option}
-            onClick={() => handleVariantSelect(variantGroup.value, option)}
-            className={cn(
-              "relative px-4 py-2 border rounded-md text-sm transition-all",
-              "hover:border-primary hover:text-primary",
-              isSelected
-                ? "border-primary text-primary"
-                : "border-input text-foreground",
-              !isAvailable && "opacity-50 cursor-not-allowed"
-            )}
-            disabled={!isAvailable}
-          >
-            {option}
-            {isSelected && (
-              <span className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-3 h-3"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  </div>
+            return (
+              <button
+                key={option}
+                onClick={() => handleVariantSelect(variantGroup.value, option)}
+                className={cn(
+                  "relative px-4 py-2 border rounded-md text-sm transition-all",
+                  "hover:border-primary hover:text-primary",
+                  isSelected
+                    ? "border-primary text-primary"
+                    : "border-input text-foreground",
+                  !isAvailable && "opacity-50 cursor-not-allowed"
+                )}
+                disabled={!isAvailable}
+              >
+                {option}
+                {isSelected && (
+                  <span className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-3 h-3"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 ))}
 
       

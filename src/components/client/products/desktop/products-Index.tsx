@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import ProductGallery from "./products-Gallery";
 import ProductInfo from "./products-Info";
 import ProductSpecs from "./products-Spec";
-import ProductShopInfo from "./products-ShopInfo";
+import ProductShopInfo from "../products-ShopInfo";
 import ProductReviews from "./products-Reviews";
 import ProductSuggestions from "./products-Suggestion";
 import { productMock } from "./mockData";
