@@ -1240,7 +1240,9 @@
 
         "on": "On",
         "off": "Off",
-        "turnOff": "Turn Off"
+        "turnOff": "Turn Off",
+
+        "dashboard": "Dashboard"
       },
 
       "password": {

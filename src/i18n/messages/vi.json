@@ -1241,7 +1241,9 @@
 
         "on": "Đã bật",
         "off": "Chưa bật",
-        "turnOff": "Tắt"
+        "turnOff": "Tắt",
+
+        "dashboard": "Tổng quan"
       },
 
       "password": {

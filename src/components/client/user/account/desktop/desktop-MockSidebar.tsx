@@ -1,0 +1,34 @@
+import { BellDot, User, NotepadText, ShieldCheck, LogOut } from "lucide-react";
+
+export const sidebarItems = [
+  {
+    labelKey: "user.account.profile.dashboard",
+    href: "/user/dashboard",
+    icon: <User className="w-5 h-5 mr-2" />,
+  },
+  {
+    labelKey: "user.account.profile.profile",
+    href: "/user/profile",
+    icon: <User className="w-5 h-5 mr-2" />,
+  },
+  {
+    labelKey: "user.account.myPurchase.myPurchase",
+    href: "/user/purchase",
+    icon: <NotepadText className="w-5 h-5 mr-2" />,
+  },
+  {
+    labelKey: "user.settings.section.notifications",
+    href: "/user/notifications",
+    icon: <BellDot className="w-5 h-5 mr-2" />,
+  },
+  {
+    labelKey: "user.account.security.security",
+    href: "/user/security",
+    icon: <ShieldCheck className="w-5 h-5 mr-2" />,
+  },
+  {
+    labelKey: "auth.common.logout",
+    href: "/logout",
+    icon: <LogOut className="w-5 h-5 mr-2" />,
+  },
+];

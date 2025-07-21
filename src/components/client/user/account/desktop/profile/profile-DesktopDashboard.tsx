@@ -5,7 +5,7 @@ import DashboardEmptyGrids from "./profile-DashBoardGrids";
 import DashboardBanner from "./profile-Banner";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 
-export default function ProfileDesktopIndex() {
+export default function Dashboard() {
   const t = useTranslations();
   const user = useUserData();
 
@@ -26,7 +26,7 @@ export default function ProfileDesktopIndex() {
   const isZaloLinked = user?.linkedAccounts?.zalo || false;
 
   return (
-    <div className="space-y-6 bg-[#f5f5f7] min-h-screen">
+    <div className="py-6 px-4 space-y-6 bg-[#f5f5f7] min-h-screen">
       {/* Tổng quan người dùng */}
       <div className="bg-white rounded-xl shadow-sm p-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
