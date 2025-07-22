@@ -25,14 +25,16 @@ export default function AccountLayout({
           </div>
         </ClientLayoutWrapper>
       ) : (
-        <ClientLayoutWrapper hideHeader hideCommit hideHero hideFooter={false}>
-          <div className="flex min-h-screen bg-[#f5f5f7] text-foreground">
-            <aside className="w-[260px] h-screen sticky top-0 bg-[#f5f5f7] border-gray-200 pt-6">
+        <ClientLayoutWrapper hideHeader hideCommit hideHero hideFooter>
+          <div className="flex h-[90vh] bg-[#f5f5f7] text-foreground gap-6 px-6 py-6">
+            <aside className="w-[280px] min-w-[280px] pt-6">
               <Sidebar />
             </aside>
 
-            <main className="flex-1 p-6 overflow-hidden">
-              <div className="w-full max-w-[1100px] mx-auto">{children}</div>
+            <main className="flex-1 overflow-hidden pt-6">
+              <div className="w-full max-w-[1100px] mx-auto space-y-6">
+                {children}
+              </div>
             </main>
           </div>
         </ClientLayoutWrapper>

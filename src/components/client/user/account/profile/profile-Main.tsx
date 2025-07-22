@@ -4,7 +4,7 @@ import { useCheckDevice } from "@/hooks/useCheckDevices";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ProfileDesktop = dynamic(() => import("../desktop/profile/profile-DesktopIndex"), {
+const ProfilePage = dynamic(() => import("../desktop/profile/profile-Index"), {
   loading: () => <Skeleton className="w-full h-full" />,
   ssr: false,
 });
@@ -19,7 +19,7 @@ export function ProfileMain() {
 
   return (
     <div className="w-full h-full">
-      {isMobileView ? <ProfileMobile /> : <ProfileDesktop />}
+      {isMobileView ? <ProfileMobile /> : <ProfilePage />}
     </div>
   );
 }
