@@ -169,3 +169,51 @@ export function findSelectedSkuPrice(
   const sku = findMatchingSku(selectedVariants, skus, variantGroups);
   return sku ? sku.price : defaultPrice;
 }
+
+/**
+ * Hàm xử lý thêm sản phẩm vào giỏ hàng
+ * @param selectedVariants Các variant đã được người dùng chọn
+ * @param skus Danh sách SKU của sản phẩm
+ * @param variantGroups Danh sách nhóm variant của sản phẩm
+ * @param quantity Số lượng sản phẩm cần thêm vào giỏ hàng
+ * @param addToCartFn Hàm addToCart từ useCart hook
+ * @returns Promise với kết quả của việc thêm vào giỏ hàng
+ */
+export async function handleAddToCart(
+  selectedVariants: SelectedVariants,
+  skus: Sku[],
+  variantGroups: VariantGroup[],
+  quantity: number,
+  addToCartFn: (data: {skuId: string, quantity: number}, showNotification?: boolean) => Promise<boolean>
+): Promise<boolean> {
+  // Tìm SKU phù hợp với các lựa chọn variant
+  const selectedSku = findMatchingSku(selectedVariants, skus, variantGroups);
+  
+  // Nếu không tìm thấy SKU phù hợp, trả về false
+  if (!selectedSku) {
+    console.error("Không tìm thấy SKU phù hợp với các lựa chọn");
+    return false;
+  }
+  
+  // Kiểm tra tồn kho
+  if (selectedSku.stock <= 0) {
+    console.error("Sản phẩm đã hết hàng");
+    return false;
+  }
+  
+  // Đảm bảo số lượng không vượt quá tồn kho
+  const safeQuantity = Math.min(quantity, selectedSku.stock);
+  
+  // Gọi hàm addToCart từ hook useCart
+  try {
+    const result = await addToCartFn({
+      skuId: selectedSku.id,
+      quantity: safeQuantity
+    }, true); // true để hiển thị thông báo
+    
+    return result;
+  } catch (error) {
+    console.error("Lỗi khi thêm vào giỏ hàng:", error);
+    return false;
+  }
+}

@@ -2,8 +2,8 @@
 
 import { t } from "i18next";
 import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper";
-import { CartTopBar } from "@/components/client/cart/desktop/cart-TopBar";
-import { CartHeader } from "@/components/client/cart/desktop/cart-Header";
+// import { CartTopBar } from "@/components/client/cart/desktop/cart-TopBar";
+// import { CartHeader } from "@/components/client/cart/desktop/cart-Header";
 import { useResponsive } from "@/hooks/useResponsive";
 
 interface CartLayoutProps {
@@ -23,7 +23,7 @@ export default function CartLayout({ children}: CartLayoutProps) {
   return (
     <ClientLayoutWrapper
       hideHeader={isMobile}
-      hideCommit={isMobile}
+      hideCommit
       hideHero
       hideFooter={isMobile}
       // topContent={topContent}

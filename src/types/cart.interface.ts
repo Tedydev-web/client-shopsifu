@@ -114,6 +114,7 @@ export interface CartItemRequest {
  * @description Request để cập nhật sản phẩm trong giỏ hàng
  */
 export interface UpdateCartItemRequest {
+    skuId: string;
     quantity: number;
     isSelected?: boolean;
 }
@@ -123,7 +124,7 @@ export interface UpdateCartItemRequest {
  * @description Request để xóa các sản phẩm khỏi giỏ hàng
  */
 export interface DeleteCartRequest {
-    itemIds: string[];
+    cartItemIds: string[];
 }
 
 /**
@@ -131,7 +132,7 @@ export interface DeleteCartRequest {
  * @description Request để chọn/bỏ chọn nhiều sản phẩm trong giỏ hàng
  */
 export interface SelectCartItemsRequest {
-    itemIds: string[];
+    cartItemIds: string[];
     isSelected: boolean;
 }
 

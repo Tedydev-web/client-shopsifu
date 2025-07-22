@@ -9,6 +9,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TokenManager } from "./token-manager";
 import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
+import { CartProvider } from '@/context/CartContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -36,7 +37,9 @@ export default async function RootLayout({
                 <Toast/>
                 <TrustDeviceModal />
                 <TokenManager />
-                {children}
+                <CartProvider>
+                  {children}
+                </CartProvider>
               </ClientLayout>
               <Toaster position="bottom-right" />
             </StoreProvider>

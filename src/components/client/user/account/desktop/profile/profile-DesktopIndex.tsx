@@ -10,7 +10,7 @@ import { DeleteAccountModal } from "./profile-DesktopDeleteAccount";
 import AccountLayout from "@/app/(client)/user/layout";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { usePasswordSecurity } from "../../profile/useProfile-2FA";
-import { useUserMobileHeader } from "@/contexts/UserMobileHeaderContext";
+import { useUserMobileHeader } from "@/context/UserMobileHeaderContext";
 import { useResponsive } from "@/hooks/useResponsive";
 
 export default function ProfileDesktopIndex() {

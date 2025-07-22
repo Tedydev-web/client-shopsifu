@@ -49,7 +49,7 @@ export const cartService = {
   updateCartItem: async (itemId: string, data: UpdateCartItemRequest): Promise<CartResponse> => {
     try {
       const url = API_ENDPOINTS.CART.UPDATE_CART_ITEM.replace(":id", itemId);
-      const response = await privateAxios.patch(url, data);
+      const response = await privateAxios.put(url, data);
       return response.data;
     } catch (error) {
       console.error(`Error updating cart item ${itemId}:`, error);

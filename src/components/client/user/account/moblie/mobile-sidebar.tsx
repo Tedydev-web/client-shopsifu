@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronRight, Home } from "lucide-react";
 import MobileHeader from "./moblie-Header";
 import { useLogout } from "@/hooks/useLogout";
-import { useUserMobileHeader } from "@/contexts/UserMobileHeaderContext";
+import { useUserMobileHeader } from "@/context/UserMobileHeaderContext";
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 
