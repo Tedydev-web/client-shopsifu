@@ -3,11 +3,11 @@
 import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper";
 import { useResponsive } from "@/hooks/useResponsive";
 
-interface CartLayoutProps {
+interface CheckoutLayoutProps {
   children: React.ReactNode;
 }
 
-export default function CartLayout({ children}: CartLayoutProps) {
+export default function CheckoutLayout({ children}: CheckoutLayoutProps) {
   const { isMobile } = useResponsive();
 
   return (
