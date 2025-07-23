@@ -1,22 +1,40 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { PaymentMethods } from '../sections/tab-2/payment-Methods';
+import { RecipientInfo } from '../sections/tab-2/recipient-Info';
+import { useCheckout } from '../hooks/useCheckout';
 
 interface PaymentTabsProps {
   onPrevious: () => void;
 }
 
 export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
+  const { state } = useCheckout();
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  
+  // Dữ liệu mẫu cho thông tin người nhận và địa chỉ
+  const customerInfo = {
+    name: state.customerInfo?.name || "Nguyễn Văn A",
+    phone: state.customerInfo?.phone || "0987654321",
+    email: state.customerInfo?.email || "example@gmail.com",
+  };
+  
+  // Format địa chỉ từ shippingAddress
+  const formattedAddress = state.shippingAddress 
+    ? `${state.shippingAddress.address}, ${state.shippingAddress.ward}, ${state.shippingAddress.district}, ${state.shippingAddress.province}`
+    : "123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh";
+  
+  const recipientInfo = {
+    address: formattedAddress,
+    receiverName: state.customerInfo?.name || "Nguyễn Văn A",
+    receiverPhone: state.customerInfo?.phone || "0987654321",
+  };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
@@ -27,6 +45,16 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
     }, 2000);
   };
 
+  const handlePaymentMethodChange = (value: string) => {
+    setPaymentMethod(value);
+  };
+
+  // Xử lý quay lại bước thông tin
+  const handleGoToInformation = () => {
+    onPrevious();
+  };
+
+  // Hiển thị màn hình kết quả khi hoàn tất đặt hàng
   if (isCompleted) {
     return (
       <div className="space-y-6">
@@ -60,102 +88,31 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Phương thức thanh toán</CardTitle>
-          <CardDescription>
-            Chọn phương thức thanh toán phù hợp với bạn
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup 
-            value={paymentMethod}
-            onValueChange={setPaymentMethod}
-            className="space-y-3"
-          >
-            <div className="flex items-center space-x-3 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
-              <RadioGroupItem value="cod" id="payment-cod" />
-              <div className="flex-1">
-                <Label htmlFor="payment-cod" className="flex justify-between cursor-pointer">
-                  <div>
-                    <div className="font-medium">Thanh toán khi nhận hàng (COD)</div>
-                    <div className="text-sm text-gray-500">Thanh toán bằng tiền mặt khi nhận được hàng</div>
-                  </div>
-                  <div className="w-12 h-8 bg-gray-100 rounded flex items-center justify-center">
-                    COD
-                  </div>
-                </Label>
-              </div>
-            </div>
+      {/* Thông tin người nhận */}
+      <RecipientInfo 
+        customerInfo={customerInfo}
+        shippingAddress={recipientInfo}
+        onEdit={handleGoToInformation}
+      />
 
-            <div className="flex items-center space-x-3 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
-              <RadioGroupItem value="momo" id="payment-momo" />
-              <div className="flex-1">
-                <Label htmlFor="payment-momo" className="flex justify-between cursor-pointer">
-                  <div>
-                    <div className="font-medium">Ví MoMo</div>
-                    <div className="text-sm text-gray-500">Thanh toán qua ví điện tử MoMo</div>
-                  </div>
-                  <div className="w-12 h-8 relative">
-                    <div className="w-8 h-8 bg-pink-500 rounded-full absolute right-0"></div>
-                  </div>
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
-              <RadioGroupItem value="bank" id="payment-bank" />
-              <div className="flex-1">
-                <Label htmlFor="payment-bank" className="flex justify-between cursor-pointer">
-                  <div>
-                    <div className="font-medium">Chuyển khoản ngân hàng</div>
-                    <div className="text-sm text-gray-500">Chuyển khoản trực tiếp vào tài khoản shop</div>
-                  </div>
-                  <div className="w-12 h-8 bg-blue-100 rounded flex items-center justify-center text-xs">
-                    BANK
-                  </div>
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
-              <RadioGroupItem value="card" id="payment-card" />
-              <div className="flex-1">
-                <Label htmlFor="payment-card" className="flex justify-between cursor-pointer">
-                  <div>
-                    <div className="font-medium">Thẻ tín dụng / ghi nợ</div>
-                    <div className="text-sm text-gray-500">Thanh toán an toàn bằng thẻ</div>
-                  </div>
-                  <div className="flex gap-1">
-                    <div className="w-8 h-6 bg-blue-100 rounded"></div>
-                    <div className="w-8 h-6 bg-red-100 rounded"></div>
-                  </div>
-                </Label>
-              </div>
-            </div>
-          </RadioGroup>
-
-          <Alert className="mt-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Chú ý</AlertTitle>
-            <AlertDescription>
-              Đơn hàng sẽ được xử lý sau khi chúng tôi xác nhận thanh toán thành công
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      {/* Phương thức thanh toán */}
+      <PaymentMethods 
+        paymentMethod={paymentMethod}
+        handlePaymentMethodChange={handlePaymentMethodChange}
+      />
 
       <div className="flex justify-between">
         <Button
           variant="outline"
           onClick={onPrevious}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 h-9 text-sm"
         >
           <ArrowLeft className="h-4 w-4" /> Quay lại
         </Button>
         <Button 
           onClick={handleSubmit} 
           disabled={isSubmitting}
+          className="h-9 text-sm"
         >
           {isSubmitting ? 'Đang xử lý...' : 'Hoàn tất đặt hàng'}
         </Button>

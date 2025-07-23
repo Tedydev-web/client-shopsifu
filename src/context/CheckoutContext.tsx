@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react';
 // Types
 export type ShippingMethod = 'store' | 'delivery';
 export type PaymentMethod = 'cod' | 'bank' | 'momo' | 'zalopay' | 'credit';
-export type CheckoutStep = 'information' | 'payment';
+export type CheckoutStep = 'cart' | 'information' | 'payment';
 
 interface CustomerInfo {
   name: string;

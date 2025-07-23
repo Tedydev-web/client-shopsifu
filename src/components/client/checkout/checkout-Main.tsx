@@ -7,7 +7,7 @@ import { InformationTabs } from './tabs/information-Tabs';
 import { PaymentTabs } from './tabs/payment-Tabs';
 import { FooterSection } from './shared/footer-Section';
 import { useCheckout } from './hooks/useCheckout';
-import { CheckoutStep } from '@/context/CheckoutContext';
+import { CheckoutStep } from './checkout-Steps';
 
 export function CheckoutMain() {
   const { state, goToStep } = useCheckout();
@@ -33,7 +33,7 @@ export function CheckoutMain() {
           </div>
         </div>
         
-        <div className="w-full lg:w-96 order-1 lg:order-2">
+        <div className="w-full lg:w-[420px] order-1 lg:order-2 lg:mt-[80px]">
           <FooterSection />
         </div>
       </div>

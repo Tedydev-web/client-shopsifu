@@ -53,7 +53,7 @@ export function ProfileDropdown() {
       </span>
     );
   }
-  const name = user.username;
+  const name = user.name;
   const role = user.role.name;
   const email = user.email;
   const avatar = user.avatar;
@@ -148,7 +148,7 @@ export function ProfileDropdown() {
         <div className="h-px bg-gray-200 mx-6 my-1"></div>
           {/* Menu Items */}
         <div>
-          {role === 'Admin' || role === 'Super Admin' && (
+          {role === 'ADMIN' || role === 'Super Admin' && (
             <>
               <Link href={ROUTES.ADMIN.DASHBOARD} className="flex items-center px-5 py-2 hover:bg-gray-50 cursor-pointer text-[14px] text-gray-800">
                 <LayoutDashboard className="w-4.5 h-4.5 mr-2 text-gray-800" />

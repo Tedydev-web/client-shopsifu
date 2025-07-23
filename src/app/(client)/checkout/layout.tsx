@@ -12,11 +12,11 @@ export default function CheckoutLayout({ children}: CheckoutLayoutProps) {
 
   return (
     <ClientLayoutWrapper
-      hideHeader={isMobile}
+      hideHeader
       hideCommit
       hideHero
-      hideFooter={isMobile}
-      // topContent={topContent}
+      hideFooter
+      topContent
     >
       <div className={`w-full ${isMobile ? "min-h-screen flex flex-col" : "min-h-screen"}`}>
         <main className={`flex-1 ${isMobile ? "" : "pb-4"}`}>
