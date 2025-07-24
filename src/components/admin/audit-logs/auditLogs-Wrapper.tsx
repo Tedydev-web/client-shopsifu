@@ -1,8 +1,8 @@
-'use client';
-import dynamic from "next/dynamic";
+// 'use client';
+// import dynamic from "next/dynamic";
 
-const AuditLogsTableDynamic = dynamic(() => import("./auditLogs-Table").then(mod => mod.AuditLogsTable), { ssr: false });
+// const AuditLogsTableDynamic = dynamic(() => import("./auditLogs-Table").then(mod => mod.AuditLogsTable), { ssr: false });
 
-export default function AuditLogsTableWrapper() {
-  return <AuditLogsTableDynamic />;
-}
+// export default function AuditLogsTableWrapper() {
+//   return <AuditLogsTableDynamic />;
+// }

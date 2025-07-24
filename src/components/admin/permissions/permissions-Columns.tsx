@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 
 // Interface mới theo PerGetByIdResponse
 export type Permission = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   module: string;

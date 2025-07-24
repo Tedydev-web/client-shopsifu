@@ -13,7 +13,7 @@ interface PopulatedProduct extends Omit<Product, 'brandId' | 'categories'> {
 }
 
 export type ProductColumn = {
-  id: number;
+  id: string;
   name: string;
   image: string;
   price: number;

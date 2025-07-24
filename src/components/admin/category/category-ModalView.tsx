@@ -14,7 +14,7 @@ interface CategoryDetailProps {
 }
 
 export function CategoryModalView({ open, onOpenChange, data }: CategoryDetailProps) {
-  const { t } = useTranslations('admin');
+  const t  = useTranslations('admin');
 
   if (!data) return null;
   

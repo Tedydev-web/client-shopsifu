@@ -6,8 +6,8 @@ import { extractProductId } from '@/components/client/products/shared/productSlu
 // Khai báo caching và revalidation
 export const revalidate = 300; // 5 phút
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   
   try {
     // Trích xuất ID sản phẩm từ slug (slug format: ten-san-pham-123)
