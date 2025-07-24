@@ -12,7 +12,7 @@ export default function DesktopSidebar() {
   const t = useTranslations();
 
   return (
-    <aside className="bg-white rounded-xl shadow-sm w-full md:w-[280px] h-[85vh]">
+    <aside className="bg-white rounded-xl shadow-sm w-full md:w-[340px] h-[85vh]">
       <nav className="flex flex-col py-4">
         {sidebarItems.map((item) => {
           const isActive = pathname === item.href;
@@ -21,7 +21,7 @@ export default function DesktopSidebar() {
             <Link key={item.href} href={item.href}>
               <div
                 className={cn(
-                  "flex items-center gap-3 px-5 py-3 my-[6px] text-base font-medium transition-all",
+                  "flex items-center gap-3 px-6 py-4 my-[6px] text-base font-medium transition-all",
                   isActive
                     ? "bg-[#FDEDEF] text-[#D70018] border-l-4 border-[#D70018]"
                     : "text-gray-800 hover:text-[#D70018] hover:border-l-4 hover:border-[#D70018] hover:bg-[#FDEDEF]"
@@ -35,7 +35,7 @@ export default function DesktopSidebar() {
                 >
                   {item.icon}
                 </div>
-                <span>{t(item.labelKey)}</span>
+                <span className="font-medium">{t(item.labelKey)}</span>
               </div>
             </Link>
           );

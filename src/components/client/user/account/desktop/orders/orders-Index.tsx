@@ -1,18 +1,24 @@
-'use client'
+"use client";
 
-import { Tabs } from "@/components/ui/tabs"
-
-import { OrderDateFilter } from "./orders-DateFilter"
-import { OrderTabContent } from "./orders-TabsContents"
+import { useState } from "react";
+import { Tabs } from "@/components/ui/tabs";
 import { OrderTabs } from "./orders-Tabs";
-
+import { OrderDateFilter } from "./orders-DateFilter";
+import { OrderTabContent } from "./orders-TabsContents";
 
 export default function OrderHistory() {
+  const [currentTab, setCurrentTab] = useState("all");
+
   return (
-    <Tabs defaultValue="all" className="w-full bg-white rounded-xl shadow-sm h-[85vh]">
+    <Tabs
+      value={currentTab}
+      onValueChange={setCurrentTab}
+      className="w-full bg-white md:rounded-xl md:shadow-sm md:h-[85vh]"
+    >
+      {/* Tabs (dùng chung cho cả mobile & desktop) */}
       <OrderTabs />
       <OrderDateFilter />
-      <OrderTabContent />
+      <OrderTabContent currentTab={currentTab} />
     </Tabs>
-  )
+  );
 }
