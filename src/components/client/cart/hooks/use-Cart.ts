@@ -4,11 +4,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { cartService } from '@/services/cartService';
 import { Cart, CartItem, CartItemRequest, UpdateCartItemRequest, CartListResponse, ShopCart } from '@/types/cart.interface';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 
 interface UseCartOptions {
   /**
    * Xác định liệu giỏ hàng có nên được tải tự động khi hook được khởi tạo
-   * @default true
+   * @default false
    */
   autoFetch?: boolean;
 }
@@ -21,6 +22,7 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const { isAuthenticated } = useAuthGuard({ silentCheck: true });
 
   // Chuyển đổi dữ liệu từ API thành cart object trong client
   const transformCartData = useCallback((data: ShopCart[]): Cart => {
@@ -52,17 +54,22 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
 
   // Lấy thông tin giỏ hàng - có thể gọi từ bất kỳ component nào
   const fetchCart = useCallback(async (params?: string) => {
+    // Kiểm tra authentication trước khi fetch
+    if (!isAuthenticated) {
+      setShopCarts([]);
+      setCart(null);
+      return null;
+    }
+
     try {
       setIsLoading(true);
       const response = await cartService.getCart(params);
       
       if (response.data && Array.isArray(response.data)) {
-        // Nếu API trả về mảng ShopCart trực tiếp
         setShopCarts(response.data as ShopCart[]);
         const transformedCart = transformCartData(response.data as ShopCart[]);
         setCart(transformedCart);
       } else if (response.data as CartListResponse) {
-        // Nếu API trả về đúng định dạng CartListResponse
         const cartData = (response.data as CartListResponse).data;
         setShopCarts(cartData);
         const transformedCart = transformCartData(cartData);
@@ -74,11 +81,13 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
       console.error('Error fetching cart:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Không thể tải thông tin giỏ hàng. Vui lòng thử lại sau.';
       toast.error(errorMessage);
-      throw error;
+      setShopCarts([]);
+      setCart(null);
+      return null;
     } finally {
       setIsLoading(false);
     }
-  }, [transformCartData]);
+  }, [isAuthenticated, transformCartData]);
 
   // Thêm sản phẩm vào giỏ hàng
   const addToCart = useCallback(async (data: CartItemRequest, showNotification: boolean = true) => {
@@ -220,12 +229,12 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
     };
   }, [cart]);
 
-  // Lấy thông tin giỏ hàng khi component được mount (nếu autoFetch = true)
+  // Lấy thông tin giỏ hàng khi component được mount (nếu autoFetch = true và đã đăng nhập)
   useEffect(() => {
-    if (options.autoFetch) {
+    if (options.autoFetch && isAuthenticated) {
       fetchCart();
     }
-  }, [fetchCart, options.autoFetch]);
+  }, [fetchCart, options.autoFetch, isAuthenticated]);
 
   return {
     // State
@@ -233,6 +242,7 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
     shopCarts,
     isLoading,
     isUpdating,
+    isAuthenticated,
     
     // Actions
     fetchCart,
