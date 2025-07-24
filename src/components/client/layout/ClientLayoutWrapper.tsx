@@ -6,6 +6,7 @@ import HeroSectionWrapper from "@/components/client/landing-page/wrapper/hero-Wr
 import HeaderWrapper from "@/components/client/layout/header/header-Wrapper";
 import DesktopCommit from "@/components/client/layout/header/desktop/desktop-Commit";
 import { useCheckDevice } from "@/hooks/useCheckDevices";
+import { cn } from "@/lib/utils";
 
 interface ClientLayoutWrapperProps {
   children: React.ReactNode;
@@ -14,6 +15,8 @@ interface ClientLayoutWrapperProps {
   hideHero?: boolean;
   hideFooter?: boolean;
   topContent?: React.ReactNode;
+  maxWidth?: string | number;
+  className?: string;
 }
 
 export default function ClientLayoutWrapper({
@@ -23,8 +26,13 @@ export default function ClientLayoutWrapper({
   hideHero = false,
   hideFooter = false,
   topContent,
+  maxWidth = "1250px",
+  className,
 }: ClientLayoutWrapperProps) {
   const deviceType = useCheckDevice();
+
+  // Convert maxWidth to string with px if it's a number
+  const maxWidthValue = typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth;
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -43,9 +51,12 @@ export default function ClientLayoutWrapper({
       <main className="flex-grow bg-[#F5F5FA]">
         {!hideHero && <HeroSectionWrapper />}
         <div
-          className={`max-w-[1250px] w-full mx-auto ${
-            deviceType !== "mobile" ? "px-4 sm:px-6" : ""
-          }`}
+          className={cn(
+            "w-full mx-auto",
+            deviceType !== "mobile" ? "px-4 sm:px-6" : "",
+            className
+          )}
+          style={{ maxWidth: maxWidthValue }}
         >
           {children}
         </div>

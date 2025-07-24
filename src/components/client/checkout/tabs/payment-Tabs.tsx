@@ -6,7 +6,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { PaymentMethods } from '../sections/tab-2/payment-Methods';
 import { RecipientInfo } from '../sections/tab-2/recipient-Info';
+import { ProductsInfo } from '../sections/tab-2/products-Info';
 import { useCheckout } from '../hooks/useCheckout';
+import { mockShopCarts, mockOrderSummary } from '../hooks/mockData';
 
 interface PaymentTabsProps {
   onPrevious: () => void;
@@ -94,6 +96,9 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
         shippingAddress={recipientInfo}
         onEdit={handleGoToInformation}
       />
+
+      {/* Thông tin sản phẩm */}
+      <ProductsInfo shopCarts={mockShopCarts} />
 
       {/* Phương thức thanh toán */}
       <PaymentMethods 

@@ -17,6 +17,7 @@ export default function CheckoutLayout({ children}: CheckoutLayoutProps) {
       hideHero
       hideFooter
       topContent
+      maxWidth={1650}
     >
       <div className={`w-full ${isMobile ? "min-h-screen flex flex-col" : "min-h-screen"}`}>
         <main className={`flex-1 ${isMobile ? "" : "pb-4"}`}>

@@ -1,4 +1,3 @@
-// components/client/products/ProductPageClientWrapper.tsx
 "use client";
 
 import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper";
@@ -10,13 +9,13 @@ import { useEffect, useState } from "react";
 import { useProduct } from "./hooks/useProduct";
 import { ClientProductDetail } from "@/types/client.products.interface";
 
-interface Props {
+interface ProductPageProps {
   slug: string;
   initialData?: ClientProductDetail;
   error?: any;
 }
 
-export default function ProductPageClientWrapper({ slug, initialData, error: initialError }: Props) {
+export function ProductPage({ slug, initialData, error: initialError }: ProductPageProps) {
   const [mounted, setMounted] = useState(false);
   const deviceType = useCheckDevice();
   const { isMobile } = useResponsive();
@@ -46,6 +45,7 @@ export default function ProductPageClientWrapper({ slug, initialData, error: ini
       hideHero
       hideFooter={isMobile}
       topContent={isMobile}
+      maxWidth={1650}
     >
       {deviceType === "mobile" ? (
         <ProductDetailMobile 

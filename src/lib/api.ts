@@ -96,8 +96,6 @@ refreshAxios.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 )
-
-
 // ==================== PRIVATE AXIOS (Thêm access token và xử lý lỗi 401) ====================
 
 
@@ -164,6 +162,93 @@ const clearAllCookies = () => {
     document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
   }
 };
+
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (reason?: any) => void;
+}> = [];
+
+const processQueue = (error: any = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+  failedQueue = [];
+};
+
+const handleLogout = async () => {
+  const { store, persistor } = getStore();
+  
+  // 1. Clear cookies
+  clearAllCookies();
+  
+  // 2. Purge persisted state
+  await persistor.purge();
+  
+  // 3. Clear profile
+  store.dispatch(clearProfile());
+  
+  // 4. Redirect
+  showToast('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại', 'info');
+  setTimeout(() => {
+    window.location.href = ROUTES.BUYER.SIGNIN;
+  }, 100);
+};
+
+// privateAxios.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     if (
+//       axios.isAxiosError(error) &&
+//       error.response?.status === 401 &&
+//       !originalRequest._retry
+//     ) {
+//       if (isRefreshing) {
+//         // Nếu đang refresh, thêm request vào queue
+//         try {
+//           await new Promise((resolve, reject) => {
+//             failedQueue.push({ resolve, reject });
+//           });
+//           return privateAxios(originalRequest);
+//         } catch (err) {
+//           return Promise.reject(err);
+//         }
+//       }
+
+//       originalRequest._retry = true;
+//       isRefreshing = true;
+
+//       try {
+//         // Thử refresh token
+//         const response = await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+        
+//         if (response.status === 200) {
+//           processQueue();
+//           return privateAxios(originalRequest);
+//         }
+//       } catch (refreshError) {
+//         processQueue(refreshError);
+//         await handleLogout();
+//         return Promise.reject(refreshError);
+//       } finally {
+//         isRefreshing = false;
+//       }
+//     }
+
+//     if (error.response?.status === 401) {
+//       await handleLogout();
+//     }
+    
+//     return Promise.reject(error);
+//   }
+// );
+
 
 // Response Interceptor → Xử lý lỗi 401
 privateAxios.interceptors.response.use(

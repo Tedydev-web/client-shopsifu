@@ -3,19 +3,53 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CustomerInfo } from '../sections/tab-1/customer-Info';
+import { ShippingAddress } from '../sections/tab-1/shipping-Address';
 import { ShippingType } from '../sections/tab-1/shipping-Type';
 import { useCheckout } from '../hooks/useCheckout';
+import { CustomerFormData, Address, ShippingAddress as ShippingAddressType } from '@/types/checkout.interface';
 
 interface InformationTabsProps {
   onNext: () => void;
 }
 
+// Mock data cho địa chỉ có sẵn - trong thực tế sẽ lấy từ API
+const mockAddresses: Address[] = [
+  {
+    id: '1',
+    isDefault: true,
+    receiverName: 'Nguyễn Phát',
+    receiverPhone: '0379157360',
+    addressDetail: '214 nguyễn phúc chu',
+    ward: 'Phường Tráng Dài',
+    district: 'Thành phố Biên Hòa',
+    province: 'Đồng Nai',
+    type: 'NHÀ RIÊNG'
+  },
+  {
+    id: '2',
+    isDefault: false,
+    receiverName: 'Nguyễn Phát',
+    receiverPhone: '0379157360',
+    addressDetail: '456 Đường DEF',
+    ward: 'Phường UVW',
+    district: 'Quận 2',
+    province: 'TP. Hồ Chí Minh',
+    type: 'VĂN PHÒNG'
+  }
+];
+
 export function InformationTabs({ onNext }: InformationTabsProps) {
-  const { updateCustomerInfo, updateShippingMethod } = useCheckout();
-  const [formData, setFormData] = useState({
+  const { updateCustomerInfo, updateShippingMethod, updateShippingAddress } = useCheckout();
+  const [sameAsCustomer, setSameAsCustomer] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  
+  const [formData, setFormData] = useState<CustomerFormData>({
+    // Customer Info
     fullName: '',
     phoneNumber: '',
     email: '',
+    saveInfo: false,
+    // Shipping Info
     receiverName: '',
     receiverPhone: '',
     province: '',
@@ -23,13 +57,14 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     ward: '',
     address: '',
     note: '',
-    saveInfo: false,
     deliveryMethod: 'standard'
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Reset selected address when manually entering new address
+    setSelectedAddress(null);
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -40,27 +75,76 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     setFormData(prev => ({ ...prev, deliveryMethod: value }));
   };
 
+  const handleSameAsCustomerChange = (checked: boolean) => {
+    setSameAsCustomer(checked);
+    if (checked) {
+      setFormData(prev => ({
+        ...prev,
+        receiverName: prev.fullName,
+        receiverPhone: prev.phoneNumber
+      }));
+    }
+  };
+
+  const handleSelectExistingAddress = (address: Address) => {
+    setSelectedAddress(address);
+    setFormData(prev => ({
+      ...prev,
+      receiverName: address.receiverName,
+      receiverPhone: address.receiverPhone,
+      province: address.province,
+      district: address.district,
+      ward: address.ward,
+      address: address.addressDetail
+    }));
+  };
+
   const handleSubmit = () => {
     // Cập nhật thông tin khách hàng vào context
-    updateCustomerInfo({
+    const customerInfo = {
       name: formData.fullName,
       email: formData.email,
       phone: formData.phoneNumber,
-    });
+    };
+    updateCustomerInfo(customerInfo);
     
-    // Cập nhật phương thức vận chuyển vào context
+    // Cập nhật phương thức vận chuyển
     updateShippingMethod(formData.deliveryMethod === 'standard' ? 'delivery' : 'delivery');
     
-    // Cập nhật địa chỉ giao hàng vào context
+    // Cập nhật địa chỉ giao hàng
     const shippingAddress = {
-      province: formData.province,
-      district: formData.district,
-      ward: formData.ward,
-      address: formData.address
+      // Thông tin người nhận luôn lấy từ form input
+      receiverName: sameAsCustomer ? formData.fullName : formData.receiverName || '',
+      receiverPhone: sameAsCustomer ? formData.phoneNumber : formData.receiverPhone || '',
+      
+      // Địa chỉ có thể từ địa chỉ có sẵn hoặc form input
+      ...(selectedAddress 
+        ? {
+              // Nếu đã chọn địa chỉ có sẵn, sử dụng trực tiếp
+            addressDetail: selectedAddress.addressDetail,
+            ward: selectedAddress.ward,
+            district: selectedAddress.district,
+            province: selectedAddress.province,
+            // String format sẵn cho recipient info
+            address: `${selectedAddress.addressDetail}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
+          }
+        : {
+            // Nếu nhập địa chỉ mới, lấy từ form và labels của select boxes
+            addressDetail: formData.address || '',
+            ward: formData.ward || '',
+            district: formData.district || '',
+            province: formData.province || '',
+            // String format cho recipient info
+            address: [
+              formData.address,
+              formData.ward,
+              formData.district,
+              formData.province
+            ].filter(Boolean).join(', ')
+          })
     };
     
-    // TODO: Thêm hàm updateShippingAddress vào context và sử dụng ở đây
-    // updateShippingAddress(shippingAddress);
+    updateShippingAddress(shippingAddress);
     
     // Lưu thông tin vào localStorage nếu được chọn
     if (formData.saveInfo) {
@@ -111,7 +195,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
         fullName: 'Nguyen Van A',
         email: 'example@gmail.com',
         phoneNumber: '0987654321',
-        // Các trường người nhận giữ nguyên để người dùng có thể chọn địa chỉ khác
       }));
     }
   }, []);
@@ -128,6 +211,19 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
           handleCheckboxChange={handleCheckboxChange}
           isLoggedIn={isLoggedIn}
         />
+        
+        <div className="mt-6">
+          <ShippingAddress
+            formData={formData}
+            handleChange={handleChange}
+            sameAsCustomer={sameAsCustomer}
+            onSameAsCustomerChange={handleSameAsCustomerChange}
+            customerName={formData.fullName}
+            customerPhone={formData.phoneNumber}
+            addresses={mockAddresses}
+            onSelectExistingAddress={handleSelectExistingAddress}
+          />
+        </div>
         
         <div className="mt-6">
           <ShippingType
