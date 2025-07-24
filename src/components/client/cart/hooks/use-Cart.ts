@@ -16,7 +16,7 @@ interface UseCartOptions {
 /**
  * Custom hook để xử lý logic giỏ hàng - có thể sử dụng ở bất kỳ đâu trong ứng dụng
  */
-export const useCart = (options: UseCartOptions = { autoFetch: true }) => {
+export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
   const [shopCarts, setShopCarts] = useState<ShopCart[]>([]);
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);

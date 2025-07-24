@@ -10,6 +10,7 @@ import { TokenManager } from "./token-manager";
 import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { CartProvider } from '@/context/CartContext';
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,16 +34,18 @@ export default async function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <NextIntlClientProvider>
           <StoreProvider>
-              <ClientLayout>
+            <ClientLayout>
+              <AuthGuard>
                 <Toast/>
                 <TrustDeviceModal />
                 <TokenManager />
                 <CartProvider>
                   {children}
                 </CartProvider>
-              </ClientLayout>
+              </AuthGuard>
               <Toaster position="bottom-right" />
-            </StoreProvider>
+            </ClientLayout>
+          </StoreProvider>
         </NextIntlClientProvider>
       </body>
     </html>
