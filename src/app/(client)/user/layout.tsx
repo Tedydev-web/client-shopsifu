@@ -25,14 +25,18 @@ export default function AccountLayout({
           </div>
         </ClientLayoutWrapper>
       ) : (
-        <ClientLayoutWrapper hideCommit hideHero hideFooter={false}>
-          <div className="min-h-screen bg-background text-foreground max-w-7xl mx-auto">
-            <div className="flex">
-              <aside className="w-64 h-screen sticky top-0">
+        <ClientLayoutWrapper hideHeader hideCommit hideHero hideFooter>
+          {/* Ghi đè layout cha bằng full-width container */}
+          <div className="w-full max-w-none px-0 mx-0">
+            <div className="flex h-[90vh] bg-[#f5f5f7] text-foreground gap-4 py-6">
+              <aside className="w-[340px] min-w-[280px] pt-6">
                 <Sidebar />
               </aside>
-              <main className="flex-1 p-4 pl-0">
-                <div className="max-w-4xl mx-auto w-full">{children}</div>
+
+              <main className="flex-1 overflow-hidden pt-6">
+                <div className="w-full max-w-full lg:max-w-[1280px] xl:max-w-[1440px] mx-auto space-y-6">
+                  {children}
+                </div>
               </main>
             </div>
           </div>

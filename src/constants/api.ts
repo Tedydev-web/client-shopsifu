@@ -143,5 +143,12 @@ export const API_ENDPOINTS = {
     UPDATE: `${API_BASE}/categories/:categoriesId`,
     DELETE: `${API_BASE}/categories/:categoriesId`
   },
+  // QUẢN LÝ ĐƠN HÀNG - ORDERS
+  ORDERS: {
+    GETALL: `${API_BASE}/orders`,
+    GET_BY_ID: `${API_BASE}/orders/:orderId`,
+    CREATE: `${API_BASE}/orders`,
+    CANCEL: `${API_BASE}/orders/:orderId`,
+  },
   // ... các endpoints khác
 }

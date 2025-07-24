@@ -89,6 +89,6 @@ export const useUpdatePasswordSchema = (t: Translate) => z.object({
   confirmNewPassword: z.string(),
 }).refine((data) => data.newPassword === data.confirmNewPassword, {
   message: t('schema.validation.password.match'),
-  path: ["confirmPassword"]
+  path: ["confirmNewPassword"]
 });
 

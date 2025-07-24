@@ -20,6 +20,7 @@ import { z } from "zod";
 import { showToast } from "@/components/ui/toastify";
 import { useUpdateProfile } from "./../../profile/useProfile-Update";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
+import { useUploadMedia } from "@/hooks/useUploadMedia";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
@@ -44,6 +45,7 @@ export function ProfileUpdateSheet({
   const { updateProfile, loading } = useUpdateProfile(() =>
     onOpenChange(false)
   );
+  const { handleAddFiles, uploadedUrls, isUploading, reset } = useUploadMedia();
 
   type ProfileFormData = z.infer<typeof formSchema>;
 
@@ -69,19 +71,26 @@ export function ProfileUpdateSheet({
     }
   }, [open, initialData, form, userData]);
 
+  useEffect(() => {
+      if (uploadedUrls.length > 0) {
+        const newUrl = uploadedUrls[0];
+        setAvatar(newUrl);
+        form.setValue("avatar", newUrl, { shouldDirty: true });
+      }
+    }, [uploadedUrls, form]);
+
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    reset(); // clear state của hook upload
+    await handleAddFiles([file]);
   };
 
   // const onSubmit = (data: ProfileFormData) => {

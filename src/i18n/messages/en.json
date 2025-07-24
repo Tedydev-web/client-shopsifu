@@ -189,43 +189,299 @@
     }
   },
   "admin": {
+    "pages": {
+      "category": {
+        "title": "Category Management",
+        "subtitle": "Manage all your product categories",
+        "addCategory": "Add Category",
+        "editCategory": "Edit Category",
+        "deleteCategory": "Delete Category",
+        "name": "Category Name",
+        "namePlaceholder": "Enter category name",
+        "slug": "Slug",
+        "slugPlaceholder": "Enter slug",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter category description (optional)",
+        "parent": "Parent Category",
+        "active": "Active",
+        "inactive": "Inactive",
+        "status": "Status",
+        "statusActive": "Active",
+        "statusInactive": "Inactive",
+        "action": "Actions",
+        "noData": "No data available",
+        "searchPlaceholder": "Search by category name",
+        "addTitle": "Add New Category",
+        "save": "Save",
+        "editTitle": "Edit Category",
+        "addDescription": "Create a new product category. Drag and drop to sort or set hierarchy.",
+        "editDescription": "Edit category information. You can drag and drop to change position or hierarchy.",
+        "treeTitle": "Category Tree",
+        "treeDescription": "Drag and drop to sort or set category hierarchy. Only one parent-child level is supported.",
+        "deleteConfirmTitle": "Confirm Delete Category",
+        "deleteConfirmDescription": "Are you sure you want to delete this category? This action cannot be undone.",
+        "column": {
+          "name": "Category Name",
+          "status": "Status",
+          "createdAt": "Created At",
+          "actions": "Actions"
+        },
+        "actions": {
+          "view": "View Details",
+          "edit": "Edit",
+          "delete": "Delete"
+        }
+      }
+    },
+    "ModuleCategory": {
+      "title": "Category Management",
+      "subtitle": "Manage all your product categories",
+      "Table": {
+        "searchPlaceholder": "Search by category name",
+        "addCategory": "Add Category",
+        "name": "Category Name",
+        "parentCategory": "Linked Category ID",
+        "logo": "Logo",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete Category",
+        "deleteTitle": "Delete Category",
+        "deleteSubTitle": "Are you sure you want to delete this category?",
+        "noParent": "None",
+        "noLogo": "No image",
+        "deleteConfirmTitle": "Confirm Category Deletion",
+        "notFound": "No categories found",
+        "cancel": "Cancel",
+        "backToRoot": "Back",
+        "currentCategory": "Current Category",
+        "deleteConfirmMessage": "Are you sure you want to delete the category"
+      },
+      "ModalCreate": {
+        "noParent": "No parent category",
+        "logoSelect": "Select Logo",
+        "addCategory": "Add Category",
+        "editCategory": "Edit Category",
+        "name": "Category Name",
+        "namePlaceholder": "Enter category name...",
+        "parentCategory": "Parent Category",
+        "parentPlaceholder": "Select parent category",
+        "logo": "Logo",
+        "logoPlaceholder": "Enter logo...",
+        "logoHelp": "",
+        "common": {
+          "cancel": "Cancel",
+          "create": "Create Category",
+          "save": "Save Information"
+        }
+      }
+    },
+    "ModuleUsers": {
+      "Table": {
+        "role": "Role",
+        "name": "User Name",
+        "Email": "Email",
+        "status": "Status",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "notFound": "No users found",
+        "addAction": "Add User",
+        "searchPlaceholder": "Search by name or role description...",
+        "deleteConfirm": {
+          "title": "Confirm User Deletion",
+          "description": "Are you sure you want to delete this user? This action cannot be undone.",
+          "deleteAction": "Delete Now",
+          "cancel": "Cancel"
+        },
+        "actions": {
+          "edit": "Edit User",
+          "delete": "Delete User"
+        }
+      }
+    },
+    "ModuleProduct": {
+      "title": "Product Management",
+      "subtitle": "Manage all your products here",
+      "DataTable": {
+        "name": "Product Name",
+        "price": "Price",
+        "category": "Category",
+        "stock": "Stock",
+        "status": "Status",
+        "action": "Action",
+        "image": "Image",
+        "description": "Description",
+        "slug": "Slug",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "edit": "Edit Info",
+        "delete": "Delete Product",
+        "view": "View Product",
+        "notFound": "No products found"
+      },
+      "Status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "archived": "Archived"
+      },
+      "searchPlaceholder": "Search by product name",
+      "DeleteModal": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this product?",
+        "confirmText": "Delete",
+        "cancelText": "Cancel"
+      },
+      "ExportData": {
+        "title": "Export Data",
+        "description": "Export product data",
+        "confirmText": "Export",
+        "cancelText": "Cancel",
+        "pickDate": "Pick Date",
+        "selectFormat": "Select Format",
+        "fileFormat": "File Format",
+        "dateRange": "Date Range"
+      },
+      "Filter": {
+        "category": "Category",
+        "price": "Price",
+        "stock": "Stock",
+        "status": "Status",
+        "action": "Action",
+        "image": "Image",
+        "description": "Description",
+        "slug": "Slug",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "edit": "Edit Info",
+        "delete": "Delete Product",
+        "notFound": "No products found",
+        "priceRange": "Price Range"
+      },
+      "AddNew": {
+        "page": {
+          "breadcrumb": {
+            "products": "Products",
+            "newPage": "Add New Product"
+          },
+          "title": "Add Product",
+          "formPlaceholder": ""
+        }
+      },
+      "mainDetails": {
+        "title": "Product Details",
+        "productTitle": "Product Title",
+        "productTitlePlaceholder": "Enter product name",
+        "content": "Content",
+        "contentPlaceholder": "Enter content"
+      }
+    },
+    "ModuleBrands": {
+      "Table": {
+        "id": "ID",
+        "logo": "Logo",
+        "name": "Brand name",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "addAction": "Add brand",
+        "notFound": "No brands found",
+        "deleteConfirm": {
+          "title": "Confirm brand deletion",
+          "description": "Are you sure you want to delete the brand {name}?",
+          "deleteAction": "Delete now",
+          "cancel": "Cancel"
+        },
+        "actions": {
+          "edit": "Edit brand",
+          "delete": "Delete brand"
+        },
+        "searchPlaceholder": "Search by brand name..."
+      },
+      "modal": {
+        "addTitle": "Add new brand",
+        "editTitle": "Edit brand",
+        "addDescription": "Enter brand information below",
+        "editDescription": "Update brand information",
+        "name": "Brand name",
+        "namePlaceholder": "Enter brand name",
+        "logo": "Logo",
+        "logoPlaceholder": "Enter logo",
+        "cancel": "Cancel",
+        "adding": "Adding...",
+        "saving": "Saving...",
+        "add": "Add",
+        "save": "Save changes",
+        "uploadImage": "Upload image",
+        "uploading": "",
+        "selectImage": "Select image"
+      }
+    },
     "sidebar": {
       "dashboard": "Dashboard",
-
       "orders": {
         "orders": "Orders",
-        "allOrders": "All Orders",
-        "newOrders": "New Orders",
-        "processedOrders": "Processed Orders"
+        "allOrders": "All orders",
+        "newOrders": "New orders",
+        "processedOrders": "Processed orders"
       },
-
+      "permission": {
+        "permissionManager": "Permission management"
+      },
+      "role": {
+        "roleManager": "Role management"
+      },
+      "user": {
+        "userManager": "User management"
+      },
+      "device": {
+        "deviceManager": "Device management"
+      },
+      "brand": {
+        "brandManager": "Brand management"
+      },
+      "audit-logs": {
+        "auditLogManager": "Audit log management"
+      },
+      "category": {
+        "category": "Category"
+      },
       "products": {
         "products": "Products",
-        "productsList": "Products List",
-        "addProducts": "Add Product"
+        "productsList": "Product list",
+        "addProducts": "Add product",
+        "title": "Product management",
+        "subtitle": "Manage all your products here",
+        "form": {
+          "name": "Product name",
+          "slug": "Slug",
+          "category": "Category",
+          "price": "Price",
+          "stock": "Stock",
+          "status": "Status",
+          "image": "Image",
+          "description": "Description",
+          "submit": "Save",
+          "cancel": "Cancel"
+        }
       },
-
       "categories": {
         "categories": "Categories"
       },
-
       "system": {
         "system": "System",
-        "permissionManager": "Permission Management",
-        "roleManager": "Role Management",
-        "userManager": "User Management",
-        "systemLog": "System Logs",
-        "deviceManager": "Device Management"
+        "permissionManager": "Permission management",
+        "roleManager": "Role management",
+        "userManager": "User management",
+        "systemLog": "System log",
+        "deviceManager": "Device management"
       },
-
       "language": {
-        "languageManager": "Language Management"
+        "languageManager": "Language management"
       },
-
       "settings": {
         "settings": "Settings",
-        "systemSettings": "System Settings",
-        "accountSettings": "Account Settings",
+        "systemSettings": "System settings",
+        "accountSettings": "Account settings",
         "profile": "Profile",
         "passwordAndSecurity": "Password & Security"
       }
@@ -975,7 +1231,7 @@
         "accountTermination": "Account Terminate",
 
         "name": "Name",
-        "firstName":"First name",
+        "firstName": "First name",
         "lastName": "Last name",
         "username": "User name",
         "phone": "Phone Number",
@@ -984,7 +1240,9 @@
 
         "on": "On",
         "off": "Off",
-        "turnOff": "Turn Off"
+        "turnOff": "Turn Off",
+
+        "dashboard": "Dashboard"
       },
 
       "password": {
@@ -1061,7 +1319,7 @@
       },
 
       "myPurchase": {
-        "myPurchase": "My Purchase"
+        "myPurchase": "Purchase history"
       }
     },
 
@@ -1083,11 +1341,26 @@
       "totalAmount": "Total Amount",
       "proceedToCheckout": "Proceed to Checkout",
 
+      "topbar": {
+        "notifications": "Notifications",
+        "help": "Help",
+        "language": "Languages",
+        "saleRegister": "Sale Register"
+      },
+
+      "productTitle": {
+        "product": "Product",
+        "unitPrice": "Unit Price",
+        "quantity": "Quantity",
+        "totalPrice": "Total Price",
+        "actions": "Actions"
+      },
+
       "footer": {
         "platformVoucher": "Platform Voucher",
         "selectOrEnterCode": "Select or enter code",
         "noItemSelected": "No item selected",
-        "selectAll": "Select All ({{count}})",
+        "selectAll": "Select All",
         "delete": "Delete",
         "removeInactive": "Remove inactive products",
         "moveToLikes": "Move to My Likes",

@@ -4,22 +4,22 @@ import { useCheckDevice } from "@/hooks/useCheckDevices";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ProfilePage = dynamic(() => import("../desktop/profile/profile-Index"), {
+const SearchDesktopIndex = dynamic(() => import("@/components/client/search/desktop/search-Index"), {
   loading: () => <Skeleton className="w-full h-full" />,
   ssr: false,
 });
-const ProfileMobile = dynamic(() => import("../moblie/profile/profile-MobileIndex"), {
+const SearchMobileIndex = dynamic(() => import("@/components/client/search/mobile/search-IndexMobile"), {
   loading: () => <Skeleton className="w-full h-full" />,
   ssr: false,
 });
 
-export function ProfileMain() {
+export function SearchContent() {
   const deviceType = useCheckDevice();
   const isMobileView = deviceType === "mobile";
 
   return (
     <div className="w-full h-full">
-      {isMobileView ? <ProfileMobile /> : <ProfilePage />}
+      {isMobileView ? <SearchMobileIndex /> : <SearchDesktopIndex />}
     </div>
   );
 }

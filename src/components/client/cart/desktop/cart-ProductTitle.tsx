@@ -1,6 +1,7 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslations } from "next-intl";
 
 interface DesktopCartHeaderProps {
   allSelected: boolean;
@@ -11,6 +12,8 @@ export default function DesktopCartHeader({
   allSelected,
   onToggleAll,
 }: DesktopCartHeaderProps) {
+  const t = useTranslations();
+
   return (
     <div className="mt-8">
       <div className="bg-white text-base text-muted-foreground border rounded-sm">
