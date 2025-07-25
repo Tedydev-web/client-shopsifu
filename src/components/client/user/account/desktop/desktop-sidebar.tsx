@@ -21,7 +21,7 @@ export default function DesktopSidebar() {
             <Link key={item.href} href={item.href}>
               <div
                 className={cn(
-                  "flex items-center gap-3 px-6 py-4 my-[6px] text-base font-medium transition-all",
+                  "flex items-center px-6 py-4 my-[6px] text-base font-medium transition-all",
                   isActive
                     ? "bg-[#FDEDEF] text-[#D70018] border-l-4 border-[#D70018]"
                     : "text-gray-800 hover:text-[#D70018] hover:border-l-4 hover:border-[#D70018] hover:bg-[#FDEDEF]"
