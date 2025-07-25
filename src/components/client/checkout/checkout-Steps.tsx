@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useCheckout } from './hooks/useCheckout';
 import Link from 'next/link';
-import { ShoppingCart, Banknote, Info  } from 'lucide-react';
+import { ShoppingCart, Banknote, Info } from 'lucide-react';
 
 export type CheckoutStep = 'cart' | 'information' | 'payment';
 
@@ -36,7 +36,6 @@ export function CheckoutSteps({
   ];
 
   useEffect(() => {
-    // Kiểm tra xem có thể chuyển sang bước thanh toán hay không
     if (
       state.customerInfo?.email &&
       state.customerInfo?.name &&
@@ -54,14 +53,13 @@ export function CheckoutSteps({
       return;
     }
     if (step === 'cart') {
-      // Navigation to cart is handled by the Link component
       return;
     }
     onStepChange?.(step);
   };
 
   return (
-    <div className={cn('flex mb-6', className)}>
+    <div className={cn('flex items-center justify-center lg:justify-start', className)}>
       {steps.map((step, index) => {
         const isActive = activeStep === step.id;
         const isDisabled = step.id === 'payment' && !canNavigateToPayment;
@@ -70,31 +68,33 @@ export function CheckoutSteps({
         return (
           <div key={step.id} className="flex items-center">
             {index > 0 && (
-              <div className="w-10 h-[2px] bg-gray-300 mx-2"></div>
+              <div className="w-8 lg:w-10 h-[2px] bg-gray-300 mx-2 lg:mx-3"></div>
             )}
             {isCartStep ? (
               <Link href="/cart" className={cn(
-                'flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors text-sm',
-                'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                'flex items-center gap-2 px-3 py-1.5 lg:py-2 rounded-full transition-colors',
+                'text-gray-700 hover:text-gray-900',
+                'text-sm lg:text-base'
               )}>
-                {step.icon && <step.icon className="h-3.5 w-3.5" />}
-                <span className="font-medium">{step.label}</span>
+                {step.icon && <step.icon className="h-4 w-4 lg:h-4.5 lg:w-4.5" />}
+                <span className="font-medium hidden sm:inline">{step.label}</span>
               </Link>
             ) : (
               <button
                 onClick={() => handleStepClick(step.id as CheckoutStep)}
                 disabled={isDisabled}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors text-sm',
+                  'flex items-center gap-2 px-3 py-1.5 lg:py-2 rounded-full transition-colors',
+                  'text-sm lg:text-base',
                   isActive
-                    ? 'bg-primary text-white'
+                    ? 'text-primary'
                     : isDisabled
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-gray-700 hover:text-gray-900'
                 )}
               >
-                {step.icon && <step.icon className="h-3.5 w-3.5" />}
-                <span className="font-medium">{step.label}</span>
+                {step.icon && <step.icon className="h-4 w-4 lg:h-4.5 lg:w-4.5" />}
+                <span className="font-medium hidden sm:inline">{step.label}</span>
               </button>
             )}
           </div>

@@ -67,24 +67,24 @@ export function ShippingAddress({
   return (
     <Card className='shadow-none'>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0 sm:justify-between">
           <CardTitle className="flex items-center text-base font-semibold">
-            <MapPin className="h-4 w-4 mr-2" />
+            <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
             Thông tin nhận hàng
           </CardTitle>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
             {!isSelectingAddress && addresses.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 text-sm"
+                className="h-8 text-sm w-full sm:w-auto"
                 onClick={() => setIsSelectingAddress(true)}
               >
-                <Book className="h-4 w-4 mr-1" />
+                <Book className="h-4 w-4 mr-1.5 flex-shrink-0" />
                 Chọn địa chỉ có sẵn
               </Button>
             )}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-2">
               <Label htmlFor="same-as-customer" className="text-xs text-gray-500">
                 Lấy thông tin khách hàng
               </Label>
@@ -96,7 +96,7 @@ export function ShippingAddress({
             </div>
           </div>
         </div>
-        <CardDescription className="text-sm font-light">
+        <CardDescription className="text-sm font-light mt-2">
           {isSelectingAddress ? 'Chọn địa chỉ giao hàng có sẵn' : 'Địa chỉ giao hàng của bạn'}
         </CardDescription>
       </CardHeader>

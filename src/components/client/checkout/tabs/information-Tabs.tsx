@@ -203,8 +203,8 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
   const isLoggedIn = true;
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+    <div className="space-y-4">
+      <form id="checkout-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         <CustomerInfo
           formData={formData}
           handleChange={handleChange}
@@ -212,7 +212,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
           isLoggedIn={isLoggedIn}
         />
         
-        <div className="mt-6">
+        <div className="mt-4">
           <ShippingAddress
             formData={formData}
             handleChange={handleChange}
@@ -225,17 +225,11 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
           />
         </div>
         
-        <div className="mt-6">
+        <div className="mt-4">
           <ShippingType
             deliveryMethod={formData.deliveryMethod}
             handleRadioChange={handleRadioChange}
           />
-        </div>
-
-        <div className="flex justify-end mt-6">
-          <Button type="submit" size="lg">
-            Tiếp tục thanh toán
-          </Button>
         </div>
       </form>
     </div>

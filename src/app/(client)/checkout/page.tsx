@@ -1,12 +1,12 @@
 'use client'
 
-import { CheckoutMain } from "@/components/client/checkout/checkout-Main";
+import CheckoutMainWrapper from "@/components/client/checkout/checkout-Wrapper";
 import { CheckoutProvider } from "@/context/CheckoutContext";
 
 export default function CheckoutPage() {
   return (
     <CheckoutProvider>
-      <CheckoutMain />
+      <CheckoutMainWrapper />
     </CheckoutProvider>
   );
 }
