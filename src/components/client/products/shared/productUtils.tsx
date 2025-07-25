@@ -79,7 +79,8 @@ export function findMatchingSku(
     return null;
   }
   
-  return skus.find(sku => sku.value === skuValue) || null;
+  // Normalize the sku.value from the API by removing spaces around the hyphen for a reliable comparison.
+  return skus.find(sku => sku.value.replace(/\s*-\s*/g, '-') === skuValue) || null;
 }
 
 /**
