@@ -22,6 +22,7 @@ function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
     setVariants,
     updateSingleSku,
     handleSubmit,
+    handleSaveAndAddNew,
   } = useProductsForm({ initialData, onCreateSuccess });
 
   return (
@@ -53,6 +54,7 @@ function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
           categories={productData.categories}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
+          handleSaveAndAddNew={handleSaveAndAddNew}
           isSubmitting={isSubmitting}
           isEditMode={isEditMode}
         />
