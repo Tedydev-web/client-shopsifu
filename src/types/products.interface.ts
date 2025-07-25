@@ -65,6 +65,7 @@ export interface ProductsResponse {
  */
 export interface ProductCreateRequest {
     name: string;
+    description: string; // Thêm trường description
     publishedAt?: string | null;
     basePrice: number;
     virtualPrice: number;

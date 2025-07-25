@@ -21,7 +21,8 @@ interface ProductAsideFormProps {
   categories: string[];
   publishedAt?: string | null; 
   handleInputChange: (field: keyof ProductCreateRequest, value: any) => void;
-  handleSubmit: () => void;
+  handleSubmit: (options?: { stayOnPage?: boolean }) => Promise<void>;
+  handleSaveAndAddNew: () => Promise<void>;
   isSubmitting: boolean;
   isEditMode: boolean;
 }
@@ -31,6 +32,7 @@ export function ProductAsideForm({
   categories,
   handleInputChange,
   handleSubmit,
+  handleSaveAndAddNew,
   isSubmitting,
   isEditMode,
   publishedAt,
@@ -225,7 +227,20 @@ export function ProductAsideForm({
   return (
     <div className="sticky top-4 grid auto-rows-max items-start gap-4 md:gap-8">
       {/* Action Buttons */}
-      <div className="flex gap-2 w-full">
+      <div className="flex flex-col gap-2">
+        {!isEditMode && (
+          <Button
+            type="button"
+            onClick={handleSaveAndAddNew}
+            disabled={isSubmitting}
+            variant="secondary"
+          >
+            {isSubmitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            Lưu và Thêm mới
+          </Button>
+        )}
         {isEditMode && (
           <Button variant="outline" className="flex-1 flex items-center gap-2">
             <Eye className="h-4 w-4" />
@@ -233,7 +248,7 @@ export function ProductAsideForm({
           </Button>
         )}
         <Button 
-          onClick={handleSubmit} 
+          onClick={() => handleSubmit()} 
           disabled={isSubmitting} 
           className="flex-1 flex items-center gap-2"
         >

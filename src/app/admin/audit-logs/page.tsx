@@ -1,5 +1,5 @@
 "use client";
-import AuditLogsTableWrapper from "@/components/admin/audit-logs/auditLogs-Wrapper";
+// import AuditLogsTableWrapper from "@/components/admin/audit-logs/auditLogs-Wrapper";
 import { useTranslations } from 'next-intl';
 
 export default function AuditLogsPage() {
@@ -12,7 +12,7 @@ export default function AuditLogsPage() {
           {t('admin.auditLogs.subtitle')}
         </p>
       </div>
-      <AuditLogsTableWrapper />
+      {/* <AuditLogsTableWrapper /> */}
     </div>
   );
 }

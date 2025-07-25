@@ -3,7 +3,7 @@
 import { useResponsive } from "@/hooks/useResponsive";
 import { Sidebar } from "@/components/client/user/layout/user-Sidebar";
 import MobileHeader from "@/components/client/user/account/moblie/moblie-Header";
-import { UserMobileHeaderProvider } from "@/contexts/UserMobileHeaderContext";
+import { UserMobileHeaderProvider } from "@/context/UserMobileHeaderContext";
 import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper";
 
 export default function AccountLayout({

@@ -60,6 +60,7 @@ export interface ClientProductTranslation {
 export interface ClientProduct extends BaseEntity {
     publishedAt: string | null;
     name: string;
+    description: string;
     basePrice: number;
     virtualPrice: number;
     brandId: string;

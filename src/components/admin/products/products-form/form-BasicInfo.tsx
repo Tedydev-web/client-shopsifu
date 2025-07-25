@@ -45,7 +45,7 @@ export function ProductBasicInfoForm({ productData, handleInputChange }: Product
         <div className="grid gap-3">
           <Label htmlFor="product-description">Mô tả</Label>
           <RichTextEditor 
-            value={productData.description || ''} 
+            value={productData.description} 
             onChange={(value) => handleInputChange('description', value)} 
           />
         </div>

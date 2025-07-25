@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { ProductItem } from "./cart-MockData";
 
@@ -12,6 +12,7 @@ interface Props {
   checked: boolean;
   onCheckedChange: () => void;
   onVariationChange: (itemId: string, selectedVariation: string) => void;
+  onRemove?: (itemId: string) => void;
 }
 
 export default function DesktopCartItem({
@@ -19,6 +20,7 @@ export default function DesktopCartItem({
   checked,
   onCheckedChange,
   onVariationChange,
+  onRemove,
 }: Props) {
   const [quantity, setQuantity] = useState(item.quantity || 1);
 
@@ -28,11 +30,11 @@ export default function DesktopCartItem({
   const total = item.price * quantity;
 
   return (
-    <div className="flex py-4 border-b bg-white text-sm text-muted-foreground">
+    <div className="flex py-5 border-b bg-white text-base text-muted-foreground">
       {/* Product (45%) */}
       <div className="flex items-center w-[45%] px-3">
         <Checkbox
-          className="mr-2 ml-[30px]"
+          className="mr-3 ml-[30px]"
           checked={checked}
           onCheckedChange={onCheckedChange}
         />
@@ -42,20 +44,22 @@ export default function DesktopCartItem({
           alt={item.name}
           width={80}
           height={80}
-          className="w-20 h-20 rounded border object-cover mr-3 ml-3"
+          className="w-24 h-24 rounded border object-cover mr-3 ml-3"
         />
 
         <div className="flex-1">
-          <div className="text-sm font-medium leading-5 line-clamp-2 text-black">
+          <div className="text-base leading-6 h-12 line-clamp-2 text-black">
             {item.name}
           </div>
 
           {/* Variation select box */}
-          <div className="mt-1">
+          <div className="mt-2">
             {item.variations ? (
               <select
-                className="text-xs text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50"
+                className="text-sm text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50"
                 value={item.variation}
+                title={`Chọn biến thể cho ${item.name}`}
+                aria-label={`Chọn biến thể cho ${item.name}`}
                 onChange={(e) =>
                   onVariationChange(item.id, e.target.value)
                 }
@@ -67,7 +71,7 @@ export default function DesktopCartItem({
                 ))}
               </select>
             ) : (
-              <div className="text-xs text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50">
+              <div className="text-sm text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50">
                 {item.variation}
               </div>
             )}
@@ -75,8 +79,8 @@ export default function DesktopCartItem({
 
           {/* Sold out warning */}
           {item.soldOut && (
-            <div className="mt-2 text-xs text-destructive">
-              Variation selected is Sold Out. Please select another variation.
+            <div className="mt-2 text-sm text-destructive">
+              Sản phẩm đã hết hàng. Vui lòng chọn biến thể khác.
             </div>
           )}
         </div>
@@ -85,31 +89,31 @@ export default function DesktopCartItem({
       {/* Unit Price */}
       <div className="w-[15%] flex flex-col items-center justify-center text-center">
         {item.originalPrice && (
-          <span className="text-xs line-through text-muted-foreground">
+          <span className="text-sm line-through text-muted-foreground">
             ₫{item.originalPrice.toLocaleString()}
           </span>
         )}
-        <span className="text-sm font-semibold text-primary">
+        <span className="text-base font-semibold text-primary">
           ₫{item.price.toLocaleString()}
         </span>
       </div>
 
       {/* Quantity */}
       <div className="w-[15%] text-center flex items-center justify-center">
-        <div className="flex items-center border rounded overflow-hidden h-8">
+        <div className="flex items-center border rounded overflow-hidden h-9">
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 px-0"
+            className="w-9 h-9 px-0"
             onClick={decrease}
           >
             <Minus className="w-4 h-4" />
           </Button>
-          <div className="px-2 text-sm w-6 text-center">{quantity}</div>
+          <div className="px-2 text-base w-8 text-center">{quantity}</div>
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 px-0"
+            className="w-9 h-9 px-0"
             onClick={increase}
           >
             <Plus className="w-4 h-4" />
@@ -119,16 +123,19 @@ export default function DesktopCartItem({
 
       {/* Total Price */}
       <div className="w-[15%] text-center flex items-center justify-center">
-        <span className="text-sm font-semibold text-primary">
+        <span className="text-base font-semibold text-primary">
           ₫{total.toLocaleString()}
         </span>
       </div>
 
       {/* Actions */}
       <div className="w-[10%] text-center flex flex-col items-center justify-center gap-1">
-        <button className="text-sm text-red-500 hover:underline">Delete</button>
-        <button className="text-sm text-red-500 hover:underline">
-          Find Similar ▼
+        <button 
+          className="text-base text-red-500 hover:underline flex items-center gap-1"
+          onClick={() => onRemove && onRemove(item.id)}
+        >
+          <Trash2 className="w-4 h-4" />
+          Xóa
         </button>
       </div>
     </div>

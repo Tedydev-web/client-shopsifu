@@ -59,23 +59,23 @@ body {
   --popover: #ffffff;
   --popover-foreground: #1F2937;
 
-  --primary: #D0201C;
+  --primary: #D70018;
   --primary-foreground: #ffffff;
 
   --secondary: #f8e5e4;
-  --secondary-foreground: #D0201C;
+  --secondary-foreground: #D70018;
 
   --muted: #f3f4f6;
   --muted-foreground: #6B7280;
 
   --accent: #f3f4f6;
-  --accent-foreground: #D0201C;
+  --accent-foreground: #D70018;
 
   --destructive: #EF4444;
 
   --border: #E5E7EB;
   --input: #E5E7EB;
-  --ring: #D0201C;
+  --ring: #D70018;
 
   --chart-1: #FF7849;
   --chart-2: #3B82F6;
@@ -85,7 +85,7 @@ body {
 
   --sidebar: #ffffff;
   --sidebar-foreground: #1F2937;
-  --sidebar-primary: #D0201C;
+  --sidebar-primary: #D70018;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f8e5e4;
   --sidebar-accent-foreground: #ffffff;

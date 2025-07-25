@@ -96,8 +96,6 @@ refreshAxios.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 )
-
-
 // ==================== PRIVATE AXIOS (Thêm access token và xử lý lỗi 401) ====================
 
 
@@ -165,129 +163,214 @@ const clearAllCookies = () => {
   }
 };
 
-// Response Interceptor → Xử lý lỗi 401
-privateAxios.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
-  async (error: any) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      console.error('❌ Lỗi 401 - Unauthorized. Token không hợp lệ hoặc đã hết hạn. Đang đăng xuất...');
-      const { store, persistor } = getStore();
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (reason?: any) => void;
+}> = [];
 
-      // 1. Clear all site cookies
-      clearAllCookies();
-
-      // 2. Purge persisted state from storage
-      await persistor.purge();
-
-      // 3. Dispatch action to clear profile from the current redux state
-      store.dispatch(clearProfile());
-
-      showToast('Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại', 'info');
-
-      // 4. Redirect to sign-in page after a short delay to allow state changes to process
-      setTimeout(() => {
-        window.location.href = ROUTES.BUYER.SIGNIN;
-      }, 100);
+const processQueue = (error: any = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
     }
+  });
+  failedQueue = [];
+};
+
+const handleLogout = async () => {
+  const { store, persistor } = getStore();
+  
+  // 1. Clear cookies
+  clearAllCookies();
+  
+  // 2. Purge persisted state
+  await persistor.purge();
+  
+  // 3. Clear profile
+  store.dispatch(clearProfile());
+  
+  // 4. Redirect
+  showToast('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại', 'info');
+  setTimeout(() => {
+    window.location.href = ROUTES.BUYER.SIGNIN;
+  }, 100);
+};
+
+privateAxios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.status === 401 &&
+      !originalRequest._retry
+    ) {
+      if (isRefreshing) {
+        // Nếu đang refresh, thêm request vào queue
+        try {
+          await new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          });
+          return privateAxios(originalRequest);
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Thử refresh token
+        const response = await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+        
+        if (response.status === 200) {
+          processQueue();
+          return privateAxios(originalRequest);
+        }
+      } catch (refreshError) {
+        processQueue(refreshError);
+        await handleLogout();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    if (error.response?.status === 401) {
+      await handleLogout();
+    }
+    
     return Promise.reject(error);
   }
 );
 
-// Token check function
-const checkToken = async () => {
-  const accessToken = Cookies.get('access_token');
-  const refreshToken = Cookies.get('refresh_token');
+
+// Response Interceptor → Xử lý lỗi 401
+// privateAxios.interceptors.response.use(
+//   (response: AxiosResponse) => {
+//     return response;
+//   },
+//   async (error: any) => {
+//     if (axios.isAxiosError(error) && error.response?.status === 401) {
+//       console.error('❌ Lỗi 401 - Unauthorized. Token không hợp lệ hoặc đã hết hạn. Đang đăng xuất...');
+//       const { store, persistor } = getStore();
+
+//       // 1. Clear all site cookies
+//       clearAllCookies();
+
+//       // 2. Purge persisted state from storage
+//       await persistor.purge();
+
+//       // 3. Dispatch action to clear profile from the current redux state
+//       store.dispatch(clearProfile());
+
+//       showToast('Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại', 'info');
+
+//       // 4. Redirect to sign-in page after a short delay to allow state changes to process
+//       setTimeout(() => {
+//         window.location.href = ROUTES.BUYER.SIGNIN;
+//       }, 100);
+//     }
+//     return Promise.reject(error);
+//   }
+// );
+// // Token check function
+// const checkToken = async () => {
+//   const accessToken = Cookies.get('access_token');
+//   const refreshToken = Cookies.get('refresh_token');
 
 
-  // ✅ Case 1: Không có access token, nhưng có refresh token → thử làm mới
-  if (!accessToken && refreshToken) {
-    console.log('Không có access token, đang thử làm mới từ refresh token...');
-    try {
-      await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
-      console.log('✅ Token đã được làm mới thành công khi khởi tạo.');
-    } catch (error) {
-      console.error('❌ Không thể làm mới token. Đăng xuất người dùng.', error);
-      await clearClientState();
-      if (window.location.pathname !== ROUTES.BUYER.SIGNIN) {
-        window.location.href = ROUTES.BUYER.SIGNIN;
-      }
-    }
-    return;
-  }
+//   // ✅ Case 1: Không có access token, nhưng có refresh token → thử làm mới
+//   if (!accessToken && refreshToken) {
+//     console.log('Không có access token, đang thử làm mới từ refresh token...');
+//     try {
+//       await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+//       console.log('✅ Token đã được làm mới thành công khi khởi tạo.');
+//     } catch (error) {
+//       console.error('❌ Không thể làm mới token. Đăng xuất người dùng.', error);
+//       await clearClientState();
+//       if (window.location.pathname !== ROUTES.BUYER.SIGNIN) {
+//         window.location.href = ROUTES.BUYER.SIGNIN;
+//       }
+//     }
+//     return;
+//   }
 
-  // ✅ Case 2: Không có access lẫn refresh token → chưa đăng nhập
-  if (!accessToken && !refreshToken) {
-    console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
-    await clearClientState();
-    return;
-  }
+//   // ✅ Case 2: Không có access lẫn refresh token → chưa đăng nhập
+//   if (!accessToken && !refreshToken) {
+//     console.log('Không có token, người dùng chưa đăng nhập. Bỏ qua kiểm tra.');
+//     await clearClientState();
+//     return;
+//   }
 
-  // ✅ Case 3: Có accessToken → decode và kiểm tra hạn
-  try {
-    const decodedToken = jwt.decode(accessToken!) as DecodedToken;
+//   // ✅ Case 3: Có accessToken → decode và kiểm tra hạn
+//   try {
+//     const decodedToken = jwt.decode(accessToken!) as DecodedToken;
 
-    if (!decodedToken?.exp) {
-      throw new Error('Token không hợp lệ hoặc thiếu trường exp');
-    }
+//     if (!decodedToken?.exp) {
+//       throw new Error('Token không hợp lệ hoặc thiếu trường exp');
+//     }
 
-    const timeLeftInMinutes = getTokenTimeLeft(decodedToken.exp);
+//     const timeLeftInMinutes = getTokenTimeLeft(decodedToken.exp);
 
-    if (timeLeftInMinutes < 0) {
-      console.warn('Token đã hết hạn. Thử làm mới...');
-      try {
-        await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
-        console.log('✅ Token đã được làm mới do đã hết hạn.');
-      } catch (error) {
-        console.error('❌ Không thể làm mới token đã hết hạn. Đăng xuất...', error);
-        await clearClientState();
-        window.location.href = ROUTES.BUYER.SIGNIN;
-      }
-      return;
-    }
+//     if (timeLeftInMinutes < 0) {
+//       console.warn('Token đã hết hạn. Thử làm mới...');
+//       try {
+//         await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+//         console.log('✅ Token đã được làm mới do đã hết hạn.');
+//       } catch (error) {
+//         console.error('❌ Không thể làm mới token đã hết hạn. Đăng xuất...', error);
+//         await clearClientState();
+//         window.location.href = ROUTES.BUYER.SIGNIN;
+//       }
+//       return;
+//     }
 
-    if (timeLeftInMinutes <= TOKEN_REFRESH_THRESHOLD) {
-      try {
-        console.log(`Token sắp hết hạn (còn ${timeLeftInMinutes.toFixed(2)} phút), đang làm mới...`);
-        await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
-        console.log('✅ Token refreshed thành công');
-      } catch (error) {
-        console.error('❌ Không thể làm mới token chủ động:', error);
-      }
-    }else {
-      console.log(`Token còn ${timeLeftInMinutes.toFixed(2)} phút`);
-    }
+//     if (timeLeftInMinutes <= TOKEN_REFRESH_THRESHOLD) {
+//       try {
+//         console.log(`Token sắp hết hạn (còn ${timeLeftInMinutes.toFixed(2)} phút), đang làm mới...`);
+//         await refreshAxios.post(API_ENDPOINTS.AUTH.REFRESH_TOKEN);
+//         console.log('✅ Token refreshed thành công');
+//       } catch (error) {
+//         console.error('❌ Không thể làm mới token chủ động:', error);
+//       }
+//     }else {
+//       console.log(`Token còn ${timeLeftInMinutes.toFixed(2)} phút`);
+//     }
 
-  } catch (error) {
-    console.error('Lỗi khi giải mã hoặc kiểm tra token. Token có thể bị lỗi:', error);
-    await clearClientState();
-    window.location.href = ROUTES.BUYER.SIGNIN;
-  }
-}
+//   } catch (error) {
+//     console.error('Lỗi khi giải mã hoặc kiểm tra token. Token có thể bị lỗi:', error);
+//     await clearClientState();
+//     window.location.href = ROUTES.BUYER.SIGNIN;
+//   }
+// }
+// // Interval management
+// let tokenCheckInterval: NodeJS.Timeout;
 
-// Interval management
-let tokenCheckInterval: NodeJS.Timeout;
-
-export const startTokenCheck = () => {
-  console.log('Bắt đầu kiểm tra access_token');
-  if (typeof window !== 'undefined') {
-    if (tokenCheckInterval) {
-      clearInterval(tokenCheckInterval);
-    }
+// export const startTokenCheck = () => {
+//   console.log('Bắt đầu kiểm tra access_token');
+//   if (typeof window !== 'undefined') {
+//     if (tokenCheckInterval) {
+//       clearInterval(tokenCheckInterval);
+//     }
     
-    // Check immediately on start
-    checkToken();
+//     // Check immediately on start
+//     checkToken();
     
-    tokenCheckInterval = setInterval(checkToken, TOKEN_CHECK_INTERVAL);
-  }
-};
+//     tokenCheckInterval = setInterval(checkToken, TOKEN_CHECK_INTERVAL);
+//   }
+// };
 
-export const stopTokenCheck = () => {
-  if (tokenCheckInterval) {
-    clearInterval(tokenCheckInterval);
-  }
-};
+// export const stopTokenCheck = () => {
+//   if (tokenCheckInterval) {
+//     clearInterval(tokenCheckInterval);
+//   }
+// };
 
 // Initialize token check
 // if (typeof window !== 'undefined') {

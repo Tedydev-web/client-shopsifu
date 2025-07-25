@@ -50,7 +50,7 @@ export default function RolesTable() {
     name: string
     description: string
     isActive: boolean
-    permissionIds: number[]
+    permissionIds: string[]
   }) => {
     try {
       if (modalMode === 'edit' && roleToEdit) {

@@ -15,12 +15,15 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useDropdown } from "../dropdown-context";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
+import Image from "next/image";
+
 interface MenuItemProps {
   icon: LucideIcon;
   label: string;
   onClick: () => void;
   requireDivider?: boolean;
 }
+
 export function ProfileDropdown() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { handleLogout, loading: logoutLoading } = useLogout();
@@ -29,11 +32,19 @@ export function ProfileDropdown() {
   const user = useUserData();
   const isOpen = openDropdown === "profile";
 
+  // Kiểm tra role từ user data
+  const isAdmin = user?.role?.name === 'ADMIN' || user?.role?.name === 'Super Admin';
+
   const menuItems: MenuItemProps[] = [
     {
       icon: User,
       label: "Tài khoản của tôi",
       onClick: () => router.push(ROUTES.BUYER.MY_ACCOUNT),
+    },
+    {
+      icon: ShoppingCart,
+      label: "Giỏ hàng của bạn",
+      onClick: () => router.push('/cart'),
     },
     {
       icon: ShoppingCart,
@@ -58,12 +69,43 @@ export function ProfileDropdown() {
       </span>
     );
   }
-  const name = user.username;
-  const role = user.role;
-  const email = user.email;
-  const avatar = user.avatar;
+
+  const name = user.name || '';
+  const email = user.email || '';
+  const avatar = user.avatar || '';
+
   // Tạo avatar từ chữ cái đầu tên nếu không có ảnh
-  const avatarText = name ? name[0].toUpperCase() : "U";
+  const getInitials = (name: string) => {
+    const parts = name.split(' ').filter(Boolean);
+    if (parts.length === 0) return 'U';
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const avatarText = getInitials(name);
+
+  const AvatarComponent = () => {
+    if (avatar) {
+      return (
+        <div className="relative w-full h-full rounded-full overflow-hidden">
+          <Image
+            src={avatar}
+            alt={name}
+            fill
+            sizes="100%"
+            className="object-cover"
+            onError={(e) => {
+              // Fallback to initials if image fails to load
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement!.innerHTML = avatarText;
+            }}
+          />
+        </div>
+      );
+    }
+    return <span>{avatarText}</span>;
+  };
+
   return (
     <div className="relative group profile-container" ref={dropdownRef}>
       {/* Trigger Button */}
@@ -109,16 +151,8 @@ export function ProfileDropdown() {
         />
 
         {/* Content layer */}
-        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold flex-shrink-0 text-black z-10 object-cover">
-          {avatar ? (
-            <img
-              src={avatar}
-              alt={name}
-              className="w-full h-full object-cover rounded-full"
-            />
-          ) : (
-            <span>{avatarText}</span>
-          )}
+        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold flex-shrink-0 text-black z-10">
+          <AvatarComponent />
         </div>
         <span className="text-[13px] z-10 relative">Hello, {name}</span>
       </div>
@@ -152,15 +186,7 @@ export function ProfileDropdown() {
         {/* Header with avatar and user info */}
         <div className="flex items-center justify-center pt-6 pb-4 w-full">
           <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-lg font-semibold mr-3 flex-shrink-0 text-gray-700">
-            {avatar ? (
-              <img
-                src={avatar}
-                alt={name}
-                className="w-full h-full object-cover rounded-full"
-              />
-            ) : (
-              <span>{avatarText}</span>
-            )}
+            <AvatarComponent />
           </div>
           <div className="flex flex-col max-w-[175px]">
             <div className="font-medium text-[16px] text-gray-900 truncate">
@@ -173,19 +199,15 @@ export function ProfileDropdown() {
         <div className="h-px bg-gray-200 mx-6 my-1"></div>
         {/* Menu Items */}
         <div>
-          {role.name === "Admin" ||
-            (role.name === "Super Admin" && (
-              <>
-                <Link
-                  href={ROUTES.ADMIN.DASHBOARD}
-                  className="flex items-center px-5 py-2 hover:bg-gray-50 cursor-pointer text-[14px] text-gray-800"
-                >
-                  <LayoutDashboard className="w-4.5 h-4.5 mr-2 text-gray-800" />
-                  Trang quản trị
-                </Link>
-                <div className="h-px bg-gray-200 mx-6 my-1"></div>
-              </>
-            ))}
+          {isAdmin && (
+            <>
+              <Link href={ROUTES.ADMIN.DASHBOARD} className="flex items-center px-5 py-2 hover:bg-gray-50 cursor-pointer text-[14px] text-gray-800">
+                <LayoutDashboard className="w-4.5 h-4.5 mr-2 text-gray-800" />
+                Trang quản trị
+              </Link>
+              <div className="h-px bg-gray-200 mx-6 my-1"></div>
+            </>
+          )}
           {menuItems.map((item, index) => (
             <React.Fragment key={index}>
               <div

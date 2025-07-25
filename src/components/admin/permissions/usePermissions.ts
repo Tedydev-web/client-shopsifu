@@ -88,7 +88,7 @@ export function usePermissions() {
     }
   };
 
-  const handleUpdate = async (id: number, data: PerUpdateRequest) => {
+  const handleUpdate = async (id: string, data: PerUpdateRequest) => {
     // Tạo controller mới để có thể hủy request
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây
@@ -110,7 +110,7 @@ export function usePermissions() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     // Tạo controller mới để có thể hủy request
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout 8 giây

@@ -9,7 +9,9 @@ import ClientLayoutWrapper from "@/components/client/layout/ClientLayoutWrapper"
 export default function HomePage() {
   return (
     <>
-    <ClientLayoutWrapper>
+    <ClientLayoutWrapper
+      maxWidth={1250}
+    >
         <main className="flex flex-col min-h-screen">
           <FlashSaleSectionWrapper />
           <CategoriesSection />
