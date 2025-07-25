@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       manual_rollback:
-        description: 'Commit SHA hoặc tag để rollback (để trống để deploy bình thường)'
+        description: "Commit SHA hoặc tag để rollback (để trống để deploy bình thường)"
         required: false
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
     if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !github.event.inputs.manual_rollback) }}
     environment: staging
     env:
-      NODE_ENV: production
+      NODE_ENV: staging
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -58,7 +58,7 @@ jobs:
             fi
             cd ${{ secrets.STAGING_PATH_PROJECT }}
             git fetch origin master && git reset --hard origin/master
-            rm -rf dist node_modules
+            rm -rf .next node_modules
             npm ci && npm run build
             pm2 describe client-shopsifu &>/dev/null && pm2 restart client-shopsifu || pm2 start dist/main.js --name client-shopsifu
             # Thêm độ trễ để ứng dụng ghi log và PM2 cập nhật trạng thái
