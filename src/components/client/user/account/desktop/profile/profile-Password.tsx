@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Pencil, Info } from "lucide-react";
@@ -19,7 +19,24 @@ import { useTranslations } from "next-intl";
 import { useUpdatePasswordSchema } from "@/utils/schema";
 import { z } from "zod";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
-import { usePasswordChangePassword } from "../../profile/useProfile-ChangePassword";
+import {
+  usePasswordChangePassword,
+  ChangePasswordResult,
+} from "./useProfile-ChangePassword";
+
+const formatDate = (isoString: string): string => {
+  const date = new Date(isoString);
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+};
+
+const STORAGE_KEY = "lastPasswordChangedAt";
 
 export default function PasswordSection() {
   const t = useTranslations();
@@ -27,11 +44,18 @@ export default function PasswordSection() {
   const { loading, handleChangePassword } = usePasswordChangePassword();
 
   const [open, setOpen] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [show, setShow] = useState({
     password: false,
     newPassword: false,
     confirmNewPassword: false,
   });
+
+  useEffect(() => {
+    const value = localStorage.getItem(STORAGE_KEY);
+    if (value) setLastUpdated(value);
+    console.log("Last password change timestamp:", value);
+  }, []);
 
   const toggleShow = (field: keyof typeof show) => {
     setShow((prev) => ({ ...prev, [field]: !prev[field] }));
@@ -47,20 +71,24 @@ export default function PasswordSection() {
       newPassword: "",
       confirmNewPassword: "",
     },
-    mode: "onTouched", // ✅ tránh mất focus khi gõ ký tự đầu tiên
+    mode: "onTouched",
   });
 
   const onSubmit = async (data: PasswordFormData) => {
     if (!user) return;
-    const result = await handleChangePassword(data);
-    if (result) {
+
+    const result = (await handleChangePassword(data)) as ChangePasswordResult;
+
+    if (result.success && result.timestamp) {
+      localStorage.setItem(STORAGE_KEY, result.timestamp);
+      setLastUpdated(result.timestamp);
       form.reset();
       setOpen(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 space-y-4 shadow-sm border">
+    <div className="bg-white rounded-lg p-6 space-y-4 border">
       <div className="flex justify-between items-center">
         <h2 className="font-semibold text-xl text-gray-800">
           {t("user.account.password.title")}
@@ -75,10 +103,14 @@ export default function PasswordSection() {
         </Button>
       </div>
 
-      <p className="text-gray-500 text-sm">
-        Cập nhật lần cuối lúc:{" "}
-        <span className="font-medium text-gray-700">21/07/2025 21:12</span>
-      </p>
+      {lastUpdated && (
+        <div className="flex items-center justify-between text-sm text-gray-500">
+          <p>Cập nhật lần cuối lúc:</p>
+          <span className="font-medium text-gray-800">
+            {formatDate(lastUpdated)}
+          </span>
+        </div>
+      )}
 
       <SheetRework
         open={open}
@@ -97,6 +129,7 @@ export default function PasswordSection() {
 
         <Form {...form}>
           <div className="space-y-4">
+            {/* Current password */}
             <FormField
               control={form.control}
               name="password"
@@ -133,6 +166,8 @@ export default function PasswordSection() {
                 </FormItem>
               )}
             />
+
+            {/* New password */}
             <FormField
               control={form.control}
               name="newPassword"
@@ -169,6 +204,8 @@ export default function PasswordSection() {
                 </FormItem>
               )}
             />
+
+            {/* Confirm password */}
             <FormField
               control={form.control}
               name="confirmNewPassword"
