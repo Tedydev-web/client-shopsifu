@@ -27,8 +27,8 @@ export function useVerify2FA() {
   const { fetchAbility } = useGetAbility();
   const userData = useUserData();
 
-  const role = userData?.role;
-  const {t} = useTranslations()
+  const role = userData?.role.name;
+  const t = useTranslations()
   
   // Khóa lưu trữ trạng thái thiết bị trong session storage
   // Được cập nhật từ kết quả API sau khi xác thực thành công
@@ -124,11 +124,11 @@ export function useVerify2FA() {
 
       // LUỒNG ĐỔI MẬT KHẨU
       if (isChangePasswordFlow && isRevokeAllFlow && role === 'Admin' || role === 'Super Admin') {
-        showToast(response.message, 'success');
+        showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
         router.push(ROUTES.ADMIN.DASHBOARD);
         return;
       }else{
-        showToast(response.message, 'success');
+        showToast(response.message || t('auth.2faVerify.otpVerificationSuccess'), 'success');
         router.push(ROUTES.HOME);
       }
 

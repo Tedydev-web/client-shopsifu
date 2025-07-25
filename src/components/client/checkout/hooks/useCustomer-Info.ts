@@ -2,20 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useProvinces } from '@/hooks/combobox/useProvinces';
-
-interface CustomerFormData {
-  fullName: string;
-  phoneNumber: string;
-  email: string;
-  address: string;
-  note: string;
-  saveInfo: boolean;
-  receiverName?: string;
-  receiverPhone?: string;
-  province?: string;
-  district?: string;
-  ward?: string;
-}
+import { CustomerFormData } from '@/types/checkout.interface';
 
 export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void) {
   // Parse formData để lấy code và name nếu có format "code|name"

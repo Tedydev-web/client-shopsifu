@@ -26,7 +26,7 @@ export default function MobileChangeLanguage() {
   };
 
   return (
-    <AccountLayout title={t("user.settings.section.language")}>
+    <AccountLayout>
       <div className="bg-white divide-y divide-gray-100">
         {LANGUAGES.map((lang) => {
           const isSelected = currentSelectedLang === lang.code;

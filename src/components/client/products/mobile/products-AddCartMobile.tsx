@@ -16,7 +16,10 @@ import {
   findMatchingSku, 
   areAllVariantsSelected, 
   getCurrentStock, 
-  isOptionAvailable
+  isOptionAvailable,
+  Sku,
+  VariantGroup,
+  SelectedVariants
 } from "@/components/client/products/shared/productUtils";
 
 interface VariantValue {
@@ -24,27 +27,10 @@ interface VariantValue {
   value: string;
 }
 
-interface Sku {
-  id: string;
-  name?: string;
-  value?: string;
-  price: number;
-  stock: number;
-  image?: string;
-  variantValues?: VariantValue[];
-}
-
 interface VariantOption {
   value: string;
   image?: string;
 }
-
-interface VariantGroup {
-  value: string;
-  options: string[];
-}
-
-type SelectedVariants = Record<string, string | null>;
 
 interface Product {
   id: string;
@@ -202,13 +188,7 @@ export default function AddCartMobile({ product, isOpen, onOpenChange, onAddToCa
                     const optionImage = (() => {
                       // Tìm SKU đầu tiên chứa option này
                       const matchingSku = product.skus.find(sku => {
-                        // Tìm trong variantValues hoặc từ chuỗi value
-                        if (sku.variantValues) {
-                          return sku.variantValues.some(v => 
-                            v.optionType === variantGroup.value && v.value === option
-                          );
-                        }
-                        // Nếu không có variantValues, thử kiểm tra từ chuỗi value
+                        // Kiểm tra từ chuỗi value của SKU
                         return sku.value && sku.value.includes(option);
                       });
                       

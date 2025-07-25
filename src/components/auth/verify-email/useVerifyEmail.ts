@@ -19,7 +19,7 @@ export function useVerifyEmail() {
       
       if (action === 'signup') {
         const response = await authService.register_send({ email })
-        showToast(response.message, 'success')
+        // showToast(response.message, 'success')
       } else {
         const response = await authService.resetPassword_send({ email })
         showToast(response.message, 'success')
