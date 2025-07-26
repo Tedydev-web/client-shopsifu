@@ -45,7 +45,7 @@ export const useCbbCategory = (parentCategoryId: string | null) => {
     queryKey: ['categories', parentCategoryId],
     queryFn: () => fetchCategories(parentCategoryId),
     staleTime: 1000 * 60 * 60, // 1 hour
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 
   return {

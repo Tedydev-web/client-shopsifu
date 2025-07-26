@@ -4,12 +4,12 @@ import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { banners } from './landing-Mockdata';
 
-function Particles({ className = "" }: { className?: string }) {
+const Particles = memo(function Particles({ className = "" }: { className?: string }) {
 	return (
 		<div className={cn("absolute inset-0 pointer-events-none", className)}>
 			{[...Array(20)].map((_, i) => (
@@ -35,9 +35,9 @@ function Particles({ className = "" }: { className?: string }) {
 			))}
 		</div>
 	);
-}
+});
 
-export function BannerSection() {
+function BannerSectionComponent() {
 	const [currentBanner, setCurrentBanner] = useState(0);
 	const [isAutoplay, setIsAutoplay] = useState(true);
 	const [direction, setDirection] = useState(0);
@@ -136,7 +136,6 @@ export function BannerSection() {
 			<motion.div
 				initial={{ scale: 1 }}
 				animate={{ scale: [1, 1.02, 1] }}
-				transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", times: [0, 0.5, 1] }}
 				className="absolute inset-0"
 			>
 				<AnimatePresence
@@ -260,3 +259,5 @@ export function BannerSection() {
 		</div>
 	);
 }
+
+export const BannerSection = memo(BannerSectionComponent);
