@@ -150,5 +150,11 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE}/orders`,
     CANCEL: `${API_BASE}/orders/:orderId`,
   },
-  // ... các endpoints khác
+  // ĐÁNH GIÁ SẢN PHẨM - REVIEWS
+  REVIEW:{
+    GET_BY_ID: `${API_BASE}/reviews/products/:productId`,
+    CREATE: `${API_BASE}/reviews`,
+    UPDATE: `${API_BASE}/reviews/:reviewId`,
+    DELETE: `${API_BASE}/reviews/:reviewId`
+  }
 }

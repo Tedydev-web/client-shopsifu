@@ -329,3 +329,105 @@ export const productMock = {
     brandTranslations: [],
   },
 };
+
+
+import { Review } from "@/types/review.interface";
+
+export const reviewsMock: Review[] = [
+{
+  id: 'review-1',
+  content: 'Sản phẩm rất tốt, chất vải mát, mặc rất thích. Sẽ ủng hộ shop lần sau. Giao hàng siêu nhanh, đóng gói cẩn thận, shipper thân thiện. Cho shop 10 điểm!',
+  rating: 5,
+  orderId: 'order-123',
+  productId: 'product-abc',
+  userId: 'user-xyz',
+  updateCount: 0,
+  createdAt: '2025-07-26T10:00:00.000Z',
+  updatedAt: '2025-07-26T10:00:00.000Z',
+  medias: [
+    {
+      id: 'media-1',
+      url: '/images/client/product/Product-1.webp',
+      type: 'IMAGE',
+      reviewId: 'review-1',
+      createdAt: '2025-07-26T10:00:00.000Z',
+    },
+    {
+      id: 'media-2',
+      url: '/images/client/product/Product-2.webp',
+      type: 'IMAGE',
+      reviewId: 'review-1',
+      createdAt: '2025-07-26T10:00:00.000Z',
+    },
+  ],
+  user: {
+    id: 'user-xyz',
+    name: 'Nguyễn Văn A',
+    avatar: '/assets/demo/user-avatar-1.png',
+  },
+},
+{
+  id: 'review-2',
+  content: 'Giao hàng nhanh, đóng gói cẩn thận. Tuy nhiên màu sắc hơi khác so với ảnh một chút, nhưng vẫn chấp nhận được.',
+  rating: 4,
+  orderId: 'order-124',
+  productId: 'product-abc',
+  userId: 'user-qwe',
+  updateCount: 1,
+  createdAt: '2025-07-25T14:30:00.000Z',
+  updatedAt: '2025-07-25T18:00:00.000Z',
+  medias: [],
+  user: {
+    id: 'user-qwe',
+    name: 'Trần Thị B',
+    avatar: '/assets/demo/user-avatar-2.png',
+  },
+},
+{
+  id: 'review-3',
+  content: 'Chất lượng bình thường, không có gì đặc sắc. Với giá này thì cũng tạm ổn.',
+  rating: 3,
+  orderId: 'order-125',
+  productId: 'product-abc',
+  userId: 'user-asd',
+  updateCount: 0,
+  createdAt: '2025-07-24T09:00:00.000Z',
+  updatedAt: '2025-07-24T09:00:00.000Z',
+  medias: [],
+  user: {
+    id: 'user-asd',
+    name: 'Lê Văn C',
+    // No avatar to test fallback
+  },
+},
+{
+  id: 'review-4',
+  content: 'Review từ người dùng ẩn danh, không có thông tin user.',
+  rating: 5,
+  orderId: 'order-126',
+  productId: 'product-abc',
+  userId: 'user-zxc',
+  updateCount: 0,
+  createdAt: '2025-07-23T18:00:00.000Z',
+  updatedAt: '2025-07-23T18:00:00.000Z',
+  medias: [],
+  user: undefined as any, // Test missing user object
+},
+{
+  id: 'review-5',
+  content: 'Sản phẩm tệ, không giống mô tả.',
+  rating: 1,
+  orderId: 'order-127',
+  productId: 'product-abc',
+  userId: 'user-jkl',
+  updateCount: 0,
+  createdAt: '2025-07-22T11:20:00.000Z',
+  updatedAt: '2025-07-22T11:20:00.000Z',
+  medias: [],
+  user: {
+    id: 'user-jkl',
+    name: 'Phạm Thị D',
+    avatar: '/assets/demo/user-avatar-3.png',
+  },
+},
+];
