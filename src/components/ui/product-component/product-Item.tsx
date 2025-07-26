@@ -37,8 +37,8 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, isLoading }) => {
   }
 
   // Tính toán giá hiển thị và giảm giá
-  const originalPrice = product.basePrice;
-  const salePrice = product.virtualPrice;
+  const originalPrice = product.virtualPrice;
+  const salePrice = product.basePrice;
   const hasDiscount = originalPrice > salePrice;
   const discountPercent = hasDiscount 
     ? Math.round(((originalPrice - salePrice) / originalPrice) * 100) 

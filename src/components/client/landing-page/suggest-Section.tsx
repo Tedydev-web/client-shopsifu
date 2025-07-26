@@ -13,7 +13,7 @@ interface SuggestSectionProps {
 const SuggestSection = ({
   title = 'Gợi ý cho bạn',
   categoryId,
-  initialLimit = 12
+  initialLimit = 24
 }: SuggestSectionProps) => {
   const {
     products,

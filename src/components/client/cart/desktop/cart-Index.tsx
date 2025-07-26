@@ -7,7 +7,7 @@ import DesktopCartHeader from "./cart-ProductTitle";
 import CartFooter from "./cart-Footer";
 import { Store, Loader2 } from "lucide-react";
 import { VoucherButton } from "./cart-ModalVoucher";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/providers/CartContext";
 import { ShopCart, CartItem } from "@/types/cart.interface";
 import { ProductItem } from "./cart-MockData";
 

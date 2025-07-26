@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ShopCart, CartItem as ApiCartItem } from '@/types/cart.interface';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/providers/CartContext';
 import { ROUTES } from '@/constants/route';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
 

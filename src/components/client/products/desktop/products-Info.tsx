@@ -16,7 +16,8 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/providers/CartContext';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import {
   Sku,
   VariantGroup,
@@ -28,6 +29,7 @@ import {
   findSelectedSkuPrice,
   handleAddToCart
 } from "../shared/productUtils";
+import { useRouter } from "next/navigation";
 
 interface Product {
   name: string;
@@ -55,9 +57,10 @@ export default function ProductInfo({ product }: { product: Product }) {
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string | null>>({});
   const [currentSku, setCurrentSku] = useState<Sku | null>(null);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  
+  const router = useRouter();
   // Sử dụng Context để quản lý giỏ hàng toàn cục
   const { addToCart } = useCart();
+  const { checkAuth } = useAuthGuard();
   
   // Lấy ra tất cả variants từ API response
   const variantGroups = product.variants || [];
@@ -139,20 +142,35 @@ export default function ProductInfo({ product }: { product: Product }) {
   
   // Hàm xử lý khi click vào nút "Thêm vào giỏ hàng"
   const handleAddToCartClick = async () => {
-    if (!isVariantSelected || !currentSku || currentSku.stock === 0) return;
-    
-    setIsAddingToCart(true);
-    try {
-      // Sử dụng hàm từ productUtils để xử lý việc thêm vào giỏ hàng
-      await handleAddToCart(
-        selectedVariants,
-        product.skus,
-        variantGroups as VariantGroup[],
-        quantity,
-        addToCart
-      );
-    } finally {
-      setIsAddingToCart(false);
+    if (checkAuth()) {
+      if (!isVariantSelected || !currentSku || currentSku.stock === 0) return;
+      
+      setIsAddingToCart(true);
+      try {
+        // Sử dụng hàm từ productUtils để xử lý việc thêm vào giỏ hàng
+        await handleAddToCart(
+          selectedVariants,
+          product.skus,
+          variantGroups as VariantGroup[],
+          quantity,
+          addToCart
+        );
+      } finally {
+        setIsAddingToCart(false);
+      }
+    }
+    else{
+      router.push('/sign-in');
+    }
+  };
+
+  // Hàm xử lý khi click vào nút "Mua ngay"
+  const handleBuyNowClick = () => {
+    if (checkAuth()) {
+      if (!isVariantSelected || !currentSku || currentSku.stock === 0) return;
+      // Logic mua ngay sẽ được triển khai ở đây, ví dụ: chuyển hướng đến trang thanh toán
+      console.log("Redirecting to checkout with SKU:", currentSku.id, "and quantity:", quantity);
+      // router.push(`/checkout?skuId=${currentSku.id}&quantity=${quantity}`);
     }
   };
 
@@ -241,10 +259,10 @@ export default function ProductInfo({ product }: { product: Product }) {
       ) : (
         <div className="flex items-center gap-3 bg-[#fafafa] px-3 py-4">
           <span className="text-3xl font-medium text-red-600">
-            ₫{product.virtualPrice.toLocaleString("vi-VN")}
+            ₫{product.basePrice.toLocaleString("vi-VN")}
           </span>
           <span className="text-sm line-through text-muted-foreground font-normal">
-            ₫{product.basePrice.toLocaleString("vi-VN")}
+            ₫{product.virtualPrice.toLocaleString("vi-VN")}
           </span>
           <Badge className="bg-yellow-400 text-black">
             {discountPercent}% OFF
@@ -412,6 +430,7 @@ export default function ProductInfo({ product }: { product: Product }) {
         <Button
           className="flex-1 h-12 rounded-xs bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md text-base font-medium flex items-center justify-center gap-2 transition-all duration-200"
           disabled={!isVariantSelected || !currentSku || currentSku.stock === 0}
+          onClick={handleBuyNowClick}
         >
           Mua Ngay
           <span>
@@ -420,7 +439,7 @@ export default function ProductInfo({ product }: { product: Product }) {
               ? currentSku.price
               : isFlashSale
                 ? flashSalePrice
-                : product.virtualPrice
+                : product.basePrice
             ).toLocaleString("vi-VN")}
           </span>
         </Button>

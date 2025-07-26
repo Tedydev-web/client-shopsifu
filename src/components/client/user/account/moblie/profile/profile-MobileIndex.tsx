@@ -9,7 +9,7 @@ import { TwoFactorAuthModal } from "./profile-Mobile2FA";
 import { DeleteAccountModal } from "./profile-MobileDeleteAccount";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { usePasswordSecurity } from "../../profile/useProfile-2FA";
-import { useUserMobileHeader } from "@/context/UserMobileHeaderContext";
+import { useUserMobileHeader } from "@/providers/UserMobileHeaderContext";
 
 export default function ProfileMobileIndex() {
   const [profileSheetOpen, setProfileSheetOpen] = useState(false);
