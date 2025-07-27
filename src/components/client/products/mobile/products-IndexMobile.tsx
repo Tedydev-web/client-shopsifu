@@ -3,7 +3,7 @@
 import ProductGalleryMobile from './products-GalleryMobile';
 import ProductInfoMobile from './products-InfoMobile';
 import ProductSpecsMobile from './products-SpecMobile';
-import ProductReviewsMobile from './products-ReviewsMobile';
+import ProductReviews from '../products-Reviews';
 import ProductSuggestionsMobile from './products-SuggestionMobile';
 import ProductsFooter from './products-Footer';
 import ProductShopInfo from '../products-ShopInfo'
@@ -95,7 +95,7 @@ export default function ProductDetailMobile({ slug, product: productData, isLoad
       <ProductInfoMobile product={product as any} />
       <ProductShopInfo shop={defaultShop}/>
       <ProductSpecsMobile product={product as any} />
-      <ProductReviewsMobile reviews={[]} />
+      <ProductReviews productId={String(product.id)} />
       <ProductSuggestionsMobile products={[]} />
       <ProductsFooter 
         product={product as any}

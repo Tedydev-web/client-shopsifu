@@ -7,7 +7,7 @@ import ProductGallery from "./products-Gallery";
 import ProductInfo from "./products-Info";
 import ProductSpecs from "./products-Spec";
 import ProductShopInfo from "../products-ShopInfo";
-import ProductReviews from "./products-Reviews";
+import ProductReviews from "../products-Reviews";
 import ProductSuggestions from "./products-Suggestion";
 import { productMock } from "./mockData";
 import { slugify } from "@/utils/slugify";
@@ -164,7 +164,7 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
 
         {/* ✅ Đánh giá */}
         <div>
-          <ProductReviews reviews={[]} />
+          <ProductReviews productId={String(product.id)} />
         </div>
 
         {/* ✅ Gợi ý sản phẩm */}

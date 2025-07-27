@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useUserMobileHeader } from '@/context/UserMobileHeaderContext'
+import { useUserMobileHeader } from '@/providers/UserMobileHeaderContext'
 
 export default function MobileHeader() {
   const pathname = usePathname()

@@ -11,7 +11,7 @@ export function useSignup() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const {t} = useTranslations()
+  const t = useTranslations()
   const Schema = RegisterSchema(t)
   const handleSignup = async (data: z.infer<typeof Schema>) => {
 

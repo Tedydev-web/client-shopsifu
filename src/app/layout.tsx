@@ -9,7 +9,7 @@ import { Toaster } from '@/components/ui/sonner';
 // import { TokenManager } from "./token-manager";
 import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import { CartProvider } from '@/context/CartContext';
+import { CartProvider } from '@/providers/CartContext';
 import { AuthGuard } from "@/components/auth/AuthGuard";
 
 const inter = Inter({

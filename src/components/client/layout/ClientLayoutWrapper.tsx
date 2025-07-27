@@ -1,7 +1,7 @@
 "use client";
 
 import { ScrollLock } from "@/components/client/layout/ScrollLock";
-import { Footer } from "@/components/client/layout/Footer/Footer"
+import { Footer } from "@/components/client/layout/footer/footer"
 import HeroSectionWrapper from "@/components/client/landing-page/wrapper/hero-Wrapper";
 import HeaderWrapper from "@/components/client/layout/header/header-Wrapper";
 import DesktopCommit from "@/components/client/layout/header/desktop/desktop-Commit";

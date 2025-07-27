@@ -4,6 +4,7 @@ export const mockSearchProducts: ClientProduct[] = [
   {
     id: '1',
     name: 'Áo thun unisex form rộng - Basic Tee',
+    description: 'Áo thun basic, dễ phối đồ, chất liệu cotton thoáng mát.',
     basePrice: 120000,
     virtualPrice: 85000,
     brandId: 'brand-1',
@@ -21,6 +22,7 @@ export const mockSearchProducts: ClientProduct[] = [
   {
     id: '2',
     name: 'Quần jean ống rộng nữ Ulzzang',
+    description: 'Quần jean ống rộng phong cách Hàn Quốc, hack dáng.',
     basePrice: 300000,
     virtualPrice: 199000,
     brandId: 'brand-2',
@@ -38,6 +40,7 @@ export const mockSearchProducts: ClientProduct[] = [
   {
     id: '3',
     name: 'Giày thể thao sneaker nam nữ',
+    description: 'Giày sneaker năng động, phù hợp cho cả nam và nữ.',
     basePrice: 500000,
     virtualPrice: 339000,
     brandId: 'brand-3',

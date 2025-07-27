@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ interface HeroSectionProps {
   className?: string;
 }
 
-export function HeroSection({ className }: HeroSectionProps) {
+function HeroSectionComponent({ className }: HeroSectionProps) {
   const isMobile = useIsMobile();
   const plugin = useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true })
@@ -190,3 +190,5 @@ export function HeroSection({ className }: HeroSectionProps) {
     </section>
   );
 }
+
+export const HeroSection = memo(HeroSectionComponent);

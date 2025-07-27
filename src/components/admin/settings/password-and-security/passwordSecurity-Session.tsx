@@ -251,7 +251,7 @@ export function PasswordSecuritySession() {
           ))}
         </Accordion>
       )}
-      {!loading && !error && totalPages > 1 && (
+      {/* {!loading && !error && totalPages > 1 && (
         <div className="p-4">
           <Pagination
             page={page}
@@ -262,7 +262,7 @@ export function PasswordSecuritySession() {
             onLimitChange={handleLimitChange}
           />
         </div>
-      )}
+      )} */}
     </SettingTable>
   );
 }

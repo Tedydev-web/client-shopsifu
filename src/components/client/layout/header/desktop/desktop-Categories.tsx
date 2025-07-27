@@ -6,33 +6,58 @@ import Image from 'next/image';
 import { ChevronRight, ChevronDown, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { categories, Category } from './desktop-Mockdata';
+import { useCbbCategory } from '@/hooks/combobox/useCbbCategory';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useDropdown } from '../dropdown-context';
 import '../style.css';
 
 
 
 
+interface CategoryOption {
+  value: string;
+  label: string;
+  icon?: string | null;
+  parentCategoryId?: string | null;
+}
+
 export function Categories() {
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+  const [activeCategory, setActiveCategory] = useState<CategoryOption | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { openDropdown, setOpenDropdown } = useDropdown();
-  
-  // Chuyển đổi từ state cục bộ sang context toàn cầu
+
+  // Fetch parent categories (level 1)
+  const { categories: parentCategories, loading: parentLoading } = useCbbCategory(null);
+
+  // Fetch child categories based on the active parent category
+  const { categories: subCategories, loading: subLoading } = useCbbCategory(activeCategory?.value || null);
+
   const open = openDropdown === 'categories';
-  
+
   const handleMouseEnter = () => {
     setOpenDropdown('categories');
   };
-  
+
   const handleMouseLeave = () => {
     setOpenDropdown('none');
+    setActiveCategory(null); // Reset active category on leave
   };
-  
+
   const handleClick = () => {
     setOpenDropdown(open ? 'none' : 'categories');
   };
+
+  useEffect(() => {
+    // Set the first category as active by default when dropdown opens and data is loaded
+    if (open && !parentLoading && parentCategories.length > 0 && !activeCategory) {
+      setActiveCategory(parentCategories[0]);
+    }
+    // Reset when dropdown closes
+    if (!open) {
+      setActiveCategory(null);
+    }
+  }, [open, parentLoading, parentCategories, activeCategory]);
   
   // Đã chuyển sang sử dụng CSS classes để tránh inline styles
   // Xem file header-styles.css
@@ -121,8 +146,8 @@ export function Categories() {
         
         <motion.div 
           ref={dropdownRef}
-          className={cn(
-            "border-1 border-gray-200 absolute top-[calc(100%+12px)] left-[-180px] min-w-full md:min-w-[950px] bg-white rounded-lg shadow-xl z-50 mb-5 overflow-y-auto dropdown-container",
+                    className={cn(
+            "border-1 border-gray-200 absolute top-[calc(100%+12px)] left-[-180px] min-w-full md:min-w-[950px] bg-white rounded-lg shadow-xl z-50 mb-5 overflow-hidden dropdown-container h-[600px]",
             open ? "opacity-100 visible" : "opacity-0 invisible"
           )}
           initial={{ opacity: 0, y: -10 }}
@@ -142,65 +167,91 @@ export function Categories() {
           <div className="absolute left-[230px] top-[-7px] w-3 h-3 bg-white transform rotate-45 border-t-1 border-l-1 border-gray-200 z-1"></div>
 
           <div className="flex h-full w-full relative z-10">            {/* Left: Main categories */}
-            <div className="h-full w-1/4 bg-white border-r-1 pr-2 py-4 rounded-l-md">              <div role="menu" className="space-y-1">
-                {categories.map((cat) => (
-                  <div
-                    key={cat.id}
-                    onMouseEnter={() => setActiveCategory(cat)}
-                    className={cn(
-                      'flex items-center justify-between px-3 py-2 text-[14px] h-[38px] text-[#333] font-medium cursor-pointer hover:bg-white transition-colors',
-                      activeCategory?.id === cat.id && 'bg-gray-100 hover:bg-gray-100'
-                    )}
-                    role="menuitem"
-                    tabIndex={0}
-                  >
-                    {cat.name}
-                    <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  </div>
-                ))}
+                                    <div className="h-full w-1/4 bg-white border-r-1 pr-2 py-4 rounded-l-md overflow-y-auto">
+              <div role="menu" className="space-y-1">
+                {parentLoading ? (
+                  // Skeleton loader for parent categories
+                  Array.from({ length: 8 }).map((_, index) => (
+                    <div key={index} className="flex items-center justify-between px-3 py-2 h-[38px]">
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-4" />
+                    </div>
+                  ))
+                ) : (
+                                    parentCategories.map((cat: CategoryOption) => (
+                    <div
+                      key={cat.value}
+                      onMouseEnter={() => setActiveCategory(cat)}
+                      className={cn(
+                        'flex items-center justify-between px-3 py-2 text-[14px] h-[38px] text-[#333] font-medium cursor-pointer hover:bg-gray-100 transition-colors rounded-md',
+                        activeCategory?.value === cat.value && 'bg-gray-100'
+                      )}
+                      role="menuitem"
+                      tabIndex={0}
+                    >
+                      {cat.label}
+                      <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    </div>
+                  ))
+                )}
               </div>
             </div>{/* Right: Sub categories */}
-            <div className="w-3/4 p-4 bg-white rounded-r-md overflow-y-auto h-full">
-              {activeCategory ? (
+                        <div className="w-3/4 p-4 bg-white rounded-r-md overflow-y-auto h-full">
+              {subLoading ? (
+                // Skeleton loader for sub-categories
                 <div className="space-y-6">
-                  {/* Category title with arrow */}
+                   <div className="flex items-center justify-between mb-3">
+                      <Skeleton className="h-6 w-1/3" />
+                      <Skeleton className="h-5 w-1/4" />
+                    </div>
+                    <div className="grid grid-cols-5 gap-4">
+                      {Array.from({ length: 10 }).map((_, index) => (
+                        <div key={index} className="group block text-center p-2">
+                          <Skeleton className="w-full aspect-square rounded-full mb-2" />
+                          <Skeleton className="h-5 w-full" />
+                        </div>
+                      ))}
+                    </div>
+                </div>
+              ) : activeCategory && subCategories.length > 0 ? (
+                <div className="space-y-6">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-base font-bold text-gray-800">{activeCategory.name}</h3>
-                    <Link href={`/category/${activeCategory.id}`} className="flex items-center text-sm text-red-600 hover:underline font-medium">
+                    <h3 className="text-base font-bold text-gray-800">{activeCategory.label}</h3>
+                    <Link href={`/category/${activeCategory.value}`} className="flex items-center text-sm text-red-600 hover:underline font-medium">
                       Xem tất cả
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </Link>
                   </div>
-                  
-                  {/* Items grid - 5 items per row */}
                   <div className="grid grid-cols-5 gap-4">
-                    {activeCategory.children.map((item) => (                      <Link
-                        key={item.id}
-                        href={`/product/${item.id}`}
+                                        {subCategories.map((item: CategoryOption) => (
+                      <Link
+                        key={item.value}
+                        href={`/product/${item.value}`}
                         className="group block text-center p-2 rounded-lg transition-all duration-200"
                       >
-                        <div className="w-full aspect-square relative mb-2 rounded-full overflow-hidden border border-gray-100">                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            priority
-                            loading="eager"
-                            className="transition-transform duration-300 group-hover:scale-110 object-cover"
-                            placeholder="blur"
-                            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmMWYxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg=="
-                          />
+                        <div className="w-full aspect-square relative mb-2 rounded-full overflow-hidden border border-gray-100 bg-gray-50">
+                          {item.icon ? (
+                            <Image
+                              src={item.icon}
+                              alt={item.label}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              className="transition-transform duration-300 group-hover:scale-110 object-cover"
+                            />
+                          ) : (
+                             <div className="w-full h-full bg-gray-100"></div>
+                          )}
                         </div>
                         <span className="text-[13px] text-[#333] group-hover:text-[#D70018] font-normal leading-tight line-clamp-2 h-10 block">
-                          {item.name}
+                          {item.label}
                         </span>
                       </Link>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="h-full flex items-center justify-center text-sm text-gray-400">
-                  Di chuột vào danh mục để xem sản phẩm
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <p>{activeCategory ? `Không có danh mục con cho ${activeCategory.label}` : 'Chọn một danh mục để xem chi tiết.'}</p>
                 </div>
               )}
             </div>

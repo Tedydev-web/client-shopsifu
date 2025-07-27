@@ -16,7 +16,7 @@ export function useReset() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const {t} = useTranslations('')
+  const t = useTranslations('')
   const schema = resetPasswordSchema(t)
 
   const handleResetPassword = async (data: z.infer<typeof schema>) => {

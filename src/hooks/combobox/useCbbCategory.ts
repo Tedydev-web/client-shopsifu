@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { categoryService } from '@/services/admin/categoryService';
 import { showToast } from '@/components/ui/toastify';
 import { parseApiError } from '@/utils/error';
@@ -15,42 +15,41 @@ interface CategoryParams extends PaginationRequest {
   parentCategoryId?: string | null;
 }
 
-export const useCbbCategory = (parentCategoryId?: string | null) => {
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const fetchCategories = async (parentCategoryId: string | null) => {
+  try {
+    const params: CategoryParams = { page: 1, limit: 100 };
+    if (parentCategoryId) {
+      params.parentCategoryId = parentCategoryId;
+    }
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        const params: CategoryParams = { page: 1, limit: 100 };
+    const response = await categoryService.getAll(params);
 
-        if (parentCategoryId) {
-          params.parentCategoryId = parentCategoryId;
-        }
+    if (response.data) {
+      return response.data.map((category) => ({
+        value: category.id,
+        label: category.name,
+        icon: category.logo,
+        parentCategoryId: category.parentCategoryId
+      }));
+    }
+    return [];
+  } catch (error) {
+    showToast(parseApiError(error), 'error');
+    // In case of an error, re-throw it so React Query can handle it
+    throw error;
+  }
+};
 
-        const response = await categoryService.getAll(params);
+export const useCbbCategory = (parentCategoryId: string | null) => {
+  const queryResult = useQuery<CategoryOption[], Error>({
+    queryKey: ['categories', parentCategoryId],
+    queryFn: () => fetchCategories(parentCategoryId),
+    staleTime: 1000 * 60 * 60, // 1 hour
+    placeholderData: (previousData) => previousData,
+  });
 
-        if (response.data) {
-          const formattedCategories = response.data.map((category) => ({
-            value: category.id,
-            label: category.name,
-            icon: category.logo,
-            parentCategoryId: category.parentCategoryId
-          }));
-          setCategories(formattedCategories);
-        }
-      } catch (error) {
-        showToast(parseApiError(error), 'error');
-        // Reset categories on error to avoid showing stale data
-        setCategories([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, [parentCategoryId]); // Re-run effect when parentCategoryId changes
-
-  return { categories, loading };
+  return {
+    categories: queryResult.data ?? [],
+    loading: queryResult.isLoading,
+  };
 };

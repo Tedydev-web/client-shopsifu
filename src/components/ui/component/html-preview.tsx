@@ -16,8 +16,11 @@ export default function HTMLPreview({ content, className = "" }: HTMLPreviewProp
   // Nếu không có nội dung, trả về null
   if (!content) return null;
 
+  // Chuyển đổi ký tự xuống dòng thành thẻ <br> để hiển thị đúng trên HTML
+  const formattedContent = content.replace(/\n/g, '<br />');
+
   // Làm sạch HTML để ngăn chặn XSS
-  const sanitizedContent = DOMPurify.sanitize(content, {
+  const sanitizedContent = DOMPurify.sanitize(formattedContent, {
     USE_PROFILES: { html: true },
     ALLOWED_TAGS: [
       "h1", "h2", "h3", "h4", "h5", "h6", "p", "br", "strong", "em", 

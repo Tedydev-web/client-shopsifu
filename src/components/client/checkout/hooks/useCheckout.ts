@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import { CheckoutContext } from '@/context/CheckoutContext';
+import { CheckoutContext } from '@/providers/CheckoutContext';
 
 export const useCheckout = () => {
   const context = useContext(CheckoutContext);

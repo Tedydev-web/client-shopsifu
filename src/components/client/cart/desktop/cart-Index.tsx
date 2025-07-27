@@ -7,7 +7,7 @@ import DesktopCartHeader from "./cart-ProductTitle";
 import CartFooter from "./cart-Footer";
 import { Store, Loader2 } from "lucide-react";
 import { VoucherButton } from "./cart-ModalVoucher";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/providers/CartContext";
 import { ShopCart, CartItem } from "@/types/cart.interface";
 import { ProductItem } from "./cart-MockData";
 
@@ -36,13 +36,13 @@ export default function DesktopCartPageMobile() {
       
       let allSelected = true;
       
-      shopCarts.forEach(shopCart => {
-        const allItemsSelected = shopCart.cartItems.every(item => item.isSelected);
+      shopCarts.forEach((shopCart: ShopCart) => {
+        const allItemsSelected = shopCart.cartItems.every((item: CartItem) => item.isSelected);
         shopSelectedState[shopCart.shop.id] = allItemsSelected;
         
         if (!allItemsSelected) allSelected = false;
         
-        shopCart.cartItems.forEach(item => {
+        shopCart.cartItems.forEach((item: CartItem) => {
           itemSelectedState[item.id] = item.isSelected || false;
         });
       });

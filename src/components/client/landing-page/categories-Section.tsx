@@ -17,6 +17,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function CategoriesSection() {
 	// Sử dụng hook để lấy danh mục cấp cao nhất (parentCategoryId = null)
 	const { categories, loading } = useCbbCategory(null);
+  interface CategoryOption {
+    value: string;
+    label: string;
+    icon?: string | null;
+    parentCategoryId?: string | null;
+  }
 
 	return (
 		<section className="w-full pt-8">
@@ -55,7 +61,7 @@ export function CategoriesSection() {
 										</div>
 									</CarouselItem>
 								) : (
-									categories.map((category) => (
+									categories.map((category: CategoryOption) => (
 									<CarouselItem key={category.value} className="pl-4 basis-auto">
 										<Link
 											href={`${ROUTES.PRODUCT.LIST}?categoryId=${category.value}`}
