@@ -53,20 +53,20 @@ export default function DashboardUser({
         </div>
 
         {/* Info */}
-        <div className="space-y-2 text-gray-700 text-sm">
+        <div className="space-y-2 ">
           <div className="flex items-center">
             <User className="w-4 h-4 mr-2 text-gray-500" />
-            <span className="font-semibold text-xl">{name}</span>
+            <span className="font-semibold text-base text-[#121214]">{name}</span>
           </div>
           <div className="flex items-center">
             <Mail className="w-4 h-4 mr-2 text-gray-500" />
-            <span className="font-medium">Email:</span>
-            <span className="ml-2 break-all">{email}</span>
+            <span className="font-medium text-xs text-[#71717A]">Email:</span>
+            <span className="ml-2 break-all text-xs text-[#71717A]">{email}</span>
           </div>
           <div className="flex items-center">
             <Phone className="w-4 h-4 mr-2 text-gray-500" />
-            <span className="font-medium">Số điện thoại:</span>
-            <span className="ml-2">{showPhone ? phone : maskPhone(phone)}</span>
+            <span className="font-medium text-xs text-[#71717A]">Số điện thoại:</span>
+            <span className="ml-2 text-xs text-[#71717A]">{showPhone ? phone : maskPhone(phone)}</span>
             <button
               onClick={() => setShowPhone(!showPhone)}
               className="ml-2 text-gray-500 hover:text-gray-700"

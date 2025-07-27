@@ -80,10 +80,10 @@ export default function AddressBook() {
   return (
     <div className="bg-white rounded-lg p-6 space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-semibold text-xl">Sổ địa chỉ</h2>
+        <h2 className="font-semibold text-base text-[#121214]">Sổ địa chỉ</h2>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-[#D70019] hover:text-red-600 hover:bg-red-50 transition"
           onClick={handleAdd}
         >
           <Plus size={18} /> Thêm địa chỉ
@@ -94,47 +94,42 @@ export default function AddressBook() {
         {addresses.map((addr, i) => (
           <div
             key={i}
-            className="bg-gray-50 rounded-lg p-4 border space-y-2 relative"
+            className="relative bg-[#F9F9F9] border rounded-xl p-4 flex flex-col"
           >
-            {/* Tags ở góc phải */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              {addr.tag && (
-                <span className="text-xs px-2 py-0.5 bg-gray-200 rounded flex items-center">
-                  {addr.tag}
-                </span>
-              )}
+            {/* Dòng 1: tag và mặc định */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-[#1D1D20]">
+                {addr.tag ? addr.tag.replace(/^🏠|🏢/, "").trim() : "Địa chỉ"}
+              </span>
               {addr.isDefault && (
-                <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-600 rounded">
+                <span className="text-xs font-medium px-2 py-0.5 bg-blue-100 text-[#193767] rounded">
                   Mặc định
                 </span>
               )}
             </div>
 
-            {/* Thông tin người nhận */}
-            <div className="flex items-center gap-2 font-semibold text-sm md:text-base">
+            {/* Dòng 2 */}
+            <div className="text-sm font-semibold text-[#1D1D20] flex flex-wrap items-center gap-1">
               <span>{addr.name}</span>
-              <span className="text-gray-400">|</span>
+              <span className="text-[#000000]">|</span>
               <span>{addr.phone}</span>
             </div>
 
-            {/* Địa chỉ */}
-            <div className="text-sm text-gray-500">{addr.address}</div>
+            {/* Dòng 3 */}
+            <p className="text-sm text-[#71717A]">{addr.address}</p>
 
-            {/* Hành động */}
-            <div className="flex justify-end gap-4 mt-2 text-sm">
-              <Button
-                variant="ghost"
-                className="text-red-500 hover:underline px-0"
-              >
+            {/* Dòng 4 */}
+            <div className="mt-auto pt-4 flex justify-end items-center gap-3 text-sm">
+              <button className="text-[#1D1D20] hover:underline transition">
                 Xoá
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-blue-500 hover:underline px-0"
+              </button>
+              <span className="text-gray-300">|</span>
+              <button
                 onClick={() => handleEdit(addr)}
+                className="text-[#3B82F6] hover:underline transition"
               >
                 Cập nhật
-              </Button>
+              </button>
             </div>
           </div>
         ))}

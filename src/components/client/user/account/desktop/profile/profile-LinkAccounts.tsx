@@ -4,7 +4,7 @@ import { FaGoogle } from "react-icons/fa";
 export default function LinkedAccounts() {
   return (
     <div className="bg-white rounded-lg p-6 space-y-6 text-base py-6">
-      <h2 className="font-semibold text-xl">Tài khoản liên kết</h2>
+      <h2 className="font-semibold text-base text-[#121214]">Tài khoản liên kết</h2>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

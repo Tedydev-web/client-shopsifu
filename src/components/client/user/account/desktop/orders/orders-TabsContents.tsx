@@ -1,10 +1,11 @@
 "use client";
 
 import { TabsContent } from "@/components/ui/tabs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { OrderEmpty } from "./orders-Empty";
 import { useGetOrders } from "@/hooks/useGetOrder";
 import { OrderStatus } from "@/types/order.interface"; // Đã có enum hợp lệ
+import { OrderDetail } from "./orders-Detail";
 
 const tabKeys = [
   { value: "all", label: "Tất cả" },
@@ -30,6 +31,16 @@ interface Props {
 
 export const OrderTabContent = ({ currentTab }: Props) => {
   const { fetchOrders, orders, loading, error } = useGetOrders();
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+  if (selectedOrderId) {
+    return (
+      <OrderDetail
+        orderId={selectedOrderId}
+        onBack={() => setSelectedOrderId(null)}
+      />
+    );
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -65,7 +76,8 @@ export const OrderTabContent = ({ currentTab }: Props) => {
               {orders.data.map((order) => (
                 <div
                   key={order.id}
-                  className="p-4 border rounded-md shadow-sm bg-gray-50"
+                  className="p-4 border rounded-md shadow-sm bg-gray-50 cursor-pointer hover:bg-gray-100"
+                  onClick={() => setSelectedOrderId(order.id)}
                 >
                   <div>
                     <strong>Mã đơn:</strong> {order.code}

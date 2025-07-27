@@ -15,12 +15,43 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
+export interface OrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productTranslations: {
+    id: string;
+    name: string;
+    description: string;
+    languageId: string;
+  }[];
+  skuPrice: number;
+  image: string;
+  skuValue: string;
+  skuId: string;
+  orderId: string;
+  quantity: number;
+  createdAt: string;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  shopId: string;
+  paymentId: string;
+  status: string; // Có thể dùng enum OrderStatus nếu có
+  createdAt: string;
+  updatedAt: string;
+  items: OrderItem[];
+}
+
 export interface OrderGetAllResponse {
-  data: any[]; // Thay `any` bằng model đơn hàng thực tế nếu có
+  data: Order[];
   total: number;
   page: number;
   limit: number;
 }
+
 
 export interface OrderGetByIdResponse {
   // Cấu trúc response chi tiết đơn hàng

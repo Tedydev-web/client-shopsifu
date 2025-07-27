@@ -94,10 +94,10 @@ export default function ProfileInfo() {
     <div className="bg-white rounded-lg p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-5">
-        <h2 className="font-semibold text-xl">Thông tin cá nhân</h2>
+        <h2 className="font-semibold text-base text-[#121214]">Thông tin cá nhân </h2>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-[#D70019] hover:text-red-600 hover:bg-red-50 transition"
           onClick={() => setOpen(true)}
         >
           <Pencil size={16} />
@@ -106,17 +106,17 @@ export default function ProfileInfo() {
       </div>
 
       {/* Info Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 text-sm text-gray-800">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 text-sm text-[#1D1D20]">
         <div className="flex justify-between py-2 border-t">
-          <span className="text-gray-500">Họ và tên:</span>
+          <span className="text-[#71717A]">Họ và tên:</span>
           <span className="font-medium">{userData.name}</span>
         </div>
         <div className="flex justify-between py-2 border-t">
-          <span className="text-gray-500">Số điện thoại:</span>
+          <span className="text-[#71717A]">Số điện thoại:</span>
           <span className="font-medium">{userData.phoneNumber}</span>
         </div>
         <div className="flex justify-between py-2 border-t">
-          <span className="text-gray-500">Email:</span>
+          <span className="text-[#71717A]">Email:</span>
           <span className="font-medium">{userData.email}</span>
         </div>
       </div>
