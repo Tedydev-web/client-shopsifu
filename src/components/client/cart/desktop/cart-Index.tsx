@@ -211,28 +211,16 @@ export default function DesktopCartPageMobile() {
               </div>
 
               {/* Items */}
-              {shopCart.cartItems.map((cartItem: CartItem) => (
+               {shopCart.cartItems.map((cartItem: CartItem) => (
                 <DesktopCartItem
                   key={cartItem.id}
-                  item={{
-                    id: cartItem.id,
-                    name: cartItem.sku.product.name,
-                    image: cartItem.sku.image,
-                    variation: cartItem.sku.value,
-                    // Xử lý variations nếu có
-                    variations: cartItem.sku.product.variants?.length > 0 
-                      ? cartItem.sku.product.variants[0].options 
-                      : undefined,
-                    price: cartItem.sku.price,
-                    originalPrice: cartItem.sku.product.virtualPrice,
-                    quantity: cartItem.quantity,
-                    soldOut: cartItem.sku.stock <= 0
-                  }}
+                  item={cartItem} // Truyền thẳng cartItem gốc
                   checked={!!selectedItems[cartItem.id]}
                   onCheckedChange={() =>
                     handleToggleItem(shopCart.shop.id, cartItem.id, shopCart.cartItems)
                   }
                   onVariationChange={handleVariationChange}
+                  onUpdateQuantity={(itemId, quantity) => updateCartItem(itemId, { quantity })}
                   onRemove={() => handleRemoveItem(cartItem.id)}
                 />
               ))}

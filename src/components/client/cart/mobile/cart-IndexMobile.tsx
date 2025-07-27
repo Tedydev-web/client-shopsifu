@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Loader } from "lucide-react";
 import { CartItem, ShopCart } from "@/types/cart.interface";
+import { PiStorefrontLight } from "react-icons/pi";
 
 export default function MobileCartIndex() {
   const { 
@@ -73,62 +74,74 @@ export default function MobileCartIndex() {
   }, [shopCarts, selectedItems]);
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="flex flex-col h-screen bg-gray-50">
       <div className="sticky top-0 z-10 bg-white shadow-sm">
         <MobileCartHeader title="Giỏ hàng" />
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center h-[calc(100vh-60px)]">
-          <Loader className="animate-spin" />
-        </div>
-      ) : !shopCarts || shopCarts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-60px)] bg-gray-50 p-10 text-center">
-          <Image src="/images/client/cart/Cart-empty-v2.webp" alt="Empty Cart" width={150} height={150} />
-          <div className="text-xl font-medium">Giỏ hàng của bạn đang trống</div>
-          <p className="text-gray-500 mt-2">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
-        </div>
-      ) : (
-        <div className="pb-24">
-          {shopCarts.map((shopCart: ShopCart) => {
-            const shopItemIds = shopCart.cartItems.map((item: CartItem) => item.id);
-            const isShopSelected = shopItemIds.length > 0 && shopItemIds.every((id: string) => selectedItems[id]);
+      <main className="flex-grow overflow-y-auto">
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center">
+            <Loader className="animate-spin" />
+          </div>
+        ) : shopCarts.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center text-center p-4">
+            <div className="relative w-32 h-32 mb-4">
+              <Image
+                src="/images/empty-cart.png"
+                alt="Empty Cart"
+                layout="fill"
+                objectFit="contain"
+              />
+            </div>
+            <p className="text-gray-500">Giỏ hàng của bạn còn trống</p>
+          </div>
+        ) : (
+          <div className="pb-4">
+            {shopCarts.map((shop: ShopCart) => {
+              const shopItemIds = shop.cartItems.map((item: CartItem) => item.id);
+              const areAllShopItemsSelected = shopItemIds.every(
+                (id: string) => selectedItems[id]
+              );
 
-            return (
-              <div key={shopCart.shop.id} className="mt-2 bg-white">
-                <div className="flex items-center p-4 border-b">
-                  <Checkbox 
-                    checked={isShopSelected} 
-                    onCheckedChange={() => handleSelectShop(shopCart.shop.id)} 
-                    className="mr-3"
-                  />
-                  <span className="font-semibold text-gray-800">{shopCart.shop.name}</span>
-                </div>
-                <div>
-                  {shopCart.cartItems.map((item: CartItem) => (
-                    <MobileCartItem
-                      key={item.id}
-                      item={item}
-                      isSelected={!!selectedItems[item.id]}
-                      onSelectionChange={handleSelectItem}
-                      onRemove={removeItemFromCart}
-                      onUpdateQuantity={updateItemQuantity}
-                      onVariationChange={handleVariationChange}
+              return (
+                <div key={shop.shop.id} className="bg-white mb-2 shadow-sm">
+                  <div className="p-4 border-b flex items-center gap-3">
+                    <Checkbox
+                      checked={areAllShopItemsSelected}
+                      onCheckedChange={() => handleSelectShop(shop.shop.id)}
                     />
-                  ))}
+                    <PiStorefrontLight className="h-5 w-5" />
+                    <span className="text-base">Shop {shop.shop.name}</span>
+                  </div>
+                  <div>
+                    {shop.cartItems.map((item: CartItem) => (
+                      <MobileCartItem
+                        key={item.id}
+                        item={item}
+                        isSelected={!!selectedItems[item.id]}
+                        onSelectionChange={handleSelectItem}
+                        onRemove={removeItemFromCart}
+                        onUpdateQuantity={updateItemQuantity}
+                        onVariationChange={handleVariationChange}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        )}
+      </main>
 
-          <MobileCartFooter
-            total={totalPrice}
-            selectedCount={selectedItemCount}
-            allSelected={areAllItemsSelected}
-            onToggleAll={handleSelectAll}
-            totalSaved={0} // Pass a default value for totalSaved
-          />
-        </div>
+      {!isLoading && shopCarts.length > 0 && (
+        <MobileCartFooter
+          total={totalPrice}
+          selectedCount={selectedItemCount}
+          allSelected={areAllItemsSelected}
+          onToggleAll={handleSelectAll}
+          totalSaved={0} // Pass a default value for totalSaved
+        />
       )}
     </div>
   );

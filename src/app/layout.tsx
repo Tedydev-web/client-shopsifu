@@ -34,7 +34,7 @@ export default async function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <NextIntlClientProvider>
           <StoreProvider>
-            <ClientLayout>
+            {/* <ClientLayout> */}
               <AuthGuard>
                 <Toast/>
                 <TrustDeviceModal />
@@ -44,7 +44,7 @@ export default async function RootLayout({
                 </CartProvider>
               </AuthGuard>
               <Toaster position="bottom-right" />
-            </ClientLayout>
+            {/* </ClientLayout> */}
           </StoreProvider>
         </NextIntlClientProvider>
       </body>

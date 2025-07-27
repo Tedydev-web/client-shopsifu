@@ -5,7 +5,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CartItem } from "@/types/cart.interface";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
+import { getProductUrl } from "@/components/client/products/shared/routes";
 
 interface MobileCartItemProps {
   item: CartItem;
@@ -51,50 +53,56 @@ export default function MobileCartItem({
       </div>
 
       {/* Image */}
-      <Image
-        src={item.product.images[0]?.imageUrl || "/placeholder.png"}
-        alt={item.product.name}
-        width={80}
-        height={80}
-        className="w-20 h-20 rounded border object-cover mr-4"
-      />
+      <Link href={getProductUrl(item.sku.product.name, item.sku.product.id)}>
+        <div className="relative w-20 h-20 mr-3">
+          <Image
+            src={item.sku.image || "/images/placeholder.png"}
+            alt={item.sku.product.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="rounded object-cover"
+          />
+        </div>
+      </Link>
 
       {/* Content */}
       <div className="flex-1 flex flex-col">
-        <p className="line-clamp-2 text-sm leading-5 mb-1 font-medium text-gray-800">
-          {item.product.name}
-        </p>
+        <Link href={getProductUrl(item.sku.product.name, item.sku.product.id)}>
+          <p className="text-sm text-gray-800 line-clamp-2 hover:text-primary transition-colors">
+            {item.sku.product.name}
+          </p>
+        </Link>
 
         {/* Variation Select */}
         <div className="mt-1 mb-2">
-          {item.product.productSkus && item.product.productSkus.length > 1 ? (
+          {/* {item.sku.product.variants && item.sku.product.variants.length > 1 ? (
             <select
               className="text-xs text-gray-600 border px-2 py-1 rounded-sm bg-gray-50 max-w-[150px] truncate"
-              value={item.productSku.sku}
+              value={item.sku.value}
               onChange={(e) => onVariationChange(item.id, e.target.value)}
             >
-              {item.product.productSkus.map((sku) => (
-                <option key={sku.sku} value={sku.sku}>
-                  {sku.variant}
+              {item.sku.product.variants.map((variant) => (
+                <option key={variant.value} value={variant.value}>
+                  {variant.value}
                 </option>
               ))}
             </select>
-          ) : (
+          ) : ( */}
             <div className="text-xs text-gray-600 border px-2 py-1 rounded-sm bg-gray-50 w-fit">
-              {item.productSku.variant}
+              Phân loại: {item.sku.value}
             </div>
-          )}
+          {/* )} */}
         </div>
 
         {/* Price */}
         <div className="flex items-center gap-2">
-            {item.originalPrice && (
+            {item.sku.product.virtualPrice && (
                 <span className="text-gray-400 line-through text-xs">
-                    ₫{item.originalPrice.toLocaleString()}
+                    ₫{item.sku.product.virtualPrice.toLocaleString()}
                 </span>
             )}
             <span className="text-primary font-semibold text-sm">
-                ₫{item.price.toLocaleString()}
+                ₫{item.sku.price.toLocaleString()}
             </span>
         </div>
 

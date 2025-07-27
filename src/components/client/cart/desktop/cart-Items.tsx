@@ -1,141 +1,128 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CartItem, CartListResponse } from "@/types/cart.interface";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { ProductItem } from "./cart-MockData";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { getProductUrl } from "@/components/client/products/shared/routes";
 
-interface Props {
-  item: ProductItem;
+interface CartItemsProps {
+  item: CartItem;
   checked: boolean;
   onCheckedChange: () => void;
-  onVariationChange: (itemId: string, selectedVariation: string) => void;
-  onRemove?: (itemId: string) => void;
+  onRemove: () => void;
+  onUpdateQuantity: (id: string, quantity: number) => void;
+  onVariationChange: (itemId: string, newSkuId: string) => void; // Thêm prop này
 }
 
-export default function DesktopCartItem({
+export default function CartItems({ 
   item,
   checked,
   onCheckedChange,
-  onVariationChange,
   onRemove,
-}: Props) {
-  const [quantity, setQuantity] = useState(item.quantity || 1);
+  onUpdateQuantity,
+}: CartItemsProps) {
+  const [quantity, setQuantity] = useState(item.quantity);
 
-  const increase = () => setQuantity((prev) => prev + 1);
-  const decrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  useEffect(() => {
+    setQuantity(item.quantity);
+  }, [item.quantity]);
 
-  const total = item.price * quantity;
+  const handleQuantityChange = (newQuantity: number) => {
+    const clampedQuantity = Math.max(1, newQuantity);
+    setQuantity(clampedQuantity);
+  };
+
+  const handleUpdateCart = () => {
+    if (quantity !== item.quantity) {
+      onUpdateQuantity(item.id, quantity);
+    }
+  };
+
+  // Add a defensive check to prevent runtime errors if data is incomplete
+  if (!item || !item.sku || !item.sku.product) {
+    return null;
+  }
 
   return (
-    <div className="flex py-5 border-b bg-white text-base text-muted-foreground">
-      {/* Product (45%) */}
-      <div className="flex items-center w-[45%] px-3">
+    <div className="flex items-center px-3 py-4 border-b">
+      {/* Product Info: w-[45%] */}
+      <div className="flex items-center gap-2 w-[45%]">
         <Checkbox
-          className="mr-3 ml-[30px]"
+          className="ml-[30px]"
           checked={checked}
           onCheckedChange={onCheckedChange}
         />
-
-        <Image
-          src={item.image}
-          alt={item.name}
-          width={80}
-          height={80}
-          className="w-24 h-24 rounded border object-cover mr-3 ml-3"
-        />
-
-        <div className="flex-1">
-          <div className="text-base leading-6 h-12 line-clamp-2 text-black">
-            {item.name}
+        <Link href={getProductUrl(item.sku.product.name, item.sku.product.id)} className="flex items-center flex-grow">
+          <div className="relative w-20 h-20 mr-4 flex-shrink-0">
+            <Image
+              src={item.sku.image || "/images/placeholder.png"}
+              alt={item.sku.product.name}
+              fill
+              sizes="80px"
+              className="object-cover rounded border"
+            />
           </div>
-
-          {/* Variation select box */}
-          <div className="mt-2">
-            {item.variations ? (
-              <select
-                className="text-sm text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50"
-                value={item.variation}
-                title={`Chọn biến thể cho ${item.name}`}
-                aria-label={`Chọn biến thể cho ${item.name}`}
-                onChange={(e) =>
-                  onVariationChange(item.id, e.target.value)
-                }
-              >
-                {item.variations.map((variation) => (
-                  <option key={variation} value={variation}>
-                    {variation}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className="text-sm text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50">
-                {item.variation}
-              </div>
-            )}
-          </div>
-
-          {/* Sold out warning */}
-          {item.soldOut && (
-            <div className="mt-2 text-sm text-destructive">
-              Sản phẩm đã hết hàng. Vui lòng chọn biến thể khác.
+          <div className="flex-1">
+            <p className="line-clamp-2 text-sm leading-5 hover:text-primary transition-colors">
+              {item.sku.product.name}
+            </p>
+            <div className="text-sm text-muted-foreground mt-1 bg-gray-50 p-1 rounded-sm inline-block">
+              Phân loại: {item.sku.value}
             </div>
-          )}
-        </div>
+          </div>
+        </Link>
       </div>
 
-      {/* Unit Price */}
-      <div className="w-[15%] flex flex-col items-center justify-center text-center">
-        {item.originalPrice && (
-          <span className="text-sm line-through text-muted-foreground">
-            ₫{item.originalPrice.toLocaleString()}
+      {/* Unit Price: w-[15%] */}
+      <div className="w-[15%] text-center">
+        {item.sku.product.virtualPrice > item.sku.price && (
+          <span className="line-through text-muted-foreground text-sm mr-2">
+            {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.sku.product.virtualPrice)}
           </span>
         )}
-        <span className="text-base font-semibold text-primary">
-          ₫{item.price.toLocaleString()}
+        <span className="text-base">
+          {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.sku.price)}
         </span>
       </div>
 
-      {/* Quantity */}
-      <div className="w-[15%] text-center flex items-center justify-center">
-        <div className="flex items-center border rounded overflow-hidden h-9">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-9 h-9 px-0"
-            onClick={decrease}
-          >
-            <Minus className="w-4 h-4" />
-          </Button>
-          <div className="px-2 text-base w-8 text-center">{quantity}</div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-9 h-9 px-0"
-            onClick={increase}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Total Price */}
-      <div className="w-[15%] text-center flex items-center justify-center">
-        <span className="text-base font-semibold text-primary">
-          ₫{total.toLocaleString()}
-        </span>
-      </div>
-
-      {/* Actions */}
-      <div className="w-[10%] text-center flex flex-col items-center justify-center gap-1">
+      {/* Quantity: w-[15%] */}
+      <div className="w-[15%] flex items-center justify-center">
         <button 
-          className="text-base text-red-500 hover:underline flex items-center gap-1"
-          onClick={() => onRemove && onRemove(item.id)}
+          onClick={() => handleQuantityChange(quantity - 1)} 
+          onMouseUp={handleUpdateCart}
+          className="p-1 border rounded-l disabled:opacity-50"
+          disabled={quantity <= 1}
         >
-          <Trash2 className="w-4 h-4" />
-          Xóa
+          <Minus size={16} />
+        </button>
+        <input 
+          type="number" 
+          value={quantity} 
+          onChange={(e) => handleQuantityChange(parseInt(e.target.value, 10) || 1)} 
+          onBlur={handleUpdateCart}
+          className="w-12 text-center border-t border-b outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+        <button 
+          onClick={() => handleQuantityChange(quantity + 1)} 
+          onMouseUp={handleUpdateCart}
+          className="p-1 border rounded-r"
+        >
+          <Plus size={16} />
+        </button>
+      </div>
+
+      {/* Total Price: w-[15%] */}
+      <div className="w-[15%] text-center font-semibold text-primary">
+        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(item.sku.price * quantity)}
+      </div>
+
+      {/* Actions: w-[10%] */}
+      <div className="w-[10%] text-center">
+        <button onClick={onRemove} className="text-muted-foreground hover:text-red-500">
+          <Trash2 size={20} />
         </button>
       </div>
     </div>
