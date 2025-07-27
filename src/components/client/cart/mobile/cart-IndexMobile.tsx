@@ -1,233 +1,135 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { mockCartItems } from "@/components/client/cart/mobile/cart-MockData";
-import CartItem from "@/components/client/cart/mobile/cart-ItemsMobile";
-import CartFooter from "@/components/client/cart/mobile/cart-FooterMobile";
-import MobileCartHeader from "@/components/client/cart/mobile/cart-HeaderMobile";
-import { ArrowUpToLine, Edit } from "lucide-react";
+import { useCart } from "@/providers/CartContext";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
+import MobileCartItem from "./cart-ItemsMobile";
+import MobileCartHeader from "./cart-HeaderMobile";
+import MobileCartFooter from "./cart-FooterMobile";
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import { Loader } from "lucide-react";
+import { CartItem, ShopCart } from "@/types/cart.interface";
 
-function getIsMobile(breakpoint = 768) {
-  if (typeof window === "undefined") return false;
-  const userAgent = navigator.userAgent.toLowerCase();
-  const isMobileDevice =
-    /android|iphone|ipad|ipod|webos|blackberry|windows phone/.test(userAgent);
-  const isSmallScreen = window.innerWidth <= breakpoint;
-  return isMobileDevice || isSmallScreen;
-}
+export default function MobileCartIndex() {
+  const { 
+    shopCarts, 
+    isLoading, 
+    updateItemQuantity, 
+    removeItemFromCart, 
+    handleVariationChange 
+  } = useCart();
 
-export default function CartPageMobile() {
-  const  t  = useTranslations();
-  const [cartItems, setCartItems] = useState(mockCartItems);
-  const [selectedShops, setSelectedShops] = useState<Record<string, boolean>>(
-    {}
-  );
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
-    {}
-  );
-  const [editingShops, setEditingShops] = useState<Record<string, boolean>>({});
-  const [isEditingGlobal, setIsEditingGlobal] = useState(false);
-  const [showScrollButton, setShowScrollButton] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(getIsMobile());
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const allSelected = cartItems.every((group) =>
-    group.items.every((item) => selectedItems[item.id])
+  const allItemIds = useMemo(() => 
+    shopCarts.flatMap((shop: ShopCart) => shop.cartItems.map((item: CartItem) => item.id)), 
+    [shopCarts]
   );
 
-  const handleToggleShop = (
-    shop: string,
-    items: (typeof cartItems)[number]["items"]
-  ) => {
-    const isChecked = !selectedShops[shop];
-    const updatedItems = { ...selectedItems };
-    items.forEach((item) => {
-      updatedItems[item.id] = isChecked;
+  const selectedItemCount = Object.values(selectedItems).filter(Boolean).length;
+  const areAllItemsSelected = allItemIds.length > 0 && selectedItemCount === allItemIds.length;
+
+  const handleSelectAll = () => {
+    const newSelectedState = !areAllItemsSelected;
+    const newSelectedItems: Record<string, boolean> = {};
+    allItemIds.forEach((id: string) => {
+      newSelectedItems[id] = newSelectedState;
     });
-    setSelectedShops((prev) => ({ ...prev, [shop]: isChecked }));
-    setSelectedItems(updatedItems);
+    setSelectedItems(newSelectedItems);
   };
 
-  const handleToggleItem = (
-    shop: string,
-    itemId: string,
-    shopItems: (typeof cartItems)[number]["items"]
-  ) => {
-    const updatedItems = { ...selectedItems, [itemId]: !selectedItems[itemId] };
-    setSelectedItems(updatedItems);
-    const allSelected = shopItems.every((item) => updatedItems[item.id]);
-    setSelectedShops((prev) => ({ ...prev, [shop]: allSelected }));
+  const handleSelectItem = (itemId: string) => {
+    setSelectedItems(prev => ({
+      ...prev,
+      [itemId]: !prev[itemId]
+    }));
   };
 
-  const handleToggleAll = () => {
-    const newValue = !allSelected;
-    const updatedShops: Record<string, boolean> = {};
-    const updatedItems: Record<string, boolean> = {};
-    cartItems.forEach((group) => {
-      updatedShops[group.shop] = newValue;
-      group.items.forEach((item) => {
-        updatedItems[item.id] = newValue;
-      });
+  const handleSelectShop = (shopId: string) => {
+    const shop = shopCarts.find((s: ShopCart) => s.shop.id === shopId);
+    if (!shop) return;
+
+    const shopItemIds = shop.cartItems.map((item: CartItem) => item.id);
+    const areAllShopItemsSelected = shopItemIds.every((id: string) => selectedItems[id]);
+    const newSelectedState = !areAllShopItemsSelected;
+
+    const newSelectedItems = { ...selectedItems };
+    shopItemIds.forEach((id: string) => {
+      newSelectedItems[id] = newSelectedState;
     });
-    setSelectedShops(updatedShops);
-    setSelectedItems(updatedItems);
+    setSelectedItems(newSelectedItems);
   };
 
-  const handleQuantityChange = (itemId: string, delta: number) => {
-    setCartItems((prev) =>
-      prev.map((group) => ({
-        ...group,
-        items: group.items.map((item) =>
-          item.id === itemId
-            ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-            : item
-        ),
-      }))
-    );
-  };
-
-  const handleVariationChange = (itemId: string, newVariation: string) => {
-    setCartItems((prev) =>
-      prev.map((group) => ({
-        ...group,
-        items: group.items.map((item) =>
-          item.id === itemId ? { ...item, variation: newVariation } : item
-        ),
-      }))
-    );
-  };
-
-  const selectedItemList = cartItems.flatMap((group) =>
-    group.items.filter((item) => selectedItems[item.id])
-  );
-
-  const total = selectedItemList.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  const totalSaved = selectedItemList.reduce((sum, item) => {
-    if (item.originalPrice) {
-      return sum + (item.originalPrice - item.price) * item.quantity;
-    }
-    return sum;
-  }, 0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollButton(window.scrollY > 300);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const totalPrice = useMemo(() => {
+    return shopCarts.reduce((total: number, shop: ShopCart) => {
+      return total + shop.cartItems.reduce((shopTotal: number, item: CartItem) => {
+        if (selectedItems[item.id]) {
+          const itemPrice = item.sku?.price ?? 0;
+          return shopTotal + itemPrice * item.quantity;
+        }
+        return shopTotal;
+      }, 0);
+    }, 0);
+  }, [shopCarts, selectedItems]);
 
   return (
-    <>
-      {isMobile && (
-        <MobileCartHeader
-          title={t("user.cart.title")}
-          onEdit={() => {
-            setIsEditingGlobal((prev) => !prev);
-            setEditingShops({});
-          }}
-          isEditingGlobal={isEditingGlobal}
-        />
-      )}
+    <div className="bg-gray-100 min-h-screen">
+      <div className="sticky top-0 z-10 bg-white shadow-sm">
+        <MobileCartHeader title="Giỏ hàng" />
+      </div>
 
-      <div className="space-y-4 pb-32 pt-[20px]">
-        {" "}
-        {/* padding top để không che header */}
-        {cartItems.map((group, groupIdx) => (
-          <div key={group.shop + "-" + groupIdx} className="bg-white border-b">
-            <div className="flex items-center justify-between px-3 py-2 pl-2">
-              <div className="flex items-center gap-2 pl-2">
-                <Checkbox
-                  checked={!!selectedShops[group.shop]}
-                  onCheckedChange={() =>
-                    handleToggleShop(group.shop, group.items)
-                  }
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                />
-                <span className="font-medium text-sm sm:text-base">
-                  {group.shop + " >"}
-                </span>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-[calc(100vh-60px)]">
+          <Loader className="animate-spin" />
+        </div>
+      ) : !shopCarts || shopCarts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-60px)] bg-gray-50 p-10 text-center">
+          <Image src="/images/client/cart/Cart-empty-v2.webp" alt="Empty Cart" width={150} height={150} />
+          <div className="text-xl font-medium">Giỏ hàng của bạn đang trống</div>
+          <p className="text-gray-500 mt-2">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
+        </div>
+      ) : (
+        <div className="pb-24">
+          {shopCarts.map((shopCart: ShopCart) => {
+            const shopItemIds = shopCart.cartItems.map((item: CartItem) => item.id);
+            const isShopSelected = shopItemIds.length > 0 && shopItemIds.every((id: string) => selectedItems[id]);
+
+            return (
+              <div key={shopCart.shop.id} className="mt-2 bg-white">
+                <div className="flex items-center p-4 border-b">
+                  <Checkbox 
+                    checked={isShopSelected} 
+                    onCheckedChange={() => handleSelectShop(shopCart.shop.id)} 
+                    className="mr-3"
+                  />
+                  <span className="font-semibold text-gray-800">{shopCart.shop.name}</span>
+                </div>
+                <div>
+                  {shopCart.cartItems.map((item: CartItem) => (
+                    <MobileCartItem
+                      key={item.id}
+                      item={item}
+                      isSelected={!!selectedItems[item.id]}
+                      onSelectionChange={handleSelectItem}
+                      onRemove={removeItemFromCart}
+                      onUpdateQuantity={updateItemQuantity}
+                      onVariationChange={handleVariationChange}
+                    />
+                  ))}
+                </div>
               </div>
-              {!isEditingGlobal && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    setEditingShops((prev) => ({
-                      ...prev,
-                      [group.shop]: !prev[group.shop],
-                    }))
-                  }
-                  className="text-primary gap-1"
-                >
-                  <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
-                  {editingShops[group.shop] ? "Done" : "Edit"}
-                </Button>
-              )}
-            </div>
-            {group.items.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                checked={!!selectedItems[item.id]}
-                onCheckedChange={() =>
-                  handleToggleItem(group.shop, item.id, group.items)
-                }
-                onQuantityChange={(delta: number) =>
-                  handleQuantityChange(item.id, delta)
-                }
-                onVariationChange={handleVariationChange}
-                isEditing={editingShops[group.shop] || isEditingGlobal}
-              />
-            ))}
-          </div>
-        ))}
-        {showScrollButton && (
-          <div className="fixed bottom-10 right-4 z-50">
-            <Button
-              onClick={scrollToTop}
-              variant="outline"
-              size="icon"
-              className="rounded-full border shadow-md"
-            >
-              <ArrowUpToLine className="w-6 h-6 text-red-500" />
-            </Button>
-          </div>
-        )}
-        <div
-          className={`w-full bg-white border-t ${
-            isMobile ? "fixed bottom-0 z-50" : "sticky bottom-0"
-          }`}
-        >
-          <CartFooter
-            total={total}
-            totalSaved={totalSaved}
-            selectedCount={selectedItemList.length}
-            allSelected={allSelected}
-            onToggleAll={handleToggleAll}
-            isEditing={isEditingGlobal}
+            );
+          })}
+
+          <MobileCartFooter
+            total={totalPrice}
+            selectedCount={selectedItemCount}
+            allSelected={areAllItemsSelected}
+            onToggleAll={handleSelectAll}
+            totalSaved={0} // Pass a default value for totalSaved
           />
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }

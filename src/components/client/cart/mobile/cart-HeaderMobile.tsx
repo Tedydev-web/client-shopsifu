@@ -33,7 +33,7 @@ export default function MobileCartHeader({
           <ChevronLeft className="w-6 h-7 text-gray-600" />
         </Link>
         <h1 className="text-lg font-bold flex-1 text-start">{title}</h1>
-        <Button
+        {/* <Button
           variant="ghost"
           size="sm"
           className="flex items-center gap-1"
@@ -47,7 +47,7 @@ export default function MobileCartHeader({
           <span className="text-sm">
             {isEditingGlobal ? t("user.cart.done") : t("user.cart.edit")}
           </span>
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

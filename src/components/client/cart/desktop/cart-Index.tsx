@@ -10,6 +10,8 @@ import { VoucherButton } from "./cart-ModalVoucher";
 import { useCart } from "@/providers/CartContext";
 import { ShopCart, CartItem } from "@/types/cart.interface";
 import { ProductItem } from "./cart-MockData";
+import { PiStorefrontLight } from "react-icons/pi";
+import Image from "next/image";
 
 export default function DesktopCartPageMobile() {
   // Sử dụng CartContext thay vì mock data
@@ -187,8 +189,6 @@ export default function DesktopCartPageMobile() {
 
   return (
     <div className="space-y-4">
-      <DesktopCartHeader allSelected={selectAll} onToggleAll={handleToggleAll} />
-
       {isLoading ? (
         <div className="flex items-center justify-center py-10">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -196,6 +196,7 @@ export default function DesktopCartPageMobile() {
         </div>
       ) : shopCarts && shopCarts.length > 0 ? (
         <>
+          <DesktopCartHeader allSelected={selectAll} onToggleAll={handleToggleAll} />
           {shopCarts.map((shopCart: ShopCart, index: number) => (
             <div key={shopCart.shop.id + "-" + index} className="bg-white border rounded-sm">
               {/* Shop Header */}
@@ -205,8 +206,8 @@ export default function DesktopCartPageMobile() {
                   checked={!!selectedShops[shopCart.shop.id]}
                   onCheckedChange={() => handleToggleShop(shopCart.shop.id, shopCart.cartItems)}
                 />
-                <Store className="h-5 w-5 mr-2 text-blue-500" />
-                <span className="font-medium text-base">{shopCart.shop.name}</span>
+                <PiStorefrontLight className="h-5 w-5 mr-2" />
+                <span className="text-base">Shop {shopCart.shop.name}</span>
               </div>
 
               {/* Items */}
@@ -251,7 +252,8 @@ export default function DesktopCartPageMobile() {
           ))}
         </>
       ) : (
-        <div className="bg-white p-10 text-center">
+        <div className="p-10 text-center flex flex-col items-center justify-center">
+          <Image src="/images/client/cart/Cart-empty-v2.webp" alt="Empty Cart" width={200} height={200} className="object-contain mb-4" />
           <div className="text-xl font-medium">Giỏ hàng của bạn đang trống</div>
           <p className="text-gray-500 mt-2">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
         </div>

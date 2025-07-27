@@ -86,7 +86,7 @@ function ShopSection({ shopCart }: { shopCart: ShopCart }) {
     <div className="bg-white rounded-lg border overflow-hidden">
       {/* Shop header */}
       <div className="flex items-center px-4 lg:px-6 py-3 border-b bg-white">
-        <PiStorefrontLight className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-gray-500" />
+        <PiStorefrontLight className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
         <span className="text-sm text-gray-700 font-medium">{shopCart.shop.name}</span>
       </div>
 

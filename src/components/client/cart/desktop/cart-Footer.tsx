@@ -30,7 +30,7 @@ export default function CartFooter({
       {/* Voucher */}
       {!isEditing && (
         <div className="flex items-center justify-between h-12 px-6 border-b">
-          <div className="flex items-center gap-2 text-foreground font-medium">
+          <div className="flex items-center gap-4 text-black">
             <Ticket className="w-5 h-5 text-red-500" />
             <span>Shopsifu Voucher</span>
           </div>
@@ -64,17 +64,11 @@ export default function CartFooter({
           <label htmlFor="select-all" className="text-base">
             Chọn tất cả ({selectedCount})
           </label>
-          {/* <span className="mx-2">|</span>
-          <button className="hover:underline text-base">Xóa</button>
-          <button className="hover:underline text-base">Xóa không hoạt động</button>
-          <button className="text-red-500 hover:underline text-base">
-            Lưu vào yêu thích
-          </button> */}
         </div>
 
         <div className="flex items-center gap-3">
           <div className="text-right text-base">
-            <span className="mr-1">
+            <span className="mr-1 text-black">
               Tổng thanh toán ({selectedCount} sản phẩm):
             </span>
             <span className="text-red-500 font-medium text-lg">
