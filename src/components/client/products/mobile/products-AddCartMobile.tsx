@@ -19,8 +19,11 @@ import {
   isOptionAvailable,
   Sku,
   VariantGroup,
-  SelectedVariants
+  SelectedVariants,
+  handleAddToCart
 } from "@/components/client/products/shared/productUtils";
+import { useCart } from '@/providers/CartContext';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 
 interface VariantValue {
   optionType: string;
@@ -29,7 +32,6 @@ interface VariantValue {
 
 interface VariantOption {
   value: string;
-  image?: string;
 }
 
 interface Product {
@@ -46,13 +48,15 @@ interface AddCartMobileProps {
   product: Product;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onAddToCart?: (skuId: string, quantity: number) => void;
 }
 
-export default function AddCartMobile({ product, isOpen, onOpenChange, onAddToCart }: AddCartMobileProps) {
+export default function AddCartMobile({ product, isOpen, onOpenChange }: AddCartMobileProps) {
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string | null>>({});
   const [currentSku, setCurrentSku] = useState<Sku | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { addToCart } = useCart();
+  const { withAuth } = useAuthGuard();
   
   // Lấy ra tất cả variants từ API response
   const variantGroups = product.variants || [];
@@ -112,14 +116,26 @@ export default function AddCartMobile({ product, isOpen, onOpenChange, onAddToCa
     });
   };
   
-  // Xử lý thêm vào giỏ hàng
-  const handleAddToCart = () => {
-    if (!currentSku || !isVariantSelected) return;
-    
-    if (onAddToCart) {
-      onAddToCart(currentSku.id, quantity);
+  const handleAddToCartClick = withAuth(async () => {
+    if (!isVariantSelected || !currentSku || currentSku.stock === 0) return;
+
+    setIsAddingToCart(true);
+    try {
+      await handleAddToCart(
+        selectedVariants,
+        product.skus,
+        variantGroups as VariantGroup[],
+        quantity,
+        addToCart
+      );
+      // Optionally close the drawer after adding to cart
+      if (onOpenChange) {
+        onOpenChange(false);
+      }
+    } finally {
+      setIsAddingToCart(false);
     }
-  };
+  });
   
   // Lấy hình ảnh sản phẩm
   const productImage = product.media?.[0]?.src || '/images/image-placeholder.jpg';
@@ -184,17 +200,6 @@ export default function AddCartMobile({ product, isOpen, onOpenChange, onAddToCa
                       product.skus
                     );
                     
-                    // Tìm SKU có chứa option này để lấy hình ảnh (nếu có)
-                    const optionImage = (() => {
-                      // Tìm SKU đầu tiên chứa option này
-                      const matchingSku = product.skus.find(sku => {
-                        // Kiểm tra từ chuỗi value của SKU
-                        return sku.value && sku.value.includes(option);
-                      });
-                      
-                      return matchingSku?.image || '';
-                    })();
-
                     return (
                       <button
                         key={option}
@@ -210,19 +215,6 @@ export default function AddCartMobile({ product, isOpen, onOpenChange, onAddToCa
                         )}
                         disabled={!isAvailable}
                       >
-                        {optionImage && (
-                          <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 border">
-                            <img 
-                              src={optionImage} 
-                              alt={option} 
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                // Xử lý lỗi khi không tải được hình ảnh
-                                (e.target as HTMLImageElement).style.display = 'none';
-                              }}
-                            />
-                          </div>
-                        )}
                         <span>{option}</span>
                         {isSelected && (
                           <span className="absolute -top-1 -right-1 bg-primary text-white rounded-full p-0.5">
@@ -287,7 +279,7 @@ export default function AddCartMobile({ product, isOpen, onOpenChange, onAddToCa
           <Button
             className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-medium text-base rounded-md"
             disabled={!isVariantSelected || !currentSku || currentSku.stock === 0}
-            onClick={handleAddToCart}
+            onClick={handleAddToCartClick}
           >
             THÊM VÀO GIỎ HÀNG
           </Button>

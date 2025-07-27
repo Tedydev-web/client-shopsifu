@@ -76,7 +76,9 @@ export default function ProductSpecsMobile({ product }: { product: Product }) {
         <div className="mt-2 pt-3 border-t">
           <h3 className="text-sm font-semibold mb-2">MÔ TẢ SẢN PHẨM</h3>
           <div className="text-xs">
-            <HTMLPreview content={product.description} />
+            <HTMLPreview
+            content={product.description.replace(/(#[a-zA-Z0-9_]+)/g, '<span class="font-medium">$1</span>')}
+          />
           </div>
         </div>
       )}

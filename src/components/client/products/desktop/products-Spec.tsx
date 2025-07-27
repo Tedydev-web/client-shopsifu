@@ -81,7 +81,9 @@ export default function ProductSpecs({ product }: { product: Product }) {
         <div className="border-t">
           <h3 className="text-base font-medium px-5 py-4 border-b">MÔ TẢ SẢN PHẨM</h3>
           <div className="p-5">
-            <HTMLPreview content={product.description} />
+            <HTMLPreview
+              content={product.description.replace(/(#[a-zA-Z0-9_]+)/g, '<span class="font-medium">$1</span>')}
+            />
           </div>
         </div>
       )}
