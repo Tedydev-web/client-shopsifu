@@ -89,6 +89,8 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
     }
   }, [isAuthenticated, transformCartData]);
 
+
+
   // Thêm sản phẩm vào giỏ hàng
   const addToCart = useCallback(async (data: CartItemRequest, showNotification: boolean = true) => {
     try {
@@ -120,15 +122,27 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
     try {
       setIsUpdating(true);
       const response = await cartService.updateCartItem(itemId, data);
-      
-      // Cập nhật lại giỏ hàng sau khi update thành công
-      await fetchCart();
+
+      // Cập nhật UI trực tiếp từ response để đảm bảo dữ liệu mới nhất
+      if (response.data) {
+        const cartData = (response.data as CartListResponse).data || response.data;
+        if (Array.isArray(cartData)) {
+          setShopCarts(cartData);
+          const transformedCart = transformCartData(cartData);
+          setCart(transformedCart);
+        } else {
+          // Fallback nếu response không đúng định dạng
+          await fetchCart();
+        }
+      } else {
+        await fetchCart();
+      }
       
       if (showNotification) {
-        const successMessage = response.message || 'Đã cập nhật sản phẩm trong giỏ hàng.';
+        const successMessage = response.message || 'Cập nhật giỏ hàng thành công';
         toast.success(successMessage);
       }
-      return true;
+      return response;
     } catch (error: any) {
       console.error('Error updating cart item:', error);
       if (showNotification) {
@@ -139,7 +153,7 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
     } finally {
       setIsUpdating(false);
     }
-  }, [fetchCart]);
+  }, [fetchCart, transformCartData]);
 
   // Xóa sản phẩm khỏi giỏ hàng
   const removeItems = useCallback(async (cartItemIds: string[], showNotification: boolean = true) => {
@@ -236,6 +250,11 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
     }
   }, [fetchCart, options.autoFetch, isAuthenticated]);
 
+  // Cập nhật số lượng của một item trong giỏ hàng
+  const updateItemQuantity = useCallback(async (itemId: string, skuId: string, quantity: number) => {
+    return await updateCartItem(itemId, { skuId, quantity });
+  }, [updateCartItem]);
+
   return {
     // State
     cart,
@@ -250,6 +269,7 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
     updateCartItem,
     removeItems,
     selectAllItems,
+    updateItemQuantity,
     
     // Helpers
     calculateSelectedTotal,
