@@ -20,7 +20,9 @@ interface CartItemsProps {
   checked: boolean;
   onCheckedChange: () => void;
   onRemove: () => void;
-  onVariationChange: (itemId: string, newSkuId: string) => void; // Thêm prop này
+  onVariationChange: (itemId: string, newSkuId: string) => void;
+  quantity: number;
+  onQuantityChange: (itemId: string, quantity: number) => void;
 }
 
 export default function CartItems({ 
@@ -29,26 +31,19 @@ export default function CartItems({
   onCheckedChange,
   onRemove,
   onVariationChange,
+  quantity,
+  onQuantityChange,
 }: CartItemsProps) {
   // 1. Call all hooks at the top level
   const { updateCartItem, isUpdating, updateItemQuantity, shopCarts } = useCart();
   const { productDetails, isLoading, error, fetchProductDetails } = useCartAction();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [quantity, setQuantity] = useState(item.quantity);
 
-  // 2. Use useMemo to safely get the most up-to-date item data
   const currentItem = useMemo(() => {
     return shopCarts
       .flatMap(shop => shop.cartItems)
       .find(cartItem => cartItem.id === item.id) || item;
   }, [shopCarts, item]);
-
-  // 3. Synchronize local quantity state with the global state from currentItem
-  useEffect(() => {
-    if (currentItem) {
-      setQuantity(currentItem.quantity);
-    }
-  }, [currentItem]);
 
   const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
   const [currentSku, setCurrentSku] = useState<Sku | null>(null);
@@ -132,9 +127,10 @@ export default function CartItems({
 
 
   const handleQuantityChange = (newQuantity: number) => {
-    // Always use the most up-to-date stock information from currentItem
     const clampedQuantity = Math.max(1, Math.min(newQuantity, currentItem.sku.stock));
-    setQuantity(clampedQuantity);
+    if (clampedQuantity !== quantity) {
+        onQuantityChange(item.id, clampedQuantity);
+    }
   };
 
   // Use useEffect to call the update API when quantity changes
@@ -289,7 +285,7 @@ export default function CartItems({
         <button 
           onClick={() => handleQuantityChange(quantity + 1)} 
           className="p-1 border rounded-r disabled:opacity-50"
-          disabled={quantity >= item.sku.stock || isUpdating}
+          disabled={quantity >= currentItem.sku.stock || isUpdating}
         >
           <Plus size={16} />
         </button>

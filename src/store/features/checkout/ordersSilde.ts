@@ -1,73 +1,137 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
+import { OrderCreateRequest, ProductInfo } from '@/types/order.interface';
 
-// TODO: Replace 'any' with actual interfaces for these types
-interface ProductInfo {
-  items: any[]; 
-}
+// --- Interfaces cho State ---
 
-interface DiscountInfo {
-  code: string | null;
+// Thông tin chung cho toàn bộ đơn hàng
+interface CommonOrderInfo {
+  receiver: {
+    name: string;
+    phone: string;
+    address: string;
+  } | null;
+  paymentGateway: string | null;
   amount: number;
 }
 
-interface DeliveryInfo {
-  address: string | null;
-  recipientName: string | null;
-  phone: string | null;
+// Thông tin riêng cho từng shop
+// Thông tin riêng cho từng shop
+interface ShopOrderInfo {
+  shopId: string;
+  cartItemIds: string[];
+  discountCodes: string[];
 }
 
-// Define a type for the slice state
-interface OrderState {
-  product: ProductInfo;
-  discount: DiscountInfo;
-  deliveryInfo: DeliveryInfo;
+
+
+// Cấu trúc state tổng thể cho slice này
+// Cấu trúc state tổng thể cho slice này
+interface CheckoutState {
+  commonInfo: CommonOrderInfo;
+  shopOrders: ShopOrderInfo[];
+  shopProducts: Record<string, ProductInfo[]>; // Key là shopId
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
+
 }
 
-// Define the initial state
-const initialState: OrderState = {
-  product: {
-    items: [],
-  },
-  discount: {
-    code: null,
+// --- Initial State ---
+
+const initialState: CheckoutState = {
+  commonInfo: {
+    receiver: null,
+    paymentGateway: null,
     amount: 0,
   },
-  deliveryInfo: {
-    address: null,
-    recipientName: null,
-    phone: null,
-  },
+  shopOrders: [],
+  shopProducts: {},
+  status: 'idle',
+  error: null,
 };
 
-export const orderSlice = createSlice({
-  name: 'order',
+// --- Slice Definition ---
+
+const checkoutSlice = createSlice({
+  name: 'checkout',
   initialState,
   reducers: {
-    setProductInfo: (state, action: PayloadAction<Partial<ProductInfo>>) => {
-      state.product = { ...state.product, ...action.payload };
+    // Cập nhật thông tin chung (người nhận, cổng thanh toán)
+    setCommonInfo(state, action: PayloadAction<Partial<CommonOrderInfo>>) {
+      state.commonInfo = { ...state.commonInfo, ...action.payload };
     },
-    setDiscountInfo: (state, action: PayloadAction<Partial<DiscountInfo>>) => {
-      state.discount = { ...state.discount, ...action.payload };
+    // Thiết lập danh sách các đơn hàng theo shop
+    // Thiết lập thông tin sản phẩm chi tiết cho các shop
+    setShopProducts(state, action: PayloadAction<Record<string, ProductInfo[]>>) {
+      state.shopProducts = action.payload;
     },
-    setDeliveryInfo: (state, action: PayloadAction<Partial<DeliveryInfo>>) => {
-      state.deliveryInfo = { ...state.deliveryInfo, ...action.payload };
+    // Thiết lập danh sách các đơn hàng theo shop
+    setShopOrders(state, action: PayloadAction<ShopOrderInfo[]>) {
+      state.shopOrders = action.payload;
     },
-    clearOrder: (state) => {
-      state.product = initialState.product;
-      state.discount = initialState.discount;
-      state.deliveryInfo = initialState.deliveryInfo;
+    // Cập nhật mã giảm giá cho một shop cụ thể
+    updateDiscountForShop(state, action: PayloadAction<{ shopId: string; discountCodes: string[] }>) {
+      const { shopId, discountCodes } = action.payload;
+      const shopIndex = state.shopOrders.findIndex(order => order.shopId === shopId);
+      if (shopIndex !== -1) {
+        state.shopOrders[shopIndex].discountCodes = discountCodes;
+      }
     },
+    // Reset state về ban đầu (sau khi thanh toán thành công hoặc hủy bỏ)
+    clearCheckoutState: () => initialState,
   },
 });
 
-// Export actions
-export const { setProductInfo, setDiscountInfo, setDeliveryInfo, clearOrder } = orderSlice.actions;
+// --- Actions ---
+export const {
+  setCommonInfo,
+  setShopProducts,
+  setShopOrders,
+  updateDiscountForShop,
+  clearCheckoutState,
+} = checkoutSlice.actions;
 
-// Selectors
-export const selectProductInfo = (state: RootState) => state.order.product;
-export const selectDiscountInfo = (state: RootState) => state.order.discount;
-export const selectDeliveryInfo = (state: RootState) => state.order.deliveryInfo;
+// --- Selectors ---
 
-// Export the reducer
-export default orderSlice.reducer;
+const selectCheckoutState = (state: RootState) => state.checkout;
+
+// Selector để lấy thông tin chung
+export const selectCommonOrderInfo = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.commonInfo
+);
+
+// Selector để lấy thông tin các đơn hàng theo shop
+// Selector để lấy thông tin sản phẩm theo shop
+export const selectShopProducts = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.shopProducts
+);
+
+// Selector để lấy thông tin các đơn hàng theo shop
+export const selectShopOrders = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.shopOrders
+);
+
+// ** Selector quan trọng: Tự động tạo request body cho API từ state **
+export const selectOrderCreateRequest = createSelector(
+  [selectCommonOrderInfo, selectShopOrders],
+  (commonInfo, shopOrders): OrderCreateRequest | null => {
+    // Chỉ tạo request khi có đủ thông tin cần thiết
+    if (!commonInfo.receiver || !commonInfo.paymentGateway || shopOrders.length === 0) {
+      return null;
+    }
+
+    return shopOrders.map((shopOrder: ShopOrderInfo) => ({
+      shopId: shopOrder.shopId,
+      cartItemIds: shopOrder.cartItemIds,
+      receiver: commonInfo.receiver!,
+      discountCodes: shopOrder.discountCodes,
+      paymentGateway: commonInfo.paymentGateway!,
+    }));
+  }
+);
+
+// --- Reducer ---
+export default checkoutSlice.reducer;

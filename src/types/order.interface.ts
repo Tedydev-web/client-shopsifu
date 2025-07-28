@@ -6,6 +6,8 @@ export interface OrderGetAllParams extends PaginationRequest {
   search?: string;
 }
 
+import { PaginationMetadata } from "./base.interface";
+
 export enum OrderStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
   PENDING_PICKUP = "PENDING_PICKUP",
@@ -15,25 +17,84 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
-export interface OrderGetAllResponse {
-  data: any[]; // Thay `any` bằng model đơn hàng thực tế nếu có
-  total: number;
-  page: number;
-  limit: number;
+// --- Interfaces cho Tạo Đơn hàng (Create Order) ---
+interface ReceiverInfo {
+  name: string;
+  phone: string;
+  address: string;
 }
 
-export interface OrderGetByIdResponse {
-  // Cấu trúc response chi tiết đơn hàng
+interface OrderCreationInfo {
+  shopId: string;
+  cartItemIds: string[];
+  receiver: ReceiverInfo;
+  discountCodes: string[];
+  paymentGateway: string;
 }
 
-export interface OrderCreateRequest {
-  // Dữ liệu gửi lên để tạo đơn hàng
-}
+export type OrderCreateRequest = OrderCreationInfo[];
 
 export interface OrderCreateResponse {
-  // Dữ liệu trả về sau khi tạo đơn
+  // Dữ liệu trả về sau khi tạo đơn hàng thành công
+  // Ví dụ: có thể chứa danh sách các orderId đã được tạo
+  [key: string]: any;
 }
+
+// --- Interfaces cho Lấy Đơn hàng (Get Order) ---
+
+interface ProductTranslation {
+  id: string;
+  name: string;
+  description: string;
+  languageId: string;
+}
+
+interface OrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productTranslations: ProductTranslation[];
+  skuPrice: number;
+  image: string;
+  skuValue: string;
+  skuId: string;
+  orderId: string;
+  quantity: number;
+  createdAt: string;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  status: OrderStatus;
+  shopId: string;
+  paymentId: string;
+  createdAt: string;
+  updatedAt: string;
+  items: OrderItem[];
+}
+
+/**
+ * @interface ProductInfo
+ * @description Thông tin chi tiết sản phẩm cho trang checkout
+ */
+export interface ProductInfo {
+  name: string;
+  image: string;
+  variation: string;
+  quantity: number;
+  subtotal: number;
+}
+
+export interface OrderGetAllResponse {
+  data: Order[];
+  metadata: PaginationMetadata;
+}
+
+export type OrderGetByIdResponse = Order;
+
 
 export interface OrderCancelResponse {
   // Dữ liệu trả về sau khi huỷ đơn
+  message: string;
 }

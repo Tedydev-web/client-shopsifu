@@ -13,6 +13,7 @@ interface CartFooterProps {
   selectedCount: number;
   allSelected: boolean;
   onToggleAll: () => void;
+  onCheckout: () => void;
 }
 
 export default function CartFooter({
@@ -22,6 +23,7 @@ export default function CartFooter({
   selectedCount,
   allSelected,
   onToggleAll,
+  onCheckout,
 }: CartFooterProps) {
   const t = useTranslations();
 
@@ -80,7 +82,11 @@ export default function CartFooter({
               </div>
             )}
           </div>
-          <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 text-base h-10 rounded-sm">
+          <Button 
+            className="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white"
+            onClick={onCheckout}
+            disabled={selectedCount === 0}
+          >
             Thanh toán
           </Button>
         </div>

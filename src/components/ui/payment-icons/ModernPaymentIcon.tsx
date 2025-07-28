@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { PaymentType } from '@/types/payment';
+import { PaymentType } from '@/types/payment.interface';
 
 type PaymentIconConfig = {
   icon: string;

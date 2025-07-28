@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { PaymentType } from '@/types/payment';
+import { PaymentType } from '@/types/payment.interface';
 
 type IconConfig = {
   path: string;

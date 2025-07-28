@@ -6,7 +6,7 @@ import { encryptTransform } from 'redux-persist-transform-encrypt';
 import authReducer from './features/auth/authSlide';
 import langReducer from './features/lang/langSlice';
 import profileReducer from './features/auth/profileSlide';
-import orderReducer from './features/checkout/ordersSilde';
+import checkoutReducer from './features/checkout/ordersSilde';
 
 // Mã hoá dữ liệu khi lưu Redux persist
 const encryptor = encryptTransform({
@@ -28,14 +28,14 @@ const rootReducer = combineReducers({
   authShopsifu: authReducer,
   langShopsifu: langReducer,
   profile: profileReducer,
-  order: orderReducer,
+  checkout: checkoutReducer,
 });
 
 // Config Redux persist
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['authShopsifu', 'langShopsifu', 'profile', 'order'], // Chỉ lưu auth, lang, profile và order
+  whitelist: ['authShopsifu', 'langShopsifu', 'profile', 'checkout'], // Chỉ lưu auth, lang, profile và checkout
   transforms: [encryptor],
 };
 
