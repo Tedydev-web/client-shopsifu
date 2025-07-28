@@ -2,7 +2,7 @@
 
 import DesktopCartItem from "./cart-Items";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import DesktopCartHeader from "./cart-ProductTitle";
 import CartFooter from "./cart-Footer";
 import { Store, Loader2 } from "lucide-react";
@@ -169,23 +169,29 @@ export default function DesktopCartPageMobile() {
     }
   };
 
-  // ✅ Tính toán các giá trị footer
-  // Sử dụng thông tin từ Cart Context thay vì tính toán lại
-  const selectedItemList = cart?.shops.flatMap((shop: ShopCart) => 
-    shop.cartItems.filter((item: CartItem) => item.isSelected)
-  ) || [];
-  
-  const total = cart?.totalSelectedPrice || 0;
-  
-  // Tính toán số tiền tiết kiệm
-  const totalSaved = selectedItemList.reduce((sum: number, item: CartItem) => {
-    const regularPrice = item.sku.product.virtualPrice || 0;
-    const currentPrice = item.sku.price || 0;
-    if (regularPrice > currentPrice) {
-      return sum + (regularPrice - currentPrice) * item.quantity;
-    }
-    return sum;
-  }, 0);
+  // ✅ Tính toán các giá trị footer dựa trên state `selectedItems` để cập nhật UI tức thì
+  const { total, totalSaved, selectedCount } = useMemo(() => {
+    let currentTotal = 0;
+    let currentTotalSaved = 0;
+    let count = 0;
+
+    shopCarts.forEach((shopCart: ShopCart) => {
+      shopCart.cartItems.forEach((item: CartItem) => {
+        if (selectedItems[item.id]) {
+          const price = item.sku.price || 0;
+          const regularPrice = item.sku.product.virtualPrice || price;
+
+          currentTotal += price * item.quantity;
+          if (regularPrice > price) {
+            currentTotalSaved += (regularPrice - price) * item.quantity;
+          }
+          count++;
+        }
+      });
+    });
+
+    return { total: currentTotal, totalSaved: currentTotalSaved, selectedCount: count };
+  }, [selectedItems, shopCarts]);
 
   return (
     <div className="space-y-4">
@@ -220,7 +226,7 @@ export default function DesktopCartPageMobile() {
                     handleToggleItem(shopCart.shop.id, cartItem.id, shopCart.cartItems)
                   }
                   onVariationChange={handleVariationChange}
-                  onUpdateQuantity={(itemId, quantity) => updateCartItem(itemId, { quantity })}
+                  // onUpdateQuantity={(itemId, quantity) => updateCartItem(itemId, { quantity })}
                   onRemove={() => handleRemoveItem(cartItem.id)}
                 />
               ))}
@@ -252,7 +258,7 @@ export default function DesktopCartPageMobile() {
         <CartFooter
           total={total}
           totalSaved={totalSaved}
-          selectedCount={selectedItemList.length}
+          selectedCount={selectedCount}
           allSelected={selectAll}
           onToggleAll={handleToggleAll}
         />

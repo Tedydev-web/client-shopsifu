@@ -16,7 +16,7 @@ export interface Sku {
   value: string;
   price: number;
   stock: number;
-  image: string;
+  image: string | null; // Allow image to be null to match SkuDetail type
   productId: string;
 }
 

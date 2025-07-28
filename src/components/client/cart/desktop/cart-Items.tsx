@@ -54,21 +54,30 @@ export default function CartItems({
   const [currentSku, setCurrentSku] = useState<Sku | null>(null);
 
   useEffect(() => {
+    // This effect synchronizes the popover's selected variants with the current item
+    // whenever the popover is opened or the underlying item data changes.
     if (isPopoverOpen && productDetails) {
+      // Re-implement the logic to get initial variants based on the current item's SKU
       const initialVariants: SelectedVariants = {};
-      productDetails.variants.forEach(group => {
-        initialVariants[group.value] = null;
-      });
-
-      const currentSkuValueParts = item.sku.value.split('-').map(part => part.trim());
+      const currentSkuValueParts = currentItem.sku.value.split('-').map(part => part.trim());
       productDetails.variants.forEach((group, index) => {
         if (currentSkuValueParts[index]) {
           initialVariants[group.value] = currentSkuValueParts[index];
         }
       });
       setSelectedVariants(initialVariants);
+
+      // Convert SkuDetail[] to Sku[] by mapping productId to a string to resolve type mismatch.
+      const compatibleSkus = productDetails.skus.map(sku => ({
+        ...sku,
+        productId: String(sku.productId),
+      }));
+
+      // Find the currently matching SKU based on the determined variants, with correct argument order
+      const matchingSku = findMatchingSku(initialVariants, compatibleSkus, productDetails.variants);
+      setCurrentSku(matchingSku);
     }
-  }, [isPopoverOpen, productDetails, item.sku.value]);
+  }, [isPopoverOpen, productDetails, currentItem.sku.value]);
 
   useEffect(() => {
     if (productDetails) {
@@ -88,10 +97,19 @@ export default function CartItems({
   }, [selectedVariants, productDetails]);
 
   const handleVariantSelect = (variantType: string, option: string) => {
-    setSelectedVariants((prev: SelectedVariants) => ({
-      ...prev,
-      [variantType]: prev[variantType] === option ? null : option,
-    }));
+    // Create new variants object, allowing for deselection
+    const newSelectedVariants = {
+      ...selectedVariants,
+      [variantType]: selectedVariants[variantType] === option ? null : option,
+    };
+    setSelectedVariants(newSelectedVariants);
+
+    // Immediately find the matching SKU for the new selection and update the state
+    if (productDetails) {
+      const compatibleSkus = productDetails.skus.map(sku => ({ ...sku, productId: String(sku.productId) }));
+      const matchingSku = findMatchingSku(newSelectedVariants, compatibleSkus, productDetails.variants);
+      setCurrentSku(matchingSku);
+    }
   };
 
   const handleConfirmUpdate = async () => {
@@ -230,7 +248,7 @@ export default function CartItems({
                     <Separator />
                     <div className="flex justify-end gap-2">
                         <Button variant="outline" onClick={() => setIsPopoverOpen(false)} disabled={isUpdating}>Trở lại</Button>
-                      <Button onClick={handleConfirmUpdate} disabled={!currentSku || currentSku.id === item.sku.id || isUpdating}>
+                      <Button onClick={handleConfirmUpdate} disabled={!currentSku || currentSku.id === currentItem.sku.id || isUpdating}>
                         {isUpdating ? 'Đang cập nhật...' : 'Xác nhận'}
                       </Button>
                     </div>
