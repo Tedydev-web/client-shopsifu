@@ -5,13 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Minus, Plus, Trash2, ChevronDown } from 'lucide-react';
-import { CartItem } from '@/types/cart.interface';
+import { CartItem, ShopCart } from '@/types/cart.interface';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { useCartAction } from '../hooks/use-CartAction';
 import { Separator } from '@/components/ui/separator';
 import { getProductUrl } from "@/components/client/products/shared/routes";
-import { useCart } from '../hooks/use-Cart';
+import { useCart } from '@/providers/CartContext';
 import { SelectedVariants, findMatchingSku, Sku } from '@/utils/productUtils';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +30,6 @@ export default function CartItems({
   checked,
   onCheckedChange,
   onRemove,
-  onVariationChange,
   quantity,
   onQuantityChange,
 }: CartItemsProps) {
@@ -41,8 +40,8 @@ export default function CartItems({
 
   const currentItem = useMemo(() => {
     return shopCarts
-      .flatMap(shop => shop.cartItems)
-      .find(cartItem => cartItem.id === item.id) || item;
+      .flatMap((shop: ShopCart) => shop.cartItems)
+      .find((cartItem: CartItem) => cartItem.id === item.id) || item;
   }, [shopCarts, item]);
 
   const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
@@ -54,7 +53,7 @@ export default function CartItems({
     if (isPopoverOpen && productDetails) {
       // Re-implement the logic to get initial variants based on the current item's SKU
       const initialVariants: SelectedVariants = {};
-      const currentSkuValueParts = currentItem.sku.value.split('-').map(part => part.trim());
+      const currentSkuValueParts = currentItem.sku.value.split('-').map((part: string) => part.trim());
       productDetails.variants.forEach((group, index) => {
         if (currentSkuValueParts[index]) {
           initialVariants[group.value] = currentSkuValueParts[index];

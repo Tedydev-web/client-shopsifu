@@ -23,7 +23,7 @@ export default function DesktopCartPageMobile() {
     cart, 
     shopCarts, 
     isLoading, 
-    updateCartItem, 
+    updateCartItemAndRefresh, 
     removeItems,
     selectAllItems,
     lastUpdated,
@@ -33,8 +33,7 @@ export default function DesktopCartPageMobile() {
   const [selectedShops, setSelectedShops] = useState<Record<string, boolean>>({});
   const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
   const [selectAll, setSelectAll] = useState(false);
-  const [itemQuantities, setItemQuantities] = useState<Record<string, number>>({});
-  
+
   // Đồng bộ trạng thái selected từ API với state local
   useEffect(() => {
     if (shopCarts && shopCarts.length > 0) {
@@ -58,14 +57,7 @@ export default function DesktopCartPageMobile() {
       setSelectedItems(itemSelectedState);
       setSelectAll(allSelected);
 
-      // Initialize quantities state
-      const initialQuantities: Record<string, number> = {};
-      shopCarts.forEach((shop: ShopCart) => {
-        shop.cartItems.forEach((item: CartItem) => {
-          initialQuantities[item.id] = item.quantity;
-        });
-      });
-      setItemQuantities(initialQuantities);
+
     }
   }, [shopCarts, lastUpdated]);
 
@@ -129,19 +121,9 @@ export default function DesktopCartPageMobile() {
 
   // Thay đổi SKU của sản phẩm
   const handleVariationChange = async (itemId: string, newSkuId: string) => {
-    try {
-      const item = shopCarts.flatMap((sc: ShopCart) => sc.cartItems).find((item: CartItem) => item.id === itemId);
-      
-      if (item) {
-        await updateCartItem(itemId, {
-          skuId: newSkuId,
-          quantity: item.quantity,
-          isSelected: item.isSelected
-        });
-      }
-    } catch (error) {
-      console.error("Error updating item variation:", error);
-      forceRefresh();
+    const item = shopCarts.flatMap((sc: ShopCart) => sc.cartItems).find((item: CartItem) => item.id === itemId);
+    if (item) {
+      await updateCartItemAndRefresh(itemId, { skuId: newSkuId, quantity: item.quantity });
     }
   };
 
@@ -154,11 +136,23 @@ export default function DesktopCartPageMobile() {
     }
   };
 
-  const handleQuantityChange = (itemId: string, quantity: number) => {
-    setItemQuantities(prev => ({
-      ...prev,
-      [itemId]: quantity
-    }));
+  const handleQuantityChange = async (itemId: string, quantity: number) => {
+    if (quantity > 0) {
+      // Tìm cart item để lấy skuId hiện tại
+      const itemToUpdate = shopCarts
+        .flatMap((shop: ShopCart) => shop.cartItems)
+        .find((item: CartItem) => item.id === itemId);
+
+      if (itemToUpdate) {
+        await updateCartItemAndRefresh(itemId, { 
+          quantity, 
+          skuId: itemToUpdate.sku.id // Thêm skuId vào payload
+        });
+      }
+    } else {
+      // Nếu số lượng là 0, coi như xóa sản phẩm
+      await handleRemoveItem(itemId);
+    }
   };
 
   // ✅ Tính toán các giá trị footer dựa trên state `selectedItems` và `itemQuantities` để cập nhật UI tức thì
@@ -170,7 +164,7 @@ export default function DesktopCartPageMobile() {
     shopCarts.forEach((shopCart: ShopCart) => {
       shopCart.cartItems.forEach((item: CartItem) => {
         if (selectedItems[item.id]) {
-          const quantity = itemQuantities[item.id] || item.quantity;
+          const quantity = item.quantity;
           const price = item.sku.price || 0;
           const regularPrice = item.sku.product.virtualPrice || price;
 
@@ -184,7 +178,7 @@ export default function DesktopCartPageMobile() {
     });
 
     return { total: currentTotal, totalSaved: currentTotalSaved, selectedCount: count };
-  }, [selectedItems, shopCarts, itemQuantities]);
+  }, [selectedItems, shopCarts]);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -263,7 +257,7 @@ export default function DesktopCartPageMobile() {
                   key={cartItem.id}
                   item={cartItem}
                   checked={!!selectedItems[cartItem.id]}
-                  quantity={itemQuantities[cartItem.id] || cartItem.quantity}
+                  quantity={cartItem.quantity}
                   onQuantityChange={handleQuantityChange}
                   onCheckedChange={() =>
                     handleToggleItem(shopCart.shop.id, cartItem.id, shopCart.cartItems)
