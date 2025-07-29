@@ -26,16 +26,6 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
     email: state.customerInfo?.email || "example@gmail.com",
   };
   
-  const formattedAddress = state.shippingAddress 
-    ? `${state.shippingAddress.address}, ${state.shippingAddress.ward}, ${state.shippingAddress.district}, ${state.shippingAddress.province}`
-    : "123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh";
-  
-  const recipientInfo = {
-    address: formattedAddress,
-    receiverName: state.customerInfo?.name || "Nguyễn Văn A",
-    receiverPhone: state.customerInfo?.phone || "0987654321",
-  };
-
   const handleSubmit = () => {
     setIsSubmitting(true);
     setTimeout(() => {
@@ -82,11 +72,17 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
   return (
     <div className="space-y-4">
       {/* Thông tin người nhận */}
-      <RecipientInfo 
-        customerInfo={customerInfo}
-        shippingAddress={recipientInfo}
-        onEdit={onPrevious}
-      />
+      {state.shippingAddress && (
+        <RecipientInfo
+          customerInfo={state.customerInfo}
+          shippingAddress={{
+            ...(state.shippingAddress as any),
+            receiverName: (state.shippingAddress as any).receiverName ?? '',
+            receiverPhone: (state.shippingAddress as any).receiverPhone ?? '',
+          }}
+          onEdit={onPrevious}
+        />
+      )}
 
       {/* Thông tin sản phẩm */}
       <ProductsInfo shopCarts={mockShopCarts} />

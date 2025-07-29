@@ -14,11 +14,10 @@ interface CustomerInfoProps {
     saveInfo: boolean;
   };
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleCheckboxChange: (checked: boolean) => void;
   isLoggedIn?: boolean;
 }
 
-export function CustomerInfo({ formData, handleChange, handleCheckboxChange, isLoggedIn = true }: CustomerInfoProps) {
+export function CustomerInfo({ formData, handleChange, isLoggedIn = true }: CustomerInfoProps) {
   return (
     <Card className='shadow-none'>
       <CardHeader className="pb-3">
@@ -76,16 +75,6 @@ export function CustomerInfo({ formData, handleChange, handleCheckboxChange, isL
               className={`${isLoggedIn ? "bg-gray-100" : ""} text-sm`}
               required
             />
-          </div>
-
-          <div className="flex items-center space-x-2 mt-2">
-            <Checkbox 
-              id="saveInfo" 
-              checked={formData.saveInfo}
-              onCheckedChange={handleCheckboxChange}
-              className="h-4 w-4"
-            />
-            <Label htmlFor="saveInfo" className="text-xs">Lưu thông tin cho lần thanh toán sau</Label>
           </div>
         </div>
       </CardContent>

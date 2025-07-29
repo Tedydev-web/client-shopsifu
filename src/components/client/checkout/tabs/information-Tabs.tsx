@@ -13,36 +13,12 @@ interface InformationTabsProps {
   onNext: () => void;
 }
 
-// Mock data cho địa chỉ có sẵn - trong thực tế sẽ lấy từ API
-const mockAddresses: Address[] = [
-  {
-    id: '1',
-    isDefault: true,
-    receiverName: 'Nguyễn Phát',
-    receiverPhone: '0379157360',
-    addressDetail: '214 nguyễn phúc chu',
-    ward: 'Phường Tráng Dài',
-    district: 'Thành phố Biên Hòa',
-    province: 'Đồng Nai',
-    type: 'NHÀ RIÊNG'
-  },
-  {
-    id: '2',
-    isDefault: false,
-    receiverName: 'Nguyễn Phát',
-    receiverPhone: '0379157360',
-    addressDetail: '456 Đường DEF',
-    ward: 'Phường UVW',
-    district: 'Quận 2',
-    province: 'TP. Hồ Chí Minh',
-    type: 'VĂN PHÒNG'
-  }
-];
+
 
 export function InformationTabs({ onNext }: InformationTabsProps) {
   const userData = useUserData();
   const { updateCustomerInfo, updateShippingMethod, updateShippingAddress } = useCheckout();
-  const [sameAsCustomer, setSameAsCustomer] = useState(false);
+
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   
   const [formData, setFormData] = useState<CustomerFormData>({
@@ -74,11 +50,23 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     }
   }, [userData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Reset selected address when manually entering new address
-    setSelectedAddress(null);
+  const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
+    let name: string, val: string;
+
+    if (typeof nameOrEvent === 'string') {
+      name = nameOrEvent;
+      val = value || '';
+    } else {
+      name = nameOrEvent.target.name;
+      val = nameOrEvent.target.value;
+    }
+
+    setFormData(prev => ({ ...prev, [name]: val }));
+    
+    // Reset selected address if user starts typing in address fields
+    if (['receiverName', 'receiverPhone', 'province', 'district', 'ward', 'address'].includes(name)) {
+      setSelectedAddress(null);
+    }
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -89,16 +77,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     setFormData(prev => ({ ...prev, deliveryMethod: value }));
   };
 
-  const handleSameAsCustomerChange = (checked: boolean) => {
-    setSameAsCustomer(checked);
-    if (checked) {
-      setFormData(prev => ({
-        ...prev,
-        receiverName: prev.fullName,
-        receiverPhone: prev.phoneNumber
-      }));
-    }
-  };
+
 
   const handleSelectExistingAddress = (address: Address) => {
     setSelectedAddress(address);
@@ -128,8 +107,8 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     // Cập nhật địa chỉ giao hàng
     const shippingAddress = {
       // Thông tin người nhận luôn lấy từ form input
-      receiverName: sameAsCustomer ? formData.fullName : formData.receiverName || '',
-      receiverPhone: sameAsCustomer ? formData.phoneNumber : formData.receiverPhone || '',
+      receiverName: formData.receiverName || '',
+      receiverPhone: formData.receiverPhone || '',
       
       // Địa chỉ có thể từ địa chỉ có sẵn hoặc form input
       ...(selectedAddress 
@@ -178,29 +157,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     onNext();
   };
 
-  // Tải thông tin đã lưu từ localStorage khi component mount
-  useEffect(() => {
-    const savedInfo = localStorage.getItem('checkoutInfo');
-    if (savedInfo) {
-      try {
-        const parsedInfo = JSON.parse(savedInfo);
-        setFormData(prev => ({
-          ...prev,
-          fullName: parsedInfo.fullName || '',
-          email: parsedInfo.email || '',
-          phoneNumber: parsedInfo.phoneNumber || '',
-          receiverName: parsedInfo.receiverName || parsedInfo.fullName || '',
-          receiverPhone: parsedInfo.receiverPhone || parsedInfo.phoneNumber || '',
-          province: parsedInfo.province || '',
-          district: parsedInfo.district || '',
-          ward: parsedInfo.ward || '',
-          address: parsedInfo.address || '',
-        }));
-      } catch (error) {
-        console.error('Lỗi khi đọc thông tin đã lưu:', error);
-      }
-    }
-  }, []);
+
 
   // Giả sử user đã đăng nhập - trong thực tế sẽ lấy từ context auth
   const isLoggedIn = true;
@@ -211,7 +168,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
         <CustomerInfo
           formData={formData}
           handleChange={handleChange}
-          handleCheckboxChange={handleCheckboxChange}
           isLoggedIn={isLoggedIn}
         />
         
@@ -219,11 +175,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
           <ShippingAddress
             formData={formData}
             handleChange={handleChange}
-            sameAsCustomer={sameAsCustomer}
-            onSameAsCustomerChange={handleSameAsCustomerChange}
-            customerName={formData.fullName}
-            customerPhone={formData.phoneNumber}
-            addresses={mockAddresses}
             onSelectExistingAddress={handleSelectExistingAddress}
           />
         </div>

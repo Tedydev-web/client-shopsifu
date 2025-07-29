@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -13,30 +13,50 @@ import { MapPin, Book } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { useCustomerInfo } from '@/components/client/checkout/hooks/useCustomer-Info';
 import { CustomerFormData, Address } from '@/types/checkout.interface';
+import { addressService } from '@/services/addressService';
+import { Address as ProfileAddress } from '@/types/auth/profile.interface';
 
 interface ShippingAddressProps {
   formData: CustomerFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  sameAsCustomer?: boolean;
-  onSameAsCustomerChange?: (checked: boolean) => void;
-  customerName?: string;
-  customerPhone?: string;
-  addresses: Address[];
+  handleChange: (nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => void;
+  addresses?: Address[];
   onSelectExistingAddress: (address: Address) => void;
 }
 
 export function ShippingAddress({ 
   formData, 
   handleChange,
-  sameAsCustomer = false,
-  onSameAsCustomerChange,
-  customerName,
-  customerPhone,
   addresses,
   onSelectExistingAddress
 }: ShippingAddressProps) {
   const [isSelectingAddress, setIsSelectingAddress] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+
+  const [savedAddresses, setSavedAddresses] = useState<ProfileAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        setIsLoadingAddresses(true);
+        const response = await addressService.getAll();
+        if (response.data) {
+          setSavedAddresses(response.data);
+          // Automatically select the default address if available
+          const defaultAddress = response.data.find(addr => addr.isDefault);
+          if (defaultAddress) {
+            handleAddressSelect(defaultAddress.id);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch addresses:", error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+  }, []);
 
   const {
     customerProvince,
@@ -56,11 +76,22 @@ export function ShippingAddress({
     handleWardChange,
   } = useCustomerInfo(formData, handleChange);
 
-  const handleAddressSelect = (addressId: string) => {
-    setSelectedAddressId(addressId);
-    const selectedAddress = addresses.find(addr => addr.id === addressId);
-    if (selectedAddress) {
-      onSelectExistingAddress(selectedAddress);
+  const handleAddressSelect = (id: string) => {
+    setSelectedAddressId(id);
+    const selected = savedAddresses.find((addr) => addr.id === id);
+    if (selected) {
+      const addressToUpdate: Address = {
+        id: selected.id,
+        isDefault: selected.isDefault,
+        receiverName: selected.recipient || '',
+        receiverPhone: selected.phoneNumber || '',
+        addressDetail: selected.street,
+        ward: selected.ward,
+        district: selected.district,
+        province: selected.province,
+        type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
+      };
+      onSelectExistingAddress(addressToUpdate);
     }
   };
 
@@ -73,7 +104,7 @@ export function ShippingAddress({
             Thông tin nhận hàng
           </CardTitle>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-            {!isSelectingAddress && addresses.length > 0 && (
+            {!isSelectingAddress && savedAddresses.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
@@ -84,16 +115,6 @@ export function ShippingAddress({
                 Chọn địa chỉ có sẵn
               </Button>
             )}
-            <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-2">
-              <Label htmlFor="same-as-customer" className="text-xs text-gray-500">
-                Lấy thông tin khách hàng
-              </Label>
-              <Switch
-                id="same-as-customer"
-                checked={sameAsCustomer}
-                onCheckedChange={onSameAsCustomerChange}
-              />
-            </div>
           </div>
         </div>
         <CardDescription className="text-sm font-light mt-2">
@@ -102,7 +123,7 @@ export function ShippingAddress({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="receiverName" className="text-xs font-medium">
                 Tên người nhận
@@ -111,11 +132,10 @@ export function ShippingAddress({
                 id="receiverName"
                 name="receiverName"
                 placeholder="Nhập tên người nhận"
-                value={sameAsCustomer ? customerName : formData.receiverName}
+                value={formData.receiverName}
                 onChange={handleChange}
                 className="text-sm"
                 required
-                disabled={sameAsCustomer}
               />
             </div>
             <div className="space-y-1">
@@ -126,11 +146,10 @@ export function ShippingAddress({
                 id="receiverPhone"
                 name="receiverPhone"
                 placeholder="Nhập số điện thoại người nhận"
-                value={sameAsCustomer ? customerPhone : formData.receiverPhone}
+                value={formData.receiverPhone}
                 onChange={handleChange}
                 className="text-sm"
                 required
-                disabled={sameAsCustomer}
               />
             </div>
           </div>
@@ -142,7 +161,10 @@ export function ShippingAddress({
                 onValueChange={handleAddressSelect}
                 className="space-y-3"
               >
-                {addresses.map((address) => (
+                {isLoadingAddresses ? (
+                  <p>Đang tải địa chỉ...</p>
+                ) : (
+                  savedAddresses.map((address) => (
                   <div
                     key={address.id}
                     className={`flex items-start space-x-3 rounded-lg border p-4 transition-colors ${
@@ -160,18 +182,19 @@ export function ShippingAddress({
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-sm bg-gray-100 px-2 py-0.5 rounded">
-                          {address.type}
+                          {address.addressType === 'HOME' ? 'Nhà riêng' : 'Văn phòng'}
                         </span>
                         {address.isDefault && (
                           <span className="text-xs text-red-500">MẶC ĐỊNH</span>
                         )}
                       </div>
                       <div className="text-sm">
-                        {`${address.addressDetail}, ${address.ward}, ${address.district}, ${address.province}`}
+                        {`${address.street}, ${address.ward}, ${address.district}, ${address.province}`}
                       </div>
                     </Label>
                   </div>
-                ))}
+                ))
+              )}
               </RadioGroup>
               <div className="flex items-center">
                 <span className="text-sm mr-2">hoặc</span>
