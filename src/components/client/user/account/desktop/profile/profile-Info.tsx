@@ -42,6 +42,12 @@ export default function ProfileInfo() {
   const [open, setOpen] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
 
+  // Lấy địa chỉ mặc định
+  const defaultAddress = userData?.addresses?.find((a) => a.isDefault);
+  const formattedAddress = defaultAddress
+    ? `${defaultAddress.street}, ${defaultAddress.ward}, ${defaultAddress.district}, ${defaultAddress.province}`
+    : "";
+
   const form = useForm<Partial<InfoState>>({
     defaultValues: {
       name: userData?.name || "",
@@ -49,7 +55,7 @@ export default function ProfileInfo() {
       avatar: userData?.avatar || "",
       // gender: userData.gender || "",
       // dob: userData.dob || "",
-      // address: userData.address || "",
+      address: formattedAddress,
     },
   });
 
@@ -69,7 +75,6 @@ export default function ProfileInfo() {
     try {
       let avatarUrl = userData?.avatar;
 
-      // Nếu có ảnh đại diện mới thì upload
       if (selectedAvatar) {
         const urls = await uploadFiles();
         if (urls.length > 0) {
@@ -92,12 +97,13 @@ export default function ProfileInfo() {
 
   return (
     <div className="bg-white rounded-lg p-6">
-      {/* Header */}
       <div className="flex justify-between items-center mb-5">
-        <h2 className="font-semibold text-xl">Thông tin cá nhân</h2>
+        <h2 className="font-semibold text-base text-[#121214]">
+          Thông tin cá nhân
+        </h2>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-[#D70019] hover:text-red-600 hover:bg-red-50 transition"
           onClick={() => setOpen(true)}
         >
           <Pencil size={16} />
@@ -105,23 +111,27 @@ export default function ProfileInfo() {
         </Button>
       </div>
 
-      {/* Info Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 text-sm text-gray-800">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 text-sm text-[#1D1D20]">
         <div className="flex justify-between py-2 border-t">
-          <span className="text-gray-500">Họ và tên:</span>
+          <span className="text-[#71717A]">Họ và tên:</span>
           <span className="font-medium">{userData.name}</span>
         </div>
         <div className="flex justify-between py-2 border-t">
-          <span className="text-gray-500">Số điện thoại:</span>
+          <span className="text-[#71717A]">Số điện thoại:</span>
           <span className="font-medium">{userData.phoneNumber}</span>
         </div>
         <div className="flex justify-between py-2 border-t">
-          <span className="text-gray-500">Email:</span>
+          <span className="text-[#71717A]">Email:</span>
           <span className="font-medium">{userData.email}</span>
+        </div>
+        <div className="flex justify-between py-2 border-t">
+          <span className="text-[#71717A]">Địa chỉ mặc định:</span>
+          <span className="font-medium text-right">
+            {formattedAddress || "Chưa có"}
+          </span>
         </div>
       </div>
 
-      {/* Modal: SheetRework */}
       <SheetRework
         open={open}
         onOpenChange={setOpen}
@@ -137,7 +147,6 @@ export default function ProfileInfo() {
         cancelText="Thiết lập lại"
         loading={loading}
       >
-        {/* Avatar chọn ảnh */}
         <div className="flex flex-col items-center gap-3 mb-4">
           <div className="relative w-24 h-24">
             <Image
@@ -216,20 +225,12 @@ export default function ProfileInfo() {
                           </SelectContent>
                         </Select>
                       ) : name === "address" ? (
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-full h-12 text-[15px] px-4 flex items-center border rounded-md">
-                            <SelectValue placeholder="Chọn địa chỉ" />
-                          </SelectTrigger>
-                          <SelectContent className="max-w-[90vw]">
-                            <SelectItem value="Chung cư A2, Phường Quang Vinh, Thành phố Biên Hòa, Đồng Nai">
-                              Chung cư A2, Phường Quang Vinh, Thành phố Biên
-                              Hòa, Đồng Nai
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          {...field}
+                          readOnly
+                          className="w-full h-12 text-[15px] px-4 bg-gray-100 cursor-not-allowed"
+                          placeholder="Chưa có địa chỉ mặc định"
+                        />
                       ) : (
                         <Input
                           {...field}

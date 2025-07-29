@@ -14,32 +14,33 @@ export default function DashboardIndex() {
 
   return (
     <div className="pr-4 bg-[#f5f5f7] min-h-screen space-y-4">
-      <DashboardUser
+      {/* <DashboardUser
         name={user?.name || "Khách"}
         email={user?.email || "Chưa có email"}
         phone={user?.phoneNumber || "Chưa có số điện thoại"}
         // birthday={user?.birthday ? new Date(user.birthday).toLocaleDateString("vi-VN") : undefined}
         avatar={user?.avatar || ""}
-      />
+      /> */}
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+      {/* <div className="grid grid-cols-1 xl:grid-cols-3 gap-4"> */}
         {/* Hàng 1 - Đơn hàng gần đây (2/3 chiều rộng) */}
-        <div className="xl:col-span-2">
+        {/* <div className="xl:col-span-2">
           <DashboardOrders />
-        </div>
+        </div> */}
 
         {/* Hàng 1 - Ưu đãi của bạn (1/3 chiều rộng) */}
-        <div>
+        {/* <div>
           <DashboardPromotions />
-        </div>
+        </div> */}
 
         {/* Hàng 2 - Sản phẩm yêu thích (full width) */}
-        <div className="xl:col-span-3">
+        {/* <div className="xl:col-span-3">
           <DashboardFavorites />
         </div>
-      </div>
+      </div> */}
+      <DashboardOrders />
 
-      <DashboardBanner />
+      {/* <DashboardBanner /> */}
     </div>
   );
 }

@@ -4,6 +4,78 @@ import { BaseResponse } from "../base.interface";
  * Kiểu dữ liệu người dùng đã được làm phẳng, thân thiện với client.
  * Đây là mô hình chuẩn để sử dụng trong toàn bộ ứng dụng (Redux, components, hooks).
  */
+export interface Address {
+  id: string;
+  name: string;
+  recipient?: string;
+  phoneNumber?: string;
+  province: string;
+  district: string;
+  ward: string;
+  street: string;
+  addressType: "HOME" | "OFFICE";
+  isDefault: boolean;
+  createdById: string;
+  updatedById: string | null;
+  deletedById: string | null;
+  deletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/* ---------------------- CREATE ---------------------- */
+export interface AddAddressRequest {
+  name: string;
+  province: string;
+  district: string;
+  ward: string;
+  street: string;
+  addressType: "HOME" | "OFFICE";
+  phoneNumber?: string;
+  recipient?: string;
+  isDefault: boolean;
+}
+
+export interface AddAddressResponse {
+  message: string;
+  data: Address;
+}
+
+/* ---------------------- UPDATE ---------------------- */
+export interface UpdateAddressRequest {
+  name: string;
+  province?: string;
+  district?: string;
+  ward?: string;
+  street?: string;
+  addressType?: "HOME" | "OFFICE";
+  phoneNumber?: string;
+  recipient?: string;
+  isDefault?: boolean;
+}
+
+export interface UpdateAddressResponse {
+  message: string;
+  data: Address;
+}
+
+/* ---------------------- GET ---------------------- */
+export interface AddressGetByIdResponse {
+  message: string;
+  data: Address;
+}
+
+export interface AddressGetAllResponse {
+  message: string;
+  data: Address[];
+}
+
+/* ---------------------- DELETE ---------------------- */
+export interface DeleteAddressResponse {
+  message: string;
+}
+
+
 export interface UserProfile {
   id: number;
   email: string;
@@ -23,6 +95,12 @@ export interface UserProfile {
   avatar: string | null;
   createdAt: string;
   updatedAt: string;
+  addresses: Address[];
+  statistics: {
+    totalOrders: number;
+    totalSpent: number;
+    memberSince: string;
+  };
 }
 
 /**
@@ -51,6 +129,12 @@ export interface UserProfileResponse extends BaseResponse {
       lastName: string;
       username: string;
       avatar: string | null;
+    };
+    addresses: Address[];
+    statistics: {
+      totalOrders: number;
+      totalSpent: number;
+      memberSince: string;
     };
   };
   createdAt: string;

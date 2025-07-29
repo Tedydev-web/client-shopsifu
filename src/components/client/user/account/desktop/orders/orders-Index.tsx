@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Tabs } from "@/components/ui/tabs";
 import { OrderTabs } from "./orders-Tabs";
 import { OrderDateFilter } from "./orders-DateFilter";
-import { OrderTabContent } from "./orders-TabsContents";
+// import { OrderTabContent } from "./orders-TabsContents";
 
 export default function OrderHistory() {
   const [currentTab, setCurrentTab] = useState("all");
@@ -18,7 +18,7 @@ export default function OrderHistory() {
       {/* Tabs (dùng chung cho cả mobile & desktop) */}
       <OrderTabs />
       <OrderDateFilter />
-      <OrderTabContent currentTab={currentTab} />
+      {/* <OrderTabContent currentTab={currentTab} /> */}
     </Tabs>
   );
 }

@@ -1,8 +1,8 @@
 import { PaginationRequest } from "@/types/base.interface";
 
 export interface OrderGetAllParams extends PaginationRequest {
-  sortOrder?: 'PENDING_PAYMENT' | 'PENDING_PICKUP' | 'PENDING_DELIVERY' | 'DELIVERED' | 'RETURNED' | 'CANCELLED';
-  sortBy?: 'asc' | 'desc';
+  sortOrder?: OrderStatus;
+  sortBy?: "asc" | "desc";
   search?: string;
 }
 

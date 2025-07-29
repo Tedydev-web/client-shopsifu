@@ -90,12 +90,12 @@ export default function PasswordSection() {
   return (
     <div className="bg-white rounded-lg p-6 space-y-4 border">
       <div className="flex justify-between items-center">
-        <h2 className="font-semibold text-xl text-gray-800">
+        <h2 className="font-semibold text-base text-[#121214]">
           {t("user.account.password.title")}
         </h2>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-[#D70019] hover:text-red-600 hover:bg-red-50 transition"
           onClick={() => setOpen(true)}
         >
           <Pencil size={18} />
@@ -104,9 +104,9 @@ export default function PasswordSection() {
       </div>
 
       {lastUpdated && (
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-[#71717A]">
           <p>Cập nhật lần cuối lúc:</p>
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-[#1D1D20]">
             {formatDate(lastUpdated)}
           </span>
         </div>

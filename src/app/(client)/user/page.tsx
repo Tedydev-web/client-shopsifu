@@ -1,7 +1,6 @@
 "use client";
 
 import MobileSidebar from "@/components/client/user/account/moblie/mobile-sidebar";
-import AccountLayout from "./layout";
 
 export default function AccountPage() {
   return (
