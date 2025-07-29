@@ -200,17 +200,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
         console.error('Lỗi khi đọc thông tin đã lưu:', error);
       }
     }
-    
-    // Fake data cho người dùng đã đăng nhập - trong thực tế sẽ lấy từ API
-    const isLoggedIn = true; // Giả sử user đã đăng nhập
-    if (isLoggedIn) {
-      setFormData(prev => ({
-        ...prev,
-        fullName: 'Nguyen Van A',
-        email: 'example@gmail.com',
-        phoneNumber: '0987654321',
-      }));
-    }
   }, []);
 
   // Giả sử user đã đăng nhập - trong thực tế sẽ lấy từ context auth
