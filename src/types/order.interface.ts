@@ -1,8 +1,8 @@
 import { PaginationRequest } from "@/types/base.interface";
 
 export interface OrderGetAllParams extends PaginationRequest {
-  sortOrder?: 'PENDING_PAYMENT' | 'PENDING_PICKUP' | 'PENDING_DELIVERY' | 'DELIVERED' | 'RETURNED' | 'CANCELLED';
-  sortBy?: 'asc' | 'desc';
+  sortOrder?: OrderStatus;
+  sortBy?: "asc" | "desc";
   search?: string;
 }
 
@@ -15,16 +15,18 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
+export interface ProductTranslation {
+  id: string;
+  name: string;
+  description: string;
+  languageId: string;
+}
+
 export interface OrderItem {
   id: string;
   productId: string;
   productName: string;
-  productTranslations: {
-    id: string;
-    name: string;
-    description: string;
-    languageId: string;
-  }[];
+  productTranslations: ProductTranslation[];
   skuPrice: number;
   image: string;
   skuValue: string;
@@ -39,32 +41,52 @@ export interface Order {
   userId: string;
   shopId: string;
   paymentId: string;
-  status: string; // Có thể dùng enum OrderStatus nếu có
+  status: OrderStatus;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
 }
 
-export interface OrderGetAllResponse {
-  data: Order[];
-  total: number;
+export interface Metadata {
+  totalItems: number;
   page: number;
   limit: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
 }
 
+export interface OrderGetAllResponse {
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: Order[];
+  metadata: Metadata;
+}
 
+/* ---------------------- GET BY ID ---------------------- */
 export interface OrderGetByIdResponse {
-  // Cấu trúc response chi tiết đơn hàng
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: Order;
 }
 
+/* ---------------------- CREATE ---------------------- */
 export interface OrderCreateRequest {
-  // Dữ liệu gửi lên để tạo đơn hàng
+  // Thêm các field khi tạo đơn hàng
 }
 
 export interface OrderCreateResponse {
-  // Dữ liệu trả về sau khi tạo đơn
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: Order;
 }
 
+/* ---------------------- CANCEL ---------------------- */
 export interface OrderCancelResponse {
-  // Dữ liệu trả về sau khi huỷ đơn
+  statusCode: number;
+  message: string;
+  timestamp: string;
 }

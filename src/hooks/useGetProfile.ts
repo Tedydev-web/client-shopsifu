@@ -15,7 +15,7 @@ export const useGetProfile = () => {
     setError(null);
     try {
       const response: UserProfileResponse = await profileService.getProfile();
-      console.log('PROFILE RESPONSE:', response);
+      // console.log('PROFILE RESPONSE:', response);
 
       // Validate response data
       if (!response?.data) {
@@ -38,6 +38,8 @@ export const useGetProfile = () => {
         username: response.data?.userProfile?.username ?? '',
         phoneNumber: response.data?.phoneNumber ?? null,
         avatar: response.data?.avatar ?? '',
+        addresses: response.data?.addresses,
+        statistics: response.data?.statistics
       };
 
       // Validate required fields

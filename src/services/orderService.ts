@@ -7,10 +7,11 @@ import {
   OrderCreateRequest,
   OrderCreateResponse,
   OrderCancelResponse,
+  OrderStatus,
 } from "@/types/order.interface";
 
 export const orderService = {
-  // Lấy tất cả đơn hàng (có hỗ trợ filter, sort, search, pagination)
+  // ✅ Lấy tất cả đơn hàng (filter, sort, search, pagination)
   getAll: async (
     params?: OrderGetAllParams,
     signal?: AbortSignal
@@ -26,7 +27,24 @@ export const orderService = {
     }
   },
 
-  // Lấy chi tiết đơn hàng theo ID
+  // ✅ Lấy đơn hàng theo status (PENDING_PAYMENT, DELIVERED, ...)
+  getByStatus: async (
+    status: OrderStatus,
+    params?: Omit<OrderGetAllParams, "sortOrder">,
+    signal?: AbortSignal
+  ): Promise<OrderGetAllResponse> => {
+    try {
+      const response = await privateAxios.get(API_ENDPOINTS.ORDERS.GETALL, {
+        params: { ...params, sortOrder: status },
+        signal,
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // ✅ Lấy chi tiết đơn hàng
   getById: async (
     orderId: string,
     signal?: AbortSignal
@@ -40,7 +58,7 @@ export const orderService = {
     }
   },
 
-  // Tạo đơn hàng mới
+  // ✅ Tạo đơn hàng mới
   create: async (
     data: OrderCreateRequest,
     signal?: AbortSignal
@@ -57,7 +75,7 @@ export const orderService = {
     }
   },
 
-  // Huỷ đơn hàng theo ID
+  // ✅ Huỷ đơn hàng
   cancel: async (
     orderId: string,
     signal?: AbortSignal

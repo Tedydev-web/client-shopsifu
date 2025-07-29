@@ -1,86 +1,136 @@
-"use client";
+// "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { orderService } from "@/services/order.service";
-import { ChevronLeft } from "lucide-react";
+// import { useEffect, useState } from "react";
+// import { useParams } from "next/navigation";
+// import { orderService } from "@/services/order.service";
+// import { OrderGetByIdResponse } from "@/types/order.interface";
+// import { Button } from "@/components/ui/button";
+// import { Card, CardContent } from "@/components/ui/card";
+// import Image from "next/image";
 
-interface OrderDetailProps {
-  orderId: string;
-  onBack: () => void;
-}
+// export const OrderDetail = () => {
+//   const { orderId } = useParams();
+//   const [order, setOrder] = useState<OrderGetByIdResponse["data"] | null>(null);
 
-export const OrderDetail = ({ orderId, onBack }: OrderDetailProps) => {
-  const [order, setOrder] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+//   useEffect(() => {
+//     if (orderId) {
+//       orderService.getById(orderId).then((res) => setOrder(res.data));
+//     }
+//   }, [orderId]);
 
-  useEffect(() => {
-    if (!orderId) return;
-    setLoading(true);
-    orderService
-      .getById(orderId)
-      .then((res) => setOrder(res.data))
-      .finally(() => setLoading(false));
-  }, [orderId]);
+//   if (!order) return <div>Đang tải...</div>;
 
-  if (loading) return <Skeleton className="w-full h-[300px]" />;
-  if (!order) return <div className="text-center text-red-500">Không tìm thấy đơn hàng</div>;
+//   return (
+//     <div className="space-y-6">
+//       {/* Tổng quan */}
+//       <Card>
+//         <CardContent className="flex flex-col gap-4">
+//           <div className="flex justify-between items-center">
+//             <div>
+//               <p className="text-sm text-muted-foreground">
+//                 Đơn hàng: <span className="font-semibold">#{order.code}</span>
+//               </p>
+//               <p className="text-sm text-muted-foreground">
+//                 Ngày đặt: {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+//               </p>
+//             </div>
+//             <span className="text-red-500 font-semibold">{order.status}</span>
+//           </div>
+//           {order.items.map((item) => (
+//             <div
+//               key={item.id}
+//               className="flex items-center gap-3 border p-3 rounded-lg"
+//             >
+//               <Image
+//                 src={item.image}
+//                 alt={item.productName}
+//                 width={80}
+//                 height={80}
+//                 className="rounded-md"
+//               />
+//               <div className="flex-1">
+//                 <p className="font-semibold">{item.productName}</p>
+//                 <p className="text-muted-foreground text-sm">{item.skuValue}</p>
+//               </div>
+//               <div className="text-right">
+//                 <p className="font-semibold">{item.skuPrice.toLocaleString()}đ</p>
+//                 <p className="text-sm text-muted-foreground">
+//                   SL: {item.quantity}
+//                 </p>
+//               </div>
+//               <Button variant="outline" size="sm" className="text-red-600 border-red-600">
+//                 Mua lại
+//               </Button>
+//             </div>
+//           ))}
+//         </CardContent>
+//       </Card>
 
-  return (
-    <div className="space-y-6 p-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Chi tiết đơn hàng #{order.code}</h2>
-        <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
-          <ChevronLeft className="w-4 h-4" /> Quay lại
-        </Button>
-      </div>
+//       {/* Thông tin khách hàng & Thanh toán */}
+//       <div className="grid md:grid-cols-2 gap-4">
+//         {/* Thông tin khách hàng */}
+//         <Card>
+//           <CardContent className="space-y-2">
+//             <h3 className="font-semibold">Thông tin khách hàng</h3>
+//             <p>Họ và tên: {order.recipient}</p>
+//             <p>SĐT: {order.phoneNumber}</p>
+//             <p>Địa chỉ: {order.address}</p>
+//             <p>Ghi chú: {order.note || "-"}</p>
+//           </CardContent>
+//         </Card>
 
-      <div className="bg-white border rounded-md shadow-sm p-4">
-        <div className="flex flex-col md:flex-row justify-between gap-4 text-sm">
-          <div className="space-y-2">
-            <p><strong>Ngày đặt:</strong> {order.createdAt}</p>
-            <p><strong>Trạng thái:</strong> {order.status}</p>
-            <p><strong>Số lượng:</strong> {order.totalQuantity}</p>
-          </div>
-          <div className="space-y-2">
-            <p><strong>Họ tên:</strong> {order.customerName}</p>
-            <p><strong>SĐT:</strong> {order.phone}</p>
-            <p><strong>Địa chỉ:</strong> {order.address}</p>
-          </div>
-        </div>
+//         {/* Thanh toán */}
+//         <Card>
+//           <CardContent className="space-y-2">
+//             <h3 className="font-semibold">Thông tin thanh toán</h3>
+//             <div className="flex justify-between">
+//               <span>Số lượng sản phẩm:</span>
+//               <span>{order.items.length}</span>
+//             </div>
+//             <div className="flex justify-between">
+//               <span>Tổng tiền hàng:</span>
+//               <span>{order.totalPrice.toLocaleString()}đ</span>
+//             </div>
+//             <div className="flex justify-between text-green-500">
+//               <span>Giảm giá:</span>
+//               <span>-{order.discount.toLocaleString()}đ</span>
+//             </div>
+//             <div className="flex justify-between text-green-500">
+//               <span>Phí vận chuyển:</span>
+//               <span>{order.shippingFee > 0 ? `${order.shippingFee}đ` : "Miễn phí"}</span>
+//             </div>
+//             <div className="flex justify-between font-semibold text-lg text-red-500">
+//               <span>Tổng số tiền:</span>
+//               <span>{order.finalAmount.toLocaleString()}đ</span>
+//             </div>
+//           </CardContent>
+//         </Card>
+//       </div>
 
-        <div className="mt-6">
-          <h3 className="font-medium mb-2">Sản phẩm</h3>
-          <div className="space-y-4">
-            {order.items.map((item: any, i: number) => (
-              <div key={i} className="flex items-center justify-between border p-3 rounded-md">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={item.thumbnailUrl || "/images/default-product.png"}
-                    alt={item.name}
-                    className="w-16 h-16 object-contain rounded-md border"
-                  />
-                  <div>
-                    <p className="font-medium text-sm">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">x{item.quantity}</p>
-                  </div>
-                </div>
-                <p className="font-semibold text-sm">{item.price.toLocaleString()}đ</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 text-sm space-y-1 border-t pt-4">
-            <p><strong>Tạm tính:</strong> {order.subtotal.toLocaleString()}đ</p>
-            <p><strong>Giảm giá:</strong> -{order.discount.toLocaleString()}đ</p>
-            <p><strong>Phí vận chuyển:</strong> {order.shippingFee.toLocaleString()}đ</p>
-            <p className="text-base font-semibold text-primary">
-              Tổng cộng: {order.totalAmount.toLocaleString()}đ
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+//       {/* Thông tin hỗ trợ và bảo hành */}
+//       <div className="grid md:grid-cols-2 gap-4">
+//         <Card>
+//           <CardContent>
+//             <h3 className="font-semibold mb-2">Thông tin hỗ trợ</h3>
+//             <Button variant="outline" className="w-full">
+//               Liên hệ hỗ trợ
+//             </Button>
+//           </CardContent>
+//         </Card>
+//         <Card>
+//           <CardContent>
+//             <h3 className="font-semibold mb-2">Trung tâm bảo hành</h3>
+//             <div className="space-y-2">
+//               <Button variant="outline" className="w-full">
+//                 Danh sách trung tâm bảo hành
+//               </Button>
+//               <Button variant="outline" className="w-full">
+//                 Bảo hành tại cửa hàng
+//               </Button>
+//             </div>
+//           </CardContent>
+//         </Card>
+//       </div>
+//     </div>
+//   );
+// };

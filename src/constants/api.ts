@@ -12,6 +12,11 @@ export const API_ENDPOINTS = {
     //PROFILE
     PROFILE: `${API_BASE}/profile`,
     UPDATE_PROFILE: `${API_BASE}/profile`,
+    ADD_ADDRESS: `${API_BASE}/profile/addresses`,
+    GET_ALL_ADDRESS: `${API_BASE}/profile/addresses`,
+    GET_ADDRESS_DETAIL: `${API_BASE}/profile/addresses/:addressId`,
+    UPDATE_ADDRESS: `${API_BASE}/profile/addresses/:addressId`,
+    DELETE_ADDRESS: `${API_BASE}/profile/addresses/:addressId`,
     CHANGE_PASSWORD_PROFILE: `${API_BASE}/profile/change-password`,
     // SIGN-UP 
     SIGNUP: `${API_BASE}/auth/complete-registration`,
