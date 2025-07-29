@@ -79,11 +79,13 @@ export interface Order {
  * @description Thông tin chi tiết sản phẩm cho trang checkout
  */
 export interface ProductInfo {
+  shopName: string;
   name: string;
   image: string;
   variation: string;
   quantity: number;
   subtotal: number;
+  price: number;
 }
 
 export interface OrderGetAllResponse {

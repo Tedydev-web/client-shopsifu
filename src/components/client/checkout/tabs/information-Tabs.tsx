@@ -7,6 +7,7 @@ import { ShippingAddress } from '../sections/tab-1/shipping-Address';
 import { ShippingType } from '../sections/tab-1/shipping-Type';
 import { useCheckout } from '../hooks/useCheckout';
 import { CustomerFormData, Address, ShippingAddress as ShippingAddressType } from '@/types/checkout.interface';
+import { useUserData } from '@/hooks/useGetData-UserLogin';
 
 interface InformationTabsProps {
   onNext: () => void;
@@ -39,6 +40,7 @@ const mockAddresses: Address[] = [
 ];
 
 export function InformationTabs({ onNext }: InformationTabsProps) {
+  const userData = useUserData();
   const { updateCustomerInfo, updateShippingMethod, updateShippingAddress } = useCheckout();
   const [sameAsCustomer, setSameAsCustomer] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
@@ -59,6 +61,18 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     note: '',
     deliveryMethod: 'standard'
   });
+
+  // Pre-fill form with user data if available
+  useEffect(() => {
+    if (userData) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: userData.name || '',
+        phoneNumber: userData.phoneNumber || '',
+        email: userData.email || '',
+      }));
+    }
+  }, [userData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

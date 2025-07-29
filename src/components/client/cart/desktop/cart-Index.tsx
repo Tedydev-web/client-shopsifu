@@ -214,6 +214,8 @@ export default function DesktopCartPageMobile() {
         variation: item.sku.value,
         quantity: item.quantity,
         subtotal: item.sku.price * item.quantity,
+        price: item.sku.price,
+        shopName: shopCart.shop.name,
       }));
       return acc;
     }, {});
