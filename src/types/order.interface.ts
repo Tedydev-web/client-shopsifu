@@ -42,14 +42,20 @@ export interface OrderCreateResponse {
 
 // --- Interfaces cho Lấy Đơn hàng (Get Order) ---
 
+interface OrderReceiver {
+  name: string;
+  phone: string;
+  address: string;
+}
+
 interface ProductTranslation {
   id: string;
   name: string;
   description: string;
   languageId: string;
 }
-
-interface OrderItem {
+ 
+export interface OrderItem {
   id: string;
   productId: string;
   productName: string;
@@ -67,6 +73,7 @@ export interface Order {
   id: string;
   userId: string;
   status: OrderStatus;
+  receiver: OrderReceiver;
   shopId: string;
   paymentId: string;
   createdAt: string;

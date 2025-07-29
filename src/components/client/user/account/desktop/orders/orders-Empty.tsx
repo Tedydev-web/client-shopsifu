@@ -6,7 +6,7 @@ export const OrderEmpty = () => {
   return (
     <div className="flex flex-col items-center justify-center text-muted-foreground gap-2 py-12">
       <img
-        src="/images/empty-order.png"
+        src="/images/client/profile/logo mini.png"
         alt="empty"
         className="w-36 h-36 object-contain"
       />

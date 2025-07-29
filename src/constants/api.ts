@@ -154,6 +154,7 @@ export const API_ENDPOINTS = {
     GET_BY_ID: `${API_BASE}/orders/:orderId`,
     CREATE: `${API_BASE}/orders`,
     CANCEL: `${API_BASE}/orders/:orderId`,
+    DELETE: `${API_BASE}/profile/addresses/:addressId`
   },
   // ĐÁNH GIÁ SẢN PHẨM - REVIEWS
   REVIEW:{

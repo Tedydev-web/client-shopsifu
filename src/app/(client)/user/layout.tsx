@@ -44,7 +44,7 @@ export default function AccountLayout({
             <div className="flex flex-col min-h-[90vh] bg-[#f5f5f7] text-foreground">
               {/* ✅ Profile header full width */}
               <div className="px-6 pt-6">
-                <div className="w-full lg:max-w-[1280px] xl:max-w-[1440px] mx-auto">
+                <div className="w-full lg:max-w-[1280px] xl:max-w-[1440px] mx-auto rounded-xl">
                   <ProfileHeader
                     name={userData?.name || ""}
                     email={userData?.email || ""}
