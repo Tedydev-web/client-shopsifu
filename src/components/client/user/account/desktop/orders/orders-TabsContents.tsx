@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { OrderEmpty } from "./orders-Empty";
 import { useOrder } from "./useOrder";
 import { OrderStatus } from "@/types/order.interface";
-import OrderDetail from "./orders-Detail";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const statusLabel: Record<OrderStatus, string> = {
   PENDING_PAYMENT: "Chờ thanh toán",
@@ -23,9 +23,9 @@ interface Props {
 }
 
 export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
+  const router = useRouter();
   const { orders, loading, error, fetchAllOrders, fetchOrdersByStatus } =
     useOrder();
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(5);
 
   useEffect(() => {
@@ -33,18 +33,17 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   }, [currentTab, onTabChange]);
 
   useEffect(() => {
-    if (selectedOrderId) return;
     if (currentTab === "all") {
       fetchAllOrders();
     } else {
       fetchOrdersByStatus(currentTab as OrderStatus);
     }
     setVisibleCount(5);
-  }, [currentTab, selectedOrderId, fetchAllOrders, fetchOrdersByStatus]);
+  }, [currentTab, fetchAllOrders, fetchOrdersByStatus]);
 
-  if (selectedOrderId) {
-    return <OrderDetail orderId={selectedOrderId} />;
-  }
+  const handleViewDetail = (orderId: string) => {
+    router.push(`/user/orders/${orderId}`);
+  };
 
   const tabs = ["all", ...Object.values(OrderStatus)];
   const displayedOrders = orders.slice(0, visibleCount);
@@ -78,7 +77,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                   <div
                     key={order.id}
                     className="flex items-center justify-between border rounded-lg p-4 bg-white hover:bg-gray-50 cursor-pointer"
-                    onClick={() => setSelectedOrderId(order.id)}
+                    onClick={() => handleViewDetail(order.id)}
                   >
                     <div className="flex items-center gap-4">
                       <img

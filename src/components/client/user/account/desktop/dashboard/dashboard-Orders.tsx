@@ -6,25 +6,13 @@ import Link from "next/link";
 import { orderService } from "@/services/orderService";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale/vi";
-
-interface OrderItem {
-  id: string;
-  productName: string;
-  skuPrice: number;
-  image: string;
-  quantity: number;
-}
-
-interface Order {
-  id: string;
-  status: string;
-  createdAt: string;
-  items: OrderItem[];
-}
+import { useRouter } from "next/navigation";
+import { Order, OrderItem } from "@/types/order.interface";
 
 export default function DashboardOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -94,6 +82,10 @@ export default function DashboardOrders() {
     );
   }
 
+  const handleViewDetail = (orderId: string) => {
+    router.push(`/user/orders/${orderId}`);
+  };
+
   return (
     <div className="bg-white rounded-lg p-4 shadow-sm">
       <div className="flex justify-between items-center mb-2">
@@ -117,7 +109,8 @@ export default function DashboardOrders() {
           return (
             <div
               key={order.id}
-              className="flex items-start justify-between border rounded-lg p-3"
+              className="flex items-start justify-between border rounded-lg p-3 cursor-pointer hover:bg-gray-50"
+              onClick={() => handleViewDetail(order.id)}
             >
               <div className="flex gap-3">
                 <Image
@@ -151,12 +144,9 @@ export default function DashboardOrders() {
                 >
                   {statusMap[order.status]?.label || order.status}
                 </span>
-                <Link
-                  href={`/orders/${order.id}`}
-                  className="block mt-2 text-sm text-blue-500 hover:underline"
-                >
-                  Xem chi tiết
-                </Link>
+                <div className="block mt-2 text-sm text-blue-500 hover:underline">
+                  Xem chi tiết →
+                </div>
               </div>
             </div>
           );
