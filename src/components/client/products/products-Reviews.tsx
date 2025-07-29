@@ -7,6 +7,15 @@ import { Review } from '@/types/review.interface';
 import { Star, ThumbsUp } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import Image from 'next/image';
 import { format, isValid } from 'date-fns';
 
@@ -72,15 +81,27 @@ const ReviewItem = ({ review }: { review: Review }) => {
 
 // Main component for displaying product reviews
 export const ProductsReviews = ({ productId }: { productId: string }) => {
-  const [filter, setFilter] = useState<number | 'all' | 'media'>('all');
+    const [filter, setFilter] = useState<number | 'all' | 'media'>('all');
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
     const { data, isLoading, error } = useQuery({
-    queryKey: ['reviews', productId],
-    queryFn: () => reviewService.getReviewsByProductId(productId, { limit: 100 }),
-    enabled: !!productId, // Only fetch if productId is available
+    queryKey: ['reviews', productId, page, filter], 
+    queryFn: () => {
+      const params: { page: number; limit: number; rating?: number; hasMedia?: boolean } = { page, limit };
+      if (typeof filter === 'number') {
+        params.rating = filter;
+      }
+      if (filter === 'media') {
+        params.hasMedia = true;
+      }
+      return reviewService.getReviewsByProductId(productId, params);
+    },
+    enabled: !!productId,
   });
 
-  const reviews: Review[] = data?.data?.data?.map((reviewWrapper: any) => reviewWrapper.data) || [];
+    const reviews: Review[] = data?.data?.data?.map((reviewWrapper: any) => reviewWrapper.data) || [];
+  const metadata = data?.data?.metadata;
 
   const summary = useMemo(() => {
     if (!reviews || reviews.length === 0) {
@@ -104,11 +125,7 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
     return { average, total, counts, mediaCount };
   }, [reviews]);
 
-  const filteredReviews = useMemo(() => {
-    if (filter === 'all') return reviews;
-    if (filter === 'media') return reviews.filter((r) => r.medias && r.medias.length > 0);
-    return reviews.filter((r) => r.rating === filter);
-  }, [reviews, filter]);
+  
 
   if (isLoading) return <div className="p-6">Loading reviews...</div>;
   if (error) return <div className="p-6 text-red-500">Error loading reviews.</div>;
@@ -126,29 +143,74 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm font-sans">
       <h2 className="text-xl font-medium mb-4">ĐÁNH GIÁ SẢN PHẨM</h2>
-      <div className="bg-neutral-50 p-4 rounded-lg flex items-center space-x-8 border">
-        <div className="text-center text-red-600 pr-8 border-r">
+      <div className="bg-neutral-50 p-4 rounded-lg flex flex-col md:flex-row md:items-center md:space-x-8 border">
+        <div className="text-center text-red-600 md:pr-8 md:border-r pb-4 md:pb-0">
           <p className="text-lg"><span className="font-bold text-3xl">{summary.average.toFixed(1)}</span> trên 5</p>
-          <StarRating rating={Math.round(summary.average)} size={6} />
+          <div className="flex justify-center">
+            <StarRating rating={Math.round(summary.average)} size={6} />
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <FilterButton value="all" label="Tất Cả" count={summary.total} />
-          <FilterButton value={5} label="5 Sao" count={summary.counts[5]} />
-          <FilterButton value={4} label="4 Sao" count={summary.counts[4]} />
-          <FilterButton value={3} label="3 Sao" count={summary.counts[3]} />
-          <FilterButton value={2} label="2 Sao" count={summary.counts[2]} />
-          <FilterButton value={1} label="1 Sao" count={summary.counts[1]} />
-          <FilterButton value="media" label="Có Hình Ảnh / Video" count={summary.mediaCount} />
+        <div className="flex-1 w-full overflow-hidden">
+          <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 -mb-2">
+            <FilterButton value="all" label="Tất Cả" count={summary.total} />
+            <FilterButton value={5} label="5 Sao" count={summary.counts[5]} />
+            <FilterButton value={4} label="4 Sao" count={summary.counts[4]} />
+            <FilterButton value={3} label="3 Sao" count={summary.counts[3]} />
+            <FilterButton value={2} label="2 Sao" count={summary.counts[2]} />
+            <FilterButton value={1} label="1 Sao" count={summary.counts[1]} />
+            <FilterButton value="media" label="Có Hình Ảnh / Video" count={summary.mediaCount} />
+          </div>
         </div>
       </div>
 
       <div className="mt-6">
-        {filteredReviews.length > 0 ? (
-          filteredReviews.map((review, index) => <ReviewItem key={`${review.id}-${index}`} review={review} />)
-        ) : (
-          <p className="text-center text-gray-500 py-8">Chưa có đánh giá nào phù hợp.</p>
-        )}
+        {reviews.map((review) => (
+          <ReviewItem key={review.id} review={review} />
+        ))}
       </div>
+
+            {((metadata?.totalPages ?? 0) > 1) && (
+        <div className="mt-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (metadata?.hasPrev) setPage(page - 1);
+                  }}
+                  className={!metadata?.hasPrev ? 'pointer-events-none text-gray-400' : ''}
+                />
+              </PaginationItem>
+              {[...Array(metadata?.totalPages || 0)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    href="#"
+                    isActive={page === i + 1}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPage(i + 1);
+                    }}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (metadata?.hasNext) setPage(page + 1);
+                  }}
+                  className={!metadata?.hasNext ? 'pointer-events-none text-gray-400' : ''}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };

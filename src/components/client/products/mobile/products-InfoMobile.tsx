@@ -19,14 +19,6 @@ export default function ProductInfoMobile({ product = productMock }) {
 
   return (
     <div className="bg-white p-4 text-sm space-y-3">
-      {/* Màu sắc */}
-      <div className="text-[13px]">
-        Màu sắc:{" "}
-        <span className="text-black font-medium">
-          {selectedColor ? selectedColor : "Chọn màu"}
-        </span>
-      </div>
-
       {/* Ảnh sản phẩm dạng lựa chọn biến thể */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar">
         {colors.map((color, index) => (
@@ -58,10 +50,10 @@ export default function ProductInfoMobile({ product = productMock }) {
       {/* Giá */}
       <div className="flex items-center gap-3">
         <span className="text-red-600 text-2xl font-bold">
-          ₫{product.virtualPrice.toLocaleString("vi-VN")}
+          ₫{product.basePrice.toLocaleString("vi-VN")}
         </span>
         <span className="line-through text-gray-400 text-sm">
-          ₫{product.basePrice.toLocaleString("vi-VN")}
+          ₫{product.virtualPrice.toLocaleString("vi-VN")}
         </span>
         <span className="text-yellow-500 text-sm font-medium">
           -{discountPercent}%

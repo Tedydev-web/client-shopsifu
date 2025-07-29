@@ -295,14 +295,14 @@ export function VoucherButton({ shopId, shopName, onApplyVoucher }: VoucherButto
 
   return (
     <>
-      <div className="flex items-center justify-between px-4 py-3 border-t text-sm">
-        <div className="flex items-center gap-1 text-gray-500">
-          <Ticket className="w-4 h-4 text-red-500" />
-          <span>Mã giảm giá của {shopName}</span>
+      <div className="flex items-center justify-between px-4 py-3 text-base">
+        <div className="flex items-center gap-4 text-gray-500">
+          <Ticket className="w-5 h-5 text-red-500" />
+          <span className="text-black">Mã giảm giá của {shopName}</span>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="text-blue-600 hover:underline text-sm"
+          className="text-blue-600 hover:underline text-base"
         >
           Xem thêm voucher
         </button>

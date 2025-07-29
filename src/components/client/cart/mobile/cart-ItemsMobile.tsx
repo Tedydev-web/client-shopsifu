@@ -1,127 +1,125 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Minus, Plus } from "lucide-react";
+import { CartItem } from "@/types/cart.interface";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { ProductItem } from "./cart-MockData";
+import Link from "next/link";
+import { useState } from "react";
+import { getProductUrl } from "@/components/client/products/shared/routes";
 
-interface CartItemProps {
-  item: ProductItem;
-  checked: boolean;
-  onCheckedChange: () => void;
-  onVariationChange: (itemId: string, selectedVariation: string) => void;
-  onQuantityChange: (delta: number) => void;
-  isEditing?: boolean; // thêm prop này
+interface MobileCartItemProps {
+  item: CartItem;
+  isSelected: boolean;
+  onSelectionChange: (id: string) => void;
+  onRemove: (id: string) => void;
+  onUpdateQuantity: (id: string, quantity: number) => void;
+  onVariationChange: (id: string, newSku: string) => void;
 }
 
-export default function CartItem({
+export default function MobileCartItem({
   item,
-  checked,
-  onCheckedChange,
+  isSelected,
+  onSelectionChange,
+  onRemove,
+  onUpdateQuantity,
   onVariationChange,
-  onQuantityChange,
-  isEditing = false,
-}: CartItemProps) {
-  const total = item.price * item.quantity;
+}: MobileCartItemProps) {
+  const [quantity, setQuantity] = useState(item.quantity);
+
+  const decrease = () => {
+    if (quantity > 1) {
+      const newQuantity = quantity - 1;
+      setQuantity(newQuantity);
+      onUpdateQuantity(item.id, newQuantity);
+    }
+  };
+
+  const increase = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    onUpdateQuantity(item.id, newQuantity);
+  };
 
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Slide actions */}
-      {isEditing && (
-        <div className="absolute right-0 top-0 bottom-0 flex z-10">
-          <button className="w-20 bg-orange-500 text-white text-sm font-medium">
-            Similar
-          </button>
-          <button className="w-20 bg-red-500 text-white text-sm font-medium">
-            Delete
-          </button>
-        </div>
-      )}
-
-      {/* Main content */}
-      <div
-        className={`bg-white flex px-4 py-4 border-b transition-transform duration-300 ${
-          isEditing ? "-translate-x-40" : "translate-x-0"
-        }`}
-      >
-        {/* Checkbox + Image */}
-        <div className="flex flex-col items-center justify-start mr-3 mt-1 my-auto">
-          <Checkbox checked={checked} onCheckedChange={onCheckedChange} />
-        </div>
-
-        <Image
-          src={item.image}
-          alt={item.name}
-          width={80}
-          height={80}
-          className="w-20 h-20 rounded border object-cover mr-3"
+    <div className="bg-white flex px-4 py-4 border-b">
+      {/* Checkbox */}
+      <div className="flex items-center justify-start mr-3">
+        <Checkbox 
+          checked={isSelected} 
+          onCheckedChange={() => onSelectionChange(item.id)} 
         />
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 flex flex-col justify-between">
-          <div>
-            <div className="text-sm font-medium leading-5 line-clamp-2">
-              {item.name}
-            </div>
-            <div className="mt-1">
-              {item.variations ? (
-                <select
-                  className="text-xs text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50"
-                  value={item.variation}
-                  onChange={(e) =>
-                    onVariationChange(item.id, e.target.value)
-                  }
-                >
-                  {item.variations.map((variation) => (
-                    <option key={variation} value={variation}>
-                      {variation}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <div className="text-xs text-muted-foreground border px-2 py-1 w-fit rounded-sm bg-gray-50">
-                  {item.variation}
-                </div>
-              )}
-            </div>
-            {item.soldOut && (
-              <div className="mt-2 text-xs text-destructive">
-                Variation selected is Sold Out. Please select another.
-              </div>
-            )}
-          </div>
+      {/* Image */}
+      <Link href={getProductUrl(item.sku.product.name, item.sku.product.id)}>
+        <div className="relative w-20 h-20 mr-3">
+          <Image
+            src={item.sku.image || "/images/placeholder.png"}
+            alt={item.sku.product.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="rounded object-cover"
+          />
+        </div>
+      </Link>
 
-          <div className="mt-3 flex justify-between items-end">
-            <div className="flex flex-col items-start gap-1">
-              {item.originalPrice && (
-                <span className="text-xs line-through text-muted-foreground">
-                  ₫{item.originalPrice.toLocaleString()}
+      {/* Content */}
+      <div className="flex-1 flex flex-col">
+        <Link href={getProductUrl(item.sku.product.name, item.sku.product.id)}>
+          <p className="text-sm text-gray-800 line-clamp-2 hover:text-primary transition-colors">
+            {item.sku.product.name}
+          </p>
+        </Link>
+
+        {/* Variation Select */}
+        <div className="mt-1 mb-2">
+          {/* {item.sku.product.variants && item.sku.product.variants.length > 1 ? (
+            <select
+              className="text-xs text-gray-600 border px-2 py-1 rounded-sm bg-gray-50 max-w-[150px] truncate"
+              value={item.sku.value}
+              onChange={(e) => onVariationChange(item.id, e.target.value)}
+            >
+              {item.sku.product.variants.map((variant) => (
+                <option key={variant.value} value={variant.value}>
+                  {variant.value}
+                </option>
+              ))}
+            </select>
+          ) : ( */}
+            <div className="text-xs text-gray-600 border px-2 py-1 rounded-sm bg-gray-50 w-fit">
+              Phân loại: {item.sku.value}
+            </div>
+          {/* )} */}
+        </div>
+
+        {/* Price */}
+        <div className="flex items-center gap-2">
+            {item.sku.product.virtualPrice && (
+                <span className="text-gray-400 line-through text-xs">
+                    ₫{item.sku.product.virtualPrice.toLocaleString()}
                 </span>
-              )}
-              <span className="text-sm font-semibold text-primary">
-                ₫{total.toLocaleString()}
-              </span>
-            </div>
+            )}
+            <span className="text-primary font-semibold text-sm">
+                ₫{item.sku.price.toLocaleString()}
+            </span>
+        </div>
 
-            <div className="flex items-center border rounded">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8 px-0"
-                onClick={() => onQuantityChange(-1)}
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-              <div className="px-2 text-sm w-6 text-center">{item.quantity}</div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8 px-0"
-                onClick={() => onQuantityChange(1)}
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
+        {/* Actions: Quantity + Remove */}
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center border rounded overflow-hidden h-7">
+            <Button variant="ghost" size="icon" className="w-7 h-7" onClick={decrease} disabled={quantity <= 1}>
+              <Minus className="w-3 h-3" />
+            </Button>
+            <div className="px-2 text-sm w-8 text-center">{quantity}</div>
+            <Button variant="ghost" size="icon" className="w-7 h-7" onClick={increase}>
+              <Plus className="w-3 h-3" />
+            </Button>
           </div>
+          <Button variant="ghost" size="icon" onClick={() => onRemove(item.id)} className="text-gray-400">
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { PaymentType, PAYMENT_TYPES } from '@/types/payment';
+import { PaymentType, PAYMENT_TYPES } from '@/types/payment.interface';
 import { SocialType } from '@/components/ui/social-icons/SocialIcon';
 
 // Types

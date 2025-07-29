@@ -6,6 +6,8 @@ export interface OrderGetAllParams extends PaginationRequest {
   search?: string;
 }
 
+import { PaginationMetadata } from "./base.interface";
+
 export enum OrderStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
   PENDING_PICKUP = "PENDING_PICKUP",
@@ -15,14 +17,39 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
-export interface ProductTranslation {
+// --- Interfaces cho Tạo Đơn hàng (Create Order) ---
+interface ReceiverInfo {
+  name: string;
+  phone: string;
+  address: string;
+}
+
+interface OrderCreationInfo {
+  shopId: string;
+  cartItemIds: string[];
+  receiver: ReceiverInfo;
+  discountCodes: string[];
+  paymentGateway: string;
+}
+
+export type OrderCreateRequest = OrderCreationInfo[];
+
+export interface OrderCreateResponse {
+  // Dữ liệu trả về sau khi tạo đơn hàng thành công
+  // Ví dụ: có thể chứa danh sách các orderId đã được tạo
+  [key: string]: any;
+}
+
+// --- Interfaces cho Lấy Đơn hàng (Get Order) ---
+
+interface ProductTranslation {
   id: string;
   name: string;
   description: string;
   languageId: string;
 }
 
-export interface OrderItem {
+interface OrderItem {
   id: string;
   productId: string;
   productName: string;
@@ -39,54 +66,35 @@ export interface OrderItem {
 export interface Order {
   id: string;
   userId: string;
+  status: OrderStatus;
   shopId: string;
   paymentId: string;
-  status: OrderStatus;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
 }
 
-export interface Metadata {
-  totalItems: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
+/**
+ * @interface ProductInfo
+ * @description Thông tin chi tiết sản phẩm cho trang checkout
+ */
+export interface ProductInfo {
+  name: string;
+  image: string;
+  variation: string;
+  quantity: number;
+  subtotal: number;
 }
 
 export interface OrderGetAllResponse {
-  statusCode: number;
-  message: string;
-  timestamp: string;
   data: Order[];
-  metadata: Metadata;
+  metadata: PaginationMetadata;
 }
 
-/* ---------------------- GET BY ID ---------------------- */
-export interface OrderGetByIdResponse {
-  statusCode: number;
-  message: string;
-  timestamp: string;
-  data: Order;
-}
+export type OrderGetByIdResponse = Order;
 
-/* ---------------------- CREATE ---------------------- */
-export interface OrderCreateRequest {
-  // Thêm các field khi tạo đơn hàng
-}
 
-export interface OrderCreateResponse {
-  statusCode: number;
-  message: string;
-  timestamp: string;
-  data: Order;
-}
-
-/* ---------------------- CANCEL ---------------------- */
 export interface OrderCancelResponse {
-  statusCode: number;
+  // Dữ liệu trả về sau khi huỷ đơn
   message: string;
-  timestamp: string;
 }

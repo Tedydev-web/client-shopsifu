@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'down-vn.img.susercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'mms.vod.susercontent.com',
+      },
     ],
   },
 };

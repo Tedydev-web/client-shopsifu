@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/providers/CartContext";
 import {
   ChevronLeft,
   ShoppingCart,
@@ -27,6 +28,11 @@ export default function ProductGalleryMobile({ media }: Props) {
   const dragStartX = useRef<number | null>(null);
 
   const router = useRouter();
+  const { 
+    cart, 
+  } = useCart();
+
+  const totalItemsCount = cart?.totalItems || 0;
 
   const handleTouchStart = (e: React.TouchEvent) => {
     dragStartX.current = e.touches[0].clientX;
@@ -189,18 +195,26 @@ export default function ProductGalleryMobile({ media }: Props) {
           variant="ghost"
           size="icon"
           className="bg-black/50 text-white hover:bg-black/70 w-9 h-9 p-0 rounded-full"
-          onClick={() => router.back()}
+          onClick={() => router.push('/')}
         >
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-black/50 text-white hover:bg-black/70 w-9 h-9 p-0 rounded-full"
-          >
-            <ShoppingCart className="w-5 h-5" />
-          </Button>
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="bg-black/50 text-white hover:bg-black/70 w-9 h-9 p-0 rounded-full"
+              onClick={() => router.push('/cart')}
+            >
+              <ShoppingCart className="w-5 h-5" />
+            </Button>
+            {totalItemsCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-medium text-white">
+                {totalItemsCount}
+              </span>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="icon"
