@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import { ShopsifuSocketProvider } from '@/providers/ShopsifuSocketProvider'
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +19,9 @@ export default function ClientLayout({
 }) {
   return (
     <ReactQueryProvider>
+      <ShopsifuSocketProvider>
       <div className={inter.className}>{children}</div>
+      </ShopsifuSocketProvider>
     </ReactQueryProvider>
   );
 }
