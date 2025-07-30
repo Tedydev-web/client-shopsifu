@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { CheckoutHeader } from './checkout-Header';
 import { CheckoutSteps } from './checkout-Steps';
-import { InformationTabs } from './tabs/information-Tabs';
-import { PaymentTabs } from './tabs/payment-Tabs';
+import { InformationTabs } from './information-Tabs/information-Index';
+import { PaymentTabs } from './payment-Tabs/payment-Index';
 import { FooterSection } from './shared/footer-Section';
 import { useCheckout } from './hooks/useCheckout';
 import { CheckoutStep } from './checkout-Steps';

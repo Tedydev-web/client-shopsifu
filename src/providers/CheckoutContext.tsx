@@ -18,6 +18,9 @@ interface ShippingAddress {
   district: string;
   ward: string;
   address: string;
+  addressDetail?: string;
+  receiverName: string;
+  receiverPhone: string;
 }
 
 interface DiscountInfo {

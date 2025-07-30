@@ -94,7 +94,7 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
       {/* Footer: Voucher & Total */}
       <div className="px-4 lg:px-6 py-4 bg-gray-50/50 border-t">
         <div className="flex flex-col gap-3">
-          <div className="flex justify-start">
+          <div className="">
             <VoucherButton shopId={shopId} shopName={shopName} />
           </div>
           <div className="flex items-center justify-end gap-3">

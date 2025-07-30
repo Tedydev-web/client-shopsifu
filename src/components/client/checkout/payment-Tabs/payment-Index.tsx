@@ -7,7 +7,6 @@ import { PaymentMethods } from '../sections/tab-2/payment-Methods';
 import { RecipientInfo } from '../sections/tab-2/recipient-Info';
 import { ProductsInfo } from '../sections/tab-2/products-Info';
 import { useCheckout } from '../hooks/useCheckout';
-import { mockShopCarts } from '../hooks/mockData';
 import { Button } from '@/components/ui/button';
 
 interface PaymentTabsProps {
@@ -74,18 +73,22 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
       {/* Thông tin người nhận */}
       {state.shippingAddress && (
         <RecipientInfo
-          customerInfo={state.customerInfo}
+          customerInfo={customerInfo}
           shippingAddress={{
-            ...(state.shippingAddress as any),
-            receiverName: (state.shippingAddress as any).receiverName ?? '',
-            receiverPhone: (state.shippingAddress as any).receiverPhone ?? '',
+            addressDetail: state.shippingAddress.addressDetail || '',
+            ward: state.shippingAddress.ward || '',
+            district: state.shippingAddress.district || '',
+            province: state.shippingAddress.province || '',
+            address: state.shippingAddress.address || '',
+            receiverName: state.shippingAddress.receiverName || '',
+            receiverPhone: state.shippingAddress.receiverPhone || '',
           }}
           onEdit={onPrevious}
         />
       )}
 
       {/* Thông tin sản phẩm */}
-      <ProductsInfo shopCarts={mockShopCarts} />
+      <ProductsInfo />
 
       {/* Phương thức thanh toán */}
       <PaymentMethods 

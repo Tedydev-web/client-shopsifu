@@ -104,6 +104,13 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     // Cập nhật phương thức vận chuyển
     updateShippingMethod(formData.deliveryMethod === 'standard' ? 'delivery' : 'delivery');
     
+    // Helper function để parse location data từ format "code|name"
+    const parseLocationValue = (value: string) => {
+      if (!value) return '';
+      const parts = value.split('|');
+      return parts[1] || parts[0]; // Ưu tiên name, fallback về code
+    };
+    
     // Cập nhật địa chỉ giao hàng
     const shippingAddress = {
       // Thông tin người nhận luôn lấy từ form input
@@ -113,7 +120,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       // Địa chỉ có thể từ địa chỉ có sẵn hoặc form input
       ...(selectedAddress 
         ? {
-              // Nếu đã chọn địa chỉ có sẵn, sử dụng trực tiếp
+            // Nếu đã chọn địa chỉ có sẵn, sử dụng trực tiếp
             addressDetail: selectedAddress.addressDetail,
             ward: selectedAddress.ward,
             district: selectedAddress.district,
@@ -122,17 +129,17 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
             address: `${selectedAddress.addressDetail}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
           }
         : {
-            // Nếu nhập địa chỉ mới, lấy từ form và labels của select boxes
+            // Nếu nhập địa chỉ mới, parse để lấy name thay vì code
             addressDetail: formData.address || '',
-            ward: formData.ward || '',
-            district: formData.district || '',
-            province: formData.province || '',
-            // String format cho recipient info
+            ward: parseLocationValue(formData.ward),
+            district: parseLocationValue(formData.district),
+            province: parseLocationValue(formData.province),
+            // String format cho recipient info với name
             address: [
               formData.address,
-              formData.ward,
-              formData.district,
-              formData.province
+              parseLocationValue(formData.ward),
+              parseLocationValue(formData.district),
+              parseLocationValue(formData.province)
             ].filter(Boolean).join(', ')
           })
     };
