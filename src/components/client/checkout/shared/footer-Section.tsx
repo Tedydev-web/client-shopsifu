@@ -5,6 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Tag, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSelector } from 'react-redux';
+import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
+import { formatCurrency } from '@/utils/formatter';
 
 interface FooterSectionProps {
   variant?: 'default' | 'mobile';
@@ -14,6 +17,16 @@ interface FooterSectionProps {
   isSubmitting?: boolean;
 }
 
+// Helper component for displaying a single price line
+function PriceLine({ label, value, isBold = false }: { label: string; value: string; isBold?: boolean }) {
+  return (
+    <div className={`flex justify-between items-center ${isBold ? 'font-semibold text-lg' : 'text-sm'}`}>
+      <span className="text-gray-600">{label}</span>
+      <span className={`${isBold ? 'text-red-600' : 'text-gray-800'}`}>{value}</span>
+    </div>
+  );
+}
+
 export function FooterSection({ 
   variant = 'default',
   step = 'information',
@@ -21,16 +34,21 @@ export function FooterSection({
   onNext,
   isSubmitting = false
 }: FooterSectionProps) {
-  const orderSummary = {
-    subtotal: 1200000,
-    shipping: 30000,
-    voucherDiscount: 50000,
-    total: 1180000
-  };
+  const shopProducts = useSelector(selectShopProducts);
 
-  const formatPrice = (price: number) => {
-    return `₫${price.toLocaleString()}`;
-  };
+  // Calculate subtotal from all products in all shops
+  const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
+    return total + shopProducts.reduce((shopTotal, product) => {
+      return shopTotal + (product.price * product.quantity);
+    }, 0);
+  }, 0);
+
+  // For now, shipping and discount are not implemented
+  const shippingFee = 0;
+  const voucherDiscount = 0;
+
+  // Calculate the final total
+  const totalPayment = subtotal + shippingFee - voucherDiscount;
 
   const getButtonText = () => {
     if (isSubmitting) return 'Đang xử lý...';
@@ -44,7 +62,7 @@ export function FooterSection({
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Tổng thanh toán</span>
           <span className="text-lg font-semibold text-primary">
-            {formatPrice(orderSummary.total)}
+            {formatCurrency(totalPayment)}
           </span>
         </div>
 
@@ -93,20 +111,7 @@ export function FooterSection({
       <div className="space-y-6">
         {/* Desktop Order Summary */}
         <div className="space-y-3">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Tổng tiền hàng</span>
-            <span className="font-medium">{formatPrice(orderSummary.subtotal)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Phí vận chuyển</span>
-            <span className="font-medium">{formatPrice(orderSummary.shipping)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Giảm giá voucher</span>
-            <span className="font-medium text-green-600">
-              -{formatPrice(orderSummary.voucherDiscount)}
-            </span>
-          </div>
+          <PriceLine label="Tổng tiền hàng" value={formatCurrency(subtotal)} />
         </div>
 
         <Separator />
@@ -140,15 +145,8 @@ export function FooterSection({
 
         {/* Desktop Total */}
         <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="font-medium text-sm">Tổng thanh toán</span>
-            <span className="text-lg font-medium text-primary">
-              {formatPrice(orderSummary.total)}
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 text-right">
-            (Đã bao gồm VAT nếu có)
-          </p>
+          <div className="my-3"></div>
+          <PriceLine label="Tổng thanh toán" value={formatCurrency(totalPayment)} isBold={true} />
         </div>
       </div>
 

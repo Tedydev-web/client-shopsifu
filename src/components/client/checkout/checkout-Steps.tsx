@@ -37,16 +37,15 @@ export function CheckoutSteps({
 
   useEffect(() => {
     if (
-      state.customerInfo?.email &&
-      state.customerInfo?.name &&
-      state.customerInfo?.phone &&
-      state.shippingAddress
+      state.receiverInfo?.name &&
+      state.receiverInfo?.phone &&
+      state.receiverInfo?.address
     ) {
       setCanNavigateToPayment(true);
     } else {
       setCanNavigateToPayment(false);
     }
-  }, [state.customerInfo, state.shippingAddress]);
+  }, [state.receiverInfo]);
 
   const handleStepClick = (step: CheckoutStep) => {
     if (step === 'payment' && !canNavigateToPayment) {

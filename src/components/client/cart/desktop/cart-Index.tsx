@@ -220,14 +220,26 @@ export default function DesktopCartPageMobile() {
       return acc;
     }, {});
 
+    // 4c. Tạo cartItemIds string để truyền vào URL
+    const allCartItemIds = selectedShopCarts
+      .flatMap((shopCart: ShopCart) => shopCart.cartItems.map((item: CartItem) => item.id))
+      .join(',');
+
+    console.log('🛒 Checkout Data:', {
+      selectedShopCarts: selectedShopCarts.length,
+      cartItemIds: allCartItemIds,
+      totalAmount: total,
+      shopOrdersPayload,
+      shopProductsPayload
+    });
 
     // 5. Dispatch các action để cập nhật Redux state
     dispatch(setShopOrders(shopOrdersPayload));
     dispatch(setShopProducts(shopProductsPayload));
     dispatch(setCommonInfo({ amount: total, receiver: null, paymentGateway: null })); // Cập nhật tổng tiền
 
-    // 6. Điều hướng đến trang thanh toán
-    router.push('/checkout'); // Thay đổi '/checkout' thành route thanh toán của bạn
+    // 6. Điều hướng đến trang thanh toán với cartItemIds trong URL
+    router.push(`/checkout/${allCartItemIds}`);
   };
 
   return (

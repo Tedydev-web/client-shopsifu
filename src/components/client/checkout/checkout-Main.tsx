@@ -8,36 +8,102 @@ import { PaymentTabs } from './payment-Tabs/payment-Index';
 import { FooterSection } from './shared/footer-Section';
 import { useCheckout } from './hooks/useCheckout';
 import { CheckoutStep } from './checkout-Steps';
+import { QrSepay } from './payment/qrSepay';
+import { useRouter } from 'next/navigation';
 
-export function CheckoutMain() {
-  const { state, goToStep } = useCheckout();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+interface CheckoutMainProps {
+  cartItemIds?: string[];
+}
 
+export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
+  // 1. Lấy state và các hàm từ hook đã được cập nhật
+  const { state, goToStep, handleCreateOrder, isSubmitting } = useCheckout();
+  const router = useRouter();
+  
+  // Debug log cartItemIds
+  console.log('🛍️ CheckoutMain - Received cartItemIds:', {
+    cartItemIds,
+    count: cartItemIds.length,
+    isValid: cartItemIds.length > 0
+  });
+  
+  // 2. State để quản lý việc hiển thị QR Sepay
+  const [showQrSepay, setShowQrSepay] = useState(false);
+  const [orderResult, setOrderResult] = useState<{
+    success: boolean;
+    paymentMethod: string;
+    orderData: any;
+    paymentId: string;
+  } | null>(null);
+
+  // 3. Hàm chuyển step
   const handleStepChange = (step: CheckoutStep) => {
     goToStep(step);
   };
-
-  const handleNext = () => {
+ 
+  // 4. Hàm xử lý khi nhấn nút "Tiếp tục" hoặc "Hoàn tất"
+  const handleNext = async () => {
     if (state.step === 'information') {
-      // Trigger form submission
+      // Kích hoạt validation của form thông tin
       const form = document.getElementById('checkout-form') as HTMLFormElement;
       if (form) {
+        // Form's onSubmit sẽ xử lý việc chuyển sang bước tiếp theo nếu hợp lệ
         form.requestSubmit();
       }
     } else if (state.step === 'payment') {
-      setIsSubmitting(true);
-      // Simulate payment processing
-      setTimeout(() => {
-        setIsSubmitting(false);
-        // Handle payment completion
-      }, 2000);
+      // Ở bước thanh toán, hành động tiếp theo là tạo đơn hàng
+      const result = await handleCreateOrder();
+      
+      console.log('🔍 Create Order Result:', result);
+      
+      // Xử lý kết quả tạo đơn hàng
+      if (result && result.success) {
+        // Check if result has paymentMethod property (success case)
+        if ('paymentMethod' in result && result.paymentMethod === 'sepay') {
+          // Hiển thị QR Sepay cho thanh toán chuyển khoản
+          const sepayResult = result as {
+            success: boolean;
+            paymentMethod: string;
+            orderData: any;
+            paymentId: string;
+          };
+          
+          console.log('🏦 Switching to QR Sepay with data:', {
+            paymentId: sepayResult.paymentId,
+            orderData: sepayResult.orderData,
+            paymentMethod: sepayResult.paymentMethod
+          });
+          
+          setOrderResult(sepayResult);
+          setShowQrSepay(true);
+        } else if ('paymentMethod' in result) {
+          // Redirect cho các phương thức thanh toán khác (COD, etc.)
+          console.log('✅ Redirecting to purchase page for payment method:', result.paymentMethod);
+          router.push('/user/purchase');
+        }
+      } else {
+        console.error('❌ Order creation failed:', result);
+      }
     }
   };
 
   const handlePrevious = () => {
     if (state.step === 'payment') {
-      goToStep('information');
+      handleStepChange('information');
     }
+  };
+  
+  // 5. Xử lý khi user xác nhận đã chuyển tiền (QR Sepay)
+  const handlePaymentConfirm = () => {
+    // Chuyển đến trang đơn hàng
+    router.push('/user/dashboard');
+  };
+  
+  // 6. Xử lý khi user hủy thanh toán (QR Sepay)
+  const handlePaymentCancel = () => {
+    setShowQrSepay(false);
+    setOrderResult(null);
+    // Quay lại bước thanh toán
   };
 
   // Helper function to get footer step type
@@ -45,10 +111,23 @@ export function CheckoutMain() {
     return step === 'cart' ? 'information' : step;
   };
 
+  // Nếu đang hiển thị QR Sepay, render component QR
+  if (showQrSepay && orderResult) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <QrSepay
+          paymentId={orderResult.paymentId}
+          onPaymentConfirm={handlePaymentConfirm}
+          onPaymentCancel={handlePaymentCancel}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <CheckoutHeader />
+      {/* <CheckoutHeader /> */}
       
       {/* Main Content */}
       <div className="flex-1 max-w-[1920px] w-full mx-auto px-3 sm:px-4 lg:px-8 2xl:px-12 py-3 lg:py-6">

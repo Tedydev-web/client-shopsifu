@@ -52,7 +52,7 @@ const paymentMethodsData: PaymentMethod[] = [
     iconType: 'image'
   } as ImagePaymentMethod,
   {
-    id: 'bank',
+    id: 'sepay',
     name: 'Chuyển khoản ngân hàng',
     description: 'Chuyển khoản trực tiếp vào tài khoản shop',
     icon: '/images/client/checkout/QRCode.png',

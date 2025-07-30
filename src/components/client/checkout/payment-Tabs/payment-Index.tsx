@@ -14,15 +14,14 @@ interface PaymentTabsProps {
 }
 
 export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
-  const { state } = useCheckout();
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const { state, updatePaymentMethod } = useCheckout();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   
   const customerInfo = {
-    name: state.customerInfo?.name || "Nguyễn Văn A",
-    phone: state.customerInfo?.phone || "0987654321",
-    email: state.customerInfo?.email || "example@gmail.com",
+    name: state.receiverInfo?.name || "Nguyễn Văn A",
+    phone: state.receiverInfo?.phone || "0987654321",
+    email: "example@gmail.com", // Email không cần thiết cho receiver
   };
   
   const handleSubmit = () => {
@@ -34,7 +33,8 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
   };
 
   const handlePaymentMethodChange = (value: string) => {
-    setPaymentMethod(value);
+    console.log('🔄 Payment method changed to:', value);
+    updatePaymentMethod(value);
   };
 
   if (isCompleted) {
@@ -51,7 +51,7 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
               <div className="text-left bg-gray-50 p-4 rounded-md w-full max-w-md">
                 <p className="text-sm mb-1"><span className="font-medium">Mã đơn hàng:</span> #ORD123456789</p>
                 <p className="text-sm mb-1"><span className="font-medium">Ngày đặt:</span> {new Date().toLocaleDateString('vi-VN')}</p>
-                <p className="text-sm"><span className="font-medium">Phương thức thanh toán:</span> {paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng' : 'Thanh toán trực tuyến'}</p>
+                <p className="text-sm"><span className="font-medium">Phương thức thanh toán:</span> {state.paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng' : 'Thanh toán trực tuyến'}</p>
               </div>
               <div className="mt-8 flex gap-4">
                 <Button variant="outline" asChild>
@@ -92,7 +92,7 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
 
       {/* Phương thức thanh toán */}
       <PaymentMethods 
-        paymentMethod={paymentMethod}
+        paymentMethod={state.paymentMethod}
         handlePaymentMethodChange={handlePaymentMethodChange}
       />
     </div>
