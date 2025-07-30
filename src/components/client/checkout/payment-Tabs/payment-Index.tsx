@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
-import { PaymentMethods } from '../sections/tab-2/payment-Methods';
-import { RecipientInfo } from '../sections/tab-2/recipient-Info';
-import { ProductsInfo } from '../sections/tab-2/products-Info';
+import { PaymentMethods } from './payment-Methods';
+import { RecipientInfo } from './recipient-Info';
+import { ProductsInfo } from './products-Info';
 import { useCheckout } from '../hooks/useCheckout';
 import { Button } from '@/components/ui/button';
 

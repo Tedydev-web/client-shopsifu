@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { CustomerInfo } from '../sections/tab-1/customer-Info';
-import { ShippingAddress } from '../sections/tab-1/shipping-Address';
-import { ShippingType } from '../sections/tab-1/shipping-Type';
+import { CustomerInfo } from './customer-Info';
+import { ShippingAddress } from './shipping-Address';
+import { ShippingType } from './shipping-Type';
 import { useCheckout } from '../hooks/useCheckout';
 import { CustomerFormData, Address, ShippingAddress as ShippingAddressType } from '@/types/checkout.interface';
 import { useUserData } from '@/hooks/useGetData-UserLogin';
