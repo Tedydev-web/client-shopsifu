@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { Order, OrderStatus } from '@/types/order.interface';
 import { formatCurrency } from '@/utils/formatter';
 import { toast } from 'sonner';
+import { useShopsifuSocket } from '@/providers/ShopsifuSocketProvider';
 
 interface QrSepayProps {
   paymentId: string;
@@ -24,6 +25,7 @@ interface QrSepayProps {
 export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel }: QrSepayProps) {
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [isExpired, setIsExpired] = useState(false);
+  const { payments } = useShopsifuSocket();
   const shopProducts = useSelector(selectShopProducts);
   const router = useRouter();
 
@@ -46,16 +48,40 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
   const qrUrl = `https://qr.sepay.vn/img?acc=${SEPAY_ACCOUNT}&bank=${SEPAY_BANK}&amount=${totalAmount}&des=DH${paymentId}`;
   
   // Console log để debug data truyền vào QrSepay
-  console.log('🔗 QR Sepay Data Debug:', {
-    paymentId,
-    totalAmount,
-    SEPAY_ACCOUNT,
-    SEPAY_BANK,
-    qrUrl,
-    shopProducts: Object.keys(shopProducts).length,
-    subtotal,
-    finalAmount: totalAmount
-  });
+  useEffect(() => {
+    console.log('🔗 QR Sepay Data Debug:', {
+      paymentId,
+      totalAmount,
+      SEPAY_ACCOUNT,
+      SEPAY_BANK,
+      qrUrl,
+      shopProducts: Object.keys(shopProducts).length,
+      subtotal,
+      finalAmount: totalAmount
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Listen for WebSocket payment success events
+  useEffect(() => {
+        console.log(`[WebSocket] Checking for payment events. Total events: ${payments.length}`);
+    if (payments.length === 0) return;
+
+    const latestPayment = payments[payments.length - 1];
+
+    // Check if the latest payment is a success for the current order via Sepay
+    if (
+      latestPayment &&
+      latestPayment.orderId === orderId &&
+      latestPayment.status === 'success' &&
+      latestPayment.gateway === 'sepay'
+    ) {
+      console.log('✅ Payment success event received via WebSocket for order:', orderId);
+      toast.success('Thanh toán thành công!');
+      // Redirect to the success page
+      router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
+    }
+  }, [payments, orderId, router, totalAmount]);
 
   // Countdown timer
   useEffect(() => {
@@ -81,13 +107,14 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
   useEffect(() => {
     if (!orderId) return;
 
-    const checkPaymentStatus = async () => {
+        const checkPaymentStatus = async () => {
+      console.log(`[Polling] Checking payment status for orderId: ${orderId}...`);
       try {
         const order: Order = await orderService.getById(orderId);
         if (order && order.status === OrderStatus.PENDING_PICKUP) {
           clearInterval(intervalId);
-          toast.success('Thanh toán thành công! Đang chuyển hướng...');
-          router.push('/user/purchase');
+          toast.success('Thanh toán thành công!');
+          router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
         }
       } catch (error) {
         console.error('Lỗi khi kiểm tra trạng thái thanh toán:', error);
@@ -101,7 +128,7 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
     return () => {
       clearInterval(intervalId);
     };
-  }, [orderId, router]);
+    }, [orderId, router, totalAmount]);
 
   // Format time display
   const formatTime = (seconds: number) => {

@@ -45,7 +45,7 @@ export function PaymentSuccess({ orderId, totalAmount }: PaymentSuccessProps) {
             </Link>
           </Button>
           <Button asChild className="w-full">
-            <Link href="/user/purchase">
+            <Link href="/user/orders">
               <ShoppingBag className="mr-2 h-4 w-4" />
               Kiểm tra đơn hàng
             </Link>

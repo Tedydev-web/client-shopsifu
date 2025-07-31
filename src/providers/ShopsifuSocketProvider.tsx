@@ -48,16 +48,6 @@ export const ShopsifuSocketProvider = ({ children }: { children: React.ReactNode
     newSocket.on('connect_error', (err) => {
       console.error('❌ Connection error:', err.message)
     })
-
-    // 👇 SỰ KIỆN QUAN TRỌNG
-    newSocket.on('payment', (data) => {
-      console.log('📩 [payment] event received:', data)
-      setPayments((prev) => [...prev, data])
-    })
-    newSocket.onAny((event, ...args) => {
-      console.log('📡 Received:', event, args)
-    })
-
     
     return () => {
       newSocket.disconnect()

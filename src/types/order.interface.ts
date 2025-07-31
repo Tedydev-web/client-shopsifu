@@ -100,3 +100,10 @@ export interface OrderCancelResponse {
   // Dữ liệu trả về sau khi huỷ đơn
   message: string;
 }
+
+export interface CreatePaymentVnPayUrl{
+  amount: number;
+  orderInfo: string;
+  orderId: string;
+  locale: string | "vn";
+}
