@@ -32,7 +32,7 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
   const [orderResult, setOrderResult] = useState<{
     success: boolean;
     paymentMethod: string;
-    orderData: any;
+    orderData: { id: string; [key: string]: any }; // Ensure orderData has an id
     paymentId: string;
   } | null>(null);
 
@@ -117,6 +117,7 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <QrSepay
           paymentId={orderResult.paymentId}
+          orderId={orderResult.orderData.id}
           onPaymentConfirm={handlePaymentConfirm}
           onPaymentCancel={handlePaymentCancel}
         />

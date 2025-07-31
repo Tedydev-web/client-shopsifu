@@ -8,19 +8,24 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
+import { orderService } from '@/services/orderService';
+import { useRouter } from 'next/navigation';
+import { Order, OrderStatus } from '@/types/order.interface';
 import { formatCurrency } from '@/utils/formatter';
 import { toast } from 'sonner';
 
 interface QrSepayProps {
   paymentId: string;
+  orderId: string; // Add orderId to check status
   onPaymentConfirm: () => void;
   onPaymentCancel: () => void;
 }
 
-export function QrSepay({ paymentId, onPaymentConfirm, onPaymentCancel }: QrSepayProps) {
+export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel }: QrSepayProps) {
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [isExpired, setIsExpired] = useState(false);
   const shopProducts = useSelector(selectShopProducts);
+  const router = useRouter();
 
   // Calculate total amount from Redux state
   const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
@@ -71,6 +76,32 @@ export function QrSepay({ paymentId, onPaymentConfirm, onPaymentCancel }: QrSepa
 
     return () => clearInterval(timer);
   }, [timeLeft]);
+
+  // Poll for payment status
+  useEffect(() => {
+    if (!orderId) return;
+
+    const checkPaymentStatus = async () => {
+      try {
+        const order: Order = await orderService.getById(orderId);
+        if (order && order.status === OrderStatus.PENDING_PICKUP) {
+          clearInterval(intervalId);
+          toast.success('Thanh toán thành công! Đang chuyển hướng...');
+          router.push('/user/purchase');
+        }
+      } catch (error) {
+        console.error('Lỗi khi kiểm tra trạng thái thanh toán:', error);
+        // Optionally stop polling on certain errors
+      }
+    };
+
+    const intervalId = setInterval(checkPaymentStatus, 3000); // Check every 3 seconds
+
+    // Cleanup on component unmount
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [orderId, router]);
 
   // Format time display
   const formatTime = (seconds: number) => {
