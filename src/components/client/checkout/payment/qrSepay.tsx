@@ -93,21 +93,21 @@ export function QrSepay({ paymentId, onPaymentConfirm, onPaymentCancel }: QrSepa
 
   if (isExpired) {
     return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="text-center">
+      <Card className="w-full max-w-md mx-auto border-red-200 shadow-lg">
+        <CardHeader className="text-center bg-red-50 rounded-t-lg">
           <div className="flex justify-center mb-4">
             <AlertCircle className="h-16 w-16 text-red-500" />
           </div>
-          <CardTitle className="text-red-600">Mã QR đã hết hạn</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-red-600 text-xl font-bold">Mã QR đã hết hạn</CardTitle>
+          <CardDescription className="text-red-500">
             Thời gian thanh toán đã hết. Vui lòng thử lại.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <Button 
             onClick={handlePaymentCancel}
             variant="outline" 
-            className="w-full"
+            className="w-full border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
           >
             <X className="h-4 w-4 mr-2" />
             Quay lại
@@ -118,66 +118,87 @@ export function QrSepay({ paymentId, onPaymentConfirm, onPaymentCancel }: QrSepa
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="text-center">
+    <Card className="w-full max-w-md mx-auto border-red-200 shadow-lg">
+      <CardHeader className="text-center bg-gradient-to-b from-red-50 to-white rounded-t-lg">
         <div className="flex justify-center mb-4">
-          <QrCode className="h-8 w-8 text-blue-600" />
+          <QrCode className="h-8 w-8 text-red-600" />
         </div>
-        <CardTitle>Quét mã QR để thanh toán</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-red-700 text-xl font-bold">Quét mã QR để thanh toán</CardTitle>
+        <CardDescription className="text-gray-600">
           Sử dụng ứng dụng ngân hàng để quét mã QR
         </CardDescription>
         
         {/* Countdown Timer */}
-        <div className="flex items-center justify-center gap-2 mt-4 p-3 bg-orange-50 rounded-lg">
-          <Clock className="h-5 w-5 text-orange-600" />
-          <span className="text-lg font-mono font-semibold text-orange-600">
+        <div className={`flex items-center justify-center gap-2 mt-4 p-3 rounded-lg transition-all duration-300 ${
+          timeLeft <= 60 
+            ? 'bg-red-100 border border-red-300' 
+            : 'bg-red-50 border border-red-200'
+        }`}>
+          <Clock className={`h-5 w-5 ${
+            timeLeft <= 60 ? 'text-red-600 animate-pulse' : 'text-red-500'
+          }`} />
+          <span className={`text-lg font-mono font-semibold ${
+            timeLeft <= 60 ? 'text-red-700' : 'text-red-600'
+          }`}>
             {formatTime(timeLeft)}
           </span>
-          <span className="text-sm text-orange-600">còn lại</span>
+          <span className={`text-sm ${
+            timeLeft <= 60 ? 'text-red-600' : 'text-red-500'
+          }`}>còn lại</span>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-6">
         {/* QR Code */}
-        <div className="flex justify-center">
-          <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
+        <div className="flex justify-center relative">
+          <div className="p-4 bg-white border-2 border-red-200 rounded-lg shadow-sm relative">
             <Image
               src={qrUrl}
               alt="QR Code Sepay"
               width={200}
               height={200}
-              className="w-48 h-48 object-contain"
+              className={`w-48 h-48 object-contain transition-all duration-500 ${
+                timeLeft <= 30 ? 'opacity-50 blur-sm grayscale' : 'opacity-100'
+              }`}
               unoptimized // Important for external QR API
             />
+            {/* Overlay khi sắp hết hạn */}
+            {timeLeft <= 30 && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 rounded-lg">
+                <div className="text-center">
+                  <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                  <p className="text-red-600 font-semibold text-sm">Sắp hết hạn</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Payment Information */}
-        <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+        <div className="space-y-3 p-4 bg-red-50 border border-red-100 rounded-lg">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Số tài khoản:</span>
-            <span className="font-medium">{SEPAY_ACCOUNT}</span>
+            <span className="text-gray-700 font-medium">Số tài khoản:</span>
+            <span className="font-semibold text-gray-900">{SEPAY_ACCOUNT}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Ngân hàng:</span>
-            <span className="font-medium">{SEPAY_BANK}</span>
+            <span className="text-gray-700 font-medium">Ngân hàng:</span>
+            <span className="font-semibold text-gray-900">{SEPAY_BANK}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Số tiền:</span>
-            <span className="font-medium text-red-600">{formatCurrency(totalAmount)}</span>
+            <span className="text-gray-700 font-medium">Số tiền:</span>
+            <span className="font-bold text-red-600 text-base">{formatCurrency(totalAmount)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Nội dung:</span>
-            <span className="font-medium">DH{paymentId}</span>
+            <span className="text-gray-700 font-medium">Nội dung:</span>
+            <span className="font-semibold text-gray-900">DH{paymentId}</span>
           </div>
         </div>
 
         {/* Important Note */}
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="text-sm">
-            <strong>Lưu ý:</strong> Vui lòng chuyển khoản đúng số tiền và nội dung để đơn hàng được xử lý nhanh chóng.
+        <Alert className="border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-sm text-red-700">
+            <strong className="text-red-800">Lưu ý:</strong> Vui lòng chuyển khoản đúng số tiền và nội dung để đơn hàng được xử lý nhanh chóng.
           </AlertDescription>
         </Alert>
 
@@ -185,7 +206,11 @@ export function QrSepay({ paymentId, onPaymentConfirm, onPaymentCancel }: QrSepa
         <div className="space-y-3">
           <Button 
             onClick={handlePaymentConfirm}
-            className="w-full bg-green-600 hover:bg-green-700"
+            className={`w-full transition-all duration-300 ${
+              timeLeft <= 30 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
+                : 'bg-red-600 hover:bg-red-700 text-white'
+            }`}
             disabled={isExpired}
           >
             <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -195,7 +220,7 @@ export function QrSepay({ paymentId, onPaymentConfirm, onPaymentCancel }: QrSepa
           <Button 
             onClick={handlePaymentCancel}
             variant="outline" 
-            className="w-full"
+            className="w-full border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
           >
             <X className="h-4 w-4 mr-2" />
             Hủy giao dịch

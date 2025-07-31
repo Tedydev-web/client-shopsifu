@@ -19,7 +19,7 @@ export const userService = {
         return response.data;
     },
     // Lấy thông tin người dùng theo ID
-    async getById(id: number): Promise<{ data: User }> {
+    async getById(id: string): Promise<{ data: User }> {
         const response = await privateAxios.get(
             API_ENDPOINTS.USERS.GETBYID.replace(':id', String(id))
         );
@@ -34,7 +34,7 @@ export const userService = {
         return response.data;
     },
     // Cập nhật người dùng
-    async update(id: number, data: UserUpdateRequest): Promise<UserUpdateResponse> {
+    async update(id: string, data: UserUpdateRequest): Promise<UserUpdateResponse> {
         const response = await privateAxios.put(
             API_ENDPOINTS.USERS.UPDATE.replace(':id', String(id)),
             data
@@ -42,7 +42,7 @@ export const userService = {
         return response.data;
     },
     // Xóa người dùng theo ID
-    async delete(id: number): Promise<UserDeleteResponse> {
+    async delete(id: string): Promise<UserDeleteResponse> {
         const response = await privateAxios.delete(
             API_ENDPOINTS.USERS.DELETE_BY_ID.replace(':id', String(id))
         );

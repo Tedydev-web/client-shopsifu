@@ -46,7 +46,7 @@ export const userStepOneSchema = (t: Translate) => z.object({
   lastName: z.string().min(1, { message: t('schema.validation.user.lastNameRequired') }),
   name: z.string().min(3, { message: t('schema.validation.user.usernameMinLength') }),
   email: z.string().email({ message: t('schema.validation.email.invalid') }),
-  roleId: z.number().min(1, { message: t('schema.validation.user.roleRequired') }),
+  roleId: z.string().min(1, { message: t('schema.validation.user.roleRequired') }),
 });
 
 // Schema for Step 2 of the user creation modal (creating a new password)
@@ -65,7 +65,7 @@ export const userCreateSchema = (t: Translate) => z.object({
   phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
   password: z.string().min(8, t('admin.users.validation.passwordLength')),
   confirmPassword: z.string(),
-  roleId: z.number(),
+  roleId: z.string().min(1, t('admin.users.validation.roleRequired')),
   status: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: t('admin.users.validation.passwordMatch'),
@@ -77,7 +77,7 @@ export const userUpdateSchema = (t: Translate) => z.object({
   email: z.string().email(t('admin.users.validation.emailValid')),
   name: z.string().min(1, t('admin.users.validation.nameRequired')),
   phoneNumber: z.string().min(1, t('admin.users.validation.phoneRequired')),
-  roleId: z.number(),
+  roleId: z.string().min(1, t('admin.users.validation.roleRequired')),
   status: z.string(),
   // Cho phép password trống hoặc phải dài tối thiểu 8 ký tự nếu có giá trị
 });

@@ -282,7 +282,7 @@ export default function DesktopCartPageMobile() {
               ))}
               
               {/* Voucher Button */}
-              <div className="p-3 border-t">
+              {/* <div className="p-3 border-t">
                 <VoucherButton 
                   shopId={shopCart.shop.id} 
                   shopName={shopCart.shop.name} 
@@ -291,7 +291,7 @@ export default function DesktopCartPageMobile() {
                     // Xử lý logic áp dụng voucher ở đây
                   }}
                 />
-              </div>
+              </div> */}
             </div>
           ))}
         </>

@@ -42,7 +42,7 @@ export default function UsersModalUpsert({
   const [confirmPassword, setConfirmPassword] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [avatar, setAvatar] = useState("")
-  const [roleId, setRoleId] = useState<number>(1) 
+  const [roleId, setRoleId] = useState<string>('') 
   const [status, setStatus] = useState("ACTIVE")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -74,7 +74,7 @@ export default function UsersModalUpsert({
       setEmail(user.email || "")
       setPhoneNumber(user.phoneNumber || "")
       setAvatar(user.avatar || "")
-      setRoleId(user.roleId || 1)
+      setRoleId(user.roleId || '')
       setStatus(user.status || "ACTIVE")
       setPassword("")
       setConfirmPassword("")
@@ -88,7 +88,7 @@ export default function UsersModalUpsert({
       setConfirmPassword("")
       setPhoneNumber("")
       setAvatar("")
-      setRoleId(1)
+      setRoleId('')
       setStatus("ACTIVE")
       setErrors({})
       
@@ -183,8 +183,12 @@ export default function UsersModalUpsert({
             data.email = email;
           }
           
-          // Truyền id riêng cho hàm onSubmit để nó có thể được sử dụng làm tham số URL
-          await onSubmit({...data, id: user.id} as User);
+          // Construct the final object to submit, including the user's id
+          const submitData: User = {
+            ...user, // Start with the original user data to have a complete User object
+            ...data, // Override with updated fields
+          };
+          await onSubmit(submitData);
         }
         onClose();
       } catch (error) {

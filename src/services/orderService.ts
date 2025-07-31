@@ -88,4 +88,21 @@ export const orderService = {
       throw error;
     }
   },
+
+  // ✅ Tính toán đơn hàng
+  calculateOrder: async (
+    data: OrderCreateRequest,
+    signal?: AbortSignal
+  ): Promise<OrderCreateResponse> => {
+    try {
+      const response = await privateAxios.post(
+        API_ENDPOINTS.ORDERS.CALCULATE_ORDER,
+        data,
+        { signal }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

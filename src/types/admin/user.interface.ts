@@ -9,7 +9,7 @@ export interface PaginationMeta {
 }
 
 export interface UserProfile {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   name?: string;
@@ -37,21 +37,21 @@ export interface UserProfile {
 // }
 
 export interface UserRole {
-  id: number;
+  id: string;
   name: string;
 }
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   phoneNumber: string;
   avatar: string;
   status: string;
-  roleId: number;
-  createdById: number | null;
-  updatedById: number | null;
-  deletedById: number | null;
+  roleId: string;
+  createdById: string | null;
+  updatedById: string | null;
+  deletedById: string | null;
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -79,7 +79,7 @@ export interface UserCreateRequest {
   avatar?: string;
   password: string;
   confirmPassword?: string; // Made optional since it's only used for frontend validation
-  roleId: number;
+  roleId: string;
   status: string;
 }
 
@@ -94,7 +94,7 @@ export interface UserUpdateRequest {
   name?: string;
   phoneNumber?: string;
   avatar?: string;
-  roleId?: number;
+  roleId?: string;
   status?: string;
 }
 
