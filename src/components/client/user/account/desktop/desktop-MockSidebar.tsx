@@ -4,7 +4,7 @@ import {
   User,
   NotepadText,
   ShieldCheck,
-  LogOut,
+  BookMarked
 } from "lucide-react";
 
 export const sidebarItems = [
@@ -22,6 +22,11 @@ export const sidebarItems = [
     labelKey: "user.account.profile.profile",
     href: "/user/profile",
     icon: <User className="w-5 h-5" strokeWidth={2.5} />,
+  },
+  {
+    labelKey: "user.account.profile.profile",
+    href: "/user/policy",
+    icon: <BookMarked className="w-5 h-5" strokeWidth={2.5} />,
   },
   {
     labelKey: "user.settings.section.notifications",

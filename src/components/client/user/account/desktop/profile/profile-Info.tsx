@@ -82,8 +82,10 @@ export default function ProfileInfo() {
         }
       }
 
+      // Chỉ lấy những field cần gửi
       const payload: Partial<UpdateProfileRequest> = {
-        ...data,
+        name: data.name,
+        phoneNumber: data.phoneNumber,
         avatar: avatarUrl,
       };
 

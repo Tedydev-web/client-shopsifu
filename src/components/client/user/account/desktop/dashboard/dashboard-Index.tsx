@@ -13,7 +13,7 @@ export default function DashboardIndex() {
   const user = useUserData();
 
   return (
-    <div className="bg-[#f5f5f7] min-h-screen space-y-4">
+    <div className="bg-[#f5f5f7] h-full space-y-4">
       {/* <DashboardUser
         name={user?.name || "Khách"}
         email={user?.email || "Chưa có email"}

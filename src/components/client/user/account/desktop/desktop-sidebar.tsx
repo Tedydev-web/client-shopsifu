@@ -15,7 +15,7 @@ export default function DesktopSidebar() {
   const { handleLogout, loading: logoutLoading } = useLogout();
 
   return (
-    <aside className="bg-white rounded-xl shadow-sm w-full md:w-[340px] h-[85vh] flex flex-col">
+    <aside className="bg-white rounded-xl shadow-sm w-full md:w-[340px] h-full flex flex-col">
       <nav className="flex flex-col py-4 flex-grow">
         {sidebarItems.map((item) => {
           const isActive = pathname === item.href;

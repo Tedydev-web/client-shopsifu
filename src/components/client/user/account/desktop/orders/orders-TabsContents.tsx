@@ -7,6 +7,7 @@ import { useOrder } from "./useOrder";
 import { OrderStatus } from "@/types/order.interface";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react"
 
 const statusLabel: Record<OrderStatus, string> = {
   PENDING_PAYMENT: "Chờ thanh toán",
@@ -26,7 +27,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   const router = useRouter();
   const { orders, loading, error, fetchAllOrders, fetchOrdersByStatus } =
     useOrder();
-  const [visibleCount, setVisibleCount] = useState(5);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   useEffect(() => {
     if (!currentTab) onTabChange("all");
@@ -38,7 +39,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
     } else {
       fetchOrdersByStatus(currentTab as OrderStatus);
     }
-    setVisibleCount(5);
+    setVisibleCount(6);
   }, [currentTab, fetchAllOrders, fetchOrdersByStatus]);
 
   const handleViewDetail = (orderId: string) => {
@@ -65,7 +66,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
               {error}
             </div>
           ) : orders.length ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {displayedOrders.map((order) => {
                 const firstItem = order.items[0];
                 const totalAmount = order.items.reduce(
@@ -96,23 +97,23 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                             "vi-VN"
                           )}
                         </div>
-                        <div className="font-medium text-gray-800 mt-1">
+                        <div className="font-medium text-gray-800 mt-1 text-sm">
                           {firstItem?.productName}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex flex-col items-end justify-between min-w-[160px]">
-                      <div className="text-sm text-gray-400 mb-1">
+                      <div className="text-xs text-gray-400 mb-1">
                         {statusLabel[order.status]}
                       </div>
-                      <div className="text-sm font-medium text-gray-700">
+                      <div className="text-xs font-medium text-gray-700">
                         Tổng thanh toán:{" "}
-                        <span className="text-red-600 font-semibold">
+                        <span className="text-[#D70018]] text-sm font-semibold">
                           {totalAmount.toLocaleString()}đ
                         </span>
                       </div>
-                      <div className="text-blue-500 text-sm mt-1">
+                      <div className="text-blue-500 text-xs mt-1">
                         Xem chi tiết →
                       </div>
                     </div>
@@ -121,12 +122,14 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
               })}
 
               {visibleCount < orders.length && (
-                <div className="flex justify-center pt-4">
+                <div className="flex justify-center mt-4">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setVisibleCount((prev) => prev + 5)}
+                    className=" text-base text-[#3B82F6]"
                   >
                     Xem thêm
+                    <ChevronDown/>
                   </Button>
                 </div>
               )}

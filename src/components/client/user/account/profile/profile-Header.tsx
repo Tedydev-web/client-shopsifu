@@ -20,7 +20,7 @@ interface ProfileHeaderProps {
   avatar?: string;
   totalOrders?: number;
   totalSpent?: number;
-  memberSince?: string; // timestamp từ API
+  memberSince?: string;
 }
 
 export default function ProfileHeader({
@@ -40,7 +40,6 @@ export default function ProfileHeader({
     return phone.slice(0, 3) + "*".repeat(5) + phone.slice(-2);
   };
 
-  // Format timestamp thành dd/MM/yyyy
   const formattedMemberSince = memberSince
     ? new Date(memberSince).toLocaleDateString("vi-VN", {
         day: "2-digit",
@@ -48,20 +47,19 @@ export default function ProfileHeader({
         year: "numeric",
       })
     : "";
-  console.log("memberSince raw:", memberSince);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm flex min-h-[170px] overflow-hidden items-center">
-      {/* Left: Avatar + Info */}
+    <div className="bg-white rounded-lg shadow-sm flex min-h-[170px] overflow-hidden items-center border border-gray-200">
+      {/* Cột Avatar + Info */}
       <div className="flex flex-1 items-center gap-4 p-6">
         {avatar ? (
           <img
             src={avatar}
             alt="Avatar"
-            className="w-20 h-20 rounded-full object-cover border border-gray-300"
+            className="w-16 h-16 rounded-full object-cover border border-gray-300"
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold text-xl">
+          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-red-500 font-semibold text-2xl">
             {name?.[0]?.toUpperCase() || "U"}
           </div>
         )}
@@ -101,13 +99,8 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* Separator */}
-      <div className="flex items-center justify-center">
-        <div className="w-[4px] bg-red-500 rounded-full h-[80%]" />
-      </div>
-
-      {/* Middle: Total Orders */}
-      <div className="flex flex-1 items-center gap-4 p-6">
+      {/* Cột Total Orders */}
+      <div className="flex flex-1 items-center gap-4 p-6 border-l-4 border-red-500">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
           <ShoppingCart className="w-6 h-6 text-red-500" />
         </div>
@@ -121,13 +114,8 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* Separator */}
-      <div className="flex items-center justify-center">
-        <div className="w-[4px] bg-red-500 rounded-full h-[80%]" />
-      </div>
-
-      {/* Right: Total Spent */}
-      <div className="flex flex-1 items-center gap-4 p-6">
+      {/* Cột Total Spent */}
+      <div className="flex flex-1 items-center gap-4 p-6 border-l-4 border-red-500">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
           <Receipt className="w-6 h-6 text-red-500" />
         </div>

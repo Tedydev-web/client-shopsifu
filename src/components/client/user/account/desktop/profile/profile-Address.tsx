@@ -23,7 +23,14 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  Plus,
+  Home,
+  Building2,
+  Loader2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import axios from "axios";
 import { useForm } from "react-hook-form";
@@ -33,8 +40,8 @@ import {
   AddAddressRequest,
   UpdateAddressRequest,
 } from "@/types/auth/profile.interface";
+import { Badge } from "@/components/ui/badge";
 
-// Types
 interface AddressFormValues {
   id?: string;
   recipient: string;
@@ -58,6 +65,7 @@ const locationService = {
 
 export default function AddressBook() {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [editingAddress, setEditingAddress] =
     useState<AddressFormValues | null>(null);
   const [addresses, setAddresses] = useState<AddressFormValues[]>([]);
@@ -78,9 +86,12 @@ export default function AddressBook() {
     },
   });
 
-  const [provinces, setProvinces] = useState<any[]>([]);
+  // cache provinces
+  const [cachedProvinces, setCachedProvinces] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [wards, setWards] = useState<any[]>([]);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
+  const [loadingWards, setLoadingWards] = useState(false);
 
   /* ------------------- LOAD DATA ------------------- */
   const fetchAddresses = async () => {
@@ -97,7 +108,7 @@ export default function AddressBook() {
       detail: a.street,
       label: a.name,
       isDefault: a.isDefault,
-      type: a.addressType.toLowerCase() as "home" | "office",
+      type: (a.addressType || "HOME").toLowerCase() as "home" | "office",
     }));
 
     setAddresses(mapped);
@@ -108,15 +119,45 @@ export default function AddressBook() {
   }, []);
 
   useEffect(() => {
-    if (open) {
-      locationService.getProvinces().then((res) => setProvinces(res.data));
+    if (cachedProvinces.length === 0) {
+      locationService
+        .getProvinces()
+        .then((res) => setCachedProvinces(res.data));
     }
-  }, [open]);
+  }, []);
+
+  // prefetch districts & wards khi edit
+  useEffect(() => {
+    if (editingAddress && cachedProvinces.length > 0) {
+      const provinceObj = cachedProvinces.find(
+        (p) => p.name === editingAddress.province
+      );
+      if (provinceObj) {
+        locationService.getDistrictsByProvince(provinceObj.code).then((res) => {
+          const ds = res.data.districts || [];
+          setDistricts(ds);
+
+          const districtObj = ds.find(
+            (d: any) => d.name === editingAddress.district
+          );
+          if (districtObj) {
+            locationService
+              .getWardsByDistrict(districtObj.code)
+              .then((res2) => {
+                setWards(res2.data.wards || []);
+              });
+          }
+        });
+      }
+    }
+  }, [editingAddress, cachedProvinces]);
 
   /* ------------------- ADD/EDIT HANDLERS ------------------- */
   const handleAdd = () => {
     setEditingAddress(null);
     form.reset();
+    setDistricts([]);
+    setWards([]);
     setOpen(true);
   };
 
@@ -127,6 +168,7 @@ export default function AddressBook() {
   };
 
   const handleSave = async (data: AddressFormValues) => {
+    setLoading(true);
     const basePayload = {
       province: data.province || "",
       district: data.district || "",
@@ -138,32 +180,37 @@ export default function AddressBook() {
       isDefault: data.isDefault,
     };
 
-    if (editingAddress?.id) {
-      // Update
-      const updatePayload: UpdateAddressRequest = {
-        ...basePayload,
-        name: data.label || "", // vẫn required
-      };
-      await updateAddress(editingAddress.id, updatePayload, () => {
-        setOpen(false);
-        fetchAddresses();
-      });
-    } else {
-      // Create
-      const createPayload: AddAddressRequest = {
-        ...basePayload,
-        name: data.label || "", // required
-      };
-      await createAddress(createPayload, () => {
-        setOpen(false);
-        fetchAddresses();
-      });
+    try {
+      if (editingAddress?.id) {
+        const updatePayload: UpdateAddressRequest = {
+          ...basePayload,
+          name: data.label || "",
+        };
+        await updateAddress(editingAddress.id, updatePayload, afterSave);
+      } else {
+        const createPayload: AddAddressRequest = {
+          ...basePayload,
+          name: data.label || "",
+        };
+        await createAddress(createPayload, afterSave);
+      }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const afterSave = () => {
+    setOpen(false);
+    fetchAddresses();
   };
 
   const handleDelete = async (addr: AddressFormValues) => {
     if (!addr.id) return;
-    await deleteAddress(addr.id, () => fetchAddresses());
+    setLoading(true);
+    await deleteAddress(addr.id, () => {
+      fetchAddresses();
+      setLoading(false);
+    });
   };
 
   /* ------------------- UTILS ------------------- */
@@ -172,18 +219,23 @@ export default function AddressBook() {
       .filter(Boolean)
       .join(", ");
 
-  const renderSelectField = (
-    name: "province" | "district" | "ward",
-    label: string,
-    options: any[],
-    fetchFunc?: (code: number) => Promise<any>,
-    setNext?: (data: any[]) => void,
-    nextField?: string,
-    resetNext?: (data: any[]) => void
-  ) => (
+  const DropdownSelect = ({
+    name,
+    label,
+    options,
+    loading,
+    onSelect,
+  }: {
+    name: keyof AddressFormValues;
+    label: string;
+    options: any[];
+    loading: boolean;
+    onSelect?: (item: any) => void;
+  }) => (
     <FormField
       control={form.control}
       name={name}
+      rules={{ required: `Vui lòng chọn ${label}` }}
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
@@ -201,38 +253,41 @@ export default function AddressBook() {
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="max-h-60 overflow-y-auto w-[--radix-popover-trigger-width] p-0">
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] max-h-60 p-0 overflow-y-auto animate-fadeIn">
               <Command>
                 <CommandInput placeholder={`Tìm ${label.toLowerCase()}`} />
                 <CommandEmpty>Không tìm thấy</CommandEmpty>
-                <CommandGroup>
-                  {options.map((o) => (
-                    <CommandItem
-                      key={o.code}
-                      value={o.name}
-                      onSelect={async () => {
-                        field.onChange(o.name);
-                        if (fetchFunc && setNext && nextField) {
-                          const res = await fetchFunc(o.code);
-                          setNext(res.data[nextField + "s"] || []);
-                          form.setValue(
-                            nextField as keyof AddressFormValues,
-                            ""
-                          );
-                          if (resetNext) resetNext([]);
-                        }
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          field.value === o.name ? "opacity-100" : "opacity-0"
-                        )}
+                {loading ? (
+                  <div className="p-2 space-y-2">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="h-8 bg-gray-200 animate-pulse rounded"
                       />
-                      {o.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                    ))}
+                  </div>
+                ) : (
+                  <CommandGroup>
+                    {options.map((o) => (
+                      <CommandItem
+                        key={String(o.code)}
+                        value={o.name}
+                        onSelect={() => {
+                          field.onChange(o.name);
+                          if (onSelect) onSelect(o);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            field.value === o.name ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {o.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
               </Command>
             </PopoverContent>
           </Popover>
@@ -246,8 +301,8 @@ export default function AddressBook() {
       <div className="flex justify-between items-center">
         <h2 className="font-semibold text-base text-[#121214]">Sổ địa chỉ</h2>
         <Button
-          variant="ghost"
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-[#D70019] hover:text-red-600 hover:bg-red-50 transition"
+          variant="outline"
+          className="flex items-center gap-2 text-[#D70019]"
           onClick={handleAdd}
         >
           <Plus size={18} /> Thêm địa chỉ
@@ -258,35 +313,41 @@ export default function AddressBook() {
         {addresses.map((addr, i) => (
           <div
             key={i}
-            className="bg-[#F9F9F9] border rounded-xl p-4 flex flex-col"
+            className="bg-[#F9F9F9] border rounded-xl p-4 flex flex-col space-y-2"
           >
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-[#1D1D20]">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                {addr.type === "home" ? (
+                  <Home size={16} />
+                ) : (
+                  <Building2 size={16} />
+                )}
                 {addr.label || "Địa chỉ"}
-              </span>
+              </div>
               {addr.isDefault && (
-                <span className="text-xs font-medium px-2 py-0.5 bg-blue-100 text-[#193767] rounded">
+                <Badge variant="outline" className="bg-blue-100 text-[#193767]">
                   Mặc định
-                </span>
+                </Badge>
               )}
             </div>
-            <div className="text-sm font-semibold text-[#1D1D20] flex flex-wrap gap-1">
+            <div className="text-sm font-semibold flex flex-wrap gap-1">
               <span>{addr.recipient}</span>
               <span className="text-[#000000]">|</span>
               <span>{addr.phone}</span>
             </div>
             <p className="text-sm text-[#71717A]">{formatFullAddress(addr)}</p>
-            <div className="mt-auto pt-4 flex justify-end items-center gap-3 text-sm">
+            <div className="mt-auto pt-2 flex justify-end items-center gap-3 text-sm">
               <button
+                disabled={loading}
                 onClick={() => handleDelete(addr)}
-                className="text-[#1D1D20] hover:underline transition"
+                className="text-[#1D1D20] hover:underline"
               >
-                Xoá
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Xoá"}
               </button>
               <span className="text-gray-300">|</span>
               <button
                 onClick={() => handleEdit(addr)}
-                className="text-[#3B82F6] hover:underline transition"
+                className="text-[#3B82F6] hover:underline"
               >
                 Cập nhật
               </button>
@@ -302,58 +363,103 @@ export default function AddressBook() {
         subtitle="Thay đổi thông tin địa chỉ nhận hàng"
         onCancel={() => setOpen(false)}
         onConfirm={form.handleSubmit(handleSave)}
-        confirmText="Lưu"
+        confirmText={loading ? "Đang lưu..." : "Lưu"}
         cancelText="Hủy"
       >
         <Form {...form}>
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSave)}>
-            {renderSelectField(
-              "province",
-              "Tỉnh/Thành phố",
-              provinces,
-              locationService.getDistrictsByProvince,
-              setDistricts,
-              "district",
-              setWards
-            )}
-            {renderSelectField(
-              "district",
-              "Quận/Huyện",
-              districts,
-              locationService.getWardsByDistrict,
-              setWards,
-              "ward",
-              () => {}
-            )}
-            {renderSelectField("ward", "Phường/Xã", wards)}
+            <DropdownSelect
+              name="province"
+              label="Tỉnh/Thành phố"
+              options={cachedProvinces}
+              loading={false}
+              onSelect={async (province) => {
+                setLoadingDistricts(true);
+                const res = await locationService.getDistrictsByProvince(
+                  province.code
+                );
+                setDistricts(res.data.districts || []);
+                setLoadingDistricts(false);
+                form.setValue("district", "");
+                setWards([]);
+              }}
+            />
+            <DropdownSelect
+              name="district"
+              label="Quận/Huyện"
+              options={districts}
+              loading={loadingDistricts}
+              onSelect={async (district) => {
+                setLoadingWards(true);
+                const res = await locationService.getWardsByDistrict(
+                  district.code
+                );
+                setWards(res.data.wards || []);
+                setLoadingWards(false);
+                form.setValue("ward", "");
+              }}
+            />
+            <DropdownSelect
+              name="ward"
+              label="Phường/Xã"
+              options={wards}
+              loading={loadingWards}
+            />
 
             {[
-              ["detail", "Địa chỉ nhà"],
+              ["detail", "Địa chỉ nhà", "required"],
               ["label", "Tên gợi nhớ"],
-              ["recipient", "Người nhận"],
-              ["phone", "Số điện thoại"],
-            ].map(([name, label]) => (
+              ["recipient", "Người nhận", "required"],
+            ].map(([name, label, required]) => (
               <FormField
-                key={name}
+                key={String(name)}
                 control={form.control}
                 name={name as keyof AddressFormValues}
+                rules={
+                  required
+                    ? { required: `${label} không được bỏ trống` }
+                    : undefined
+                }
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{label}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder={`Nhập ${label.toLowerCase()}`}
-                        value={field.value as string}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        name={field.name}
-                        ref={field.ref}
+                        {...field}
+                        value={
+                          typeof field.value === "string" ? field.value : ""
+                        }
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
             ))}
+
+            <FormField
+              control={form.control}
+              name="phone"
+              rules={{
+                required: "Số điện thoại bắt buộc",
+                pattern: {
+                  value: /^(0|\+84)\d{9}$/,
+                  message: "Số điện thoại không hợp lệ",
+                },
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Số điện thoại</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Nhập số điện thoại"
+                      {...field}
+                      value={typeof field.value === "string" ? field.value : ""}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
