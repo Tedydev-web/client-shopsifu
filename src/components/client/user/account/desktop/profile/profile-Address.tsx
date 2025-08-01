@@ -301,7 +301,7 @@ export default function AddressBook() {
       <div className="flex justify-between items-center">
         <h2 className="font-semibold text-base text-[#121214]">Sổ địa chỉ</h2>
         <Button
-          variant="outline"
+          variant="ghost"
           className="flex items-center gap-2 text-[#D70019]"
           onClick={handleAdd}
         >

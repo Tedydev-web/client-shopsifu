@@ -4,7 +4,7 @@ import {
   User,
   NotepadText,
   ShieldCheck,
-  BookMarked
+  BookMarked,
 } from "lucide-react";
 
 export const sidebarItems = [
@@ -24,9 +24,11 @@ export const sidebarItems = [
     icon: <User className="w-5 h-5" strokeWidth={2.5} />,
   },
   {
-    labelKey: "user.account.profile.profile",
-    href: "/user/policy",
+    labelKey: "user.account.profile.policy",
+    href: "/policy",
     icon: <BookMarked className="w-5 h-5" strokeWidth={2.5} />,
+    target: "_blank",
+    rel: "noopener noreferrer",
   },
   {
     labelKey: "user.settings.section.notifications",

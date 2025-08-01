@@ -50,19 +50,21 @@ export default function ProfileHeader({
 
   return (
     <div className="bg-white rounded-lg shadow-sm flex min-h-[170px] overflow-hidden items-center border border-gray-200">
-      {/* Cột Avatar + Info */}
+      {/* Avatar + Info */}
       <div className="flex flex-1 items-center gap-4 p-6">
+        {/* Avatar */}
         {avatar ? (
           <img
             src={avatar}
             alt="Avatar"
-            className="w-16 h-16 rounded-full object-cover border border-gray-300"
+            className="w-20 h-20 rounded-full object-cover border border-gray-300"
           />
         ) : (
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-red-500 font-semibold text-2xl">
+          <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-red-500 font-semibold text-2xl">
             {name?.[0]?.toUpperCase() || "U"}
           </div>
         )}
+        {/* Info */}
         <div className="space-y-1">
           <div className="flex items-center">
             <User className="w-4 h-4 mr-2 text-gray-500" />
@@ -99,8 +101,11 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* Cột Total Orders */}
-      <div className="flex flex-1 items-center gap-4 p-6 border-l-4 border-red-500">
+      {/* Separator */}
+      <div className="h-24 w-[3px] bg-red-500 rounded-full mx-2" />
+
+      {/* Total Orders */}
+      <div className="flex flex-1 items-center gap-4 p-6">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
           <ShoppingCart className="w-6 h-6 text-red-500" />
         </div>
@@ -114,8 +119,11 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* Cột Total Spent */}
-      <div className="flex flex-1 items-center gap-4 p-6 border-l-4 border-red-500">
+      {/* Separator */}
+      <div className="h-24 w-[3px] bg-red-500 rounded-full mx-2" />
+
+      {/* Total Spent */}
+      <div className="flex flex-1 items-center gap-4 p-6">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
           <Receipt className="w-6 h-6 text-red-500" />
         </div>
