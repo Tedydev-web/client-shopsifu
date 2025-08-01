@@ -105,5 +105,5 @@ export interface CreatePaymentVnPayUrl{
   amount: number;
   orderInfo: string;
   orderId: string;
-  locale: string | "vn";
+  locale: string | "vn";  
 }

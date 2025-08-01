@@ -25,7 +25,7 @@ interface QrSepayProps {
 export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel }: QrSepayProps) {
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [isExpired, setIsExpired] = useState(false);
-  const { payments } = useShopsifuSocket();
+  const { payments, connect, disconnect } = useShopsifuSocket();
   const shopProducts = useSelector(selectShopProducts);
   const router = useRouter();
 
@@ -47,6 +47,17 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
   // Generate QR URL according to Sepay docs
   const qrUrl = `https://qr.sepay.vn/img?acc=${SEPAY_ACCOUNT}&bank=${SEPAY_BANK}&amount=${totalAmount}&des=DH${paymentId}`;
   
+  // Connect and disconnect socket based on component lifecycle
+  useEffect(() => {
+    if (paymentId) {
+      connect(paymentId);
+    }
+    return () => {
+      disconnect();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paymentId]);
+
   // Console log để debug data truyền vào QrSepay
   useEffect(() => {
     console.log('🔗 QR Sepay Data Debug:', {
@@ -78,6 +89,7 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
     ) {
       console.log('✅ Payment success event received via WebSocket for order:', orderId);
       toast.success('Thanh toán thành công!');
+      console.clear();
       // Redirect to the success page
       router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
     }
@@ -114,6 +126,7 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
         if (order && order.status === OrderStatus.PENDING_PICKUP) {
           clearInterval(intervalId);
           toast.success('Thanh toán thành công!');
+          console.clear();
           router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
         }
       } catch (error) {

@@ -1,62 +1,101 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState, useCallback, ReactNode, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 
 type PaymentData = any
 
-interface ShopsifuSocketContextType {
-  isConnected: boolean
+interface SocketContextType {
   payments: PaymentData[]
+  isConnected: boolean
+  connect: (paymentId: string) => void
+  disconnect: () => void
+  sendMoney?: (amount: string) => void
 }
 
-const ShopsifuSocketContext = createContext<ShopsifuSocketContextType>({
-  isConnected: false,
-  payments: [],
-})
+const SocketContext = createContext<SocketContextType | undefined>(undefined)
 
-export const useShopsifuSocket = () => useContext(ShopsifuSocketContext)
+export const useShopsifuSocket = () => {
+  const context = useContext(SocketContext)
+  if (context === undefined) {
+    throw new Error('useShopsifuSocket must be used within a ShopsifuSocketProvider')
+  }
+  return context
+}
 
-export const ShopsifuSocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const [socket, setSocket] = useState<Socket | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
+export const ShopsifuSocketProvider = ({ children }: { children: ReactNode }) => {
   const [payments, setPayments] = useState<PaymentData[]>([])
+  const [isConnected, setIsConnected] = useState(false)
+  const socketRef = useRef<Socket | null>(null)
 
-  useEffect(() => {
+  const connect = useCallback((paymentId: string) => {
+    if (socketRef.current) {
+      socketRef.current.disconnect()
+    }
+
+    // Kết nối trực tiếp đến namespace payment
     const newSocket = io('https://api.shopsifu.live/payment', {
+      path: '/socket.io',
+      query: { paymentId },
+      // Cookie sẽ tự động được gửi
+      withCredentials: true,
       transports: ['websocket'],
-      // auth: { token: 'your_token' }, // nếu backend yêu cầu
+      forceNew: true
     })
 
-    setSocket(newSocket)
-
     newSocket.on('connect', () => {
-      console.log('🟢 Connected')
+      console.log(`[WebSocket] Connected to payment namespace with paymentId: ${paymentId}`)
       setIsConnected(true)
     })
 
     newSocket.on('disconnect', () => {
-      console.log('🔴 Disconnected')
+      console.log('[WebSocket] Disconnected from payment namespace')
       setIsConnected(false)
     })
 
+    // Listen event 'payment' như backend emit
     newSocket.on('payment', (data: PaymentData) => {
-      console.log('📨 Payment event:', data)
-      setPayments((prev) => [...prev, data])
+      // console.log('Received payment event:', data)
+      setPayments((prevPayments) => [...prevPayments, data])
     })
 
-    newSocket.on('connect_error', (err) => {
-      console.error('❌ Connection error:', err.message)
+    // Listen event 'receive-money' từ PaymentGateway
+    newSocket.on('receive-money', (data: PaymentData) => {
+      // console.log('Received money event:', data)
+      setPayments((prevPayments) => [...prevPayments, data])
     })
     
-    return () => {
-      newSocket.disconnect()
+    newSocket.on('connect_error', (err) => {
+      console.error('❌ Connection error:', err.message)
+      setIsConnected(false)
+    })
+
+    socketRef.current = newSocket
+  }, [])
+
+  const disconnect = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.disconnect()
+      socketRef.current = null
+      setIsConnected(false)
+      setPayments([])
     }
   }, [])
 
-  return (
-    <ShopsifuSocketContext.Provider value={{ isConnected, payments }}>
-      {children}
-    </ShopsifuSocketContext.Provider>
-  )
+  // Thêm method để send message
+  const sendMoney = useCallback((amount: string) => {
+    if (socketRef.current && isConnected) {
+      socketRef.current.emit('send-money', amount)
+    }
+  }, [isConnected])
+
+  const contextValue = {
+    payments,
+    isConnected,
+    connect,
+    disconnect,
+    sendMoney
+  }
+
+  return <SocketContext.Provider value={contextValue}>{children}</SocketContext.Provider>
 }
