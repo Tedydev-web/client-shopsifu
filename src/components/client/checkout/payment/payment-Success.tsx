@@ -24,7 +24,17 @@ export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMeth
   
   // Theo dõi trạng thái thanh toán nếu là pending
   useEffect(() => {
-    if (status !== 'pending') return;
+    // Không gọi API trong các trường hợp sau:
+    // 1. Status đã xác định (success/failed)
+    // 2. Là callback từ VNPay (đã xác thực qua verifyVNPayReturn)
+    // 3. OrderId không hợp lệ (N/A hoặc không định dạng đúng)
+    if (
+      status !== 'pending' || 
+      paymentMethod === 'vnpay' ||
+      !orderId || 
+      orderId === 'N/A' ||
+      !orderId.match(/^[a-zA-Z0-9]+$/) // Kiểm tra OrderId có hợp lệ không
+    ) return;
     
     const checkPaymentStatus = async () => {
       try {
@@ -127,21 +137,60 @@ const PendingView = ({
   onPaymentSuccess: () => void 
 }) => {
   const { connect, disconnect } = useShopsifuSocket();
+  const [paymentId, setPaymentId] = useState<string>('');
+
+  // Xác định paymentId từ orderId hoặc từ URL params
+  useEffect(() => {
+    // Với VNPay, trích xuất paymentId từ OrderInfo trong URL nếu có
+    if (paymentMethod === 'vnpay') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const orderInfo = searchParams.get('vnp_OrderInfo');
+      
+      if (orderInfo && orderInfo.startsWith('DH')) {
+        // Lấy paymentId từ OrderInfo (định dạng "DH12345")
+        setPaymentId(orderInfo.replace('DH', ''));
+        console.log(`[VNPay] Extracted paymentId: ${orderInfo.replace('DH', '')}`);
+      } else {
+        // Nếu không có trong URL, có thể sử dụng orderId làm paymentId
+        setPaymentId(orderId);
+      }
+    } else {
+      // Với các phương thức khác, dùng orderId làm paymentId
+      setPaymentId(orderId);
+    }
+  }, [orderId, paymentMethod]);
 
   useEffect(() => {
-    if (orderId) {
-      connect(orderId);
+    // Không kết nối socket nếu:
+    // 1. Là callback từ VNPay (đã xác thực qua verifyVNPayReturn)
+    // 2. PaymentId không hợp lệ
+    if (
+      paymentMethod === 'vnpay' || 
+      !paymentId || 
+      paymentId === 'N/A' || 
+      !paymentId.match(/^[a-zA-Z0-9]+$/) // Kiểm tra paymentId có hợp lệ không
+    ) {
+      return;
     }
+    
+    // Kết nối socket với paymentId thay vì orderId
+    console.log(`[Socket] Connecting with paymentId: ${paymentId}`);
+    connect(paymentId);
     return () => disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
+  }, [paymentId, paymentMethod]);
 
   useEffect(() => {
+    // Không theo dõi sự kiện storage nếu là VNPay callback
+    if (paymentMethod === 'vnpay' || !paymentId || paymentId === 'N/A') {
+      return;
+    }
+    
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === 'payment_event' && event.newValue) {
         const paymentData = JSON.parse(event.newValue);
-        if (paymentData && paymentData.paymentId.toString() === orderId && paymentData.status === 'success') {
-          console.log('✅ Payment success detected for order:', orderId);
+        if (paymentData && paymentData.paymentId.toString() === paymentId && paymentData.status === 'success') {
+          console.log('✅ Payment success detected for paymentId:', paymentId);
           localStorage.removeItem('payment_event');
           onPaymentSuccess();
         }
@@ -149,7 +198,7 @@ const PendingView = ({
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [orderId, onPaymentSuccess]);
+  }, [paymentId, onPaymentSuccess, paymentMethod]);
 
   // Chọn màu dựa vào phương thức thanh toán
   const getPaymentColors = () => {
@@ -187,9 +236,9 @@ const PendingView = ({
   const getPaymentLogo = () => {
     switch (paymentMethod) {
       case 'vnpay':
-        return "/payment-icons/vnpay.svg";
+        return "/images/client/checkout/vnpay_vi.webp";
       case 'momo':
-        return "/payment-logos/momo.png";
+        return "/images/client/checkout/momo_vi.webp";
       default:
         return null;
     }

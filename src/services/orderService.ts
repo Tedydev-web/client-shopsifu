@@ -127,10 +127,12 @@ export const orderService = {
     signal?: AbortSignal
   ): Promise<any> => {
     try {
+      console.log('[VNPay API] Verifying payment with query:', queryString);
       const response = await privateAxios.get(
         `/payment/vnpay/verify-return?${queryString}`,
         { signal }
       );
+      console.log('[VNPay API] Verification response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error in verifyVNPayReturn:', error);

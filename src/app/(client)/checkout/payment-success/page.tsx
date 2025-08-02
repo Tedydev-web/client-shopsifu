@@ -14,13 +14,27 @@ const PaymentSuccessContent = () => {
   // Kiểm tra xem có phải là callback từ VNPay không
   const isVNPayCallback = searchParams.has('vnp_ResponseCode');
   
+  console.log('Payment Success Page:', {
+    isVNPayCallback,
+    params: Object.fromEntries(searchParams.entries()),
+  });
+  
   useEffect(() => {
     const processParams = async () => {
       // Nếu là callback từ VNPay
       if (isVNPayCallback) {
         try {
-          // Lấy toàn bộ query parameters
-          const queryString = searchParams.toString();
+          // Chỉ lấy các query params bắt đầu bằng vnp_
+          const vnpParams = Array.from(searchParams.entries())
+            .filter(([key]) => key.startsWith('vnp_'))
+            .reduce((obj, [key, value]) => {
+              obj[key] = value;
+              return obj;
+            }, {} as Record<string, string>);
+          
+          // Tạo query string mới chỉ với các tham số của VNPay
+          const queryString = new URLSearchParams(vnpParams).toString();
+          console.log('[VNPay] Sending verification request with params:', queryString);
           
           // Gọi API xác thực kết quả thanh toán VNPay
           const response = await orderService.verifyVNPayReturn(queryString);
