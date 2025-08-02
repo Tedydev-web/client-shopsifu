@@ -42,10 +42,33 @@ export function ShippingAddress({
         const response = await addressService.getAll();
         if (response.data) {
           setSavedAddresses(response.data);
+          
           // Automatically select the default address if available
           const defaultAddress = response.data.find(addr => addr.isDefault);
           if (defaultAddress) {
-            handleAddressSelect(defaultAddress.id);
+            // Kích hoạt chế độ chọn địa chỉ có sẵn
+            setIsSelectingAddress(true);
+            // Đặt ID địa chỉ đã chọn
+            setSelectedAddressId(defaultAddress.id);
+            
+            // Tạo đối tượng địa chỉ để cập nhật form ngay lập tức
+            const addressToUpdate: Address = {
+              id: defaultAddress.id,
+              isDefault: defaultAddress.isDefault,
+              receiverName: defaultAddress.recipient || defaultAddress.name || '',
+              receiverPhone: defaultAddress.phoneNumber || '',
+              addressDetail: defaultAddress.street,
+              ward: `${defaultAddress.ward}|${defaultAddress.ward}`,
+              district: `${defaultAddress.district}|${defaultAddress.district}`,
+              province: `${defaultAddress.province}|${defaultAddress.province}`,
+              type: defaultAddress.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
+            };
+            
+            console.log('[ShippingAddress] Auto-selected default address:', defaultAddress);
+            console.log('[ShippingAddress] Address to update on load:', addressToUpdate);
+            
+            // Gọi hàm cập nhật từ component cha trực tiếp không qua setTimeout
+            onSelectExistingAddress(addressToUpdate);
           }
         }
       } catch (error) {
@@ -56,8 +79,58 @@ export function ShippingAddress({
     };
 
     fetchAddresses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Debug useEffect để theo dõi sự thay đổi của formData
+  useEffect(() => {
+    console.log('[ShippingAddress] formData changed:', {
+      receiverName: formData.receiverName,
+      receiverPhone: formData.receiverPhone,
+      province: formData.province,
+      district: formData.district,
+      ward: formData.ward,
+      address: formData.address
+    });
+  }, [formData]);
+  
+  // Theo dõi khi selectedAddressId thay đổi để cập nhật dữ liệu
+  useEffect(() => {
+    if (selectedAddressId && isSelectingAddress) {
+      const selected = savedAddresses.find(addr => addr.id === selectedAddressId);
+      if (selected) {
+        console.log('[ShippingAddress] Address selected by ID change:', selected);
+        
+        // Tạo đối tượng địa chỉ để cập nhật form
+        const addressToUpdate: Address = {
+          id: selected.id,
+          isDefault: selected.isDefault,
+          receiverName: selected.recipient || selected.name || '',
+          receiverPhone: selected.phoneNumber || '',
+          addressDetail: selected.street,
+          ward: `${selected.ward}|${selected.ward}`,
+          district: `${selected.district}|${selected.district}`,
+          province: `${selected.province}|${selected.province}`,
+          type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
+        };
+        
+        // Gọi hàm cập nhật từ component cha
+        onSelectExistingAddress(addressToUpdate);
+      }
+    }
+  }, [selectedAddressId, isSelectingAddress, savedAddresses]);
+  
+  // Theo dõi khi isSelectingAddress thay đổi để xử lý chuyển đổi giữa các chế độ
+  useEffect(() => {
+    if (!isSelectingAddress) {
+      // Nếu chuyển từ chọn địa chỉ có sẵn sang nhập địa chỉ mới
+      console.log('[ShippingAddress] Switching to manual address input mode');
+      setSelectedAddressId('');
+      
+      // Không cần gửi sự kiện reset ở đây vì đã xử lý trong nút "nhập địa chỉ mới"
+    }
+  }, [isSelectingAddress]);
+  
   const {
     customerProvince,
     customerDistrict,
@@ -80,17 +153,32 @@ export function ShippingAddress({
     setSelectedAddressId(id);
     const selected = savedAddresses.find((addr) => addr.id === id);
     if (selected) {
+      // Log thông tin địa chỉ được chọn để debug
+      console.log('[ShippingAddress] Selected address:', selected);
+      
+      // Tạo đối tượng địa chỉ để cập nhật form
+      // Format các trường province, district, ward để phù hợp với useCustomer-Info hook
+      // (định dạng code|name)
       const addressToUpdate: Address = {
         id: selected.id,
         isDefault: selected.isDefault,
-        receiverName: selected.recipient || '',
+        receiverName: selected.recipient || selected.name || '',
         receiverPhone: selected.phoneNumber || '',
         addressDetail: selected.street,
-        ward: selected.ward,
-        district: selected.district,
-        province: selected.province,
+        // Định dạng địa chỉ với cả code và name: "code|name"
+        ward: `${selected.ward}|${selected.ward}`,
+        district: `${selected.district}|${selected.district}`,
+        province: `${selected.province}|${selected.province}`,
         type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
       };
+      
+      console.log('[ShippingAddress] Address to update:', addressToUpdate);
+      
+      // Kích hoạt chế độ đang chọn địa chỉ có sẵn
+      setIsSelectingAddress(true);
+      
+      // Gọi hàm cập nhật từ component cha 
+      // Đặt sau setIsSelectingAddress để đảm bảo state đã được cập nhật
       onSelectExistingAddress(addressToUpdate);
     }
   };
@@ -109,7 +197,21 @@ export function ShippingAddress({
                 variant="outline"
                 size="sm"
                 className="h-8 text-sm w-full sm:w-auto"
-                onClick={() => setIsSelectingAddress(true)}
+                onClick={() => {
+                  // Đánh dấu chuyển sang chế độ chọn địa chỉ có sẵn
+                  setIsSelectingAddress(true);
+                  
+                  // Tự động chọn địa chỉ mặc định nếu có
+                  const defaultAddress = savedAddresses.find(addr => addr.isDefault);
+                  if (defaultAddress) {
+                    setSelectedAddressId(defaultAddress.id);
+                    handleAddressSelect(defaultAddress.id);
+                  } else if (savedAddresses.length > 0) {
+                    // Nếu không có địa chỉ mặc định, chọn địa chỉ đầu tiên
+                    setSelectedAddressId(savedAddresses[0].id);
+                    handleAddressSelect(savedAddresses[0].id);
+                  }
+                }}
               >
                 <Book className="h-4 w-4 mr-1.5 flex-shrink-0" />
                 Chọn địa chỉ có sẵn
@@ -123,6 +225,7 @@ export function ShippingAddress({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
+          {/* Luôn hiển thị trường tên người nhận và số điện thoại, ngay cả khi đang chọn địa chỉ có sẵn */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="receiverName" className="text-xs font-medium">
@@ -132,7 +235,7 @@ export function ShippingAddress({
                 id="receiverName"
                 name="receiverName"
                 placeholder="Nhập tên người nhận"
-                value={formData.receiverName}
+                value={formData.receiverName || ''}
                 onChange={handleChange}
                 className="text-sm"
                 required
@@ -146,7 +249,7 @@ export function ShippingAddress({
                 id="receiverPhone"
                 name="receiverPhone"
                 placeholder="Nhập số điện thoại người nhận"
-                value={formData.receiverPhone}
+                value={formData.receiverPhone || ''}
                 onChange={handleChange}
                 className="text-sm"
                 required
@@ -204,6 +307,22 @@ export function ShippingAddress({
                   onClick={() => {
                     setIsSelectingAddress(false);
                     setSelectedAddressId('');
+                    
+                    // Khi chuyển sang nhập địa chỉ mới, xóa thông tin địa chỉ cũ
+                    const clearedAddressData: Address = {
+                      id: '',
+                      receiverName: formData.receiverName, // Giữ lại tên người nhận
+                      receiverPhone: formData.receiverPhone, // Giữ lại số điện thoại
+                      addressDetail: '', // Xóa thông tin địa chỉ
+                      ward: '',
+                      district: '',
+                      province: '',
+                      type: 'NHÀ RIÊNG', // Giá trị mặc định
+                      isDefault: false
+                    };
+                    
+                    // Gọi hàm từ component cha để cập nhật lại formData
+                    onSelectExistingAddress(clearedAddressData);
                   }}
                 >
                   nhập địa chỉ mới

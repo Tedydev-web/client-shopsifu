@@ -22,6 +22,14 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
 
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   
+  // Thêm state lưu trữ thông tin nhập mới tạm thời
+  const [tempNewAddressData, setTempNewAddressData] = useState({
+    province: '',
+    district: '',
+    ward: '',
+    address: ''
+  });
+  
   const [formData, setFormData] = useState<CustomerFormData>({
     // Customer Info
     fullName: '',
@@ -41,15 +49,45 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
 
   // Pre-fill form with user data if available
   useEffect(() => {
+    console.log('UserData from Redux:', userData);
     if (userData) {
-      setFormData(prev => ({
-        ...prev,
-        fullName: userData.name || '',
+      // Đảm bảo fullName được lấy từ userData.name hoặc kết hợp từ firstName và lastName
+      let fullName = userData.name;
+      if (!fullName) {
+        const firstName = userData.firstName || '';
+        const lastName = userData.lastName || '';
+        fullName = [firstName, lastName].filter(Boolean).join(' ');
+      }
+      
+      // Cập nhật state với dữ liệu từ Redux
+      const updatedFormData = {
+        ...formData,
+        fullName: fullName || '',
         phoneNumber: userData.phoneNumber || '',
-        email: userData.email || '',
-      }));
+        email: userData.email || ''
+      };
+      
+      console.log('Setting form data with user info:', updatedFormData);
+      setFormData(updatedFormData);
     }
   }, [userData]);
+  
+  // Theo dõi thay đổi của selectedAddress
+  useEffect(() => {
+    if (!selectedAddress) {
+      // Nếu chuyển sang chế độ nhập mới, khôi phục dữ liệu nhập trước đó nếu có
+      if (tempNewAddressData.province || tempNewAddressData.district || tempNewAddressData.ward || tempNewAddressData.address) {
+        console.log('[InformationIndex] Restoring previous manual address data:', tempNewAddressData);
+        setFormData(prev => ({
+          ...prev,
+          province: tempNewAddressData.province,
+          district: tempNewAddressData.district,
+          ward: tempNewAddressData.ward,
+          address: tempNewAddressData.address
+        }));
+      }
+    }
+  }, [selectedAddress, tempNewAddressData]);
 
   const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
     let name: string, val: string;
@@ -71,6 +109,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
   };
 
   const handleCheckboxChange = (checked: boolean) => {
+    console.log('Checkbox saveInfo changed to:', checked);
     setFormData(prev => ({ ...prev, saveInfo: checked }));
   };
 
@@ -79,18 +118,50 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
   };
 
 
-
   const handleSelectExistingAddress = (address: Address) => {
-    setSelectedAddress(address);
-    setFormData(prev => ({
-      ...prev,
-      receiverName: address.receiverName,
-      receiverPhone: address.receiverPhone,
-      province: address.province,
-      district: address.district,
-      ward: address.ward,
-      address: address.addressDetail
-    }));
+    // Log để debug
+    console.log('[InformationIndex] Received selected address:', address);
+    
+    // Kiểm tra xem địa chỉ này có id không (để biết là địa chỉ có sẵn hay địa chỉ mới)
+    const isExistingAddress = address.id && address.id.length > 0;
+    
+    // Lưu địa chỉ đã chọn vào state nếu là địa chỉ có sẵn, hoặc null nếu là nhập mới
+    setSelectedAddress(isExistingAddress ? address : null);
+    
+    // Đảm bảo các giá trị là string không phải undefined
+    const safeReceiverName = address.receiverName || '';
+    const safeReceiverPhone = address.receiverPhone || '';
+    const safeAddressDetail = address.addressDetail || '';
+    const safeProvince = address.province || '';
+    const safeDistrict = address.district || '';
+    const safeWard = address.ward || '';
+
+    if (!isExistingAddress) {
+      // Nếu chuyển sang chế độ nhập mới, lưu lại thông tin nhập trước đó
+      setTempNewAddressData({
+        province: formData.province,
+        district: formData.district,
+        ward: formData.ward,
+        address: formData.address
+      });
+    }
+
+    // Cập nhật formData với thông tin từ địa chỉ đã chọn
+    const updatedFormData = {
+      ...formData,
+      receiverName: safeReceiverName || formData.fullName, // Sử dụng tên người dùng nếu không có tên người nhận
+      receiverPhone: safeReceiverPhone || formData.phoneNumber, // Sử dụng SĐT người dùng nếu không có SĐT người nhận
+      province: isExistingAddress ? safeProvince : '', // Nếu là địa chỉ mới, xóa các thông tin địa chỉ
+      district: isExistingAddress ? safeDistrict : '',
+      ward: isExistingAddress ? safeWard : '',
+      address: isExistingAddress ? safeAddressDetail : ''
+    };
+    
+    console.log('[InformationIndex] Updated form data:', updatedFormData);
+    console.log('[InformationIndex] Is existing address:', isExistingAddress);
+    
+    // Cập nhật state formData
+    setFormData(updatedFormData);
   };
 
   const handleSubmit = () => {
@@ -215,7 +286,12 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     <div className="space-y-4">
       <form id="checkout-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         <CustomerInfo
-          formData={formData}
+          formData={{
+            fullName: formData.fullName,
+            phoneNumber: formData.phoneNumber,
+            email: formData.email,
+            saveInfo: formData.saveInfo
+          }}
           handleChange={handleChange}
           isLoggedIn={isLoggedIn}
         />
