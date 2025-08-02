@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { selectShopOrders, selectShopProducts } from '@/store/features/checkout/ordersSilde';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { OrderCreateRequest } from '@/types/order.interface';
+import { OrderCreateRequest, OrderHandlerResult } from '@/types/order.interface';
 import { CheckoutStep } from '@/providers/CheckoutContext';
 
 export const useCheckout = () => {
@@ -19,6 +19,23 @@ export const useCheckout = () => {
   const shopProducts = useSelector(selectShopProducts);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Calculate total amount from all products in all shops
+  const calculateTotalAmount = (): number => {
+    // Calculate subtotal from all products
+    const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
+      return total + shopProducts.reduce((shopTotal, product) => {
+        return shopTotal + (product.price * product.quantity);
+      }, 0);
+    }, 0);
+
+    // Phí vận chuyển và giảm giá (hiện tại đang là 0)
+    const shippingFee = 0;
+    const voucherDiscount = 0;
+    
+    // Tổng tiền thanh toán
+    return subtotal + shippingFee - voucherDiscount;
+  };
 
   if (context === undefined) {
     throw new Error('useCheckout must be used within a CheckoutProvider');
@@ -45,22 +62,20 @@ export const useCheckout = () => {
     context.updateShippingMethod(method);
   };
 
-  const handleCreateOrder = async () => {
-    if (isSubmitting) return;
+const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResult | undefined> => {
+  if (isSubmitting) return;
 
-    // Validate receiver info
-    if (!context.state.receiverInfo.name || !context.state.receiverInfo.phone || !context.state.receiverInfo.address) {
-      toast.error('Vui lòng điền đầy đủ thông tin người nhận.');
-      return;
-    }
+  // Validate receiver info
+  if (!context.state.receiverInfo.name || !context.state.receiverInfo.phone || !context.state.receiverInfo.address) {
+    toast.error('Vui lòng điền đầy đủ thông tin người nhận.');
+    return;
+  }
 
-    // Check if we have orders from Redux
-    if (!shopOrders || shopOrders.length === 0) {
-      toast.error('Không có sản phẩm nào để đặt hàng.');
-      return;
-    }
-
-    // Get the correct payment gateway ID from the selected payment method
+  // Check if we have orders from Redux
+  if (!shopOrders || shopOrders.length === 0) {
+    toast.error('Không có sản phẩm nào để đặt hàng.');
+    return;
+  }    // Get the correct payment gateway ID from the selected payment method
     const getPaymentGatewayId = (paymentMethod: string): string => {
       // Map payment method IDs to the correct gateway format
       const paymentGatewayMap: { [key: string]: string } = {
@@ -73,13 +88,6 @@ export const useCheckout = () => {
     };
 
     const selectedPaymentGateway = getPaymentGatewayId(context.state.paymentMethod);
-
-    // Special handling for sepay (bank transfer)
-    if (selectedPaymentGateway === 'sepay') {
-      console.log('🏦 Đã chọn phương thức chuyển khoản ngân hàng (sepay)');
-      // For sepay, we'll create the order first, then show QR code
-      // The QR component will handle the payment confirmation
-    }
 
     setIsSubmitting(true);
     try {
@@ -107,30 +115,62 @@ export const useCheckout = () => {
 
       // Call the order service
       const response = await orderService.create(orderPayload);
+      const orderData = response.data;
 
       // Handle different payment methods
       if (selectedPaymentGateway === 'sepay') {
-        // For sepay, we need to show QR code for payment
-        // The response should contain paymentId for QR generation
         toast.success('Đơn hàng đã được tạo! Vui lòng quét mã QR để thanh toán.');
-        
         const result = {
           success: true,
           paymentMethod: 'sepay',
-          orderData: response.data,
-          paymentId: response.data.paymentId
+          orderData: orderData,
+          paymentId: orderData.paymentId
         };
         
         console.log('🎯 Sepay Order Result:', result);
         return result;
+      } else if (selectedPaymentGateway === 'vnpay') {
+        try {
+          // Tạo URL thanh toán VNPay
+          const vnPayResponse = await orderService.createPaymentVnPayUrl({
+            amount: totalAmount || calculateTotalAmount(), // Sử dụng tổng tiền được truyền vào hoặc tính toán lại
+            orderInfo: `DH${orderData.paymentId}`,
+            orderId: orderData.paymentId.toString(), // Đảm bảo đây là string
+            locale: 'vn'
+          });
+          
+          toast.success('Đang chuyển hướng đến cổng thanh toán VNPay...');
+          
+          const result = {
+            success: true,
+            paymentMethod: 'vnpay',
+            orderData: {
+              ...orderData,
+              finalTotal: totalAmount || calculateTotalAmount() // Thêm finalTotal vào orderData
+            },
+            paymentId: orderData.paymentId, // Thêm paymentId cho socket
+            paymentUrl: vnPayResponse.data.paymentUrl
+          };
+          
+          console.log('🔄 VNPay Payment URL Generated:', result);
+          return result;
+        } catch (vnPayError: any) {
+          console.error('Failed to generate VNPay URL:', vnPayError);
+          toast.error('Không thể tạo URL thanh toán VNPay. Vui lòng thử lại.');
+          return {
+            success: false,
+            paymentMethod: 'vnpay',
+            orderData: orderData,
+            error: vnPayError.message
+          };
+        }
       } else {
-        // For other payment methods (COD, etc.)
+        // Các phương thức thanh toán khác (COD, ...)
         toast.success('Đặt hàng thành công!');
-        // router.push(`/user/purchase`);
         const result = {
           success: true,
           paymentMethod: selectedPaymentGateway,
-          orderData: response.data
+          orderData: orderData
         };
         
         console.log('✅ Other Payment Result:', result);

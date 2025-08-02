@@ -8,6 +8,8 @@ import {
   OrderCreateResponse,
   OrderCancelResponse,
   OrderStatus,
+  CreatePaymentVnPayUrl,
+  CreatePaymentVnPayUrlResponse
 } from "@/types/order.interface";
 
 export const orderService = {
@@ -102,6 +104,36 @@ export const orderService = {
       );
       return response.data;
     } catch (error) {
+      throw error;
+    }
+  },
+  createPaymentVnPayUrl: async (
+    data: CreatePaymentVnPayUrl,
+    signal?: AbortSignal
+  ): Promise<CreatePaymentVnPayUrlResponse> => {
+    try {
+      const response = await privateAxios.post(
+        API_ENDPOINTS.ORDERS.CREATE_PAYMENT_VNPAY_URL,
+        data,
+        { signal }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  verifyVNPayReturn: async (
+    queryString: string,
+    signal?: AbortSignal
+  ): Promise<any> => {
+    try {
+      const response = await privateAxios.get(
+        `/payment/vnpay/verify-return?${queryString}`,
+        { signal }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error in verifyVNPayReturn:', error);
       throw error;
     }
   },

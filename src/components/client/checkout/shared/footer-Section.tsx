@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useSelector } from 'react-redux';
 import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
 import { formatCurrency } from '@/utils/formatter';
+import { useEffect } from 'react';
 
 interface FooterSectionProps {
   variant?: 'default' | 'mobile';
@@ -15,6 +16,7 @@ interface FooterSectionProps {
   onPrevious?: () => void;
   onNext?: () => void;
   isSubmitting?: boolean;
+  onTotalChange?: (total: number) => void;
 }
 
 // Helper component for displaying a single price line
@@ -32,7 +34,8 @@ export function FooterSection({
   step = 'information',
   onPrevious,
   onNext,
-  isSubmitting = false
+  isSubmitting = false,
+  onTotalChange
 }: FooterSectionProps) {
   const shopProducts = useSelector(selectShopProducts);
 
@@ -49,6 +52,13 @@ export function FooterSection({
 
   // Calculate the final total
   const totalPayment = subtotal + shippingFee - voucherDiscount;
+  
+  // Gửi tổng tiền thanh toán lên component cha nếu có callback
+  useEffect(() => {
+    if (onTotalChange) {
+      onTotalChange(totalPayment);
+    }
+  }, [totalPayment, onTotalChange]);
 
   const getButtonText = () => {
     if (isSubmitting) return 'Đang xử lý...';
