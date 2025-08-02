@@ -22,15 +22,35 @@ interface PaymentStatusProps {
 export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMethod }: PaymentStatusProps) {
   const [status, setStatus] = useState(initialStatus);
   
+  // Log để debug initialStatus và paymentMethod
+  useEffect(() => {
+    console.log('[Payment Status Component]', {
+      initialStatus,
+      paymentMethod,
+      orderId,
+      totalAmount
+    });
+  }, [initialStatus, paymentMethod, orderId, totalAmount]);
+  
+  // Cập nhật state từ initialStatus khi thay đổi
+  useEffect(() => {
+    console.log('[Payment Status] initialStatus updated:', initialStatus);
+    setStatus(initialStatus);
+  }, [initialStatus]);
+
   // Theo dõi trạng thái thanh toán nếu là pending
   useEffect(() => {
+    // Nếu là VNPay, không cần kiểm tra vì đã được xác thực trực tiếp từ API
+    if (paymentMethod === 'vnpay') {
+      console.log('[VNPay] Using verified status from API:', status);
+      return;
+    }
+    
     // Không gọi API trong các trường hợp sau:
     // 1. Status đã xác định (success/failed)
-    // 2. Là callback từ VNPay (đã xác thực qua verifyVNPayReturn)
-    // 3. OrderId không hợp lệ (N/A hoặc không định dạng đúng)
+    // 2. OrderId không hợp lệ (N/A hoặc không định dạng đúng)
     if (
       status !== 'pending' || 
-      paymentMethod === 'vnpay' ||
       !orderId || 
       orderId === 'N/A' ||
       !orderId.match(/^[a-zA-Z0-9]+$/) // Kiểm tra OrderId có hợp lệ không
@@ -64,6 +84,9 @@ export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMeth
     return () => clearInterval(intervalId);
   }, [orderId, status]);
 
+  // Log trước khi render để debug
+  console.log(`[PaymentStatus] Rendering view for status: ${status} (initialStatus: ${initialStatus}, paymentMethod: ${paymentMethod})`);
+  
   if (status === 'pending') {
     return <PendingView 
              orderId={orderId} 
@@ -170,10 +193,11 @@ const PendingView = ({
       paymentId === 'N/A' || 
       !paymentId.match(/^[a-zA-Z0-9]+$/) // Kiểm tra paymentId có hợp lệ không
     ) {
+      console.log(`[Socket] Not connecting for ${paymentMethod} payment. Using verified status instead.`);
       return;
     }
     
-    // Kết nối socket với paymentId thay vì orderId
+    // Kết nối socket với paymentId thay vì orderId (chỉ cho các phương thức không phải VNPay)
     console.log(`[Socket] Connecting with paymentId: ${paymentId}`);
     connect(paymentId);
     return () => disconnect();
@@ -183,19 +207,42 @@ const PendingView = ({
   useEffect(() => {
     // Không theo dõi sự kiện storage nếu là VNPay callback
     if (paymentMethod === 'vnpay' || !paymentId || paymentId === 'N/A') {
+      console.log('[Storage Events] Not listening for', paymentMethod);
       return;
     }
     
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'payment_event' && event.newValue) {
-        const paymentData = JSON.parse(event.newValue);
+    // Kiểm tra localStorage hiện tại (để xử lý trường hợp đã được cập nhật nhưng chưa kích hoạt sự kiện)
+    try {
+      const existingData = localStorage.getItem('payment_event');
+      if (existingData) {
+        const paymentData = JSON.parse(existingData);
         if (paymentData && paymentData.paymentId.toString() === paymentId && paymentData.status === 'success') {
-          console.log('✅ Payment success detected for paymentId:', paymentId);
+          console.log('✅ Existing payment success found for paymentId:', paymentId);
           localStorage.removeItem('payment_event');
           onPaymentSuccess();
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('Error checking local storage:', err);
+    }
+    
+    // Lắng nghe sự kiện thay đổi từ các tab khác
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'payment_event' && event.newValue) {
+        try {
+          const paymentData = JSON.parse(event.newValue);
+          if (paymentData && paymentData.paymentId.toString() === paymentId && paymentData.status === 'success') {
+            console.log('✅ Payment success detected for paymentId:', paymentId);
+            localStorage.removeItem('payment_event');
+            onPaymentSuccess();
+          }
+        } catch (err) {
+          console.error('Error processing storage event:', err);
         }
       }
     };
+    
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [paymentId, onPaymentSuccess, paymentMethod]);

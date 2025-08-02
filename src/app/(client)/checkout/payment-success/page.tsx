@@ -38,15 +38,21 @@ const PaymentSuccessContent = () => {
           
           // Gọi API xác thực kết quả thanh toán VNPay
           const response = await orderService.verifyVNPayReturn(queryString);
+          console.log('[VNPay] Verification response:', response.data);
           const { isSuccess, vnp_TxnRef, vnp_Amount } = response.data;
           
           // Xử lý kết quả
           const extractedOrderId = vnp_TxnRef.replace('DH', '');
-          const amount = vnp_Amount / 100; // VNPay trả về số tiền * 100
+          const amount = vnp_Amount
           
+          // Cập nhật state
           setOrderId(extractedOrderId);
           setTotalAmount(amount);
-          setPaymentStatus(isSuccess ? 'success' : 'failed');
+          
+          // Cập nhật trạng thái ngay lập tức
+          const newStatus = isSuccess ? 'success' : 'failed';
+          console.log(`[VNPay] Setting payment status to: ${newStatus} for order: ${extractedOrderId}`);
+          setPaymentStatus(newStatus);
           
         } catch (error) {
           console.error('Failed to verify VNPay payment:', error);
