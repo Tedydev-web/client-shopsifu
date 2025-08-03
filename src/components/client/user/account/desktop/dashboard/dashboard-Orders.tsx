@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { orderService } from "@/services/orderService";
 import { format } from "date-fns";
-import { vi } from "date-fns/locale/vi";
+import { vi } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import { Order, OrderItem } from "@/types/order.interface";
 
@@ -82,8 +82,8 @@ export default function DashboardOrders() {
     );
   }
 
-  const handleViewDetail = (orderId: string) => {
-    router.push(`/user/orders/${orderId}`);
+  const handleViewDetail = (orderId: string, productId: string) => {
+    router.push(`/user/orders/${orderId}?productId=${productId}`);
   };
 
   return (
@@ -98,59 +98,83 @@ export default function DashboardOrders() {
         </Link>
       </div>
 
-      <div className="space-y-2">
-        {orders.map((order) => {
-          const firstItem = order.items[0];
-          const totalAmount = order.items.reduce(
-            (sum, item) => sum + item.skuPrice * item.quantity,
-            0
-          );
+      <div className="space-y-3">
+        {orders.map((order) =>
+          order.items.map((item: OrderItem) => {
+            const totalAmount = item.skuPrice * item.quantity;
 
-          return (
-            <div
-              key={order.id}
-              className="flex items-start justify-between border rounded-lg p-3 cursor-pointer hover:bg-gray-50"
-              onClick={() => handleViewDetail(order.id)}
-            >
-              <div className="flex gap-3">
-                <Image
-                  src={firstItem?.image || "/static/no-image.png"}
-                  alt={firstItem?.productName || "Sản phẩm"}
-                  width={60}
-                  height={60}
-                  className="rounded-md object-cover"
-                />
-                <div className="text-left">
-                  <p className="text-sm font-medium text-gray-900">
-                    Ngày đặt hàng:{" "}
-                    {format(new Date(order.createdAt), "dd/MM/yyyy", {
-                      locale: vi,
-                    })}
-                  </p>
-                  <p className="text-sm mt-1 text-gray-800 font-semibold">
-                    {firstItem?.productName}
-                  </p>
-                  <div className="text-sm font-medium text-red-600">
-                    {totalAmount.toLocaleString()}đ
+            return (
+              <div
+                key={item.id}
+                className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 h-[120px] flex flex-col justify-between"
+                onClick={() => handleViewDetail(order.id, item.productId)}
+              >
+                {/* Header: thông tin đơn hàng */}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <p className="text-base text-neutral-500">
+                      Đơn hàng:{" "}
+                      <span className="text-sm text-neutral-800 font-semibold">
+                        #{order.paymentId}
+                      </span>
+                    </p>
+                    <p className="text-base text-neutral-500">
+                      Ngày đặt:{" "}
+                      <span className="text-sm text-neutral-800 font-semibold">
+                        {format(new Date(order.createdAt), "dd/MM/yyyy", {
+                          locale: vi,
+                        })}
+                      </span>
+                    </p>
+                  </div>
+
+                  <span
+                    className={`text-xs px-2 py-1 rounded ${
+                      statusMap[order.status]?.className ||
+                      "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {statusMap[order.status]?.label || order.status}
+                  </span>
+                </div>
+
+                {/* Product Info */}
+                <div className="flex justify-between items-end mt-2">
+                  <div className="flex gap-3">
+                    <Image
+                      src={item.image || "/static/no-image.png"}
+                      alt={item.productName || "Sản phẩm"}
+                      width={70}
+                      height={70}
+                      className="rounded-md object-cover w-[70px] h-[70px]"
+                    />
+                    <div className="text-left max-w-[400px]">
+                      <p className="text-sm text-gray-800 font-semibold truncate">
+                        {item.productName}
+                      </p>
+                      {item.skuValue && (
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                          Phân loại: {item.skuValue}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <p className="text-sm text-neutral-500">
+                      Tổng thanh toán:{" "}
+                      <span className="text-sm font-semibold text-red-600">
+                        {totalAmount.toLocaleString()}đ
+                      </span>
+                    </p>
+                    <div className="text-sm text-blue-500 hover:underline mt-1">
+                      Xem chi tiết →
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <span
-                  className={`text-xs px-2 py-1 rounded ${
-                    statusMap[order.status]?.className ||
-                    "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {statusMap[order.status]?.label || order.status}
-                </span>
-                <div className="block mt-2 text-sm text-blue-500 hover:underline">
-                  Xem chi tiết →
-                </div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

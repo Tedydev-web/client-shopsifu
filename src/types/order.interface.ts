@@ -98,7 +98,10 @@ export interface OrderGetAllResponse {
   metadata: PaginationMetadata;
 }
 
-export type OrderGetByIdResponse = Order;
+export interface OrderGetByIdResponse {
+  data: Order;
+  metadata: PaginationMetadata;
+}
 
 
 export interface OrderCancelResponse {

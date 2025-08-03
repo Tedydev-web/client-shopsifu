@@ -9,11 +9,12 @@ import {
   OrderCreateRequest,
   OrderCreateResponse,
   OrderCancelResponse,
+  Order,
 } from "@/types/order.interface";
 
 export function useOrder() {
   const [orders, setOrders] = useState<OrderGetAllResponse["data"]>([]);
-  const [orderDetail, setOrderDetail] = useState<OrderGetByIdResponse | null>(null);
+  const [orderDetail, setOrderDetail] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +59,11 @@ export function useOrder() {
     setError(null);
     try {
       const res = await orderService.getById(orderId);
-      setOrderDetail(res);
+      console.log("📦 API getById response:", res.data);
+
+      const firstOrder = res.data ?? null; // ✅ chọn phần tử đầu
+      setOrderDetail(firstOrder);
+
       return res;
     } catch (err: any) {
       setError(err.message || "Lỗi khi tải chi tiết đơn hàng");

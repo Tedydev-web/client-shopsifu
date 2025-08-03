@@ -1,170 +1,265 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Phone } from "lucide-react";
-import { orderService } from "@/services/orderService";
+import { Phone, ChevronLeft } from "lucide-react";
+import { useOrder } from "./useOrder";
 import { Order, OrderItem } from "@/types/order.interface";
+import Link from "next/link";
 
 interface OrderDetailProps {
   orderId: string;
 }
 
 export default function OrderDetail({ orderId }: OrderDetailProps) {
-  const [order, setOrder] = useState<Order | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("productId");
+
+  const { fetchOrderDetail, loading } = useOrder();
+  const [order, setOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    if (orderId) {
-      orderService.getById(orderId).then((res: Order) => setOrder(res));
-    }
-  }, [orderId]);
+    const loadOrder = async () => {
+      if (!orderId) return;
+      try {
+        const res = await fetchOrderDetail(orderId);
+        console.log("📦 API response:", res);
+        setOrder(res?.data ?? null);
+      } catch (err) {
+        console.error("❌ Lỗi khi load chi tiết đơn:", err);
+      }
+    };
 
-  if (!order) return <div>Đang tải...</div>;
+    loadOrder();
+  }, [orderId, fetchOrderDetail]);
 
-  const firstItem = order.items?.[0];
-  const totalQuantity = order.items?.reduce(
-    (sum: number, item: OrderItem) => sum + item.quantity,
-    0
-  );
-  const totalAmount = order.items?.reduce(
-    (sum: number, item: OrderItem) => sum + item.skuPrice * item.quantity,
-    0
-  );
+  useEffect(() => {
+    console.log("🔄 Updated order state:", order);
+  }, [order]);
+
+  if (loading || !order) {
+    return <div>Đang tải...</div>;
+  }
+
+  const statusMap: Record<
+    string,
+    { label: string; variant?: "default" | "destructive" }
+  > = {
+    PENDING_PAYMENT: { label: "Chờ thanh toán" },
+    PENDING_PICKUP: { label: "Chờ lấy hàng" },
+    PENDING_DELIVERY: { label: "Đang giao hàng" },
+    DELIVERED: { label: "Đã giao hàng" },
+    RETURNED: { label: "Đã trả hàng" },
+    CANCELLED: { label: "Đã hủy", variant: "destructive" },
+  };
+
+  const currentStatus = statusMap[order.status] || { label: order.status };
+
+  const selectedItem: OrderItem | undefined =
+    order.items?.find((item) => item.productId === productId) ||
+    order.items?.[0];
+
+  const totalQuantity =
+    selectedItem?.quantity ??
+    order.items?.reduce((sum, item) => sum + item.quantity, 0) ??
+    0;
+
+  const discount = 234000; // demo discount
+  const shippingFee: number = 0;
+
+  const totalAmount: number =
+    order.items?.reduce(
+      (sum: number, item: OrderItem) => sum + item.skuPrice * item.quantity,
+      0
+    ) ?? 0;
+
+  const finalAmount = totalAmount - discount;
 
   return (
-    <div className="space-y-4">
-      {/* Nút quay lại */}
-      <Button variant="ghost" onClick={() => router.back()} className="mb-2">
-        ← Quay lại
-      </Button>
-
+    <div className="mx-auto bg-[#f5f5f5] space-y-4 text-sm rounded-md">
       {/* Breadcrumb */}
-      <div className="text-sm text-muted-foreground">
-        Lịch sử mua hàng /{" "}
-        <span className="text-foreground">Chi tiết đơn hàng</span>
-      </div>
+      <Link
+        href="/user/orders"
+        className="flex items-center gap-1 text-muted-foreground text-sm bg-white rounded-lg p-4 border cursor-pointer"
+      >
+        <ChevronLeft className="w-5 h-5" />
+        <span className="text-[#121214] text-sm">
+          Lịch sử mua hàng
+          <span className="font-medium text-[#CFCFD3]">
+            {" "}
+            / Chi tiết đơn hàng
+          </span>
+        </span>
+      </Link>
 
       {/* Tổng quan */}
-      <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-x-3">
-            <span className="text-sm font-medium">Đơn hàng: #{order.id}</span>
-            <span className="text-sm text-muted-foreground">
-              Ngày đặt: {new Date(order.createdAt).toLocaleDateString("vi-VN")}
-            </span>
-            <Badge variant="destructive">{order.status}</Badge>
-          </div>
-        </CardHeader>
-        <Separator />
-        <CardContent className="flex items-center justify-between py-4">
+      <section className="bg-white rounded-lg border p-4 space-y-3">
+        <h2 className="text-lg font-semibold">Tổng quan</h2>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="font-medium">Mã thanh toán: #{order.paymentId}</span>
+          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground">
+            Ngày đặt: {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+          </span>
+          <span className="text-muted-foreground">•</span>
+          <Badge
+            variant={currentStatus.variant || "default"}
+            className="text-xs"
+          >
+            {currentStatus.label}
+          </Badge>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <img
-              src={firstItem?.image}
-              alt={firstItem?.productName}
+              src={selectedItem?.image}
+              alt={selectedItem?.productName}
               className="w-20 h-20 object-cover rounded"
             />
             <div>
-              <p className="font-medium">{firstItem?.productName}</p>
-              <p className="text-muted-foreground text-sm">
-                {firstItem?.skuValue}
-              </p>
-              <p className="text-lg font-semibold">
-                {(firstItem?.skuPrice ?? 0).toLocaleString()}đ
-              </p>
-              <p className="text-sm">Số lượng: {firstItem?.quantity}</p>
+              <p className="font-medium">{selectedItem?.productName}</p>
+              <div className="flex items-center gap-2">
+                <span className="text-[#d70018] font-semibold">
+                  {(selectedItem?.skuPrice ?? 0).toLocaleString()}đ
+                </span>
+              </div>
+              <span className="text-xs bg-gray-100 rounded px-2 py-0.5">
+                {selectedItem?.skuValue}
+              </span>
             </div>
           </div>
-          <Button variant="outline" size="sm">
-            Mua lại
-          </Button>
-        </CardContent>
-      </Card>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-sm">Số lượng: {totalQuantity}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-[#d70018] text-[#d70018] hover:bg-[#d70018] hover:text-white"
+            >
+              Mua lại
+            </Button>
+          </div>
+        </div>
+      </section>
 
-      {/* Grid 2 cột */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Thông tin khách hàng */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Thông tin khách hàng</CardTitle>
-          </CardHeader>
-          <Separator />
-          <CardContent className="space-y-2 text-sm">
-            <p>
-              <span className="font-medium">Họ và tên: </span>
-              {order.receiver?.name}
-            </p>
-            <p>
-              <span className="font-medium">Số điện thoại: </span>
-              {order.receiver?.phone}
-            </p>
-            <p>
-              <span className="font-medium">Địa chỉ: </span>
-              {order.receiver?.address}
-            </p>
-          </CardContent>
-        </Card>
+      {/* Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-4">
+        {/* Cột trái */}
+        <div className="md:col-span-5 flex flex-col space-y-4">
+          {/* Thông tin khách hàng */}
+          <section className="bg-white rounded-lg border p-4 space-y-3">
+            <h2 className="text-lg font-semibold">Thông tin khách hàng</h2>
+            <div className="px-2 space-y-2 text-base">
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-muted-foreground">Họ và tên:</span>
+                <span className="font-medium">{order.receiver?.name}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-muted-foreground">Số điện thoại:</span>
+                <span className="font-medium">{order.receiver?.phone}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-muted-foreground">Địa chỉ:</span>
+                <span className="font-semibold text-right max-w-[70%]">
+                  {order.receiver?.address}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Ghi chú:</span>
+                <span className="text-muted-foreground">-</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Thông tin hỗ trợ */}
+          <section className="bg-white rounded-lg border p-4 py-6 space-y-3">
+            <h2 className="text-lg font-semibold">Thông tin hỗ trợ</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Số điện thoại:</span>
+                <span className="font-semibold">18002097</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-[#d70018] text-[#d70018] hover:bg-[#d70018] hover:text-white"
+              >
+                <Phone className="w-4 h-4 mr-1" /> Liên hệ
+              </Button>
+            </div>
+          </section>
+
+          {/* Trung tâm bảo hành */}
+          <section className="bg-white rounded-lg border p-4 space-y-3 flex-1">
+            <h2 className="text-lg font-semibold">Trung tâm bảo hành</h2>
+            <div className="flex justify-between">
+              <span>Danh sách trung tâm bảo hành</span>
+              <Button variant="link" className="text-primary px-0">
+                Truy cập
+              </Button>
+            </div>
+            <div className="flex justify-between">
+              <span>Bảo hành tại CellphoneS</span>
+              <Button variant="link" className="text-primary px-0">
+                Truy cập
+              </Button>
+            </div>
+          </section>
+        </div>
 
         {/* Thông tin thanh toán */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Thông tin thanh toán</CardTitle>
-          </CardHeader>
-          <Separator />
-          <CardContent className="space-y-2 text-sm">
-            <p>
-              <span className="font-medium">Tổng số sản phẩm: </span>
-              {totalQuantity}
+        <section className="bg-white rounded-lg border p-6 space-y-4 md:col-span-5 flex flex-col shadow-sm h-full">
+          <h2 className="text-xl font-semibold">Thông tin thanh toán</h2>
+
+          {/* Sản phẩm */}
+          <div className="p-2 space-y-3">
+            <h3 className="text-base font-medium bg-neutral-100 rounded-xs px-2 py-1">
+              Sản phẩm
+            </h3>
+            <div className="flex px-2 justify-between border-b pb-2">
+              <span>Số lượng sản phẩm:</span>
+              <span>{totalQuantity}</span>
+            </div>
+            <div className="flex px-2 justify-between border-b pb-2">
+              <span>Tổng tiền hàng:</span>
+              <span>{totalAmount.toLocaleString()}đ</span>
+            </div>
+            <div className="flex px-2 justify-between border-b pb-2 text-green-600">
+              <span>Giảm giá:</span>
+              <span>-{discount.toLocaleString()}đ</span>
+            </div>
+            <div className="flex px-2 justify-between text-green-600">
+              <span>Phí vận chuyển:</span>
+              <span>
+                {shippingFee === 0
+                  ? "Miễn phí"
+                  : `${shippingFee.toLocaleString()}đ`}
+              </span>
+            </div>
+          </div>
+
+          {/* Thanh toán */}
+          <div className="p-2 space-y-3 mt-3">
+            <h3 className="text-base font-medium bg-neutral-100 rounded-xs px-2 py-1">
+              Thanh toán
+            </h3>
+            <div className="flex px-2 justify-between border-b pb-2 font-semibold text-[#d70018] text-lg">
+              <span>Tổng số tiền</span>
+              <span>{finalAmount.toLocaleString()}đ</span>
+            </div>
+            <p className="text-xs px-2 text-muted-foreground border-b pb-2">
+              (Đã bao gồm VAT và được làm tròn)
             </p>
-            <p className="font-semibold text-lg">
-              Tổng số tiền: {totalAmount?.toLocaleString()}đ
-            </p>
-          </CardContent>
-        </Card>
+            <div className="flex px-2 justify-between text-red-600">
+              <span>Tổng số tiền đã thanh toán</span>
+              <span>0đ</span>
+            </div>
+          </div>
+        </section>
       </div>
-
-      {/* Thông tin hỗ trợ */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Thông tin hỗ trợ</CardTitle>
-        </CardHeader>
-        <Separator />
-        <CardContent className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-primary" />
-            <span>0123 456 789</span>
-          </div>
-          <Button variant="outline" size="sm">
-            Liên hệ
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Trung tâm bảo hành */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Trung tâm bảo hành</CardTitle>
-        </CardHeader>
-        <Separator />
-        <CardContent className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span>Danh sách trung tâm bảo hành</span>
-            <Button variant="link" className="text-primary px-0">
-              Truy cập
-            </Button>
-          </div>
-          <div className="flex justify-between">
-            <span>Bảo hành tại CellphoneS</span>
-            <Button variant="link" className="text-primary px-0">
-              Truy cập
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

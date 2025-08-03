@@ -18,7 +18,7 @@ export default function AccountLayout({
 
   return (
     <UserMobileHeaderProvider>
-      <ClientLayoutWrapper hideHeader hideCommit hideHero hideFooter>
+      <ClientLayoutWrapper hideCommit hideHero hideFooter maxWidth={1400}>
         <div className="!w-full !max-w-none !px-0 !mx-0 !bg-neutral-200">
           {isMobile ? (
             <div className="fixed inset-0 z-50 bg-background">
@@ -60,10 +60,10 @@ export default function AccountLayout({
 
               {/* Sidebar + children */}
               <div className="flex flex-1 gap-4 px-6 pb-6">
-                <aside className="w-[340px] min-w-[280px] pt-6">
+                <aside className="w-[340px] min-w-[280px] pt-4">
                   <Sidebar />
                 </aside>
-                <main className="flex-1 overflow-hidden pt-6">
+                <main className="flex-1 overflow-hidden pt-4">
                   <div className="w-full lg:max-w-[1280px] xl:max-w-[1440px] mx-auto space-y-6">
                     {children}
                   </div>
