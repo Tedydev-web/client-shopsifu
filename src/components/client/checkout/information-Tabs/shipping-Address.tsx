@@ -43,33 +43,9 @@ export function ShippingAddress({
         if (response.data) {
           setSavedAddresses(response.data);
           
-          // Automatically select the default address if available
-          const defaultAddress = response.data.find(addr => addr.isDefault);
-          if (defaultAddress) {
-            // Kích hoạt chế độ chọn địa chỉ có sẵn
-            setIsSelectingAddress(true);
-            // Đặt ID địa chỉ đã chọn
-            setSelectedAddressId(defaultAddress.id);
-            
-            // Tạo đối tượng địa chỉ để cập nhật form ngay lập tức
-            const addressToUpdate: Address = {
-              id: defaultAddress.id,
-              isDefault: defaultAddress.isDefault,
-              receiverName: defaultAddress.recipient || defaultAddress.name || '',
-              receiverPhone: defaultAddress.phoneNumber || '',
-              addressDetail: defaultAddress.street,
-              ward: `${defaultAddress.ward}|${defaultAddress.ward}`,
-              district: `${defaultAddress.district}|${defaultAddress.district}`,
-              province: `${defaultAddress.province}|${defaultAddress.province}`,
-              type: defaultAddress.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
-            };
-            
-            console.log('[ShippingAddress] Auto-selected default address:', defaultAddress);
-            console.log('[ShippingAddress] Address to update on load:', addressToUpdate);
-            
-            // Gọi hàm cập nhật từ component cha trực tiếp không qua setTimeout
-            onSelectExistingAddress(addressToUpdate);
-          }
+          // Xóa phần tự động chọn địa chỉ mặc định
+          // Chỉ hiển thị các địa chỉ và để người dùng chọn
+          console.log('[ShippingAddress] Addresses loaded:', response.data);
         }
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
@@ -201,16 +177,8 @@ export function ShippingAddress({
                   // Đánh dấu chuyển sang chế độ chọn địa chỉ có sẵn
                   setIsSelectingAddress(true);
                   
-                  // Tự động chọn địa chỉ mặc định nếu có
-                  const defaultAddress = savedAddresses.find(addr => addr.isDefault);
-                  if (defaultAddress) {
-                    setSelectedAddressId(defaultAddress.id);
-                    handleAddressSelect(defaultAddress.id);
-                  } else if (savedAddresses.length > 0) {
-                    // Nếu không có địa chỉ mặc định, chọn địa chỉ đầu tiên
-                    setSelectedAddressId(savedAddresses[0].id);
-                    handleAddressSelect(savedAddresses[0].id);
-                  }
+                  // Không tự động chọn địa chỉ nào, để người dùng tự chọn
+                  setSelectedAddressId('');
                 }}
               >
                 <Book className="h-4 w-4 mr-1.5 flex-shrink-0" />

@@ -18,12 +18,6 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   
-  const customerInfo = {
-    name: state.receiverInfo?.name || "Nguyễn Văn A",
-    phone: state.receiverInfo?.phone || "0987654321",
-    email: "example@gmail.com", // Email không cần thiết cho receiver
-  };
-  
   const handleSubmit = () => {
     setIsSubmitting(true);
     setTimeout(() => {
@@ -73,7 +67,6 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
       {/* Thông tin người nhận */}
       {state.shippingAddress && (
         <RecipientInfo
-          customerInfo={customerInfo}
           shippingAddress={{
             addressDetail: state.shippingAddress.addressDetail || '',
             ward: state.shippingAddress.ward || '',

@@ -3,13 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useUserData } from '@/hooks/useGetData-UserLogin';
 
 interface RecipientInfoProps {
-  customerInfo: {
-    name: string;
-    phone: string;
-    email: string;
-  };
   shippingAddress: {
     addressDetail?: string;
     ward?: string;
@@ -22,7 +18,16 @@ interface RecipientInfoProps {
   onEdit?: () => void;
 }
 
-export function RecipientInfo({ customerInfo, shippingAddress, onEdit }: RecipientInfoProps) {
+export function RecipientInfo({ shippingAddress, onEdit }: RecipientInfoProps) {
+  // Lấy thông tin khách hàng trực tiếp từ Redux
+  const userData = useUserData();
+  
+  // Khởi tạo thông tin khách hàng từ userData
+  const customerInfo = {
+    name: userData?.name || userData?.firstName + ' ' + userData?.lastName || '',
+    phone: userData?.phoneNumber || '',
+    email: userData?.email || ''
+  };
   const getFullAddress = () => {
     if (shippingAddress.addressDetail) {
       return [

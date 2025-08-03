@@ -4,20 +4,15 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CustomerInfo } from './customer-Info';
 import { ShippingAddress } from './shipping-Address';
-import { ShippingType } from './shipping-Type';
 import { useCheckout } from '../hooks/useCheckout';
 import { CustomerFormData, Address, ShippingAddress as ShippingAddressType } from '@/types/checkout.interface';
-import { useUserData } from '@/hooks/useGetData-UserLogin';
 import { toast } from 'sonner';
 
 interface InformationTabsProps {
   onNext: () => void;
 }
 
-
-
 export function InformationTabs({ onNext }: InformationTabsProps) {
-  const userData = useUserData();
   const { updateReceiverInfo, updateShippingAddress, updateShippingMethod } = useCheckout();
 
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
@@ -47,31 +42,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     deliveryMethod: 'standard'
   });
 
-  // Pre-fill form with user data if available
-  useEffect(() => {
-    console.log('UserData from Redux:', userData);
-    if (userData) {
-      // Đảm bảo fullName được lấy từ userData.name hoặc kết hợp từ firstName và lastName
-      let fullName = userData.name;
-      if (!fullName) {
-        const firstName = userData.firstName || '';
-        const lastName = userData.lastName || '';
-        fullName = [firstName, lastName].filter(Boolean).join(' ');
-      }
-      
-      // Cập nhật state với dữ liệu từ Redux
-      const updatedFormData = {
-        ...formData,
-        fullName: fullName || '',
-        phoneNumber: userData.phoneNumber || '',
-        email: userData.email || ''
-      };
-      
-      console.log('Setting form data with user info:', updatedFormData);
-      setFormData(updatedFormData);
-    }
-  }, [userData]);
-  
   // Theo dõi thay đổi của selectedAddress
   useEffect(() => {
     if (!selectedAddress) {
@@ -88,6 +58,20 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       }
     }
   }, [selectedAddress, tempNewAddressData]);
+
+  // Xử lý nhận dữ liệu từ CustomerInfo
+  const handleCustomerInfoChange = (customerData: {
+    fullName: string;
+    phoneNumber: string;
+    email: string;
+    saveInfo: boolean;
+  }) => {
+    console.log('[InformationIndex] Received customer data:', customerData);
+    setFormData(prev => ({
+      ...prev,
+      ...customerData
+    }));
+  };
 
   const handleChange = (nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => {
     let name: string, val: string;
@@ -108,15 +92,9 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     }
   };
 
-  const handleCheckboxChange = (checked: boolean) => {
-    console.log('Checkbox saveInfo changed to:', checked);
-    setFormData(prev => ({ ...prev, saveInfo: checked }));
-  };
-
   const handleRadioChange = (value: string) => {
     setFormData(prev => ({ ...prev, deliveryMethod: value }));
   };
-
 
   const handleSelectExistingAddress = (address: Address) => {
     // Log để debug
@@ -129,8 +107,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     setSelectedAddress(isExistingAddress ? address : null);
     
     // Đảm bảo các giá trị là string không phải undefined
-    const safeReceiverName = address.receiverName || '';
-    const safeReceiverPhone = address.receiverPhone || '';
     const safeAddressDetail = address.addressDetail || '';
     const safeProvince = address.province || '';
     const safeDistrict = address.district || '';
@@ -146,11 +122,9 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       });
     }
 
-    // Cập nhật formData với thông tin từ địa chỉ đã chọn
+    // Cập nhật formData với thông tin từ địa chỉ đã chọn - CHỈ CẬP NHẬT PHẦN ĐỊA CHỈ
     const updatedFormData = {
       ...formData,
-      receiverName: safeReceiverName || formData.fullName, // Sử dụng tên người dùng nếu không có tên người nhận
-      receiverPhone: safeReceiverPhone || formData.phoneNumber, // Sử dụng SĐT người dùng nếu không có SĐT người nhận
       province: isExistingAddress ? safeProvince : '', // Nếu là địa chỉ mới, xóa các thông tin địa chỉ
       district: isExistingAddress ? safeDistrict : '',
       ward: isExistingAddress ? safeWard : '',
@@ -277,8 +251,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     onNext();
   };
 
-
-
   // Giả sử user đã đăng nhập - trong thực tế sẽ lấy từ context auth
   const isLoggedIn = true;
 
@@ -286,13 +258,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     <div className="space-y-4">
       <form id="checkout-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         <CustomerInfo
-          formData={{
-            fullName: formData.fullName,
-            phoneNumber: formData.phoneNumber,
-            email: formData.email,
-            saveInfo: formData.saveInfo
-          }}
-          handleChange={handleChange}
+          onDataChange={handleCustomerInfoChange}
           isLoggedIn={isLoggedIn}
         />
         
