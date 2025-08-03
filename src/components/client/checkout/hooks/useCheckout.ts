@@ -120,10 +120,17 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
       // Handle different payment methods
       if (selectedPaymentGateway === 'sepay') {
         toast.success('Đơn hàng đã được tạo! Vui lòng quét mã QR để thanh toán.');
+        
+        // Ensure we have order data and extract the first order's ID if available
+        const orderId = orderData.orders && orderData.orders.length > 0 
+          ? orderData.orders[0].id 
+          : undefined;
+        
         const result = {
           success: true,
           paymentMethod: 'sepay',
           orderData: orderData,
+          orderId: orderId, // Include the order ID correctly
           paymentId: orderData.paymentId
         };
         
@@ -141,6 +148,11 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
           
           toast.success('Đang chuyển hướng đến cổng thanh toán VNPay...');
           
+          // Ensure we have order data and extract the first order's ID if available
+          const orderId = orderData.orders && orderData.orders.length > 0 
+            ? orderData.orders[0].id 
+            : undefined;
+            
           const result = {
             success: true,
             paymentMethod: 'vnpay',
@@ -148,6 +160,7 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
               ...orderData,
               finalTotal: totalAmount || calculateTotalAmount() // Thêm finalTotal vào orderData
             },
+            orderId: orderId, // Include the order ID correctly
             paymentId: orderData.paymentId, // Thêm paymentId cho socket
             paymentUrl: vnPayResponse.data.paymentUrl
           };
@@ -157,20 +170,34 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
         } catch (vnPayError: any) {
           console.error('Failed to generate VNPay URL:', vnPayError);
           toast.error('Không thể tạo URL thanh toán VNPay. Vui lòng thử lại.');
+          // Ensure we have order data and extract the first order's ID if available
+          const orderId = orderData.orders && orderData.orders.length > 0 
+            ? orderData.orders[0].id 
+            : undefined;
+            
           return {
             success: false,
             paymentMethod: 'vnpay',
             orderData: orderData,
+            orderId: orderId,
             error: vnPayError.message
           };
         }
       } else {
         // Các phương thức thanh toán khác (COD, ...)
         toast.success('Đặt hàng thành công!');
+        
+        // Ensure we have order data and extract the first order's ID if available
+        const orderId = orderData.orders && orderData.orders.length > 0 
+          ? orderData.orders[0].id 
+          : undefined;
+          
         const result = {
           success: true,
           paymentMethod: selectedPaymentGateway,
-          orderData: orderData
+          orderData: orderData,
+          orderId: orderId,
+          paymentId: orderData.paymentId
         };
         
         console.log('✅ Other Payment Result:', result);

@@ -47,7 +47,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     if (!selectedAddress) {
       // Nếu chuyển sang chế độ nhập mới, khôi phục dữ liệu nhập trước đó nếu có
       if (tempNewAddressData.province || tempNewAddressData.district || tempNewAddressData.ward || tempNewAddressData.address) {
-        console.log('[InformationIndex] Restoring previous manual address data:', tempNewAddressData);
         setFormData(prev => ({
           ...prev,
           province: tempNewAddressData.province,
@@ -66,7 +65,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     email: string;
     saveInfo: boolean;
   }) => {
-    console.log('[InformationIndex] Received customer data:', customerData);
     setFormData(prev => ({
       ...prev,
       ...customerData
@@ -97,12 +95,8 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
   };
 
   const handleSelectExistingAddress = (address: Address) => {
-    // Log để debug
-    console.log('[InformationIndex] Received selected address:', address);
-    
     // Prevent unnecessary updates
     if (JSON.stringify(address) === JSON.stringify(selectedAddress)) {
-      console.log('[InformationIndex] Skipping duplicate address update');
       return;
     }
     
@@ -134,9 +128,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       address: isExistingAddress ? safeAddressDetail : ''
     };
     
-    console.log('[InformationIndex] Updated form data:', updatedFormData);
-    console.log('[InformationIndex] Is existing address:', isExistingAddress);
-    
     // First update formData
     setFormData(updatedFormData);
     
@@ -163,20 +154,10 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     }
     
     // 3. Validation địa chỉ - less strict for debugging
-    console.log('[InformationIndex] Validating address:', {
-      selectedAddress,
-      formDataAddress: {
-        address: formData.address,
-        province: formData.province,
-        district: formData.district,
-        ward: formData.ward
-      }
-    });
     
     if (selectedAddress) {
       // Nếu chọn địa chỉ có sẵn, kiểm tra địa chỉ có đầy đủ không
       if (!selectedAddress.addressDetail) {
-        console.warn('[InformationIndex] Selected address missing addressDetail');
         // Don't block submission for debugging
       }
     } else {
@@ -186,15 +167,12 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       }
       // For debugging, don't block on these fields
       if (!formData.province) {
-        console.warn('[InformationIndex] Missing province');
         // errors.push('Vui lòng chọn tỉnh/thành phố');
       }
       if (!formData.district) {
-        console.warn('[InformationIndex] Missing district');
         // errors.push('Vui lòng chọn quận/huyện');
       }
       if (!formData.ward) {
-        console.warn('[InformationIndex] Missing ward');
         // errors.push('Vui lòng chọn phường/xã');
       }
     }
@@ -254,7 +232,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
           })
     };
     
-    console.log('[InformationIndex] Updating shipping address:', shippingAddress);
+    // Update shipping address
     
     // Ensure addressDetail is not empty
     if (!shippingAddress.addressDetail && shippingAddress.address) {
@@ -306,20 +284,6 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
             handleRadioChange={handleRadioChange}
           />
         </div> */}
-        
-        <div className="mt-6 flex justify-end">
-          <Button 
-            type="button" 
-            className="w-full sm:w-auto"
-            onClick={(e) => {
-              e.preventDefault();
-              console.log('[InformationIndex] Submit button clicked');
-              handleSubmit();
-            }}
-          >
-            Tiếp tục thanh toán
-          </Button>
-        </div>
       </form>
     </div>
   );

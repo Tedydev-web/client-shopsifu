@@ -35,18 +35,29 @@ interface OrderCreationInfo {
 export type OrderCreateRequest = OrderCreationInfo[];
 
 export interface OrderCreateResponse {
-  success: boolean;
+  statusCode: number;
   message: string;
+  timestamp: string;
   data: {
-    id: string;
-    paymentId: string;
-    shopId: string;
-    userId: string;
-    status: OrderStatus;
-    items: OrderItem[];
-    finalTotal: number;
-    createdAt: string;
-    updatedAt: string;
+    orders: {
+      id: string;
+      userId: string;
+      status: OrderStatus;
+      receiver: {
+        name: string;
+        phone: string;
+        address: string;
+      };
+      shopId: string;
+      paymentId: number;
+      createdById: string;
+      updatedById: string | null;
+      deletedById: string | null;
+      deletedAt: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }[];
+    paymentId: number;
   }
 }
 
@@ -131,11 +142,12 @@ export interface OrderHandlerResult {
   success: boolean;
   paymentMethod?: string;
   orderData?: {
-    id: string;
-    paymentId?: string;
+    orders?: any[];
+    paymentId?: number;
     [key: string]: any;
   };
-  paymentId?: string;
+  orderId?: string; // The ID of the order (from the first order in orders array)
+  paymentId?: number;
   paymentUrl?: string;
   error?: string;
 }

@@ -48,7 +48,7 @@ export const useBrand = () => {
     getResponseMetadata,
     mapResponseToData,
     initialSort: { sortBy: "createdAt", sortOrder: "desc" },
-    defaultLimit: 10,
+    defaultLimit: 12, // Tăng limit lên 12 để phù hợp với hiển thị 2 hàng, mỗi hàng 6 brand
   });
 
   return {

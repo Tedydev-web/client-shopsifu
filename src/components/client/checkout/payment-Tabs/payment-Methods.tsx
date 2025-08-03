@@ -35,22 +35,22 @@ type PaymentMethod = TextPaymentMethod | ImagePaymentMethod | CardPaymentMethod;
 
 // Mock data for payment methods
 const paymentMethodsData: PaymentMethod[] = [
-  {
-    id: 'cod',
-    name: 'Thanh toán khi nhận hàng (COD)',
-    description: 'Thanh toán bằng tiền mặt khi nhận được hàng',
-    icon: '/images/client/checkout/COD.webp',
-    bgColor: 'bg-gray-100',
-    iconType: 'image'
-  } as ImagePaymentMethod,
-  {
-    id: 'momo',
-    name: 'Ví MoMo',
-    description: 'Thanh toán qua ví điện tử MoMo',
-    icon: '/images/client/checkout/momo_vi.webp',
-    bgColor: 'bg-pink-50',
-    iconType: 'image'
-  } as ImagePaymentMethod,
+  // {
+  //   id: 'cod',
+  //   name: 'Thanh toán khi nhận hàng (COD)',
+  //   description: 'Thanh toán bằng tiền mặt khi nhận được hàng',
+  //   icon: '/images/client/checkout/COD.webp',
+  //   bgColor: 'bg-gray-100',
+  //   iconType: 'image'
+  // } as ImagePaymentMethod,
+  // {
+  //   id: 'momo',
+  //   name: 'Ví MoMo',
+  //   description: 'Thanh toán qua ví điện tử MoMo',
+  //   icon: '/images/client/checkout/momo_vi.webp',
+  //   bgColor: 'bg-pink-50',
+  //   iconType: 'image'
+  // } as ImagePaymentMethod,
   {
     id: 'sepay',
     name: 'Chuyển khoản ngân hàng',
