@@ -15,6 +15,7 @@ import { useCustomerInfo } from '@/components/client/checkout/hooks/useCustomer-
 import { CustomerFormData, Address } from '@/types/checkout.interface';
 import { addressService } from '@/services/addressService';
 import { Address as ProfileAddress } from '@/types/auth/profile.interface';
+import { useProvinces } from '@/hooks/combobox/useProvinces';
 
 interface ShippingAddressProps {
   formData: CustomerFormData;
@@ -34,6 +35,13 @@ export function ShippingAddress({
 
   const [savedAddresses, setSavedAddresses] = useState<ProfileAddress[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+  
+  // Move the hook call to the component top level
+  const {
+    getProvinceName,
+    getDistrictName,
+    getWardName
+  } = useProvinces();
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -70,31 +78,29 @@ export function ShippingAddress({
     });
   }, [formData]);
   
-  // Theo dõi khi selectedAddressId thay đổi để cập nhật dữ liệu
+  // Theo dõi khi selectedAddressId thay đổi để cập nhật dữ liệu - 
+  // Chỉ log thông tin, KHÔNG gọi onSelectExistingAddress vì đã gọi trong handleAddressSelect
   useEffect(() => {
     if (selectedAddressId && isSelectingAddress) {
       const selected = savedAddresses.find(addr => addr.id === selectedAddressId);
       if (selected) {
         console.log('[ShippingAddress] Address selected by ID change:', selected);
         
-        // Tạo đối tượng địa chỉ để cập nhật form
-        const addressToUpdate: Address = {
-          id: selected.id,
-          isDefault: selected.isDefault,
-          receiverName: selected.recipient || selected.name || '',
-          receiverPhone: selected.phoneNumber || '',
-          addressDetail: selected.street,
-          ward: `${selected.ward}|${selected.ward}`,
-          district: `${selected.district}|${selected.district}`,
-          province: `${selected.province}|${selected.province}`,
-          type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
-        };
+        // Chỉ log thông tin, không thực hiện cập nhật ở đây để tránh vòng lặp vô hạn
+        const provinceName = getProvinceName(selected.province);
+        const districtName = getDistrictName(selected.district);
+        const wardName = getWardName(selected.ward);
         
-        // Gọi hàm cập nhật từ component cha
-        onSelectExistingAddress(addressToUpdate);
+        console.log('[ShippingAddress] Selected address details:', {
+          province: `${selected.province}|${provinceName || selected.province}`,
+          district: `${selected.district}|${districtName || selected.district}`,
+          ward: `${selected.ward}|${wardName || selected.ward}`,
+        });
+        
+        // KHÔNG gọi onSelectExistingAddress ở đây vì đã được gọi trong handleAddressSelect
       }
     }
-  }, [selectedAddressId, isSelectingAddress, savedAddresses]);
+  }, [selectedAddressId, isSelectingAddress, savedAddresses, getProvinceName, getDistrictName, getWardName]);
   
   // Theo dõi khi isSelectingAddress thay đổi để xử lý chuyển đổi giữa các chế độ
   useEffect(() => {
@@ -126,15 +132,30 @@ export function ShippingAddress({
   } = useCustomerInfo(formData, handleChange);
 
   const handleAddressSelect = (id: string) => {
+    // First update the ID in our local state
     setSelectedAddressId(id);
+    
     const selected = savedAddresses.find((addr) => addr.id === id);
     if (selected) {
       // Log thông tin địa chỉ được chọn để debug
       console.log('[ShippingAddress] Selected address:', selected);
       
+      // Make sure we're in selecting address mode
+      if (!isSelectingAddress) {
+        setIsSelectingAddress(true);
+      }
+      
       // Tạo đối tượng địa chỉ để cập nhật form
       // Format các trường province, district, ward để phù hợp với useCustomer-Info hook
       // (định dạng code|name)
+      
+      // Lấy tên của tỉnh/thành phố, quận/huyện, phường/xã từ code
+      // Using the functions from the hook that's now called at component level
+      const provinceName = getProvinceName(selected.province);
+      const districtName = getDistrictName(selected.district);
+      const wardName = getWardName(selected.ward);
+      
+      // Ensure we have valid names, or fall back to the code values
       const addressToUpdate: Address = {
         id: selected.id,
         isDefault: selected.isDefault,
@@ -142,20 +163,19 @@ export function ShippingAddress({
         receiverPhone: selected.phoneNumber || '',
         addressDetail: selected.street,
         // Định dạng địa chỉ với cả code và name: "code|name"
-        ward: `${selected.ward}|${selected.ward}`,
-        district: `${selected.district}|${selected.district}`,
-        province: `${selected.province}|${selected.province}`,
+        ward: `${selected.ward}|${wardName || selected.ward}`,
+        district: `${selected.district}|${districtName || selected.district}`,
+        province: `${selected.province}|${provinceName || selected.province}`,
         type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
       };
       
       console.log('[ShippingAddress] Address to update:', addressToUpdate);
       
-      // Kích hoạt chế độ đang chọn địa chỉ có sẵn
-      setIsSelectingAddress(true);
-      
-      // Gọi hàm cập nhật từ component cha 
-      // Đặt sau setIsSelectingAddress để đảm bảo state đã được cập nhật
-      onSelectExistingAddress(addressToUpdate);
+      // Schedule the update to run after the current render cycle
+      setTimeout(() => {
+        // Gọi hàm cập nhật từ component cha - sử dụng setTimeout để tránh vòng lặp cập nhật
+        onSelectExistingAddress(addressToUpdate);
+      }, 0);
     }
   };
 
@@ -178,7 +198,10 @@ export function ShippingAddress({
                   setIsSelectingAddress(true);
                   
                   // Không tự động chọn địa chỉ nào, để người dùng tự chọn
-                  setSelectedAddressId('');
+                  // Clear any previously selected address
+                  if (selectedAddressId) {
+                    setSelectedAddressId('');
+                  }
                 }}
               >
                 <Book className="h-4 w-4 mr-1.5 flex-shrink-0" />
@@ -273,6 +296,7 @@ export function ShippingAddress({
                   variant="link"
                   className="text-red-500 font-normal p-0 h-auto text-sm hover:text-red-600"
                   onClick={() => {
+                    // First update our local state
                     setIsSelectingAddress(false);
                     setSelectedAddressId('');
                     
@@ -289,8 +313,11 @@ export function ShippingAddress({
                       isDefault: false
                     };
                     
-                    // Gọi hàm từ component cha để cập nhật lại formData
-                    onSelectExistingAddress(clearedAddressData);
+                    // Schedule the update to run after the current render cycle
+                    setTimeout(() => {
+                      // Gọi hàm từ component cha để cập nhật lại formData - sử dụng setTimeout để tránh vòng lặp cập nhật
+                      onSelectExistingAddress(clearedAddressData);
+                    }, 0);
                   }}
                 >
                   nhập địa chỉ mới

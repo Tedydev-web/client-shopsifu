@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
 import { PaymentMethods } from './payment-Methods';
@@ -17,6 +17,12 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
   const { state, updatePaymentMethod } = useCheckout();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  
+  // Debug: Log state whenever it changes
+  useEffect(() => {
+    console.log('[PaymentTabs] Current state:', state);
+    console.log('[PaymentTabs] ShippingAddress:', state.shippingAddress);
+  }, [state]);
   
   const handleSubmit = () => {
     setIsSubmitting(true);
@@ -65,7 +71,7 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
   return (
     <div className="space-y-4">
       {/* Thông tin người nhận */}
-      {state.shippingAddress && (
+      {state.shippingAddress ? (
         <RecipientInfo
           shippingAddress={{
             addressDetail: state.shippingAddress.addressDetail || '',
@@ -78,6 +84,17 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
           }}
           onEdit={onPrevious}
         />
+      ) : (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-yellow-800">Chưa có thông tin địa chỉ giao hàng. Vui lòng quay lại bước trước để nhập thông tin.</p>
+          <Button 
+            variant="outline" 
+            onClick={onPrevious} 
+            className="mt-2"
+          >
+            Quay lại nhập thông tin
+          </Button>
+        </div>
       )}
 
       {/* Thông tin sản phẩm */}
