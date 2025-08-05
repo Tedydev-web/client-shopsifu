@@ -23,6 +23,14 @@ import {
   usePasswordChangePassword,
   ChangePasswordResult,
 } from "./useProfile-ChangePassword";
+import { useResponsive } from "@/hooks/useResponsive";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+} from "@/components/ui/drawer";
 
 const formatDate = (isoString: string): string => {
   const date = new Date(isoString);
@@ -42,6 +50,7 @@ export default function PasswordSection() {
   const t = useTranslations();
   const user = useUserData();
   const { loading, handleChangePassword } = usePasswordChangePassword();
+  const { isMobile } = useResponsive();
 
   const [open, setOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
@@ -54,7 +63,6 @@ export default function PasswordSection() {
   useEffect(() => {
     const value = localStorage.getItem(STORAGE_KEY);
     if (value) setLastUpdated(value);
-    console.log("Last password change timestamp:", value);
   }, []);
 
   const toggleShow = (field: keyof typeof show) => {
@@ -87,6 +95,70 @@ export default function PasswordSection() {
     }
   };
 
+  // Nội dung form tái sử dụng
+  const formContent = (
+    <>
+      <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-md mb-4 text-blue-700 text-sm">
+        <Info className="w-4 h-4 mt-0.5" />
+        <p>{t("user.account.password.subtitle")}</p>
+      </div>
+
+      <Form {...form}>
+        <div className="space-y-4">
+          {(
+            [
+              ["password", "currentPassword", "currentPasswordPlaceholder"],
+              ["newPassword", "newPassword", "newPasswordPlaceholder"],
+              [
+                "confirmNewPassword",
+                "confirmPassword",
+                "newPasswordPlaceholder",
+              ],
+            ] as const
+          ).map(([fieldName, labelKey, placeholderKey]) => (
+            <FormField
+              key={fieldName}
+              control={form.control}
+              name={fieldName}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {t(`user.account.password.${labelKey}`)}
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={show[fieldName] ? "text" : "password"}
+                        placeholder={t(
+                          `user.account.password.${placeholderKey}`
+                        )}
+                        {...field}
+                        className="pr-12"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => toggleShow(fieldName)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        tabIndex={-1}
+                      >
+                        {show[fieldName] ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+        </div>
+      </Form>
+    </>
+  );
+
   return (
     <div className="bg-white rounded-lg p-6 space-y-4 border">
       <div className="flex justify-between items-center">
@@ -112,139 +184,37 @@ export default function PasswordSection() {
         </div>
       )}
 
-      <SheetRework
-        open={open}
-        onOpenChange={setOpen}
-        title={t("user.account.password.title")}
-        subtitle={t("user.account.password.subtitle")}
-        confirmText={t("user.account.password.changePassword")}
-        cancelText={t("common.cancel")}
-        onCancel={() => setOpen(false)}
-        onConfirm={form.handleSubmit(onSubmit)}
-      >
-        <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-md mb-4 text-blue-700 text-sm">
-          <Info className="w-4 h-4 mt-0.5" />
-          <p>{t("user.account.password.subtitle")}</p>
-        </div>
-
-        <Form {...form}>
-          <div className="space-y-4">
-            {/* Current password */}
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {t("user.account.password.currentPassword")}
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={show.password ? "text" : "password"}
-                        placeholder={t(
-                          "user.account.password.currentPasswordPlaceholder"
-                        )}
-                        {...field}
-                        className="pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => toggleShow("password")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                        tabIndex={-1}
-                      >
-                        {show.password ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* New password */}
-            <FormField
-              control={form.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {t("user.account.password.newPassword")}
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={show.newPassword ? "text" : "password"}
-                        placeholder={t(
-                          "user.account.password.newPasswordPlaceholder"
-                        )}
-                        {...field}
-                        className="pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => toggleShow("newPassword")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                        tabIndex={-1}
-                      >
-                        {show.newPassword ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Confirm password */}
-            <FormField
-              control={form.control}
-              name="confirmNewPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {t("user.account.password.confirmPassword")}
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={show.confirmNewPassword ? "text" : "password"}
-                        placeholder={t(
-                          "user.account.password.newPasswordPlaceholder"
-                        )}
-                        {...field}
-                        className="pr-12"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => toggleShow("confirmNewPassword")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                        tabIndex={-1}
-                      >
-                        {show.confirmNewPassword ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </Form>
-      </SheetRework>
+      {isMobile ? (
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent className="p-4 data-[state=open]:animate-slide-up data-[state=closed]:animate-slide-down">
+            <DrawerHeader>
+              <DrawerTitle>{t("user.account.password.title")}</DrawerTitle>
+            </DrawerHeader>
+            {formContent}
+            <DrawerFooter className="flex justify-end gap-2 mt-4">
+              <Button variant="outline" onClick={() => setOpen(false)}>
+                {t("common.cancel")}
+              </Button>
+              <Button onClick={form.handleSubmit(onSubmit)} disabled={loading}>
+                {t("user.account.password.changePassword")}
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <SheetRework
+          open={open}
+          onOpenChange={setOpen}
+          title={t("user.account.password.title")}
+          subtitle={t("user.account.password.subtitle")}
+          confirmText={t("user.account.password.changePassword")}
+          cancelText={t("common.cancel")}
+          onCancel={() => setOpen(false)}
+          onConfirm={form.handleSubmit(onSubmit)}
+        >
+          {formContent}
+        </SheetRework>
+      )}
     </div>
   );
 }

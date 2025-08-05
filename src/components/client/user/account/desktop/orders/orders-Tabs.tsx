@@ -46,30 +46,35 @@ export const OrderTabs = () => {
     <div className="relative w-full">
       <div
         ref={scrollRef}
-        className="w-full overflow-x-auto scrollbar-hide md:overflow-x-hidden"
-        style={{ scrollPaddingLeft: 0 }} // đảm bảo cuộn từ 0
+        className="w-full overflow-x-auto scrollbar-hide lg:overflow-x-hidden"
       >
         <TabsList
-          className="flex w-max md:w-full bg-white px-0 py-2 h-12 gap-2 
-               md:justify-between md:gap-4"
+          className="flex w-max min-w-full
+            bg-white overflow-x-auto scrollbar-hide
+            border-b border-gray-200
+            px-1 md:px-2 py-0.5 sm:py-1 
+            h-10 sm:h-11 gap-0 md:gap-2"
         >
           {tabValues.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
               className="relative flex-shrink-0 whitespace-nowrap 
-                   text-xs md:text-sm font-medium text-muted-foreground 
-                   px-3 py-2 text-center 
-                   bg-transparent border-none shadow-none rounded-none 
-                   hover:bg-transparent focus:outline-none focus:ring-0 focus-visible:ring-0 
-                   data-[state=active]:text-[#d70018] 
-                   data-[state=active]:after:content-[''] 
-                   data-[state=active]:after:absolute 
-                   data-[state=active]:after:inset-x-0 
-                   data-[state=active]:after:-bottom-1 
-                   data-[state=active]:after:h-[3px] 
-                   data-[state=active]:after:bg-[#d70018] 
-                   md:flex-1"
+                     text-[11px] sm:text-xs md:text-sm font-medium text-muted-foreground 
+                     px-2 sm:px-3 py-1.5 sm:py-2 text-center 
+                     bg-transparent border-none shadow-none rounded-md md:rounded-none
+                     hover:bg-gray-50 md:hover:bg-transparent
+                     focus:outline-none focus:ring-0 focus-visible:ring-0 
+                     data-[state=active]:text-[#d70018] 
+                     data-[state=active]:after:content-[''] 
+                     data-[state=active]:after:absolute 
+                     data-[state=active]:after:inset-x-0 
+                     data-[state=active]:after:-bottom-0.5 sm:data-[state=active]:after:-bottom-1
+                     data-[state=active]:after:-right-0
+                     data-[state=active]:after:h-[2px] sm:data-[state=active]:after:h-[3px] 
+                     data-[state=active]:shadow-none
+                     data-[state=active]:after:bg-[#d70018] 
+                     md:flex-1"
             >
               {tab.label}
             </TabsTrigger>
@@ -77,16 +82,17 @@ export const OrderTabs = () => {
         </TabsList>
       </div>
 
-      {/* Chỉ hiển thị mũi tên trên mobile khi có scroll */}
+      {/* Left Arrow */}
       {showLeftArrow && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 from-white to-transparent h-full w-10 flex items-center justify-start pointer-events-none md:hidden">
-          <ChevronLeft className="text-gray-400 w-5 h-5" />
+        <div className="absolute left-0 top-0 h-full w-8 sm:w-10 flex items-center justify-start pointer-events-none md:hidden bg-gradient-to-r from-white to-transparent">
+          <ChevronLeft className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5 ml-1" />
         </div>
       )}
 
+      {/* Right Arrow */}
       {showRightArrow && (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-gradient-to-l from-white to-transparent h-full w-10 flex items-center justify-end pointer-events-none md:hidden">
-          <ChevronRight className="text-gray-400 w-5 h-5" />
+        <div className="absolute right-0 top-0 h-full w-8 sm:w-10 flex items-center justify-end pointer-events-none md:hidden bg-gradient-to-l from-white to-transparent">
+          <ChevronRight className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5 mr-1" />
         </div>
       )}
     </div>

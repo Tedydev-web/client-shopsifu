@@ -1,101 +1,162 @@
-// "use client";
+"use client";
 
-// import { TabsContent } from "@/components/ui/tabs";
-// import { useEffect, useState } from "react";
-// import { OrderEmpty } from "./orders-Empty";
-// import { useGetOrders } from "@/hooks/useGetOrder";
-// import { OrderStatus } from "@/types/order.interface"; // Đã có enum hợp lệ
-// // import { OrderDetail } from "./orders-Detail";
+import { TabsContent } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
+import { OrderEmpty } from "./orders-Empty";
+import { useOrder } from "./useOrder";
+import { OrderStatus } from "@/types/order.interface";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 
-// const tabKeys = [
-//   { value: "all", label: "Tất cả" },
-//   { value: "pending", label: "Chờ xác nhận" },
-//   { value: "confirmed", label: "Đã xác nhận" },
-//   { value: "shipping", label: "Đang vận chuyển" },
-//   { value: "delivered", label: "Đã giao hàng" },
-//   { value: "cancelled", label: "Đã huỷ" },
-// ];
+const statusLabel: Record<OrderStatus, string> = {
+  PENDING_PAYMENT: "Chờ thanh toán",
+  PENDING_PICKUP: "Chờ lấy hàng",
+  PENDING_DELIVERY: "Đang giao hàng",
+  DELIVERED: "Đã giao hàng",
+  RETURNED: "Đã trả hàng",
+  CANCELLED: "Đã huỷ",
+};
 
-// // ✅ Map từ tab string sang enum
-// const statusMap: Record<string, OrderStatus | undefined> = {
-//   pending: OrderStatus.PENDING_PAYMENT,
-//   confirmed: OrderStatus.PENDING_PICKUP,
-//   shipping: OrderStatus.PENDING_DELIVERY,
-//   delivered: OrderStatus.DELIVERED,
-//   cancelled: OrderStatus.CANCELLED,
-// };
+interface Props {
+  currentTab: string;
+  onTabChange: (tab: string) => void;
+}
 
-// interface Props {
-//   currentTab: string;
-// }
+export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
+  const router = useRouter();
+  const { orders, loading, error, fetchAllOrders, fetchOrdersByStatus } =
+    useOrder();
+  const [visibleCount, setVisibleCount] = useState(6);
 
-// export const OrderTabContent = ({ currentTab }: Props) => {
-//   const { fetchOrders, orders, loading, error } = useGetOrders();
-//   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!currentTab) onTabChange("all");
+  }, [currentTab, onTabChange]);
 
-//   // if (selectedOrderId) {
-//   //   return (
-//   //     <OrderDetail
-//   //       orderId={selectedOrderId}
-//   //       onBack={() => setSelectedOrderId(null)}
-//   //     />
-//   //   );
-//   // }
+  useEffect(() => {
+    if (currentTab === "all") {
+      fetchAllOrders();
+    } else {
+      fetchOrdersByStatus(currentTab as OrderStatus);
+    }
+    setVisibleCount(6);
+  }, [currentTab, fetchAllOrders, fetchOrdersByStatus]);
 
-//   useEffect(() => {
-//     const controller = new AbortController();
+  const handleViewDetail = (orderId: string) => {
+    router.push(`/user/orders/${orderId}`);
+  };
 
-//     const params =
-//       currentTab === "all"
-//         ? { page: 1, limit: 10 }
-//         : { page: 1, limit: 10, sortOrder: statusMap[currentTab] };
+  const tabs = ["all", ...Object.values(OrderStatus)];
+  const displayedOrders = orders.slice(0, visibleCount);
 
-//     fetchOrders(params, controller.signal);
+  return (
+    <>
+      {tabs.map((value) => (
+        // <TabsContent
+        //   key={value}
+        //   value={value}
+        //   className="bg-white rounded-xl min-h-[60vh] sm:min-h-[70vh] px-2 sm:px-4 pb-2
+        //              data-[state=active]:shadow-lg transition-all"
+        // >
+        <TabsContent
+          key={value}
+          value={value}
+          className="
+    bg-white rounded-none shadow-none
+    min-h-[70vh] px-2 pb-2
+    md:rounded-xl md:shadow-sm md:min-h-[85vh]
+    transition-all
+  "
+        >
+          {value !== currentTab ? null : loading ? (
+            <div className="h-full flex items-center justify-center text-muted-foreground text-sm sm:text-base">
+              Đang tải đơn hàng...
+            </div>
+          ) : error ? (
+            <div className="h-full flex items-center justify-center text-destructive text-sm sm:text-base">
+              {error}
+            </div>
+          ) : orders.length ? (
+            <div className="space-y-3">
+              {displayedOrders.map((order) => {
+                const firstItem = order.items[0];
+                const totalAmount = order.items.reduce(
+                  (sum, item) => sum + item.skuPrice * item.quantity,
+                  0
+                );
 
-//     return () => controller.abort();
-//   }, [currentTab]);
+                return (
+                  <div
+                    key={order.id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center 
+                               justify-between border rounded-lg 
+                               p-3 sm:p-4 bg-white hover:bg-gray-50 cursor-pointer
+                               text-xs sm:text-sm"
+                    onClick={() => handleViewDetail(order.id)}
+                  >
+                    {/* Left: Image + Info */}
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                      <img
+                        src={firstItem?.image}
+                        alt={firstItem?.productName}
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
+                          Đơn hàng:{" "}
+                          <span className="font-semibold">{order.id}</span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-500">
+                          Ngày đặt:{" "}
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </div>
+                        <div className="font-medium text-gray-800 mt-1 text-sm truncate">
+                          {firstItem?.productName}
+                        </div>
+                      </div>
+                    </div>
 
-//   return (
-//     <>
-//       {tabKeys.map(({ value }) => (
-//         <TabsContent
-//           key={value}
-//           value={value}
-//           className="bg-white rounded-xl h-[85vh] px-4 py-6 data-[state=active]:shadow-lg transition-all"
-//         >
-//           {value !== currentTab ? null : loading ? (
-//             <div className="h-full flex items-center justify-center text-muted-foreground">
-//               Đang tải đơn hàng...
-//             </div>
-//           ) : error ? (
-//             <div className="h-full flex items-center justify-center text-destructive">
-//               {error}
-//             </div>
-//           ) : orders?.data?.length ? (
-//             <div className="grid gap-4">
-//               {orders.data.map((order) => (
-//                 <div
-//                   key={order.id}
-//                   className="p-4 border rounded-md shadow-sm bg-gray-50 cursor-pointer hover:bg-gray-100"
-//                   onClick={() => setSelectedOrderId(order.id)}
-//                 >
-//                   <div>
-//                     <strong>Mã đơn:</strong> {order.code}
-//                   </div>
-//                   <div>
-//                     <strong>Trạng thái:</strong> {order.status}
-//                   </div>
-//                   <div>
-//                     <strong>Tổng:</strong> {order.totalAmount.toLocaleString()}đ
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           ) : (
-//             <OrderEmpty />
-//           )}
-//         </TabsContent>
-//       ))}
-//     </>
-//   );
-// };
+                    {/* Right: Status + Price */}
+                    <div
+                      className="flex flex-row sm:flex-col items-center sm:items-end 
+                                    justify-between sm:justify-start 
+                                    gap-2 mt-3 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
+                    >
+                      <div className="text-gray-400">
+                        {statusLabel[order.status]}
+                      </div>
+                      <div className="font-medium text-gray-700">
+                        Tổng:{" "}
+                        <span className="text-[#D70018] font-semibold">
+                          {totalAmount.toLocaleString()}đ
+                        </span>
+                      </div>
+                      <div className="text-blue-500">Xem chi tiết →</div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {visibleCount < orders.length && (
+                <div className="flex justify-center mt-4">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setVisibleCount((prev) => prev + 5)}
+                    className="text-xs sm:text-sm md:text-base text-[#3B82F6]"
+                  >
+                    Xem thêm
+                    <ChevronDown className="ml-1 w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <OrderEmpty />
+          )}
+        </TabsContent>
+      ))}
+    </>
+  );
+};

@@ -26,6 +26,14 @@ import { useUpdateProfile } from "@/components/client/user/account/profile/usePr
 import { UpdateProfileRequest } from "@/types/auth/profile.interface";
 import Image from "next/image";
 import useUploadMedia from "@/hooks/useUploadMedia";
+import { useResponsive } from "@/hooks/useResponsive";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+} from "@/components/ui/drawer";
 
 interface InfoState {
   name: string;
@@ -39,6 +47,7 @@ interface InfoState {
 
 export default function ProfileInfo() {
   const userData = useUserData();
+  const { isMobile } = useResponsive();
   const [open, setOpen] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
 
@@ -63,13 +72,7 @@ export default function ProfileInfo() {
     setOpen(false);
   });
 
-  const {
-    handleAddFiles,
-    uploadedUrls,
-    files,
-    uploadFiles,
-    reset: resetUpload,
-  } = useUploadMedia();
+  const { handleAddFiles, uploadFiles, reset: resetUpload } = useUploadMedia();
 
   const onSubmit = async (data: Partial<UpdateProfileRequest>) => {
     try {
@@ -83,7 +86,8 @@ export default function ProfileInfo() {
       }
 
       const payload: Partial<UpdateProfileRequest> = {
-        ...data,
+        name: data.name,
+        phoneNumber: data.phoneNumber,
         avatar: avatarUrl,
       };
 
@@ -94,6 +98,111 @@ export default function ProfileInfo() {
   };
 
   if (!userData) return null;
+
+  // Tách nội dung form để tái sử dụng
+  const formContent = (
+    <>
+      <div className="flex flex-col items-center gap-3 mb-4">
+        <div className="relative w-24 h-24">
+          <Image
+            src={
+              selectedAvatar
+                ? URL.createObjectURL(selectedAvatar)
+                : userData.avatar || "/default-avatar.png"
+            }
+            alt="avatar"
+            fill
+            className="rounded-full object-cover border"
+          />
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 text-sm gap-2"
+          onClick={() => document.getElementById("avatarUpload")?.click()}
+        >
+          <UploadCloud size={16} />
+          Đổi ảnh đại diện
+        </Button>
+        <input
+          type="file"
+          id="avatarUpload"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              handleAddFiles([file]);
+              setSelectedAvatar(file);
+            }
+          }}
+        />
+      </div>
+
+      <Form {...form}>
+        <form className="space-y-5">
+          {(
+            [
+              ["name", "Họ và tên"],
+              ["gender", "Giới tính"],
+              ["dob", "Ngày sinh"],
+              ["phoneNumber", "Số điện thoại"],
+              ["email", "Email"],
+              ["address", "Địa chỉ mặc định"],
+            ] as [keyof InfoState, string][]
+          ).map(([name, label]) => (
+            <FormField
+              key={name}
+              control={form.control}
+              name={name}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm">{label}</FormLabel>
+                  <FormControl>
+                    {name === "dob" ? (
+                      <Input
+                        type="date"
+                        {...field}
+                        className="w-full h-12 text-[15px] px-4"
+                      />
+                    ) : name === "gender" ? (
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="w-full h-12 text-[15px] px-4 flex items-center border rounded-md">
+                          <SelectValue placeholder="Chọn giới tính" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Nam">Nam</SelectItem>
+                          <SelectItem value="Nữ">Nữ</SelectItem>
+                          <SelectItem value="Khác">Khác</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : name === "address" ? (
+                      <Input
+                        {...field}
+                        readOnly
+                        className="w-full h-12 text-[15px] px-4 bg-gray-100 cursor-not-allowed"
+                        placeholder="Chưa có địa chỉ mặc định"
+                      />
+                    ) : (
+                      <Input
+                        {...field}
+                        disabled={["phoneNumber", "email"].includes(name)}
+                        className="w-full h-12 text-[15px] px-4"
+                      />
+                    )}
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+        </form>
+      </Form>
+    </>
+  );
 
   return (
     <div className="bg-white rounded-lg p-6">
@@ -132,121 +241,56 @@ export default function ProfileInfo() {
         </div>
       </div>
 
-      <SheetRework
-        open={open}
-        onOpenChange={setOpen}
-        title="Cập nhật thông tin cá nhân"
-        subtitle=""
-        onCancel={() => {
-          form.reset();
-          setSelectedAvatar(null);
-          resetUpload();
-        }}
-        onConfirm={form.handleSubmit(onSubmit)}
-        confirmText="Cập nhật thông tin"
-        cancelText="Thiết lập lại"
-        loading={loading}
-      >
-        <div className="flex flex-col items-center gap-3 mb-4">
-          <div className="relative w-24 h-24">
-            <Image
-              src={
-                selectedAvatar
-                  ? URL.createObjectURL(selectedAvatar)
-                  : userData.avatar || "/default-avatar.png"
-              }
-              alt="avatar"
-              fill
-              className="rounded-full object-cover border"
-            />
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="h-10 text-sm gap-2"
-            onClick={() => document.getElementById("avatarUpload")?.click()}
-          >
-            <UploadCloud size={16} />
-            Đổi ảnh đại diện
-          </Button>
-          <input
-            type="file"
-            id="avatarUpload"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                handleAddFiles([file]);
-                setSelectedAvatar(file);
-              }
-            }}
-          />
-        </div>
+      {isMobile ? (
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent className="p-0">
+            <DrawerHeader>
+              <DrawerTitle>Cập nhật thông tin cá nhân</DrawerTitle>
+            </DrawerHeader>
 
-        <Form {...form}>
-          <form className="space-y-5">
-            {(
-              [
-                ["name", "Họ và tên"],
-                ["gender", "Giới tính"],
-                ["dob", "Ngày sinh"],
-                ["phoneNumber", "Số điện thoại"],
-                ["email", "Email"],
-                ["address", "Địa chỉ mặc định"],
-              ] as [keyof InfoState, string][]
-            ).map(([name, label]) => (
-              <FormField
-                key={name}
-                control={form.control}
-                name={name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm">{label}</FormLabel>
-                    <FormControl>
-                      {name === "dob" ? (
-                        <Input
-                          type="date"
-                          {...field}
-                          className="w-full h-12 text-[15px] px-4"
-                        />
-                      ) : name === "gender" ? (
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-full h-12 text-[15px] px-4 flex items-center border rounded-md">
-                            <SelectValue placeholder="Chọn giới tính" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Nam">Nam</SelectItem>
-                            <SelectItem value="Nữ">Nữ</SelectItem>
-                            <SelectItem value="Khác">Khác</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : name === "address" ? (
-                        <Input
-                          {...field}
-                          readOnly
-                          className="w-full h-12 text-[15px] px-4 bg-gray-100 cursor-not-allowed"
-                          placeholder="Chưa có địa chỉ mặc định"
-                        />
-                      ) : (
-                        <Input
-                          {...field}
-                          disabled={["phoneNumber", "email"].includes(name)}
-                          className="w-full h-12 text-[15px] px-4"
-                        />
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-          </form>
-        </Form>
-      </SheetRework>
+            {/* Vùng nội dung cuộn */}
+            <div className="px-4 overflow-y-auto max-h-[calc(80vh-100px)]">
+              {formContent}
+            </div>
+
+            <DrawerFooter className="flex justify-end gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  form.reset();
+                  setSelectedAvatar(null);
+                  resetUpload();
+                  setOpen(false);
+                }}
+              >
+                Thiết lập lại
+              </Button>
+              <Button onClick={form.handleSubmit(onSubmit)} disabled={loading}>
+                Cập nhật thông tin
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <SheetRework
+          open={open}
+          onOpenChange={setOpen}
+          title="Cập nhật thông tin cá nhân"
+          subtitle=""
+          onCancel={() => {
+            form.reset();
+            setSelectedAvatar(null);
+            resetUpload();
+          }}
+          onConfirm={form.handleSubmit(onSubmit)}
+          confirmText="Cập nhật thông tin"
+          cancelText="Thiết lập lại"
+          loading={loading}
+          className="sm:!max-w-lg w-full px-2"
+        >
+          {formContent}
+        </SheetRework>
+      )}
     </div>
   );
 }
