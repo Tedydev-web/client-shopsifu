@@ -95,7 +95,8 @@ export const API_ENDPOINTS = {
   },
   PRODUCTS:{
     LIST: `${API_BASE}/products`,
-    DETAIL: `${API_BASE}/products/:id`
+    DETAIL: `${API_BASE}/products/:id`,
+    SEARCH: `${API_BASE}/search/products`,
   },
   // QUẢN LÝ GIỎ HÀNG - CART
   CART:{

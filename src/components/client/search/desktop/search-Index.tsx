@@ -66,7 +66,7 @@ export default function SearchDesktopIndex({ categoryId }: SearchDesktopIndexPro
             </div>
           )}
           <SearchSortBar />
-          {/* <SearchProductGrid categoryId={categoryId} /> */}
+          <SearchProductGrid categoryId={categoryId} />
           {/* <Pagination /> */}
         </div>
       </div>
