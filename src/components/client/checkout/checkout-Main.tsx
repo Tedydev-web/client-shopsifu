@@ -163,7 +163,7 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
       console.log(`[Polling] Checking VNPay payment status for orderId: ${activeOrderId}...`);
       try {
         const order = await orderService.getById(activeOrderId);
-        if (order && order.status === OrderStatus.PENDING_PICKUP) {
+        if (order && order.data.status === OrderStatus.PENDING_PICKUP) {
           clearInterval(intervalId);
           toast.success('Thanh toán VNPay thành công!');
           router.push(`/checkout/payment-success?orderId=${activeOrderId}&totalAmount=${totalAmount}`);

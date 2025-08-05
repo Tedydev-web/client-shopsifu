@@ -131,9 +131,9 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
       }
       
       toast.loading('Đang kiểm tra thanh toán...');
-      const order: Order = await orderService.getById(orderId);
+      const Order = await orderService.getById(orderId);
       
-      if (order && order.status === OrderStatus.PENDING_PICKUP) {
+      if (Order.data.status === OrderStatus.PENDING_PICKUP) {
         toast.dismiss();
         toast.success('Thanh toán thành công!');
         router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);

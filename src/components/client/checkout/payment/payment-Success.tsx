@@ -61,13 +61,13 @@ export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMeth
         const orderData = await orderService.getById(orderId);
         
         // Nếu đơn hàng đã được thanh toán
-        if (orderData.status === OrderStatus.PENDING_PICKUP || 
-            orderData.status === OrderStatus.PENDING_DELIVERY || 
-            orderData.status === OrderStatus.DELIVERED) {
+        if (orderData.data.status === OrderStatus.PENDING_PICKUP || 
+            orderData.data.status === OrderStatus.PENDING_DELIVERY || 
+            orderData.data.status === OrderStatus.DELIVERED) {
           setStatus('success');
         } 
         // Nếu đơn hàng đã bị hủy
-        else if (orderData.status === OrderStatus.CANCELLED) {
+        else if (orderData.data.status === OrderStatus.CANCELLED) {
           setStatus('failed');
         }
       } catch (error) {
