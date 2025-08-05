@@ -15,19 +15,20 @@ const SearchMobileIndex = dynamic(() => import("@/components/client/search/mobil
 });
 
 interface SearchContentProps {
-  categoryId?: string | null;
+  categoryIds?: string[];
+  currentCategoryId?: string | null;
 }
 
-export function SearchContent({ categoryId }: SearchContentProps) {
+export function SearchContent({ categoryIds = [], currentCategoryId }: SearchContentProps) {
   const deviceType = useCheckDevice();
   const isMobileView = deviceType === "mobile";
 
   return (
     <div className="w-full h-full">
       {isMobileView ? (
-        <SearchMobileIndex categoryId={categoryId} /> 
+        <SearchMobileIndex categoryIds={categoryIds} currentCategoryId={currentCategoryId} /> 
       ) : (
-        <SearchDesktopIndex categoryId={categoryId} />
+        <SearchDesktopIndex categoryIds={categoryIds} currentCategoryId={currentCategoryId} />
       )}
     </div>
   );

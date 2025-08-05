@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -14,203 +14,31 @@ import {
   X, 
   ChevronDown 
 } from "lucide-react";
-import { useCbbCategory } from '@/hooks/combobox/useCbbCategory';
-import { createCategorySlug } from '@/utils/slugify';
-import { useRouter } from 'next/navigation';
+import { useSidebar } from '../hooks/useSidebar';
 
+// Dữ liệu tĩnh cho các bộ lọc
 const locations = ['Đồng Nai', 'TP. Hồ Chí Minh', 'Bình Dương', 'Bà Rịa - Vũng Tàu'];
 const shippingOptions = ['Nhanh', 'Tiết Kiệm'];
 const brands = ['Nike', 'Adidas', 'Uniqlo', 'Zara', 'H&M'];
 
 interface SearchSidebarProps {
-  categoryId?: string | null;
+  categoryIds?: string[];
+  currentCategoryId?: string | null;
 }
 
-interface CategoryOption {
-  value: string;
-  label: string;
-  icon?: string | null;
-  parentCategoryId?: string | null;
-}
-
-export default function SearchSidebar({ categoryId }: SearchSidebarProps) {
-  const router = useRouter();
-  
-  // State để lưu thông tin danh mục
-  const [parentCategory, setParentCategory] = useState<{value: string, label: string} | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>(categoryId || "");
-  
-  // *** KEY: State để control việc fetch subcategories ***
-  const [parentCategoryIdForFetch, setParentCategoryIdForFetch] = useState<string | null>(null);
-  
-  // Luôn lấy danh mục cha (top level categories)
-  const { categories: parentCategories, loading: loadingParentCategories } = useCbbCategory(null);
-  
-  // *** KEY: Chỉ fetch subcategories khi parentCategoryIdForFetch thay đổi ***
-  const { categories: subcategories, loading: loadingSubcategories } = useCbbCategory(parentCategoryIdForFetch);
-  
-  // *** DEBUG: Log để kiểm tra data flow ***
-  console.log('DEBUG SearchSidebar:', {
-    categoryId,
-    parentCategoryIdForFetch,
-    subcategories: subcategories.map(s => s.label),
+export default function SearchSidebar({ categoryIds = [], currentCategoryId }: SearchSidebarProps) {
+  // Sử dụng custom hook để xử lý tất cả logic
+  const { 
+    parentCategory,
     selectedCategory,
-    parentCategory: parentCategory?.label
-  });
-  
-  // Xử lý logic khi có categoryId từ URL
-  useEffect(() => {
-    console.log('useEffect triggered:', { categoryId, parentCategories: parentCategories.length });
-    
-    if (categoryId && parentCategories.length > 0) {
-      // Kiểm tra xem categoryId có phải là danh mục cha không
-      const parentCategoryFound = parentCategories.find(cat => cat.value === categoryId);
-      
-      if (parentCategoryFound) {
-        console.log('Found parent category:', parentCategoryFound.label);
-        // *** Là danh mục cha: set để fetch subcategories ***
-        setParentCategory(parentCategoryFound);
-        setSelectedCategory(categoryId);
-        setParentCategoryIdForFetch(categoryId); // Trigger fetch subcategories
-      } else {
-        console.log('Category is subcategory, finding parent...');
-        // *** Là danh mục con: tìm parent của nó ***
-        findParentOfSubcategory(categoryId);
-      }
-    } else if (!categoryId) {
-      console.log('No categoryId, resetting...');
-      // Reset về trạng thái ban đầu
-      setParentCategory(null);
-      setSelectedCategory("");
-      setParentCategoryIdForFetch(null);
-    }
-  }, [categoryId, parentCategories]);
-  
-  // Function để tìm parent category của một subcategory
-  const findParentOfSubcategory = (subCategoryId: string) => {
-    console.log('Finding parent for subcategory:', subCategoryId);
-    
-    // Nếu đã có subcategories loaded, kiểm tra xem subcategory có trong đó không
-    if (subcategories.length > 0 && parentCategory) {
-      const foundInCurrent = subcategories.find(sub => sub.value === subCategoryId);
-      if (foundInCurrent) {
-        console.log('Found subcategory in current list, keeping parent:', parentCategory.label);
-        setSelectedCategory(subCategoryId);
-        // *** KHÔNG thay đổi parentCategoryIdForFetch để giữ nguyên subcategories list ***
-        return;
-      }
-    }
-    
-    // *** Nếu không tìm thấy trong subcategories hiện tại, 
-    // có thể subcategory này thuộc parent khác ***
-    // Nhưng để đơn giản, ta sẽ set về trạng thái "tất cả danh mục"
-    console.log('Subcategory not found in current parent, resetting to root');
-    setParentCategory(null);
-    setSelectedCategory(subCategoryId);
-    setParentCategoryIdForFetch(null); // Reset về root level
-  };
-  
-  // Effect để xử lý khi subcategories được load và kiểm tra subcategory
-  useEffect(() => {
-    console.log('subcategories effect:', { 
-      categoryId, 
-      subcategoriesLength: subcategories.length, 
-      parentCategoryIdForFetch 
-    });
-    
-    // Chỉ xử lý khi:
-    // 1. Có categoryId từ URL
-    // 2. categoryId không phải là parent category 
-    // 3. Đã có subcategories được load
-    if (categoryId && 
-        subcategories.length > 0 && 
-        !parentCategories.find(cat => cat.value === categoryId)) {
-      
-      const foundSubcategory = subcategories.find(sub => sub.value === categoryId);
-      if (foundSubcategory) {
-        console.log('Setting selected subcategory:', foundSubcategory.label);
-        setSelectedCategory(categoryId);
-        
-        // Tìm và set parent category tương ứng
-        const parentFound = parentCategories.find(parent => parent.value === parentCategoryIdForFetch);
-        if (parentFound && (!parentCategory || parentCategory.value !== parentFound.value)) {
-          console.log('Setting parent category:', parentFound.label);
-          setParentCategory(parentFound);
-        }
-      }
-    }
-  }, [subcategories, categoryId, parentCategories, parentCategoryIdForFetch, parentCategory]);
-  
-  const [selectedFilters, setSelectedFilters] = useState<{[key: string]: string[]}>({
-    locations: [],
-    brands: [],
-    shipping: []
-  });
-  
-  // *** UPDATED: Logic xử lý chọn danh mục ***
-  const handleCategorySelect = (categoryId: string, categoryName?: string) => {
-    console.log('handleCategorySelect:', { categoryId, categoryName });
-    
-    if (categoryId === selectedCategory) return;
-    
-    if (!categoryId) {
-      router.push('/');
-      return;
-    }
-    
-    // Kiểm tra xem có phải là parent category không
-    const isParentCategory = parentCategories.find(cat => cat.value === categoryId);
-    
-    if (isParentCategory) {
-      console.log('Selecting NEW parent category:', isParentCategory.label);
-      // *** Chọn parent category mới: trigger fetch subcategories mới ***
-      setParentCategory(isParentCategory);
-      setSelectedCategory(categoryId);
-      setParentCategoryIdForFetch(categoryId); // Trigger fetch subcategories mới
-    } else {
-      console.log('Selecting subcategory, keeping current subcategories list');
-      // *** Chọn subcategory: CHỈ update selectedCategory, KHÔNG thay đổi parentCategoryIdForFetch ***
-      setSelectedCategory(categoryId);
-      // parentCategoryIdForFetch giữ nguyên → subcategories list không thay đổi
-    }
-    
-    // Tìm tên và redirect
-    let name = categoryName;
-    if (!name) {
-      if (isParentCategory) {
-        name = isParentCategory.label;
-      } else {
-        const subcat = subcategories.find(cat => cat.value === categoryId);
-        name = subcat?.label || '';
-      }
-    }
-    
-    if (name) {
-      const slug = createCategorySlug(name, categoryId);
-      router.push(slug);
-    }
-  };
-  
-  const handleCheckboxChange = (section: string, item: string, checked: boolean) => {
-    setSelectedFilters(prev => {
-      const newFilters = {...prev};
-      if (checked) {
-        newFilters[section] = [...(prev[section] || []), item];
-      } else {
-        newFilters[section] = (prev[section] || []).filter(i => i !== item);
-      }
-      return newFilters;
-    });
-  };
-
-  const handleClearAll = () => {
-    router.push('/');
-    setSelectedFilters({
-      locations: [],
-      brands: [],
-      shipping: []
-    });
-  };
+    subcategories,
+    loadingSubcategories,
+    selectedFilters,
+    setSelectedFilters,
+    handleCategorySelect,
+    handleCheckboxChange,
+    handleClearAll
+  } = useSidebar({ categoryIds, currentCategoryId });
   
   return (
     <aside className="w-64 shrink-0 space-y-6 text-sm">
@@ -222,7 +50,8 @@ export default function SearchSidebar({ categoryId }: SearchSidebarProps) {
         items={subcategories.map(cat => cat.label)}
         itemIds={subcategories.map(cat => cat.value)}
         selectedValue={selectedCategory}
-        onValueChange={handleCategorySelect}
+        onParentSelect={(id, name) => handleCategorySelect(id, name, true)}
+        onChildSelect={(id, name) => handleCategorySelect(id, name, false)}
         isLoading={loadingSubcategories}
       />
       <Separator className="my-4" />
@@ -269,21 +98,23 @@ function CategorySectionWithParent({
   title, 
   icon,
   parentCategory, 
-  parentCategoryId = "",
+  parentCategoryId,
   items,
-  itemIds = [],
+  itemIds,
   selectedValue,
-  onValueChange,
-  isLoading = false,
+  onParentSelect,
+  onChildSelect,
+  isLoading,
 }: { 
   title: string; 
   icon?: React.ReactNode;
   parentCategory: string;
-  parentCategoryId?: string;
+  parentCategoryId: string;
   items: string[];
-  itemIds?: string[];
+  itemIds: string[];
   selectedValue: string;
-  onValueChange: (value: string, name?: string) => void;
+  onParentSelect: (id: string, name: string) => void;
+  onChildSelect: (id: string, name: string) => void;
   isLoading?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -304,7 +135,7 @@ function CategorySectionWithParent({
           className={`px-3 py-2 rounded-md cursor-pointer transition-colors duration-200 ${
             selectedValue === parentCategoryId ? "font-bold text-red-600" : "hover:bg-gray-50 font-medium"
           }`}
-          onClick={() => onValueChange(parentCategoryId, parentCategory)}
+          onClick={() => onParentSelect(parentCategoryId, parentCategory)}
         >
           <div className="flex items-center justify-between">
             <span>{parentCategory}</span>
@@ -331,7 +162,7 @@ function CategorySectionWithParent({
                       ? "bg-red-50 text-red-600" 
                       : "hover:bg-gray-50"
                   }`}
-                  onClick={() => onValueChange(itemId, item)}
+                  onClick={() => onChildSelect(itemId, item)}
                 >
                   <div className="flex items-center justify-between">
                     <span>{item}</span>

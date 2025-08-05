@@ -1,60 +1,40 @@
-import { useState, useEffect } from 'react';
+"use client";
+
 import { ClientProduct } from '@/types/client.products.interface';
-import { clientProductsService } from '@/services/clientProductsService';
 import ProductItem from '@/components/ui/product-component/product-Item';
-import { mockSearchProducts } from './search-MockData';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { useProductsContext } from '../context/ProductsContext';
 
 interface SearchProductGridProps {
   categoryId?: string | null;
 }
 
 export default function SearchProductGrid({ categoryId }: SearchProductGridProps) {
-  const [products, setProducts] = useState<ClientProduct[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // Sử dụng ProductsContext để lấy dữ liệu
+  const { 
+    products, 
+    metadata, 
+    isLoading, 
+    isError, 
+    error, 
+    currentPage,
+    handlePageChange,
+    paginationData
+  } = useProductsContext();
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Chuẩn bị params để truyền vào API
-        const params: any = {
-          page: 1,
-          limit: 20,
-        };
-        
-        // Thêm categoryId vào params nếu có
-        if (categoryId) {
-          params.categories = categoryId;
-        }
-        
-        // Gọi API để lấy sản phẩm
-        const response = await clientProductsService.getProducts(params);
-        
-        // Kiểm tra và cập nhật state
-        if (response && response.data) {
-          setProducts(response.data);
-        } else {
-          setProducts([]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch products:", err);
-        setError("Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.");
-        // Fallback sử dụng mock data trong trường hợp lỗi
-        setProducts(mockSearchProducts);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    fetchProducts();
-  }, [categoryId]); // Re-fetch khi categoryId thay đổi
+  const { totalPages, hasNextPage, hasPrevPage } = paginationData;
 
   // Hiển thị loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {Array(10).fill(null).map((_, index) => (
@@ -70,10 +50,12 @@ export default function SearchProductGrid({ categoryId }: SearchProductGridProps
   }
 
   // Hiển thị thông báo lỗi
-  if (error) {
+  if (isError) {
     return (
       <div className="w-full py-12 flex flex-col items-center justify-center">
-        <div className="text-red-500 mb-4">{error}</div>
+        <div className="text-red-500 mb-4">
+          Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.
+        </div>
         <button 
           onClick={() => window.location.reload()} 
           className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
@@ -93,12 +75,135 @@ export default function SearchProductGrid({ categoryId }: SearchProductGridProps
     );
   }
 
-  // Hiển thị danh sách sản phẩm
+  // Function để hiển thị danh sách trang
+  const renderPaginationItems = () => {
+    // Nếu chỉ có 1 trang, không hiển thị phân trang
+    if (totalPages <= 1) return null;
+    
+    const items = [];
+    
+    // Hiển thị max 5 trang và sử dụng "..." cho các trang khác
+    const maxVisiblePages = 5;
+    let startPage = 1;
+    let endPage = totalPages;
+    
+    if (totalPages > maxVisiblePages) {
+      // Tính toán startPage và endPage để hiển thị 5 trang xung quanh trang hiện tại
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      
+      if (currentPage <= halfVisible + 1) {
+        // Gần đầu: hiển thị 1 -> maxVisiblePages
+        endPage = maxVisiblePages;
+      } else if (currentPage >= totalPages - halfVisible) {
+        // Gần cuối: hiển thị (totalPages - maxVisiblePages + 1) -> totalPages
+        startPage = totalPages - maxVisiblePages + 1;
+      } else {
+        // Ở giữa: hiển thị (currentPage - halfVisible) -> (currentPage + halfVisible)
+        startPage = currentPage - halfVisible;
+        endPage = currentPage + halfVisible;
+      }
+    }
+    
+    // Hiển thị trang đầu tiên nếu cần
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key="page-1">
+          <PaginationLink 
+            onClick={() => handlePageChange(1)}
+            isActive={currentPage === 1}
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      
+      // Hiển thị dấu "..." nếu không bắt đầu từ trang 2
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="ellipsis-1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    }
+    
+    // Hiển thị các trang giữa
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={`page-${i}`}>
+          <PaginationLink 
+            onClick={() => handlePageChange(i)}
+            isActive={currentPage === i}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    // Hiển thị trang cuối cùng nếu cần
+    if (endPage < totalPages) {
+      // Hiển thị dấu "..." nếu không kết thúc ở trang gần cuối
+      if (endPage < totalPages - 1) {
+        items.push(
+          <PaginationItem key="ellipsis-2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      items.push(
+        <PaginationItem key={`page-${totalPages}`}>
+          <PaginationLink 
+            onClick={() => handlePageChange(totalPages)}
+            isActive={currentPage === totalPages}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return items;
+  };
+
+  // Hiển thị danh sách sản phẩm và phân trang
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {products.map((product: ClientProduct) => (
-        <ProductItem key={product.id} product={product} />
-      ))}
+    <div className="space-y-8">
+      {/* Grid sản phẩm */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {products.map((product: ClientProduct) => (
+          <ProductItem key={product.id} product={product} />
+        ))}
+      </div>
+      
+      {/* Phân trang */}
+      {totalPages > 1 && (
+        <Pagination className="mt-8">
+          <PaginationContent>
+            {/* Nút Previous */}
+            {hasPrevPage && (
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => handlePageChange(currentPage - 1)} 
+                />
+              </PaginationItem>
+            )}
+            
+            {/* Danh sách trang */}
+            {renderPaginationItems()}
+            
+            {/* Nút Next */}
+            {hasNextPage && (
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => handlePageChange(currentPage + 1)} 
+                />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

@@ -2,14 +2,26 @@
 
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useProductsContext } from '../context/ProductsContext';
 
-export default function SearchSortBar() {
+interface SearchSortBarProps {
+  categoryId?: string | null;
+}
+
+export default function SearchSortBar({ categoryId }: SearchSortBarProps) {
   const [sort, setSort] = useState('Liên Quan');
   const [showPriceDropdown, setShowPriceDropdown] = useState(false);
   const [priceSort, setPriceSort] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(10); // Giả sử có 10 trang
   
+  // Lấy dữ liệu từ ProductsContext
+  const { 
+    currentPage, 
+    paginationData, 
+    handlePageChange,
+    isLoading
+  } = useProductsContext();
+  
+  const { totalPages, hasNextPage, hasPrevPage } = paginationData;
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Xử lý đóng dropdown khi click ra ngoài
@@ -26,22 +38,15 @@ export default function SearchSortBar() {
     };
   }, []);
 
-  // Xử lý chuyển trang
-  const handlePageChange = (page: number) => {
-    // Kiểm tra giới hạn trang
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
-
   return (
-    <div className="flex justify-between items-center bg-white p-3 rounded-xs mb-2">
+    <div className="flex justify-between items-center bg-white p-3 rounded-md shadow-sm mb-4">
       {/* Phần sort options */}
       <div className="flex items-center gap-3">
         {['Liên Quan', 'Mới Nhất', 'Bán Chạy'].map((option) => (
           <button
             key={option}
             className={`text-sm px-3 py-1.5 border rounded-md transition-colors duration-200 ${
-              sort === option ? 'bg-primary text-white border-primary' : 'text-gray-700 hover:border-primary hover:text-primary'
+              sort === option ? 'bg-red-600 text-white border-red-600' : 'text-gray-700 hover:border-red-600 hover:text-red-600'
             }`}
             onClick={() => setSort(option)}
           >
@@ -53,7 +58,7 @@ export default function SearchSortBar() {
         <div className="relative" ref={dropdownRef}>
           <button 
             className={`text-sm px-3 py-1.5 border rounded-md flex items-center gap-1 transition-colors duration-200 ${
-              priceSort ? 'bg-primary text-white border-primary' : 'text-gray-700 hover:border-primary hover:text-primary'
+              priceSort ? 'bg-red-600 text-white border-red-600' : 'text-gray-700 hover:border-red-600 hover:text-red-600'
             }`}
             onClick={() => setShowPriceDropdown(!showPriceDropdown)}
           >
@@ -86,30 +91,32 @@ export default function SearchSortBar() {
         </div>
       </div>
       
-      {/* Phần pagination */}
-      <div className="flex items-center gap-2">
-        <button 
-          className="p-1.5 border rounded-md hover:border-primary hover:text-primary transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft size={16} />
-        </button>
-        
-        <div className="flex items-center gap-1">
-          <span className="text-sm font-medium text-gray-700">{currentPage}</span>
-          <span className="text-sm text-gray-500">/</span>
-          <span className="text-sm text-gray-500">{totalPages}</span>
+      {/* Phần pagination đơn giản */}
+      {!isLoading && totalPages > 1 && (
+        <div className="flex items-center gap-2">
+          <button 
+            className="p-1.5 border rounded-md hover:border-red-600 hover:text-red-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={!hasPrevPage}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-medium text-gray-700">{currentPage}</span>
+            <span className="text-sm text-gray-500">/</span>
+            <span className="text-sm text-gray-500">{totalPages}</span>
+          </div>
+          
+          <button 
+            className="p-1.5 border rounded-md hover:border-red-600 hover:text-red-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={!hasNextPage}
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
-        
-        <button 
-          className="p-1.5 border rounded-md hover:border-primary hover:text-primary transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight size={16} />
-        </button>
-      </div>
+      )}
     </div>
   );
 }

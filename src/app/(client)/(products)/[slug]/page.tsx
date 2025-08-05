@@ -1,5 +1,5 @@
 import { SearchContent } from "@/components/client/search/search-Main";
-import { extractCategoryId, isCategorySlug } from "@/utils/slugify";
+import { extractCategoryIds, extractCurrentCategoryId, isCategorySlug } from "@/utils/slugify";
 import { Metadata } from "next";
 
 // Định nghĩa interface cho params
@@ -65,20 +65,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // Component chính của trang
 export default async function ProductPage({ params }: PageProps) {
-  // *** FIX: Await params trước khi sử dụng (Next.js 15) ***
+  // Await params trước khi sử dụng
   const { slug } = await params;
-  let categoryId: string | null = null;
+  
+  // Xác định thông tin category
+  let categoryIds: string[] = [];
+  let currentCategoryId: string | null = null;
   
   // Kiểm tra nếu slug có hậu tố "-cat."
   if (isCategorySlug(slug)) {
-    categoryId = extractCategoryId(slug);
+    categoryIds = extractCategoryIds(slug);
+    currentCategoryId = categoryIds[categoryIds.length - 1]; // ID cuối cùng là ID hiện tại
   }
-  
 
   console.log('ProductPage:', { 
     slug: decodeURIComponent(slug), 
-    categoryId 
+    categoryIds,
+    currentCategoryId
   });
 
-  return <SearchContent categoryId={categoryId} />;
+  return <SearchContent 
+    categoryIds={categoryIds} 
+    currentCategoryId={currentCategoryId} 
+  />;
 }
