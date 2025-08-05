@@ -75,7 +75,7 @@ export default async function ProductPage({ params }: PageProps) {
   // Kiểm tra nếu slug có hậu tố "-cat."
   if (isCategorySlug(slug)) {
     categoryIds = extractCategoryIds(slug);
-    currentCategoryId = categoryIds[categoryIds.length - 1]; // ID cuối cùng là ID hiện tại
+    currentCategoryId = extractCurrentCategoryId(slug) || categoryIds[categoryIds.length - 1]; // ID cuối cùng là ID hiện tại
   }
 
   console.log('ProductPage:', { 

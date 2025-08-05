@@ -111,3 +111,72 @@ export interface ClientProductsListParams {
     minPrice?: number;
     maxPrice?: number;
 }
+
+/**
+ * @interface ProductSpecification
+ * @description Represents a product specification attribute-value pair
+ */
+export interface ProductSpecification {
+    name: string;
+    value: string;
+}
+
+/**
+ * @interface ProductAttribute
+ * @description Represents a product attribute name-value pair
+ */
+export interface ProductAttribute {
+    attrName: string;
+    attrValue: string;
+}
+
+/**
+ * @interface ClientSearchResultItem
+ * @description Represents a single item in search results
+ */
+export interface ClientSearchResultItem {
+    skuId: string;
+    productId: string;
+    skuValue: string;
+    skuPrice: number;
+    skuStock: number;
+    skuImage: string;
+    productName: string;
+    productDescription: string;
+    productImages: string[];
+    brandId: string;
+    brandName: string;
+    categoryIds: string[];
+    categoryNames: string[];
+    specifications: ProductSpecification[];
+    variants: ClientVariant[];
+    attrs: ProductAttribute[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+/**
+ * @interface ClientSearchResponse
+ * @description Represents the API response for search functionality
+ */
+export interface ClientSearchResponse extends BaseResponse {
+    data: ClientSearchResultItem[];
+    metadata: PaginationMetadata;
+}
+
+/**
+ * @interface ClientSearchParams
+ * @description Parameters for search API
+ */
+export interface ClientSearchParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    categories?: string;
+    brandId?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    [key: string]: any; // For additional dynamic parameters
+}

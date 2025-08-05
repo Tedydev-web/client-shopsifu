@@ -1,17 +1,20 @@
 'use client';
-
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, TrendingUp, Clock, X, Tag } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import '../style.css';
-import { trendingSearches, popularCategories} from './desktop-Mockdata';
 import { useDropdown } from '../dropdown-context';
-// Dữ liệu mẫu cho các trending searches
+import { useCbbCategory } from '@/hooks/combobox/useCbbCategory';
+import { createCategorySlug } from '@/utils/slugify';
+import { clientProductsService } from '@/services/clientProductsService';
+import { useDebounce } from '@/hooks/useDebounce';
+import { ClientSearchResultItem } from '@/types/client.products.interface';
 
 
 export function SearchInput() {
@@ -19,28 +22,99 @@ export function SearchInput() {
 	const [hoverEffect, setHoverEffect] = useState(false);
 	const searchRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const router = useRouter();
 	const { openDropdown, setOpenDropdown } = useDropdown();
+	
+	// State cho kết quả tìm kiếm
+	const [searchSuggestions, setSearchSuggestions] = useState<ClientSearchResultItem[]>([]);
+	const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+	
+	// Sử dụng hook để lấy danh mục từ API
+	const { categories, loading } = useCbbCategory(null);
+	
+	// Debounce search term để tránh gọi API quá nhiều
+	const debouncedSearchTerm = useDebounce(searchTerm, 500);
 	
 	// Chuyển trạng thái focus thành dựa vào context
 	const isFocused = openDropdown === 'search';
 	
-	const handleFocus = () => {
+	// Tối ưu các handlers bằng useCallback để tránh re-render không cần thiết
+	const handleFocus = useCallback(() => {
 		setOpenDropdown('search');
-	};
+	}, [setOpenDropdown]);
 	
-	const handleBlur = () => {
+	const handleBlur = useCallback(() => {
 		// Không đóng dropdown ngay lập tức khi blur để cho phép click vào dropdown
 		// Việc đóng sẽ được xử lý bởi DropdownProvider khi click ngoài
-	};
+	}, []);
+	
+	// Tách function fetchSearchSuggestions thành useCallback để tối ưu hiệu năng
+	const fetchSearchSuggestions = useCallback(async (term: string) => {
+		// Chỉ tìm kiếm khi có ít nhất 2 ký tự
+		if (term.length < 2) {
+			setSearchSuggestions([]);
+			return;
+		}
+		
+		setIsLoadingSuggestions(true);
+		
+		try {
+			// Sử dụng AbortController để có thể hủy request nếu có một request mới
+			const controller = new AbortController();
+			const signal = controller.signal;
+			
+			// Gọi API tìm kiếm với signal để có thể cancel nếu cần
+			const response = await clientProductsService.getSearchSuggestions(term, 5);
+			
+			// Kiểm tra nếu request đã bị hủy
+			if (signal.aborted) return;
+			
+			setSearchSuggestions(response.data);
+		} catch (error) {
+			// Kiểm tra nếu lỗi là do request bị hủy thì không xử lý
+			if ((error as Error).name === 'AbortError') return;
+			
+			console.error("Error fetching search suggestions:", error);
+			setSearchSuggestions([]);
+		} finally {
+			setIsLoadingSuggestions(false);
+		}
+	}, []);
+	
+	// Effect để gọi API search khi searchTerm thay đổi
+	useEffect(() => {
+		if (debouncedSearchTerm.length < 2) {
+			setSearchSuggestions([]);
+			return;
+		}
+		
+		// Gọi hàm fetchSearchSuggestions đã được tối ưu
+		fetchSearchSuggestions(debouncedSearchTerm);
+		
+		// Cleanup function để hủy request khi component unmount hoặc debouncedSearchTerm thay đổi
+		return () => {
+			// Nếu có controller để abort request, thực hiện ở đây
+		};
+	}, [debouncedSearchTerm, fetchSearchSuggestions]);
+	
+	// Chuyển đến trang tìm kiếm - được tách ra để tái sử dụng
+	const navigateToSearch = useCallback((term: string) => {
+		if (!term.trim()) return;
+		
+		setOpenDropdown('none');
+		// Luôn chuyển hướng đến route gốc /search để reset mọi trạng thái liên quan đến category
+		router.push(`/search?q=${encodeURIComponent(term)}`);
+	}, [router, setOpenDropdown]);
+	
 	// Cập nhật từ khóa tìm kiếm và giữ focus
-	const handleSearchTermClick = (term: string) => {
+	const handleSearchTermClick = useCallback((term: string) => {
 		setSearchTerm(term);
 		if (inputRef.current) {
 			inputRef.current.focus();
 		}
-	};
+	}, []);
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newSearchTerm = e.target.value;
         setSearchTerm(newSearchTerm);
         
@@ -48,7 +122,23 @@ export function SearchInput() {
         if (newSearchTerm && openDropdown !== 'search') {
             setOpenDropdown('search');
         }
-    };
+    }, [openDropdown, setOpenDropdown]);
+    
+    // Xử lý sự kiện khi người dùng nhấn phím
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && searchTerm.trim()) {
+            e.preventDefault();
+            navigateToSearch(searchTerm);
+        } else if (e.key === 'Escape') {
+            // Đóng dropdown khi nhấn Escape
+            e.preventDefault();
+            setOpenDropdown('none');
+        } else if (e.key === 'ArrowDown' && searchSuggestions.length > 0) {
+            // Có thể thêm logic chọn gợi ý bằng phím mũi tên
+            e.preventDefault();
+            // Chức năng nâng cao - sẽ triển khai sau nếu cần
+        }
+    }, [searchTerm, searchSuggestions.length, navigateToSearch, setOpenDropdown]);
 
 	return (
 		<>
@@ -79,8 +169,13 @@ export function SearchInput() {
 						onFocus={handleFocus}
 						onBlur={handleBlur}
 						value={searchTerm}
-						// onChange={(e) => setSearchTerm(e.target.value)}
 						onChange={handleInputChange}
+						onKeyDown={handleKeyDown}
+						aria-label="Tìm kiếm"
+						aria-expanded={isFocused}
+						aria-controls="search-suggestions"
+						role="combobox"
+						autoComplete="off"
 					/>
 					{searchTerm && (
 						<motion.button
@@ -94,11 +189,11 @@ export function SearchInput() {
 							<X className='h-4 w-4 text-gray-400' />
 						</motion.button>
 					)}
-					<Link
-						href={searchTerm ? `/search?q=${encodeURIComponent(searchTerm)}` : '#'}
-						onClick={(e) => {
-							if (!searchTerm) e.preventDefault();
-							if (searchTerm) setOpenDropdown('none');
+					<div 
+						onClick={() => {
+							if (searchTerm) {
+								navigateToSearch(searchTerm);
+							}
 						}}
 					>
 						<motion.div
@@ -109,11 +204,13 @@ export function SearchInput() {
 								type='button'
 								size='sm'
 								className='h-9 rounded-full px-6 m-1 bg-red-500 hover:bg-red-600'
+								aria-label="Tìm kiếm"
+								onClick={() => searchTerm && navigateToSearch(searchTerm)}
 							>
 								<Search className='h-5 w-5 text-white' />
 							</Button>
 						</motion.div>
-					</Link>
+					</div>
 				</motion.div>
 				
 				{/* Search dropdown with AnimatePresence for smooth enter/exit */}
@@ -140,7 +237,7 @@ export function SearchInput() {
 							}}
 						>
 							{/* Bubble arrow pointing to the search bar */}
-							<div className='absolute search-dropdown-arrow w-3 h-3 bg-white transform rotate-45 border-t border-l border-gray-200' style={{ left: 'calc(50% - 6px)', top: '-6px' }}></div>
+							<div className='absolute search-dropdown-arrow w-3 h-3 bg-white transform rotate-45 border-t border-l border-gray-200'></div>
 							
 							<div>
 								{/* Header section with padding */}
@@ -159,67 +256,98 @@ export function SearchInput() {
 								<div className='mb-0'> {/* Changed mb-5 to mb-0 to remove extra space at bottom */}
 									{!searchTerm ? (
 										<>
-											{/* Layout khi chưa nhập gì - Chỉ hiển thị danh mục phổ biến */}
+											{/* Layout khi chưa nhập gì - Chỉ hiển thị danh mục phổ biến từ API */}
 											<div>
-												{popularCategories.slice(0, 8).map((category) => (
-													<motion.div
-														key={category.id}
-														className='cursor-pointer modal-input' /* Fixed class name syntax */
-														onClick={() => setOpenDropdown('none')}
-													>
-														<div className='px-5 py-2.5'> {/* Standardized padding */}
-															<Link
-																href={`/category/${category.id}`}
-																className='w-full flex items-center justify-between'
-																onClick={(e) => e.stopPropagation()}
-															>
-																<div className='flex items-center'>
-																	<div className='w-10 h-10 relative overflow-hidden rounded-full border border-gray-100 mr-3'>
-																		<Image
-																			src={category.image}
-																			alt={category.name}
-																			layout='fill'
-																			objectFit='cover'
-																			className='transition-transform duration-300'
-																		/>
-																	</div>
-																	<span className='text-sm text-gray-800'>{category.name}</span>
-																</div>
-																{/* <Tag className='h-4 w-4 text-gray-500' /> */}
-															</Link>
+												{loading ? (
+													// Hiển thị skeleton loading khi đang tải danh mục
+													Array(5).fill(0).map((_, index) => (
+														<div key={index} className='px-5 py-2.5'>
+															<div className='w-full flex items-center'>
+																<div className='w-10 h-10 bg-gray-200 rounded-full mr-3 animate-pulse'></div>
+																<div className='h-4 bg-gray-200 rounded w-40 animate-pulse'></div>
+															</div>
 														</div>
-													</motion.div>
-												))}
+													))
+												) : (
+													// Hiển thị 5 danh mục từ API
+													categories.slice(0, 5).map((category) => (
+														<motion.div
+															key={category.value}
+															className='cursor-pointer modal-input'
+															onClick={() => setOpenDropdown('none')}
+														>
+															<div className='px-5 py-2.5'>
+																<Link
+																	href={createCategorySlug(category.label, [category.value])}
+																	className='w-full flex items-center justify-between'
+																	onClick={(e) => e.stopPropagation()}
+																>
+																	<div className='flex items-center'>
+																		<div className='w-10 h-10 relative overflow-hidden rounded-full border border-gray-100 mr-3'>
+																			{category.icon ? (
+																				<Image
+																					src={category.icon}
+																					alt={category.label}
+																					fill
+																					sizes="40px"
+																					className='object-cover transition-transform duration-300'
+																				/>
+																			) : (
+																				<div className='w-full h-full bg-gray-100 flex items-center justify-center text-gray-400'>
+																					{category.label.charAt(0)}
+																				</div>
+																			)}
+																		</div>
+																		<span className='text-sm text-gray-800'>{category.label}</span>
+																	</div>
+																</Link>
+															</div>
+														</motion.div>
+													))
+												)}
 											</div>
 										</>
 									) : (
 										<>
 											{/* Layout khi đã nhập - Hiển thị kết quả liên quan */}
 											<div>
-												{/* Filtered results based on search term */}
-												<div>
-													{trendingSearches
-														.filter(item => 
-															item.text.toLowerCase().includes(searchTerm.toLowerCase())
-														)
-														.slice(0, 5)
-														.map((item) => (
-															<motion.div
-																key={item.id}
-																className='cursor-pointer modal-input' /* Applied same class for consistency */
-																onClick={() => handleSearchTermClick(item.text)}
-															>
-																<div className='px-5 py-2.5 flex items-center justify-between'>
-																	<div className='flex items-center'>
-																		<Search className='h-4 w-4 text-gray-500 mr-2.5' />
-																		<span className='text-sm font-medium text-gray-800'>{item.text}</span>
-																	</div>
-																	<span className='text-xs text-gray-500'>{item.category}</span>
+												{/* Hiển thị kết quả tìm kiếm từ API */}
+												{isLoadingSuggestions ? (
+													// Hiển thị skeleton loading khi đang tải kết quả
+													Array(3).fill(0).map((_, index) => (
+														<div key={index} className='px-5 py-2.5'>
+															<div className='w-full flex items-center'>
+																<div className='w-6 h-6 bg-gray-200 rounded-full mr-3 animate-pulse'></div>
+																<div className='flex-1'>
+																	<div className='h-4 bg-gray-200 rounded w-3/4 animate-pulse mb-1'></div>
+																	<div className='h-3 bg-gray-100 rounded w-1/2 animate-pulse'></div>
 																</div>
-															</motion.div>
-														))
-													}
-												</div>
+															</div>
+														</div>
+													))
+												) : searchSuggestions.length > 0 ? (
+													// Hiển thị kết quả tìm kiếm nếu có
+													searchSuggestions.map((item) => (
+														<motion.div
+															key={item.productId}
+															className='cursor-pointer modal-input'
+															onClick={() => handleSearchTermClick(item.productName)}
+														>
+															<div className='px-5 py-2.5 flex items-center justify-between'>
+																<div className='flex items-center'>
+																	<Search className='h-4 w-4 text-gray-500 mr-2.5' />
+																	<span className='text-sm font-medium text-gray-800'>{item.productName}</span>
+																</div>
+																<span className='text-xs text-gray-500'>{item.categoryNames[0] || 'Sản phẩm'}</span>
+															</div>
+														</motion.div>
+													))
+												) : searchTerm.length > 1 ? (
+													// Hiển thị thông báo không có kết quả
+													<div className='px-5 py-6 text-center'>
+														<p className='text-gray-500'>Không tìm thấy kết quả cho "{searchTerm}"</p>
+													</div>
+												) : null}
 											</div>
 										</>
 									)}

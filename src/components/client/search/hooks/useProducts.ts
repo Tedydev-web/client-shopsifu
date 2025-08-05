@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
-import { ClientProductsResponse, ClientProduct } from '@/types/client.products.interface';
+import { ClientProductsResponse, ClientProduct, ClientSearchResultItem } from '@/types/client.products.interface';
 import { clientProductsService } from '@/services/clientProductsService';
 import { useServerDataTable } from '@/hooks/useServerDataTable';
 
@@ -31,6 +31,7 @@ interface PaginationData {
 
 interface UseProductsProps {
   categoryId?: string | null;
+  key?: string; // Key để force re-render khi cần thiết
 }
 
 interface UseProductsReturn {
@@ -56,7 +57,9 @@ interface UseProductsReturn {
   };
 }
 
-export function useProducts({ categoryId }: UseProductsProps): UseProductsReturn {
+export function useProducts({ categoryId, key }: UseProductsProps): UseProductsReturn {
+  // Ghi log khi hook được gọi lại để debug
+  console.log("useProducts hook called with:", { categoryId, key });
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
@@ -78,17 +81,70 @@ export function useProducts({ categoryId }: UseProductsProps): UseProductsReturn
     pagination: paginationRaw,
     handlePageChange: internalHandlePageChange,
     refreshData,
-  } = useServerDataTable<ClientProduct, ClientProduct>({
+  } = useServerDataTable<ClientProduct | ClientSearchResultItem, ClientProduct>({
     fetchData: async (params: ApiParams) => {
       // Thêm các params đặc biệt
       const apiParams: ApiParams = { ...params };
       
-      if (categoryId) {
+      // Nếu có từ khóa tìm kiếm, ưu tiên API search và bỏ qua category filter
+      if (searchQuery) {
+        // Xóa category param nếu đang tìm kiếm để đảm bảo tìm kiếm trên toàn bộ sản phẩm
+        delete apiParams.categories;
+      } else if (categoryId) {
+        // Chỉ áp dụng filter theo category khi không có search query
         apiParams.categories = categoryId;
       }
       
+      // Nếu có từ khóa tìm kiếm, sử dụng API search
       if (searchQuery) {
-        apiParams.search = searchQuery;
+        apiParams.q = searchQuery; // Sử dụng param 'q' thay vì 'search' cho API search
+        
+        // Thêm tham số timestamp để đảm bảo không cache kết quả
+        apiParams._t = new Date().getTime();
+        
+        console.log("Searching products with params:", { q: searchQuery, ...apiParams });
+        
+        const searchResponse = await clientProductsService.searchProducts(apiParams);
+        
+        // Chuyển đổi dữ liệu từ search API sang định dạng tương thích với ClientProduct
+        const convertedData = searchResponse.data.map(item => ({
+          id: item.productId,
+          name: item.productName,
+          description: item.productDescription || '',
+          basePrice: item.skuPrice || 0,
+          virtualPrice: item.skuPrice || 0, // Có thể cần thêm logic xử lý giá ảo
+          brandId: item.brandId || '',
+          images: item.productImages || [],
+          variants: item.variants || [],
+          productTranslations: [],
+          publishedAt: item.createdAt,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          // Thêm các trường bắt buộc từ BaseEntity
+          createdById: 0, // Default value
+          updatedById: null,
+          deletedById: null,
+          deletedAt: null,
+          // Thêm các trường cần thiết khác
+          isPublished: true,
+          brandName: item.brandName || '',
+          categories: item.categoryIds?.map((id, index) => ({
+            id,
+            name: item.categoryNames?.[index] || ''
+          })) || []
+        })) as unknown as ClientProduct[]; // Sử dụng unknown làm trung gian
+        
+        console.log("Search response received:", {
+          itemCount: convertedData.length,
+          metadata: searchResponse.metadata
+        });
+    
+        return {
+          statusCode: searchResponse.statusCode,
+          message: searchResponse.message,
+          data: convertedData,
+          metadata: searchResponse.metadata,
+        };
       }
       
       return await clientProductsService.getProducts(apiParams);
@@ -141,9 +197,9 @@ export function useProducts({ categoryId }: UseProductsProps): UseProductsReturn
     router.push(newPath);
   };
   
-  // Chỉ refresh data khi categoryId hoặc searchQuery thay đổi
+  // Force refresh data khi URL thay đổi và khi categoryId hoặc searchQuery thay đổi
   useEffect(() => {
-    // Bỏ qua lần render đầu tiên
+    // Bỏ qua lần render đầu tiên (chỉ để tránh refresh không cần thiết khi mount)
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
       return;
@@ -153,24 +209,34 @@ export function useProducts({ categoryId }: UseProductsProps): UseProductsReturn
     const categoryIdChanged = categoryId !== prevCategoryIdRef.current;
     const searchQueryChanged = searchQuery !== prevSearchQueryRef.current;
     
-    // Nếu có sự thay đổi, mới refresh data
+    // Force refresh data mỗi khi URL chứa search query thay đổi
     if (categoryIdChanged || searchQueryChanged) {
+      console.log("Data refresh triggered:", { categoryId, searchQuery });
+      
       // Cập nhật refs trước khi gọi refreshData để tránh vòng lặp
       prevCategoryIdRef.current = categoryId;
       prevSearchQueryRef.current = searchQuery;
       
-      // Reset về trang 1 và refresh data
-      internalHandlePageChange(1);
+      // Reset về trang 1 và refresh data ngay lập tức
+      setTimeout(() => {
+        refreshData();
+        internalHandlePageChange(1);
+      }, 0);
       
-      // Cập nhật URL với page=1
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.set('page', '1');
-      const pathname = window.location.pathname;
-      const queryString = newParams.toString();
-      const newPath = queryString ? `${pathname}?${queryString}` : pathname;
-      router.push(newPath);
+      // Cập nhật URL với page=1 nếu đang không trong quá trình update URL từ các nơi khác
+      if (!isUpdatingUrlRef.current) {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set('page', '1');
+        const pathname = window.location.pathname;
+        const queryString = newParams.toString();
+        const newPath = queryString ? `${pathname}?${queryString}` : pathname;
+        router.push(newPath);
+      }
+      
+      // Reset flag
+      isUpdatingUrlRef.current = false;
     }
-  }, [categoryId, searchQuery, internalHandlePageChange, router, searchParams]);
+  }, [categoryId, searchQuery, internalHandlePageChange, router, searchParams, refreshData]);
   
   // Tạo dữ liệu phân trang để trả về
   const paginationData = useMemo(() => ({

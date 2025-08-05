@@ -4,8 +4,11 @@ import { Search, ArrowLeft, X, History, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useCbbCategory } from '@/hooks/combobox/useCbbCategory';
+import { createCategorySlug } from '@/utils/slugify';
+import Link from 'next/link';
 
-import { allSuggestions, popularCategories } from '@/components/client/layout/header/moblie/searchData';
+import { allSuggestions } from '@/components/client/layout/header/moblie/searchData';
 
 const SEARCH_HISTORY_KEY = 'searchHistory';
 
@@ -21,6 +24,9 @@ export function MobileSearchInput() {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  
+  // Sử dụng hook để lấy danh mục từ API
+  const { categories, loading } = useCbbCategory(null);
 
   // Load search history from localStorage
   useEffect(() => {
@@ -204,39 +210,52 @@ export function MobileSearchInput() {
                     </div>
                   )}                  {/* Danh mục phổ biến */}
                   <div className="p-4 bg-white">
-                    <h3 className="font-medium text-gray-900 mb-3">Danh mục phổ biến</h3>                    <div className="grid grid-cols-1 gap-2">
-                      {popularCategories.map((category) => (
-                        <button
-                          key={category.order}
-                          onClick={() => handleSelectSuggestion(category.name)}
-                          className={cn(
-                            "flex items-center gap-3 p-3 rounded-lg transition-all text-left w-full",
-                            category.order <= 3 
-                              ? "bg-white hover:bg-gray-50 shadow-sm" 
-                              : "bg-gray-50 hover:bg-gray-100"
-                          )}
-                        >                          {category.order <= 3 ? (
+                    <h3 className="font-medium text-gray-900 mb-3">Danh mục phổ biến</h3>                    
+                    <div className="grid grid-cols-1 gap-2">
+                      {loading ? (
+                        // Skeleton loading khi đang tải danh mục
+                        Array(5).fill(0).map((_, index) => (
+                          <div key={index} className="flex items-center gap-3 p-3 bg-white hover:bg-gray-50 shadow-sm rounded-lg">
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 animate-pulse"></div>
+                            <div className="h-4 bg-gray-200 rounded w-40 animate-pulse"></div>
+                          </div>
+                        ))
+                      ) : (
+                        // Hiển thị 5 danh mục từ API
+                        categories.slice(0, 5).map((category, index) => (
+                          <Link
+                            href={createCategorySlug(category.label, [category.value])}
+                            key={category.value}
+                            className={cn(
+                              "flex items-center gap-3 p-3 rounded-lg transition-all text-left w-full",
+                              index < 3 
+                                ? "bg-white hover:bg-gray-50 shadow-sm" 
+                                : "bg-gray-50 hover:bg-gray-100"
+                            )}
+                          >                          
+                            {index < 3 ? (
+                              <span className={cn(
+                                "flex items-center justify-center w-6 h-6 rounded-full text-sm font-bold",
+                                index === 0 && "bg-red-100 text-red-600",
+                                index === 1 && "bg-orange-100 text-orange-600",
+                                index === 2 && "bg-yellow-100 text-yellow-600"
+                              )}>
+                                {index + 1}
+                              </span>
+                            ) : (
+                              <span className="flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-500 rounded-full text-sm">
+                                {index + 1}
+                              </span>
+                            )}
                             <span className={cn(
-                              "flex items-center justify-center w-6 h-6 rounded-full text-sm font-bold",
-                              category.order === 1 && "bg-red-100 text-red-600",
-                              category.order === 2 && "bg-orange-100 text-orange-600",
-                              category.order === 3 && "bg-yellow-100 text-yellow-600"
+                              "font-medium",
+                              index < 3 && "text-gray-900"
                             )}>
-                              {category.order}
+                              {category.label}
                             </span>
-                          ) : (
-                            <span className="flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-500 rounded-full text-sm">
-                              {category.order}
-                            </span>
-                          )}
-                          <span className={cn(
-                            "font-medium",
-                            category.order <= 3 && "text-gray-900"
-                          )}>
-                            {category.name}
-                          </span>
-                        </button>
-                      ))}
+                          </Link>
+                        ))
+                      )}
                     </div>
                   </div>
                 </>

@@ -13,12 +13,20 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { useProductsContext } from '../context/ProductsContext';
+import { useSearchParams } from 'next/navigation';
 
 interface SearchProductGridProps {
   categoryId?: string | null;
 }
 
 export default function SearchProductGrid({ categoryId }: SearchProductGridProps) {
+  // Lấy search query từ URL để đảm bảo re-render khi thay đổi
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
+  
+  // Ghi log để debug
+  console.log("SearchProductGrid rendering with:", { categoryId, searchQuery });
+  
   // Sử dụng ProductsContext để lấy dữ liệu
   const { 
     products, 
@@ -68,9 +76,18 @@ export default function SearchProductGrid({ categoryId }: SearchProductGridProps
 
   // Hiển thị khi không có sản phẩm
   if (products.length === 0) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const searchQuery = searchParams.get('q');
+    
     return (
       <div className="w-full py-12 flex flex-col items-center justify-center">
-        <div className="text-black text-lg mb-2">Không tìm thấy kết quả nào</div>
+        <div className="text-black text-lg mb-2">
+          {searchQuery 
+            ? `Không tìm thấy kết quả nào cho từ khóa "${searchQuery}"` 
+            : categoryId 
+              ? "Không tìm thấy sản phẩm nào trong danh mục này" 
+              : "Không tìm thấy sản phẩm nào"}
+        </div>
       </div>
     );
   }

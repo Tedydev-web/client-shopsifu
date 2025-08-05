@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useMemo } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useEffect } from 'react';
 import { useProducts } from '../hooks/useProducts';
 import { ClientProduct, ClientProductsResponse } from '@/types/client.products.interface';
 import { useSearchParams } from 'next/navigation';
@@ -33,10 +33,33 @@ interface ProductsProviderProps {
 export function ProductsProvider({ children, currentCategoryId }: ProductsProviderProps) {
   const searchParams = useSearchParams();
   const sort = searchParams.get('sort') || 'relevance';
+  const searchQuery = searchParams.get('q') || '';
   
-  const productsData = useProducts({ categoryId: currentCategoryId });
+  // Nếu có search query, bỏ qua categoryId để đảm bảo tìm kiếm trên toàn bộ sản phẩm
+  const effectiveCategoryId = searchQuery ? null : currentCategoryId;
+  
+  // Tạo key để force re-render khi search query hoặc categoryId thay đổi
+  // Điều này đảm bảo useProducts sẽ luôn chạy lại khi URL thay đổi
+  const dataKey = useMemo(() => `${searchQuery || ''}-${effectiveCategoryId || ''}-${sort || ''}`, 
+    [searchQuery, effectiveCategoryId, sort]);
+  
+  // useProducts sẽ được khởi tạo lại khi dataKey thay đổi
+  const productsData = useProducts({ 
+    categoryId: effectiveCategoryId, 
+    key: dataKey // Truyền key để làm điểm phân biệt
+  });
   
   // Thêm các giá trị bổ sung cho context
+  // useEffect để log khi searchQuery hoặc categoryId thay đổi
+  useEffect(() => {
+    console.log("ProductsContext detected changes:", { 
+      searchQuery, 
+      currentCategoryId, 
+      effectiveCategoryId,
+      dataKey 
+    });
+  }, [searchQuery, currentCategoryId, effectiveCategoryId, dataKey]);
+  
   const contextValue = useMemo(() => ({
     ...productsData,
     selectedSort: sort,
