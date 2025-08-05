@@ -418,6 +418,27 @@
         "selectImage": "Chọn ảnh lên"
       }
     },
+    "orders": {
+      "title": "Danh sách đơn hàng",
+      "subtitle": "Quản lý tất cả đơn hàng",
+      "searchPlaceholder": "Tìm kiếm đơn hàng",
+      "orderCode": "Mã đơn hàng",
+      "orderDate": "Ngày lên đơn",
+      "customerName": "Khách hàng",
+      "shopName": "Tên shop",
+      "status": "Trạng thái",
+      "paymentMethod": "Thanh toán",
+      "totalAmount": "Tổng tiền",
+      "notFound": "Không có đơn hàng",
+      "statuses": {
+        "pendingPayment": "Chờ thanh toán",
+        "pendingPickup": "Chờ lấy hàng",
+        "pendingDelivery": "Đang giao",
+        "delivered": "Đã giao",
+        "returned": "Đã trả hàng",
+        "cancelled": "Đã hủy"
+      }
+    },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
 
@@ -425,7 +446,8 @@
         "orders": "Đơn hàng",
         "allOrders": "Tất cả đơn hàng",
         "newOrders": "Đơn hàng mới",
-        "processedOrders": "Đơn hàng đã xử lý"
+        "processedOrders": "Đơn hàng đã xử lý",
+        "listOrders": "Danh sách đơn hàng"
       },
       "permission": {
         "permissionManager": "Quản lý quyền"

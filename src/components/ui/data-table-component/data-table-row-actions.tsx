@@ -37,6 +37,7 @@ export type ActionItem<TData> = CommandAction<TData> | SeparatorAction;
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
+  t: (key: string) => string;
   actions?: ActionItem<TData>[];
 }
 
