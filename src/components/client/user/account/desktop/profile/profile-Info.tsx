@@ -148,6 +148,7 @@ export default function ProfileInfo() {
         confirmText="Cập nhật thông tin"
         cancelText="Thiết lập lại"
         loading={loading}
+        className="sm:!max-w-lg w-full px-2"
       >
         <div className="flex flex-col items-center gap-3 mb-4">
           <div className="relative w-24 h-24">

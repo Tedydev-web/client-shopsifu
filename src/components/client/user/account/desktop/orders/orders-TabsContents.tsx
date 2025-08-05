@@ -7,7 +7,7 @@ import { useOrder } from "./useOrder";
 import { OrderStatus } from "@/types/order.interface";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react"
+import { ChevronDown } from "lucide-react";
 
 const statusLabel: Record<OrderStatus, string> = {
   PENDING_PAYMENT: "Chờ thanh toán",
@@ -52,17 +52,28 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   return (
     <>
       {tabs.map((value) => (
+        // <TabsContent
+        //   key={value}
+        //   value={value}
+        //   className="bg-white rounded-xl min-h-[60vh] sm:min-h-[70vh] px-2 sm:px-4 pb-2
+        //              data-[state=active]:shadow-lg transition-all"
+        // >
         <TabsContent
           key={value}
           value={value}
-          className="bg-white rounded-xl min-h-[70vh] px-4 pb-2 data-[state=active]:shadow-lg transition-all"
+          className="
+    bg-white rounded-none shadow-none
+    min-h-[70vh] px-2 pb-2
+    md:rounded-xl md:shadow-sm md:min-h-[85vh]
+    transition-all
+  "
         >
           {value !== currentTab ? null : loading ? (
-            <div className="h-full flex items-center justify-center text-muted-foreground">
+            <div className="h-full flex items-center justify-center text-muted-foreground text-sm sm:text-base">
               Đang tải đơn hàng...
             </div>
           ) : error ? (
-            <div className="h-full flex items-center justify-center text-destructive">
+            <div className="h-full flex items-center justify-center text-destructive text-sm sm:text-base">
               {error}
             </div>
           ) : orders.length ? (
@@ -77,45 +88,52 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                 return (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between border rounded-lg p-4 bg-white hover:bg-gray-50 cursor-pointer"
+                    className="flex flex-col sm:flex-row items-start sm:items-center 
+                               justify-between border rounded-lg 
+                               p-3 sm:p-4 bg-white hover:bg-gray-50 cursor-pointer
+                               text-xs sm:text-sm"
                     onClick={() => handleViewDetail(order.id)}
                   >
-                    <div className="flex items-center gap-4">
+                    {/* Left: Image + Info */}
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                       <img
                         src={firstItem?.image}
                         alt={firstItem?.productName}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded"
                       />
-                      <div>
-                        <div className="text-sm text-gray-500">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs sm:text-sm text-gray-500 truncate">
                           Đơn hàng:{" "}
                           <span className="font-semibold">{order.id}</span>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          Ngày đặt hàng:{" "}
+                        <div className="text-xs sm:text-sm text-gray-500">
+                          Ngày đặt:{" "}
                           {new Date(order.createdAt).toLocaleDateString(
                             "vi-VN"
                           )}
                         </div>
-                        <div className="font-medium text-gray-800 mt-1 text-sm">
+                        <div className="font-medium text-gray-800 mt-1 text-sm truncate">
                           {firstItem?.productName}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end justify-between min-w-[160px]">
-                      <div className="text-xs text-gray-400 mb-1">
+                    {/* Right: Status + Price */}
+                    <div
+                      className="flex flex-row sm:flex-col items-center sm:items-end 
+                                    justify-between sm:justify-start 
+                                    gap-2 mt-3 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
+                    >
+                      <div className="text-gray-400">
                         {statusLabel[order.status]}
                       </div>
-                      <div className="text-xs font-medium text-gray-700">
-                        Tổng thanh toán:{" "}
-                        <span className="text-[#D70018]] text-sm font-semibold">
+                      <div className="font-medium text-gray-700">
+                        Tổng:{" "}
+                        <span className="text-[#D70018] font-semibold">
                           {totalAmount.toLocaleString()}đ
                         </span>
                       </div>
-                      <div className="text-blue-500 text-xs mt-1">
-                        Xem chi tiết →
-                      </div>
+                      <div className="text-blue-500">Xem chi tiết →</div>
                     </div>
                   </div>
                 );
@@ -126,10 +144,10 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                   <Button
                     variant="ghost"
                     onClick={() => setVisibleCount((prev) => prev + 5)}
-                    className=" text-base text-[#3B82F6]"
+                    className="text-xs sm:text-sm md:text-base text-[#3B82F6]"
                   >
                     Xem thêm
-                    <ChevronDown/>
+                    <ChevronDown className="ml-1 w-4 h-4" />
                   </Button>
                 </div>
               )}

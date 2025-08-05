@@ -49,18 +49,18 @@ export default function ProfileHeader({
     : "";
 
   return (
-    <div className="bg-white rounded-lg shadow-sm flex min-h-[170px] overflow-hidden items-center border border-gray-200">
+    <div className="bg-white rounded-lg shadow-sm flex flex-col lg:flex-row min-h-[170px] overflow-hidden items-center border border-gray-200">
       {/* Avatar + Info */}
-      <div className="flex flex-1 items-center gap-4 p-6">
+      <div className="flex flex-1 items-center gap-4 p-4 sm:p-6 w-full">
         {/* Avatar */}
         {avatar ? (
           <img
             src={avatar}
             alt="Avatar"
-            className="w-20 h-20 rounded-full object-cover border border-gray-300"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border border-gray-300"
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-red-500 font-semibold text-2xl">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-100 flex items-center justify-center text-red-500 font-semibold text-xl sm:text-2xl">
             {name?.[0]?.toUpperCase() || "U"}
           </div>
         )}
@@ -68,13 +68,13 @@ export default function ProfileHeader({
         <div className="space-y-1">
           <div className="flex items-center">
             <User className="w-4 h-4 mr-2 text-gray-500" />
-            <span className="font-semibold text-base text-[#121214]">
+            <span className="font-semibold text-sm sm:text-base text-[#121214]">
               {name}
             </span>
           </div>
           <div className="flex items-center">
             <Mail className="w-4 h-4 mr-2 text-gray-500" />
-            <span className="text-xs text-[#71717A]">{email}</span>
+            <span className="text-xs text-[#71717A] break-all">{email}</span>
           </div>
           <div className="flex items-center">
             <Phone className="w-4 h-4 mr-2 text-gray-500" />
@@ -102,36 +102,36 @@ export default function ProfileHeader({
       </div>
 
       {/* Separator */}
-      <div className="h-24 w-[3px] bg-red-500 rounded-full mx-2" />
+      <div className="hidden lg:block h-24 w-[3px] bg-red-500 rounded-full mx-2" />
 
       {/* Total Orders */}
-      <div className="flex flex-1 items-center gap-4 p-6">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
-          <ShoppingCart className="w-6 h-6 text-red-500" />
+      <div className="flex flex-1 items-center gap-4 p-4 sm:p-6 w-full border-t lg:border-t-0 lg:border-l border-gray-100">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
+          <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
         </div>
         <div className="flex flex-col">
-          <span className="text-lg font-bold text-black leading-none">
+          <span className="text-base sm:text-lg font-bold text-black leading-none">
             {totalOrders}
           </span>
-          <span className="text-sm text-gray-500 whitespace-nowrap">
+          <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
             Tổng số đơn hàng đã mua
           </span>
         </div>
       </div>
 
       {/* Separator */}
-      <div className="h-24 w-[3px] bg-red-500 rounded-full mx-2" />
+      <div className="hidden lg:block h-24 w-[3px] bg-red-500 rounded-full mx-2" />
 
       {/* Total Spent */}
-      <div className="flex flex-1 items-center gap-4 p-6">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
-          <Receipt className="w-6 h-6 text-red-500" />
+      <div className="flex flex-1 items-center gap-4 p-4 sm:p-6 w-full border-t lg:border-t-0 lg:border-l border-gray-100">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
+          <Receipt className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
         </div>
         <div className="flex flex-col">
-          <span className="text-lg font-bold text-black leading-none">
+          <span className="text-base sm:text-lg font-bold text-black leading-none">
             {totalSpent.toLocaleString()}đ
           </span>
-          <span className="text-sm text-gray-500 whitespace-nowrap">
+          <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
             Tổng tiền tích lũy
             {formattedMemberSince && ` • Từ ${formattedMemberSince}`}
           </span>
