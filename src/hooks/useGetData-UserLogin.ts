@@ -20,7 +20,7 @@ export const useUserData = () => {
     }
 
     // Ghép họ và tên một cách an toàn để tiện sử dụng
-    const name = [user.firstName, user.lastName].filter(Boolean).join(' ');
+    // const name = [user.firstName, user.lastName].filter(Boolean).join(' ');
 
     // Trả về một đối tượng mới bao gồm tất cả các thuộc tính của user và thuộc tính 'name'
     return {

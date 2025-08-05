@@ -67,6 +67,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     await originalFetchCart();
     setLastUpdated(Date.now());
   }, [originalFetchCart]);
+
+  // Hàm mới để update và refresh
+  const updateCartItemAndRefresh = useCallback(async (itemId: string, data: any, showNotification: boolean = false) => {
+    const result = await originalUpdateCartItem(itemId, data, showNotification);
+    if (result) {
+      await forceRefresh(); // Gọi forceRefresh để đảm bảo re-render
+    }
+    return result;
+  }, [originalUpdateCartItem, forceRefresh]);
   
   return (
     <CartContext.Provider value={{
@@ -77,7 +86,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItems,
       selectAllItems,
       lastUpdated,
-      forceRefresh
+      forceRefresh,
+      updateCartItemAndRefresh
     }}>
       {children}
     </CartContext.Provider>

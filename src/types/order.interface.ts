@@ -35,9 +35,19 @@ interface OrderCreationInfo {
 export type OrderCreateRequest = OrderCreationInfo[];
 
 export interface OrderCreateResponse {
-  // Dữ liệu trả về sau khi tạo đơn hàng thành công
-  // Ví dụ: có thể chứa danh sách các orderId đã được tạo
-  [key: string]: any;
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    paymentId: string;
+    shopId: string;
+    userId: string;
+    status: OrderStatus;
+    items: OrderItem[];
+    finalTotal: number;
+    createdAt: string;
+    updatedAt: string;
+  }
 }
 
 // --- Interfaces cho Lấy Đơn hàng (Get Order) ---
@@ -86,11 +96,13 @@ export interface Order {
  * @description Thông tin chi tiết sản phẩm cho trang checkout
  */
 export interface ProductInfo {
+  shopName: string;
   name: string;
   image: string;
   variation: string;
   quantity: number;
   subtotal: number;
+  price: number;
 }
 
 export interface OrderGetAllResponse {
@@ -107,4 +119,33 @@ export interface OrderGetByIdResponse {
 export interface OrderCancelResponse {
   // Dữ liệu trả về sau khi huỷ đơn
   message: string;
+}
+
+export interface CreatePaymentVnPayUrl{
+  amount: number;
+  orderInfo: string;
+  orderId: string | number;  // paymentId có thể là string hoặc number từ API
+  locale: string | "vn";  
+}
+export interface CreatePaymentVnPayUrlResponse{
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: {
+      paymentUrl: string;
+  }
+}
+
+// Interface cho kết quả trả về từ hàm handleCreateOrder
+export interface OrderHandlerResult {
+  success: boolean;
+  paymentMethod?: string;
+  orderData?: {
+    id: string;
+    paymentId?: string;
+    [key: string]: any;
+  };
+  paymentId?: string;
+  paymentUrl?: string;
+  error?: string;
 }

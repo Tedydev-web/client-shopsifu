@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { slugify } from "@/utils/slugify";
 import HTMLPreview from "@/components/ui/component/html-preview";
 
+
 interface Product {
   weight?: string;
   description?: string; // HTML Markdown content
@@ -18,7 +19,12 @@ interface Product {
     name: string;
   };
   series?: string;
-  sku?: string;
+  sku?:[
+    {
+      name: string;
+      stock: number;
+    }
+  ];
   material?: string;
   origin?: string;
   warrantyType?: string;
@@ -26,6 +32,12 @@ interface Product {
   stock?: number;
   shipFrom?: string;
   name?: string;
+  specifications:[
+    {
+      name: string;
+      value: string;
+    }
+  ]
 }
 
 export default function ProductSpecs({ product }: { product: Product }) {
@@ -66,14 +78,13 @@ export default function ProductSpecs({ product }: { product: Product }) {
         
         <SpecRow label="Thương hiệu" value={product.brand?.name} />
         <SpecRow label="Dòng sản phẩm" value={product.series ?? product.name} />
-        <SpecRow label="SKU" value={product.sku} />
-        <SpecRow label="Chất liệu" value={product.material} />
-        <SpecRow label="Xuất xứ" value={product.origin} />
-        <SpecRow label="Loại bảo hành" value={product.warrantyType} />
-        <SpecRow label="Thời gian bảo hành" value={product.warrantyTime} />
-        <SpecRow label="Kho hàng" value={product.stock?.toString()} />
-        <SpecRow label="Gửi từ" value={product.shipFrom} />
-        <SpecRow label="Trọng lượng sản phẩm" value={product.weight} />
+        {product.specifications.map((specification) => (
+          <SpecRow
+            key={specification.name}
+            label={specification.name}
+            value={specification.value}
+          />
+        ))}
       </div>
       
       {/* Mô tả sản phẩm */}

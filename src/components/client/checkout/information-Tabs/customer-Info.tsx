@@ -5,20 +5,90 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
+import { useUserData } from '@/hooks/useGetData-UserLogin';
+import { useEffect, useState } from 'react';
 
 interface CustomerInfoProps {
-  formData: {
+  onDataChange?: (data: {
     fullName: string;
     phoneNumber: string;
     email: string;
     saveInfo: boolean;
-  };
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleCheckboxChange: (checked: boolean) => void;
+  }) => void;
   isLoggedIn?: boolean;
 }
 
-export function CustomerInfo({ formData, handleChange, handleCheckboxChange, isLoggedIn = true }: CustomerInfoProps) {
+export function CustomerInfo({ onDataChange, isLoggedIn = true }: CustomerInfoProps) {
+  const userData = useUserData();
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    email: '',
+    saveInfo: false
+  });
+
+  // Lấy dữ liệu người dùng từ Redux khi component được tải
+  useEffect(() => {
+    if (userData) {
+      // Đảm bảo fullName được lấy từ userData.name hoặc kết hợp từ firstName và lastName
+      let fullName = userData.name;
+      if (!fullName) {
+        const firstName = userData.firstName || '';
+        const lastName = userData.lastName || '';
+        fullName = [firstName, lastName].filter(Boolean).join(' ');
+      }
+      
+      // Cập nhật state với dữ liệu từ Redux
+      const updatedData = {
+        ...formData,
+        fullName: userData.name || '',
+        phoneNumber: userData.phoneNumber || '',
+        email: userData.email || ''
+      };
+      
+      console.log('[CustomerInfo] Setting user data from Redux:', updatedData);
+      setFormData(updatedData);
+      
+      // Gửi dữ liệu đã cập nhật lên component cha
+      if (onDataChange) {
+        onDataChange(updatedData);
+      }
+    }
+  }, [userData]);
+
+  // Xử lý sự kiện thay đổi input
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    
+    const updatedData = {
+      ...formData,
+      [name]: newValue
+    };
+    
+    setFormData(updatedData);
+    
+    // Gửi dữ liệu đã cập nhật lên component cha
+    if (onDataChange) {
+      onDataChange(updatedData);
+    }
+  };
+
+  // Xử lý sự kiện khi checkbox thay đổi
+  const handleCheckboxChange = (checked: boolean) => {
+    const updatedData = {
+      ...formData,
+      saveInfo: checked
+    };
+    
+    setFormData(updatedData);
+    
+    // Gửi dữ liệu đã cập nhật lên component cha
+    if (onDataChange) {
+      onDataChange(updatedData);
+    }
+  };
+
   return (
     <Card className='shadow-none'>
       <CardHeader className="pb-3">
@@ -76,16 +146,6 @@ export function CustomerInfo({ formData, handleChange, handleCheckboxChange, isL
               className={`${isLoggedIn ? "bg-gray-100" : ""} text-sm`}
               required
             />
-          </div>
-
-          <div className="flex items-center space-x-2 mt-2">
-            <Checkbox 
-              id="saveInfo" 
-              checked={formData.saveInfo}
-              onCheckedChange={handleCheckboxChange}
-              className="h-4 w-4"
-            />
-            <Label htmlFor="saveInfo" className="text-xs">Lưu thông tin cho lần thanh toán sau</Label>
           </div>
         </div>
       </CardContent>

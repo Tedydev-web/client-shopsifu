@@ -113,7 +113,7 @@ export function CartDropdown() {
     shopCarts.forEach((shopCart: ShopCart) => {
       shopCart.cartItems.forEach((item: ApiCartItem) => {
         if (selectedItems[item.id]) {
-          const price = item.sku.product.virtualPrice;
+          const price = item.sku.product.basePrice;
           total += price * item.quantity;
         }
       });
@@ -227,7 +227,7 @@ export function CartDropdown() {
                           <h3 className="text-sm font-medium text-gray-800 line-clamp-2">{product.name}</h3>
                           <p className="text-xs text-gray-500 mt-1">Phân loại: {item.sku.value}</p>
                           <p className="text-sm text-red-600 font-semibold mt-1">
-                            {product.virtualPrice.toLocaleString('vi-VN')}₫
+                            {product.basePrice.toLocaleString('vi-VN')}₫
                           </p>
                           <div className="flex items-center mt-2">
                             <Button 
@@ -276,13 +276,13 @@ export function CartDropdown() {
                   <span className="text-md font-semibold text-gray-800">Tổng cộng</span>
                   <span className="text-xl font-bold text-red-600">{calculateSelectedTotal().toLocaleString('vi-VN')}₫</span>
                 </div>
-                <Button 
+                {/* <Button 
                   size="lg" 
                   className="w-full bg-red-600 hover:bg-red-700" 
                   disabled={noItemsSelected}
                 >
                   Thanh toán ({getTotalSelectedItems()} sản phẩm)
-                </Button>
+                </Button> */}
                 <Button asChild size="lg" variant="outline" className="w-full">
                   <Link href="/cart" className="flex items-center justify-center gap-2">
                     <ShoppingCart className="h-5 w-5" />

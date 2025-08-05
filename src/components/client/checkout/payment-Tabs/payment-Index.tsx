@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
-import { PaymentMethods } from '../sections/tab-2/payment-Methods';
-import { RecipientInfo } from '../sections/tab-2/recipient-Info';
-import { ProductsInfo } from '../sections/tab-2/products-Info';
+import { PaymentMethods } from './payment-Methods';
+import { RecipientInfo } from './recipient-Info';
+import { ProductsInfo } from './products-Info';
 import { useCheckout } from '../hooks/useCheckout';
-import { mockShopCarts } from '../hooks/mockData';
 import { Button } from '@/components/ui/button';
 
 interface PaymentTabsProps {
@@ -15,27 +14,16 @@ interface PaymentTabsProps {
 }
 
 export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
-  const { state } = useCheckout();
-  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const { state, updatePaymentMethod } = useCheckout();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   
-  const customerInfo = {
-    name: state.customerInfo?.name || "Nguyễn Văn A",
-    phone: state.customerInfo?.phone || "0987654321",
-    email: state.customerInfo?.email || "example@gmail.com",
-  };
+  // Debug: Log state whenever it changes
+  useEffect(() => {
+    console.log('[PaymentTabs] Current state:', state);
+    console.log('[PaymentTabs] ShippingAddress:', state.shippingAddress);
+  }, [state]);
   
-  const formattedAddress = state.shippingAddress 
-    ? `${state.shippingAddress.address}, ${state.shippingAddress.ward}, ${state.shippingAddress.district}, ${state.shippingAddress.province}`
-    : "123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh";
-  
-  const recipientInfo = {
-    address: formattedAddress,
-    receiverName: state.customerInfo?.name || "Nguyễn Văn A",
-    receiverPhone: state.customerInfo?.phone || "0987654321",
-  };
-
   const handleSubmit = () => {
     setIsSubmitting(true);
     setTimeout(() => {
@@ -45,7 +33,8 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
   };
 
   const handlePaymentMethodChange = (value: string) => {
-    setPaymentMethod(value);
+    console.log('🔄 Payment method changed to:', value);
+    updatePaymentMethod(value);
   };
 
   if (isCompleted) {
@@ -62,7 +51,7 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
               <div className="text-left bg-gray-50 p-4 rounded-md w-full max-w-md">
                 <p className="text-sm mb-1"><span className="font-medium">Mã đơn hàng:</span> #ORD123456789</p>
                 <p className="text-sm mb-1"><span className="font-medium">Ngày đặt:</span> {new Date().toLocaleDateString('vi-VN')}</p>
-                <p className="text-sm"><span className="font-medium">Phương thức thanh toán:</span> {paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng' : 'Thanh toán trực tuyến'}</p>
+                <p className="text-sm"><span className="font-medium">Phương thức thanh toán:</span> {state.paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng' : 'Thanh toán trực tuyến'}</p>
               </div>
               <div className="mt-8 flex gap-4">
                 <Button variant="outline" asChild>
@@ -82,18 +71,38 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
   return (
     <div className="space-y-4">
       {/* Thông tin người nhận */}
-      <RecipientInfo 
-        customerInfo={customerInfo}
-        shippingAddress={recipientInfo}
-        onEdit={onPrevious}
-      />
+      {state.shippingAddress ? (
+        <RecipientInfo
+          shippingAddress={{
+            addressDetail: state.shippingAddress.addressDetail || '',
+            ward: state.shippingAddress.ward || '',
+            district: state.shippingAddress.district || '',
+            province: state.shippingAddress.province || '',
+            address: state.shippingAddress.address || '',
+            receiverName: state.shippingAddress.receiverName || '',
+            receiverPhone: state.shippingAddress.receiverPhone || '',
+          }}
+          onEdit={onPrevious}
+        />
+      ) : (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-yellow-800">Chưa có thông tin địa chỉ giao hàng. Vui lòng quay lại bước trước để nhập thông tin.</p>
+          <Button 
+            variant="outline" 
+            onClick={onPrevious} 
+            className="mt-2"
+          >
+            Quay lại nhập thông tin
+          </Button>
+        </div>
+      )}
 
       {/* Thông tin sản phẩm */}
-      <ProductsInfo shopCarts={mockShopCarts} />
+      <ProductsInfo />
 
       {/* Phương thức thanh toán */}
       <PaymentMethods 
-        paymentMethod={paymentMethod}
+        paymentMethod={state.paymentMethod}
         handlePaymentMethodChange={handlePaymentMethodChange}
       />
     </div>

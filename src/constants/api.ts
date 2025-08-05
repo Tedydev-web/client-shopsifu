@@ -154,7 +154,8 @@ export const API_ENDPOINTS = {
     GET_BY_ID: `${API_BASE}/orders/:orderId`,
     CREATE: `${API_BASE}/orders`,
     CANCEL: `${API_BASE}/orders/:orderId`,
-    DELETE: `${API_BASE}/profile/addresses/:addressId`
+    CALCULATE_ORDER: `${API_BASE}/orders/calculate`,
+    CREATE_PAYMENT_VNPAY_URL: `${API_BASE}/payment/vnpay/create-payment`
   },
   // ĐÁNH GIÁ SẢN PHẨM - REVIEWS
   REVIEW:{

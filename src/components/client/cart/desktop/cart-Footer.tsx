@@ -30,7 +30,7 @@ export default function CartFooter({
   return (
     <div className="w-full sticky bottom-0 bg-white border-t text-base text-muted-foreground">
       {/* Voucher */}
-      {!isEditing && (
+      {/* {!isEditing && (
         <div className="flex items-center justify-between h-12 px-6 border-b">
           <div className="flex items-center gap-4 text-black">
             <Ticket className="w-5 h-5 text-red-500" />
@@ -40,7 +40,7 @@ export default function CartFooter({
             Chọn hoặc nhập mã
           </button>
         </div>
-      )}
+      )} */}
 
       {/* Coin */}
       {!isEditing && (

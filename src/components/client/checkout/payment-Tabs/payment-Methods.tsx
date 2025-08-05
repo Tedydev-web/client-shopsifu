@@ -39,7 +39,7 @@ const paymentMethodsData: PaymentMethod[] = [
     id: 'cod',
     name: 'Thanh toán khi nhận hàng (COD)',
     description: 'Thanh toán bằng tiền mặt khi nhận được hàng',
-    icon: '/images/checkout/COD.webp',
+    icon: '/images/client/checkout/COD.webp',
     bgColor: 'bg-gray-100',
     iconType: 'image'
   } as ImagePaymentMethod,
@@ -47,29 +47,26 @@ const paymentMethodsData: PaymentMethod[] = [
     id: 'momo',
     name: 'Ví MoMo',
     description: 'Thanh toán qua ví điện tử MoMo',
-    icon: '/images/checkout/momo_vi.webp',
+    icon: '/images/client/checkout/momo_vi.webp',
     bgColor: 'bg-pink-50',
     iconType: 'image'
   } as ImagePaymentMethod,
   {
-    id: 'bank',
+    id: 'sepay',
     name: 'Chuyển khoản ngân hàng',
     description: 'Chuyển khoản trực tiếp vào tài khoản shop',
-    icon: '/images/checkout/QRCode.png',
+    icon: '/images/client/checkout/QRCode.png',
     bgColor: 'bg-blue-100',
     iconType: 'image'
   } as ImagePaymentMethod,
   {
-    id: 'card',
-    name: 'Thẻ tín dụng / ghi nợ',
-    description: 'Thanh toán an toàn bằng thẻ',
-    cardIcons: [
-      { icon: '/payment-icons/visa.svg', alt: 'Visa' },
-      { icon: '/payment-icons/mastercard.svg', alt: 'Mastercard' },
-      { icon: '/payment-icons/jcb.svg', alt: 'JCB' }
-    ],
-    iconType: 'cards'
-  } as CardPaymentMethod
+    id: 'vnpay',
+    name: 'Ví VNPay',
+    description: 'Thanh toán qua ví điện tử VNPay',
+    icon: '/images/client/checkout/vnpay_vi.webp',
+    bgColor: 'bg-blue-100',
+    iconType: 'image'
+  } as ImagePaymentMethod
 ];
 
 interface PaymentMethodsProps {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -13,31 +13,106 @@ import { MapPin, Book } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { useCustomerInfo } from '@/components/client/checkout/hooks/useCustomer-Info';
 import { CustomerFormData, Address } from '@/types/checkout.interface';
+import { addressService } from '@/services/addressService';
+import { Address as ProfileAddress } from '@/types/auth/profile.interface';
+import { useProvinces } from '@/hooks/combobox/useProvinces';
 
 interface ShippingAddressProps {
   formData: CustomerFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  sameAsCustomer?: boolean;
-  onSameAsCustomerChange?: (checked: boolean) => void;
-  customerName?: string;
-  customerPhone?: string;
-  addresses: Address[];
+  handleChange: (nameOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value?: string) => void;
+  addresses?: Address[];
   onSelectExistingAddress: (address: Address) => void;
 }
 
 export function ShippingAddress({ 
   formData, 
   handleChange,
-  sameAsCustomer = false,
-  onSameAsCustomerChange,
-  customerName,
-  customerPhone,
   addresses,
   onSelectExistingAddress
 }: ShippingAddressProps) {
   const [isSelectingAddress, setIsSelectingAddress] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
 
+  const [savedAddresses, setSavedAddresses] = useState<ProfileAddress[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+  
+  // Move the hook call to the component top level
+  const {
+    getProvinceName,
+    getDistrictName,
+    getWardName
+  } = useProvinces();
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        setIsLoadingAddresses(true);
+        const response = await addressService.getAll();
+        if (response.data) {
+          setSavedAddresses(response.data);
+          
+          // Xóa phần tự động chọn địa chỉ mặc định
+          // Chỉ hiển thị các địa chỉ và để người dùng chọn
+          console.log('[ShippingAddress] Addresses loaded:', response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch addresses:", error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debug useEffect để theo dõi sự thay đổi của formData
+  useEffect(() => {
+    console.log('[ShippingAddress] formData changed:', {
+      receiverName: formData.receiverName,
+      receiverPhone: formData.receiverPhone,
+      province: formData.province,
+      district: formData.district,
+      ward: formData.ward,
+      address: formData.address
+    });
+  }, [formData]);
+  
+  // Theo dõi khi selectedAddressId thay đổi để cập nhật dữ liệu - 
+  // Chỉ log thông tin, KHÔNG gọi onSelectExistingAddress vì đã gọi trong handleAddressSelect
+  useEffect(() => {
+    if (selectedAddressId && isSelectingAddress) {
+      const selected = savedAddresses.find(addr => addr.id === selectedAddressId);
+      if (selected) {
+        console.log('[ShippingAddress] Address selected by ID change:', selected);
+        
+        // Chỉ log thông tin, không thực hiện cập nhật ở đây để tránh vòng lặp vô hạn
+        const provinceName = getProvinceName(selected.province);
+        const districtName = getDistrictName(selected.district);
+        const wardName = getWardName(selected.ward);
+        
+        console.log('[ShippingAddress] Selected address details:', {
+          province: `${selected.province}|${provinceName || selected.province}`,
+          district: `${selected.district}|${districtName || selected.district}`,
+          ward: `${selected.ward}|${wardName || selected.ward}`,
+        });
+        
+        // KHÔNG gọi onSelectExistingAddress ở đây vì đã được gọi trong handleAddressSelect
+      }
+    }
+  }, [selectedAddressId, isSelectingAddress, savedAddresses, getProvinceName, getDistrictName, getWardName]);
+  
+  // Theo dõi khi isSelectingAddress thay đổi để xử lý chuyển đổi giữa các chế độ
+  useEffect(() => {
+    if (!isSelectingAddress) {
+      // Nếu chuyển từ chọn địa chỉ có sẵn sang nhập địa chỉ mới
+      console.log('[ShippingAddress] Switching to manual address input mode');
+      setSelectedAddressId('');
+      
+      // Không cần gửi sự kiện reset ở đây vì đã xử lý trong nút "nhập địa chỉ mới"
+    }
+  }, [isSelectingAddress]);
+  
   const {
     customerProvince,
     customerDistrict,
@@ -56,11 +131,51 @@ export function ShippingAddress({
     handleWardChange,
   } = useCustomerInfo(formData, handleChange);
 
-  const handleAddressSelect = (addressId: string) => {
-    setSelectedAddressId(addressId);
-    const selectedAddress = addresses.find(addr => addr.id === addressId);
-    if (selectedAddress) {
-      onSelectExistingAddress(selectedAddress);
+  const handleAddressSelect = (id: string) => {
+    // First update the ID in our local state
+    setSelectedAddressId(id);
+    
+    const selected = savedAddresses.find((addr) => addr.id === id);
+    if (selected) {
+      // Log thông tin địa chỉ được chọn để debug
+      console.log('[ShippingAddress] Selected address:', selected);
+      
+      // Make sure we're in selecting address mode
+      if (!isSelectingAddress) {
+        setIsSelectingAddress(true);
+      }
+      
+      // Tạo đối tượng địa chỉ để cập nhật form
+      // Format các trường province, district, ward để phù hợp với useCustomer-Info hook
+      // (định dạng code|name)
+      
+      // Lấy tên của tỉnh/thành phố, quận/huyện, phường/xã từ code
+      // Using the functions from the hook that's now called at component level
+      const provinceName = getProvinceName(selected.province);
+      const districtName = getDistrictName(selected.district);
+      const wardName = getWardName(selected.ward);
+      
+      // Ensure we have valid names, or fall back to the code values
+      const addressToUpdate: Address = {
+        id: selected.id,
+        isDefault: selected.isDefault,
+        receiverName: selected.recipient || selected.name || '',
+        receiverPhone: selected.phoneNumber || '',
+        addressDetail: selected.street,
+        // Định dạng địa chỉ với cả code và name: "code|name"
+        ward: `${selected.ward}|${wardName || selected.ward}`,
+        district: `${selected.district}|${districtName || selected.district}`,
+        province: `${selected.province}|${provinceName || selected.province}`,
+        type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
+      };
+      
+      console.log('[ShippingAddress] Address to update:', addressToUpdate);
+      
+      // Schedule the update to run after the current render cycle
+      setTimeout(() => {
+        // Gọi hàm cập nhật từ component cha - sử dụng setTimeout để tránh vòng lặp cập nhật
+        onSelectExistingAddress(addressToUpdate);
+      }, 0);
     }
   };
 
@@ -73,27 +188,26 @@ export function ShippingAddress({
             Thông tin nhận hàng
           </CardTitle>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-            {!isSelectingAddress && addresses.length > 0 && (
+            {!isSelectingAddress && savedAddresses.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
                 className="h-8 text-sm w-full sm:w-auto"
-                onClick={() => setIsSelectingAddress(true)}
+                onClick={() => {
+                  // Đánh dấu chuyển sang chế độ chọn địa chỉ có sẵn
+                  setIsSelectingAddress(true);
+                  
+                  // Không tự động chọn địa chỉ nào, để người dùng tự chọn
+                  // Clear any previously selected address
+                  if (selectedAddressId) {
+                    setSelectedAddressId('');
+                  }
+                }}
               >
                 <Book className="h-4 w-4 mr-1.5 flex-shrink-0" />
                 Chọn địa chỉ có sẵn
               </Button>
             )}
-            <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-2">
-              <Label htmlFor="same-as-customer" className="text-xs text-gray-500">
-                Lấy thông tin khách hàng
-              </Label>
-              <Switch
-                id="same-as-customer"
-                checked={sameAsCustomer}
-                onCheckedChange={onSameAsCustomerChange}
-              />
-            </div>
           </div>
         </div>
         <CardDescription className="text-sm font-light mt-2">
@@ -102,7 +216,8 @@ export function ShippingAddress({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Luôn hiển thị trường tên người nhận và số điện thoại, ngay cả khi đang chọn địa chỉ có sẵn */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="receiverName" className="text-xs font-medium">
                 Tên người nhận
@@ -111,11 +226,10 @@ export function ShippingAddress({
                 id="receiverName"
                 name="receiverName"
                 placeholder="Nhập tên người nhận"
-                value={sameAsCustomer ? customerName : formData.receiverName}
+                value={formData.receiverName || ''}
                 onChange={handleChange}
                 className="text-sm"
                 required
-                disabled={sameAsCustomer}
               />
             </div>
             <div className="space-y-1">
@@ -126,11 +240,10 @@ export function ShippingAddress({
                 id="receiverPhone"
                 name="receiverPhone"
                 placeholder="Nhập số điện thoại người nhận"
-                value={sameAsCustomer ? customerPhone : formData.receiverPhone}
+                value={formData.receiverPhone || ''}
                 onChange={handleChange}
                 className="text-sm"
                 required
-                disabled={sameAsCustomer}
               />
             </div>
           </div>
@@ -142,7 +255,10 @@ export function ShippingAddress({
                 onValueChange={handleAddressSelect}
                 className="space-y-3"
               >
-                {addresses.map((address) => (
+                {isLoadingAddresses ? (
+                  <p>Đang tải địa chỉ...</p>
+                ) : (
+                  savedAddresses.map((address) => (
                   <div
                     key={address.id}
                     className={`flex items-start space-x-3 rounded-lg border p-4 transition-colors ${
@@ -160,18 +276,19 @@ export function ShippingAddress({
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-sm bg-gray-100 px-2 py-0.5 rounded">
-                          {address.type}
+                          {address.addressType === 'HOME' ? 'Nhà riêng' : 'Văn phòng'}
                         </span>
                         {address.isDefault && (
                           <span className="text-xs text-red-500">MẶC ĐỊNH</span>
                         )}
                       </div>
                       <div className="text-sm">
-                        {`${address.addressDetail}, ${address.ward}, ${address.district}, ${address.province}`}
+                        {`${address.street}, ${address.ward}, ${address.district}, ${address.province}`}
                       </div>
                     </Label>
                   </div>
-                ))}
+                ))
+              )}
               </RadioGroup>
               <div className="flex items-center">
                 <span className="text-sm mr-2">hoặc</span>
@@ -179,8 +296,28 @@ export function ShippingAddress({
                   variant="link"
                   className="text-red-500 font-normal p-0 h-auto text-sm hover:text-red-600"
                   onClick={() => {
+                    // First update our local state
                     setIsSelectingAddress(false);
                     setSelectedAddressId('');
+                    
+                    // Khi chuyển sang nhập địa chỉ mới, xóa thông tin địa chỉ cũ
+                    const clearedAddressData: Address = {
+                      id: '',
+                      receiverName: formData.receiverName, // Giữ lại tên người nhận
+                      receiverPhone: formData.receiverPhone, // Giữ lại số điện thoại
+                      addressDetail: '', // Xóa thông tin địa chỉ
+                      ward: '',
+                      district: '',
+                      province: '',
+                      type: 'NHÀ RIÊNG', // Giá trị mặc định
+                      isDefault: false
+                    };
+                    
+                    // Schedule the update to run after the current render cycle
+                    setTimeout(() => {
+                      // Gọi hàm từ component cha để cập nhật lại formData - sử dụng setTimeout để tránh vòng lặp cập nhật
+                      onSelectExistingAddress(clearedAddressData);
+                    }, 0);
                   }}
                 >
                   nhập địa chỉ mới

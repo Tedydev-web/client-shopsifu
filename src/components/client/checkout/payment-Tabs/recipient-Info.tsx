@@ -3,13 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useUserData } from '@/hooks/useGetData-UserLogin';
+import { useEffect } from 'react';
 
 interface RecipientInfoProps {
-  customerInfo: {
-    name: string;
-    phone: string;
-    email: string;
-  };
   shippingAddress: {
     addressDetail?: string;
     ward?: string;
@@ -22,17 +19,63 @@ interface RecipientInfoProps {
   onEdit?: () => void;
 }
 
-export function RecipientInfo({ customerInfo, shippingAddress, onEdit }: RecipientInfoProps) {
+export function RecipientInfo({ shippingAddress, onEdit }: RecipientInfoProps) {
+  // Lấy thông tin khách hàng trực tiếp từ Redux
+  const userData = useUserData();
+  
+  // Debug: Log shipping address
+  useEffect(() => {
+    console.log('[RecipientInfo] Received shippingAddress:', shippingAddress);
+  }, [shippingAddress]);
+  
+  // Khởi tạo thông tin khách hàng từ userData
+  const customerInfo = {
+    name: userData?.name || userData?.firstName + ' ' + userData?.lastName || '',
+    phone: userData?.phoneNumber || '',
+    email: userData?.email || ''
+  };
+  
+  // Function to parse location value from "code|name" format
+  const parseLocationName = (value?: string): string => {
+    if (!value) return '';
+    console.log('[RecipientInfo] Parsing location value:', value);
+    const parts = value.split('|');
+    return parts.length > 1 ? parts[1] : value; // Return name if available, otherwise return the original value
+  };
+  
   const getFullAddress = () => {
+    // Log what we're working with
+    console.log('[RecipientInfo] Getting full address from:', {
+      addressDetail: shippingAddress.addressDetail,
+      address: shippingAddress.address,
+      ward: shippingAddress.ward,
+      district: shippingAddress.district,
+      province: shippingAddress.province
+    });
+    
+    // First try using addressDetail + location details
     if (shippingAddress.addressDetail) {
-      return [
+      const parts = [
         shippingAddress.addressDetail,
-        shippingAddress.ward,
-        shippingAddress.district,
-        shippingAddress.province
-      ].filter(Boolean).join(', ');
+        parseLocationName(shippingAddress.ward),
+        parseLocationName(shippingAddress.district),
+        parseLocationName(shippingAddress.province)
+      ].filter(Boolean);
+      
+      console.log('[RecipientInfo] Address parts:', parts);
+      
+      if (parts.length > 0) {
+        return parts.join(', ');
+      }
     }
-    return shippingAddress.address || 'Chưa có địa chỉ';
+    
+    // Fallback to the full address if provided
+    if (shippingAddress.address && shippingAddress.address.trim() !== '') {
+      return shippingAddress.address;
+    }
+    
+    // Last resort
+    return 'Chưa có địa chỉ';
   };
 
   return (
@@ -135,7 +178,7 @@ export function RecipientInfo({ customerInfo, shippingAddress, onEdit }: Recipie
               <div>
                 <span className="font-medium">{shippingAddress.receiverName}</span>
                 <span className="text-gray-400 mx-2">|</span>
-                <span className="font-medium">{shippingAddress.receiverPhone}</span>
+                <span className="font-medium">{shippingAddress.receiverPhone || 'Chưa có số điện thoại'}</span>
               </div>
             </div>
           </div>

@@ -8,6 +8,8 @@ import {
   OrderCreateResponse,
   OrderCancelResponse,
   OrderStatus,
+  CreatePaymentVnPayUrl,
+  CreatePaymentVnPayUrlResponse
 } from "@/types/order.interface";
 
 export const orderService = {
@@ -85,6 +87,55 @@ export const orderService = {
       const response = await privateAxios.delete(url, { signal });
       return response.data;
     } catch (error) {
+      throw error;
+    }
+  },
+
+  // ✅ Tính toán đơn hàng
+  calculateOrder: async (
+    data: OrderCreateRequest,
+    signal?: AbortSignal
+  ): Promise<OrderCreateResponse> => {
+    try {
+      const response = await privateAxios.post(
+        API_ENDPOINTS.ORDERS.CALCULATE_ORDER,
+        data,
+        { signal }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  createPaymentVnPayUrl: async (
+    data: CreatePaymentVnPayUrl,
+    signal?: AbortSignal
+  ): Promise<CreatePaymentVnPayUrlResponse> => {
+    try {
+      const response = await privateAxios.post(
+        API_ENDPOINTS.ORDERS.CREATE_PAYMENT_VNPAY_URL,
+        data,
+        { signal }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  verifyVNPayReturn: async (
+    queryString: string,
+    signal?: AbortSignal
+  ): Promise<any> => {
+    try {
+      console.log('[VNPay API] Verifying payment with query:', queryString);
+      const response = await privateAxios.get(
+        `/payment/vnpay/verify-return?${queryString}`,
+        { signal }
+      );
+      console.log('[VNPay API] Verification response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error in verifyVNPayReturn:', error);
       throw error;
     }
   },
