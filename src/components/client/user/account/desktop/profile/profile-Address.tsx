@@ -41,6 +41,14 @@ import {
   UpdateAddressRequest,
 } from "@/types/auth/profile.interface";
 import { Badge } from "@/components/ui/badge";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface AddressFormValues {
   id?: string;
@@ -71,6 +79,7 @@ export default function AddressBook() {
   const [addresses, setAddresses] = useState<AddressFormValues[]>([]);
   const { getAllAddresses, createAddress, updateAddress, deleteAddress } =
     useAddress();
+  const { isMobile } = useResponsive();
 
   const form = useForm<AddressFormValues>({
     defaultValues: {
@@ -93,7 +102,6 @@ export default function AddressBook() {
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingWards, setLoadingWards] = useState(false);
 
-  /* ------------------- LOAD DATA ------------------- */
   const fetchAddresses = async () => {
     const data = await getAllAddresses();
     if (!data) return;
@@ -126,7 +134,6 @@ export default function AddressBook() {
     }
   }, []);
 
-  // prefetch districts & wards khi edit
   useEffect(() => {
     if (editingAddress && cachedProvinces.length > 0) {
       const provinceObj = cachedProvinces.find(
@@ -152,7 +159,6 @@ export default function AddressBook() {
     }
   }, [editingAddress, cachedProvinces]);
 
-  /* ------------------- ADD/EDIT HANDLERS ------------------- */
   const handleAdd = () => {
     setEditingAddress(null);
     form.reset();
@@ -213,7 +219,6 @@ export default function AddressBook() {
     });
   };
 
-  /* ------------------- UTILS ------------------- */
   const formatFullAddress = (data: AddressFormValues) =>
     [data.detail, data.ward, data.district, data.province]
       .filter(Boolean)
@@ -253,7 +258,7 @@ export default function AddressBook() {
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[var(--radix-popover-trigger-width)] max-h-60 p-0 overflow-y-auto animate-fadeIn">
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] max-h-60 p-0 overflow-y-auto">
               <Command>
                 <CommandInput placeholder={`Tìm ${label.toLowerCase()}`} />
                 <CommandEmpty>Không tìm thấy</CommandEmpty>
@@ -294,6 +299,143 @@ export default function AddressBook() {
         </FormItem>
       )}
     />
+  );
+
+  const formContent = (
+    <Form {...form}>
+      <form className="space-y-4" onSubmit={form.handleSubmit(handleSave)}>
+        <DropdownSelect
+          name="province"
+          label="Tỉnh/Thành phố"
+          options={cachedProvinces}
+          loading={false}
+          onSelect={async (province) => {
+            setLoadingDistricts(true);
+            const res = await locationService.getDistrictsByProvince(
+              province.code
+            );
+            setDistricts(res.data.districts || []);
+            setLoadingDistricts(false);
+            form.setValue("district", "");
+            setWards([]);
+          }}
+        />
+        <DropdownSelect
+          name="district"
+          label="Quận/Huyện"
+          options={districts}
+          loading={loadingDistricts}
+          onSelect={async (district) => {
+            setLoadingWards(true);
+            const res = await locationService.getWardsByDistrict(district.code);
+            setWards(res.data.wards || []);
+            setLoadingWards(false);
+            form.setValue("ward", "");
+          }}
+        />
+        <DropdownSelect
+          name="ward"
+          label="Phường/Xã"
+          options={wards}
+          loading={loadingWards}
+        />
+
+        {[
+          ["detail", "Địa chỉ nhà", "required"],
+          ["label", "Tên gợi nhớ"],
+          ["recipient", "Người nhận", "required"],
+        ].map(([name, label, required]) => (
+          <FormField
+            key={String(name)}
+            control={form.control}
+            name={name as keyof AddressFormValues}
+            rules={
+              required
+                ? { required: `${label} không được bỏ trống` }
+                : undefined
+            }
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{label}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={`Nhập ${label.toLowerCase()}`}
+                    {...field}
+                    value={typeof field.value === "string" ? field.value : ""}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        ))}
+
+        <FormField
+          control={form.control}
+          name="phone"
+          rules={{
+            required: "Số điện thoại bắt buộc",
+            pattern: {
+              value: /^(0|\+84)\d{9}$/,
+              message: "Số điện thoại không hợp lệ",
+            },
+          }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Số điện thoại</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Nhập số điện thoại"
+                  {...field}
+                  value={typeof field.value === "string" ? field.value : ""}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Loại địa chỉ</FormLabel>
+              <div className="flex gap-3 border-b border-gray-200 pb-4">
+                <Button
+                  type="button"
+                  variant={field.value === "home" ? "default" : "outline"}
+                  onClick={() => field.onChange("home")}
+                >
+                  Nhà
+                </Button>
+                <Button
+                  type="button"
+                  variant={field.value === "office" ? "default" : "outline"}
+                  onClick={() => field.onChange("office")}
+                >
+                  Văn phòng
+                </Button>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="isDefault"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-3">
+              <FormLabel className="mb-0">Đặt làm địa chỉ mặc định</FormLabel>
+              <FormControl>
+                <Switch
+                  checked={!!field.value}
+                  onCheckedChange={(checked) => field.onChange(checked)}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </form>
+    </Form>
   );
 
   return (
@@ -356,157 +498,44 @@ export default function AddressBook() {
         ))}
       </div>
 
-      <SheetRework
-        open={open}
-        onOpenChange={setOpen}
-        title={editingAddress ? "Cập nhật địa chỉ" : "Thêm địa chỉ"}
-        subtitle="Thay đổi thông tin địa chỉ nhận hàng"
-        onCancel={() => setOpen(false)}
-        onConfirm={form.handleSubmit(handleSave)}
-        confirmText={loading ? "Đang lưu..." : "Lưu"}
-        cancelText="Hủy"
-      >
-        <Form {...form}>
-          <form className="space-y-4" onSubmit={form.handleSubmit(handleSave)}>
-            <DropdownSelect
-              name="province"
-              label="Tỉnh/Thành phố"
-              options={cachedProvinces}
-              loading={false}
-              onSelect={async (province) => {
-                setLoadingDistricts(true);
-                const res = await locationService.getDistrictsByProvince(
-                  province.code
-                );
-                setDistricts(res.data.districts || []);
-                setLoadingDistricts(false);
-                form.setValue("district", "");
-                setWards([]);
-              }}
-            />
-            <DropdownSelect
-              name="district"
-              label="Quận/Huyện"
-              options={districts}
-              loading={loadingDistricts}
-              onSelect={async (district) => {
-                setLoadingWards(true);
-                const res = await locationService.getWardsByDistrict(
-                  district.code
-                );
-                setWards(res.data.wards || []);
-                setLoadingWards(false);
-                form.setValue("ward", "");
-              }}
-            />
-            <DropdownSelect
-              name="ward"
-              label="Phường/Xã"
-              options={wards}
-              loading={loadingWards}
-            />
+      {isMobile ? (
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent className="p-0">
+            <DrawerHeader>
+              <DrawerTitle>
+                {editingAddress ? "Cập nhật địa chỉ" : "Thêm địa chỉ"}
+              </DrawerTitle>
+            </DrawerHeader>
 
-            {[
-              ["detail", "Địa chỉ nhà", "required"],
-              ["label", "Tên gợi nhớ"],
-              ["recipient", "Người nhận", "required"],
-            ].map(([name, label, required]) => (
-              <FormField
-                key={String(name)}
-                control={form.control}
-                name={name as keyof AddressFormValues}
-                rules={
-                  required
-                    ? { required: `${label} không được bỏ trống` }
-                    : undefined
-                }
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{label}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={`Nhập ${label.toLowerCase()}`}
-                        {...field}
-                        value={
-                          typeof field.value === "string" ? field.value : ""
-                        }
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            ))}
+            {/* Vùng nội dung cuộn */}
+            <div className="px-4 overflow-y-auto max-h-[calc(80vh-100px)]">
+              {formContent}
+            </div>
 
-            <FormField
-              control={form.control}
-              name="phone"
-              rules={{
-                required: "Số điện thoại bắt buộc",
-                pattern: {
-                  value: /^(0|\+84)\d{9}$/,
-                  message: "Số điện thoại không hợp lệ",
-                },
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Số điện thoại</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Nhập số điện thoại"
-                      {...field}
-                      value={typeof field.value === "string" ? field.value : ""}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Loại địa chỉ</FormLabel>
-                  <div className="flex gap-3 border-b border-gray-200 pb-4">
-                    <Button
-                      type="button"
-                      variant={field.value === "home" ? "default" : "outline"}
-                      onClick={() => field.onChange("home")}
-                    >
-                      Nhà
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={field.value === "office" ? "default" : "outline"}
-                      onClick={() => field.onChange("office")}
-                    >
-                      Văn phòng
-                    </Button>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="isDefault"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-3">
-                  <FormLabel className="mb-0">
-                    Đặt làm địa chỉ mặc định
-                  </FormLabel>
-                  <FormControl>
-                    <Switch
-                      checked={!!field.value}
-                      onCheckedChange={(checked) => field.onChange(checked)}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-      </SheetRework>
+            <DrawerFooter className="flex justify-end gap-2 mt-4">
+              <Button
+                onClick={form.handleSubmit(handleSave)}
+                disabled={loading}
+              >
+                {loading ? "Đang lưu..." : "Lưu"}
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <SheetRework
+          open={open}
+          onOpenChange={setOpen}
+          title={editingAddress ? "Cập nhật địa chỉ" : "Thêm địa chỉ"}
+          subtitle="Thay đổi thông tin địa chỉ nhận hàng"
+          onCancel={() => setOpen(false)}
+          onConfirm={form.handleSubmit(handleSave)}
+          confirmText={loading ? "Đang lưu..." : "Lưu"}
+          cancelText="Hủy"
+        >
+          {formContent}
+        </SheetRework>
+      )}
     </div>
   );
 }
