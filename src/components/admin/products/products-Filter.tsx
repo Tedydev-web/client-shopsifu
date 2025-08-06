@@ -25,30 +25,87 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 
-// --- Dữ liệu giả định cho các bộ lọc ---
-// Thay thế bằng dữ liệu từ API của bạn
-const categories = [
-  { value: "electronics", label: "Electronics" },
-  { value: "clothing", label: "Clothing" },
-  { value: "books", label: "Books" },
-  { value: "home-goods", label: "Home Goods" },
-];
-const sizes = ["S", "M", "L", "XL", "XXL"];
+// Sử dụng trực tiếp categoryService để lấy dữ liệu danh mục từ API
+import { categoryService } from '@/services/admin/categoryService';
+import { Category } from '@/types/admin/category.interface';
 
 interface ProductsFilterProps<TData> {
   table: Table<TData>;
   onPriceFilterChange?: (minPrice: number | null, maxPrice: number | null) => void;
+  currentPriceFilter?: { minPrice: number | null; maxPrice: number | null };
+  onCategoryFilterChange?: (categoryId: string | null) => void;
+  currentCategoryFilter?: string | null;
 }
 
-export function ProductsFilter<TData>({ table, onPriceFilterChange }: ProductsFilterProps<TData>) {
+export function ProductsFilter<TData>({ 
+  table, 
+  onPriceFilterChange,
+  currentPriceFilter,
+  onCategoryFilterChange,
+  currentCategoryFilter
+}: ProductsFilterProps<TData>) {
   const t = useTranslations("admin.ModuleProduct.Filter");
 
+  // Không cần kiểm tra column tồn tại để dùng filter
   // const categoryColumn = table.getColumn("category");
-  const priceColumn = table.getColumn("price");
+  // const priceColumn = table.getColumn("price");
   // const sizeColumn = table.getColumn("size");
+  
+  // State để lưu danh sách danh mục
+  const [categories, setCategories] = React.useState<Array<{
+    value: string;
+    label: string;
+    icon?: string | null;
+    parentCategoryId?: string | null;
+  }>>([]);
+  const [loadingCategories, setLoadingCategories] = React.useState(true);
+  
+  // Gọi API lấy danh sách danh mục khi component mount
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await categoryService.getAll({ page: 1, limit: 100 });
+        
+        if (response.data) {
+          const mappedCategories = response.data.map((category) => ({
+            value: category.id,
+            label: category.name,
+            icon: category.logo,
+            parentCategoryId: category.parentCategoryId
+          }));
+          setCategories(mappedCategories);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
 
-  // Giá từ 1 nghìn đến 10 triệu VND
-  const [priceRange, setPriceRange] = React.useState<[number, number]>([1000, 10000000]);
+  // Lấy giá mặc định hoặc giá từ currentPriceFilter nếu có
+  const defaultMinPrice = 1000;
+  const defaultMaxPrice = 10000000;
+  const [priceRange, setPriceRange] = React.useState<[number, number]>([
+    (currentPriceFilter && currentPriceFilter.minPrice !== null) ? currentPriceFilter.minPrice : defaultMinPrice,
+    (currentPriceFilter && currentPriceFilter.maxPrice !== null) ? currentPriceFilter.maxPrice : defaultMaxPrice
+  ]);
+  
+  // Cập nhật priceRange khi currentPriceFilter thay đổi từ bên ngoài
+  React.useEffect(() => {
+    if (currentPriceFilter) {
+      const newMin = currentPriceFilter.minPrice !== null ? currentPriceFilter.minPrice : defaultMinPrice;
+      const newMax = currentPriceFilter.maxPrice !== null ? currentPriceFilter.maxPrice : defaultMaxPrice;
+      
+      // Chỉ cập nhật khi giá trị thực sự thay đổi để tránh re-render không cần thiết
+      if (priceRange[0] !== newMin || priceRange[1] !== newMax) {
+        setPriceRange([newMin, newMax]);
+      }
+    }
+  }, [currentPriceFilter]);
   
   // Apply server-side filtering via API parameters
   const applyPriceFilter = () => {
@@ -61,30 +118,57 @@ export function ProductsFilter<TData>({ table, onPriceFilterChange }: ProductsFi
 
   const clearPriceFilter = () => {
     console.log('Clearing price filter');
-    setPriceRange([1000, 10000000]);
+    setPriceRange([defaultMinPrice, defaultMaxPrice]);
     if (onPriceFilterChange) {
       // Clear the price filter by passing null values
       onPriceFilterChange(null, null);
     }
   };
-
-  // const selectedCategories = new Set(categoryColumn?.getFilterValue() as string[]);
+  
+  // Xử lý khi chọn danh mục (chỉ chọn 1 danh mục)
+  const handleCategoryChange = (categoryId: string) => {
+    if (onCategoryFilterChange) {
+      // Nếu categoryId trùng với categoryId hiện tại, xóa filter (toggle)
+      if (categoryId === currentCategoryFilter) {
+        onCategoryFilterChange(null);
+      } else {
+        // Nếu chọn danh mục khác, thay thế danh mục đang chọn
+        onCategoryFilterChange(categoryId);
+      }
+    }
+  };
+  
+  // Xử lý xóa filter danh mục
+  const clearCategoryFilter = () => {
+    if (onCategoryFilterChange) {
+      onCategoryFilterChange(null);
+    }
+  };
   // const selectedSizes = new Set(sizeColumn?.getFilterValue() as string[]);
 
   return (
     <div className="flex items-center space-x-2">
-      {/* --- Bộ lọc Danh mục (Multi-select) --- */}
-      {/* {categoryColumn && (
+      {/* --- Bộ lọc Danh mục --- */}
+      {(
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 border-dashed">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={cn(
+                "h-8",
+                currentCategoryFilter 
+                  ? "border-primary/50 bg-primary/10" 
+                  : "border-dashed"
+              )}
+            >
               <PlusCircle className="mr-2 h-4 w-4" />
               {t("category")}
-              {selectedCategories.size > 0 && (
+              {currentCategoryFilter && (
                 <>
                   <Separator orientation="vertical" className="mx-2 h-4" />
-                  <Badge variant="secondary" className="rounded-sm px-1 font-normal">
-                    {selectedCategories.size}
+                  <Badge variant="secondary" className="rounded-sm px-1 font-normal truncate max-w-[120px]">
+                    {categories.find(cat => cat.value === currentCategoryFilter)?.label || currentCategoryFilter}
                   </Badge>
                 </>
               )}
@@ -92,51 +176,48 @@ export function ProductsFilter<TData>({ table, onPriceFilterChange }: ProductsFi
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0" align="start">
             <Command>
-              <CommandInput placeholder={t("category")} />
+              <CommandInput placeholder={t("searchCategory") || "Search category..."} />
               <CommandList>
-                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandEmpty>{t("noResults") || "No results found."}</CommandEmpty>
                 <CommandGroup>
-                  {categories.map((option) => {
-                    const isSelected = selectedCategories.has(option.value);
-                    return (
-                      <CommandItem
-                        key={option.value}
-                        onSelect={() => {
-                          if (isSelected) {
-                            selectedCategories.delete(option.value);
-                          } else {
-                            selectedCategories.add(option.value);
-                          }
-                          const filterValues = Array.from(selectedCategories);
-                          categoryColumn?.setFilterValue(
-                            filterValues.length ? filterValues : undefined
-                          );
-                        }}
-                      >
-                        <div
-                          className={cn(
-                            "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                            isSelected
-                              ? "bg-primary text-primary-foreground"
-                              : "opacity-50 [&_svg]:invisible"
-                          )}
+                  {loadingCategories ? (
+                    <CommandItem disabled>
+                      <span className="opacity-70">{t("loading") || "Loading..."}</span>
+                    </CommandItem>
+                  ) : (
+                    categories.map((category) => {
+                      const isSelected = currentCategoryFilter === category.value;
+                      return (
+                        <CommandItem
+                          key={category.value}
+                          onSelect={() => handleCategoryChange(category.value)}
+                          className="flex items-center space-x-2"
                         >
-                          <Check className={cn("h-4 w-4")} />
-                        </div>
-                        <span>{option.label}</span>
-                      </CommandItem>
-                    );
-                  })}
+                          <div
+                            className={cn(
+                              "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                              isSelected
+                                ? "bg-primary text-primary-foreground"
+                                : "opacity-50 [&_svg]:invisible"
+                            )}
+                          >
+                            <Check className="h-4 w-4" />
+                          </div>
+                          <span>{category.label}</span>
+                        </CommandItem>
+                      );
+                    })
+                  )}
                 </CommandGroup>
-                {selectedCategories.size > 0 && (
+                {currentCategoryFilter && (
                   <>
                     <CommandSeparator />
                     <CommandGroup>
                       <CommandItem
-                        onSelect={() => categoryColumn?.setFilterValue(undefined)}
+                        onSelect={clearCategoryFilter}
                         className="justify-center text-center"
                       >
-                        Clear filters
+                        {t("clearFilters") || "Clear filters"}
                       </CommandItem>
                     </CommandGroup>
                   </>
@@ -145,10 +226,10 @@ export function ProductsFilter<TData>({ table, onPriceFilterChange }: ProductsFi
             </Command>
           </PopoverContent>
         </Popover>
-      )} */}
+      )}
 
       {/* --- Bộ lọc Giá --- */}
-      {priceColumn && (
+      {(
         <Popover>
           <PopoverTrigger asChild>
             <Button 
@@ -156,14 +237,14 @@ export function ProductsFilter<TData>({ table, onPriceFilterChange }: ProductsFi
               size="sm" 
               className={cn(
                 "h-8",
-                priceRange[0] !== 1000 || priceRange[1] !== 10000000 
+                priceRange[0] !== defaultMinPrice || priceRange[1] !== defaultMaxPrice 
                   ? "border-primary/50 bg-primary/10" 
                   : "border-dashed"
               )}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               {t("price")}
-              {(priceRange[0] !== 1000 || priceRange[1] !== 10000000) && (
+              {(priceRange[0] !== defaultMinPrice || priceRange[1] !== defaultMaxPrice) && (
                 <>
                   <Separator orientation="vertical" className="mx-2 h-4" />
                   <Badge variant="secondary" className="rounded-sm px-1 font-normal">
@@ -200,13 +281,29 @@ export function ProductsFilter<TData>({ table, onPriceFilterChange }: ProductsFi
                   {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(priceRange[1])}
                 </span>
               </div>
-              <div className="flex justify-end space-x-2 pt-2">
-                <Button variant="ghost" size="sm" onClick={clearPriceFilter}>
-                  Clear
-                </Button>
-                <Button size="sm" onClick={applyPriceFilter}>
-                  Apply
-                </Button>
+              <div className="flex flex-col gap-2 pt-2">
+                {(currentPriceFilter?.minPrice !== null || currentPriceFilter?.maxPrice !== null) && (
+                  <p className="text-sm text-muted-foreground italic">
+                    {t("activeFilter")}: {currentPriceFilter?.minPrice?.toLocaleString('vi-VN')} - {currentPriceFilter?.maxPrice?.toLocaleString('vi-VN')} VND
+                  </p>
+                )}
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={clearPriceFilter}
+                    title={t("clearFilter") || "Clear filter"}
+                  >
+                    {t("clear") || "Clear"}
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    onClick={applyPriceFilter}
+                    title={t("applyFilter") || "Apply filter"}
+                  >
+                    {t("apply") || "Apply"}
+                  </Button>
+                </div>
               </div>
             </div>
           </PopoverContent>

@@ -34,6 +34,9 @@ export function ProductsTable() {
     handleCloseDeleteModal,
     handlePriceFilterChange,
     priceFilter,
+    handleCategoryFilterChange,
+    categoryFilter,
+    searchQuery,
   } = useProducts();
 
   const onEdit = (product: ProductColumn) => {
@@ -54,12 +57,18 @@ export function ProductsTable() {
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <SearchInput
-          value={pagination.search || ''}
+          value={searchQuery || ''}
           onValueChange={handleSearch}
           placeholder={t('searchPlaceholder')}
           className="w-full md:max-w-sm"
         />
-        <ProductsFilter table={table} onPriceFilterChange={handlePriceFilterChange} />
+        <ProductsFilter 
+          table={table} 
+          onPriceFilterChange={handlePriceFilterChange}
+          currentPriceFilter={priceFilter}
+          onCategoryFilterChange={handleCategoryFilterChange}
+          currentCategoryFilter={categoryFilter}
+        />
       </div>
       <div className="flex items-center gap-2">
         <ProductsExportData data={data} table={table} />

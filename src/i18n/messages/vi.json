@@ -359,7 +359,17 @@
         "edit": "Sửa thông tin",
         "delete": "Xóa sản phẩm",
         "notFound": "Không tìm thấy sản phẩm",
-        "priceRange": "Khoảng giá"
+        "priceRange": "Khoảng giá",
+        "clear": "Xóa bộ lọc",
+        "applyFilter": "Áp dụng bộ lọc",
+        "apply": "Áp dụng",
+        "clearFilter": "Xóa bộ lọc",
+        "activeFilter": "Bộ lọc đang áp dụng",
+        "searchCategory": "Tìm kiếm danh mục",
+        "Search category...": "Tìm kiếm danh mục",
+        "noResults": "Không có kết quả",
+        "loading":"Đang tải dữ liệu...",
+        "clearFilters": "Xóa tất cả bộ lọc"
       },
       "AddNew": {
         "page": {
