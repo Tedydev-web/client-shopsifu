@@ -159,10 +159,10 @@ export function CategoryModal({
         
         {/* Main Content - Fixed Height with Proper Overflow */}
         <div className="flex-1 min-h-0 overflow-hidden">
-          <div className="grid grid-cols-4 gap-px bg-border rounded-lg overflow-hidden" style={{ height: '450px' }}>
+          <div className="grid grid-cols-4 gap-px bg-border rounded-lg" style={{ height: '450px' }}>
 
             {/* Parent Category Column */}
-            <div className="bg-background flex flex-col">
+            <div className="bg-background flex flex-col overflow-auto">
               <div className="p-3 border-b bg-muted/30">
                 <h3 className="text-sm font-medium">Danh mục cha</h3>
               </div>
@@ -202,7 +202,7 @@ export function CategoryModal({
             </div>
 
             {/* Child Category Column */}
-            <div className="bg-background flex flex-col">
+            <div className="bg-background flex flex-col overflow-auto">
               <div className="p-3 border-b bg-muted/30">
                 <h3 className="text-sm font-medium">Danh mục con</h3>
               </div>

@@ -1,4 +1,3 @@
-
 "use client";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,7 +51,6 @@ export function ProductAsideForm({
     if (publishedAt) {
       try {
         const date = new Date(publishedAt);
-        // Kiểm tra xem date có hợp lệ không
         if (!isNaN(date.getTime())) {
           setIsPublished(true);
           setPublishDate(date);
@@ -73,99 +71,122 @@ export function ProductAsideForm({
     }
   }, [publishedAt]);
 
+  // Simplified category processing
   useEffect(() => {
-  // Chỉ fetch khi có categories và không phải từ modal xác nhận
-  if (categories && categories.length > 0 && selectedCategoryPath === '') {
-    const fetchCategoryData = async () => {
-      setIsLoadingCategory(true);
-      try {
-        // Fetch tất cả categories trong một lần để tránh nhiều API calls
-        const response = await categoryService.getAll();
-        
-        // Lấy mảng categories từ response
-        const allCategories = response.data || response;
-        
-        // Mảng để lưu tên đường dẫn của các danh mục đã chọn
-        const categoryPaths = [];
-        
-        // Xử lý từng category ID trong mảng categories
-        for (const categoryId of categories) {
-          // Tìm category theo ID trong danh sách đã fetch
-          const category = allCategories.find(c => c.id && c.id.toString() === categoryId);
+    if (categories && categories.length > 0 && selectedCategoryPath === '') {
+      const fetchCategoryData = async () => {
+        setIsLoadingCategory(true);
+        try {
+          // Fetch tất cả categories một lần
+          const response = await categoryService.getAll();
+          const allCategories = response.data || response;
           
-          if (category) {
-            // Nếu tìm thấy category
-            if (category.parentCategoryId) {
-              // Tìm parent category nếu có parentCategoryId
-              const parentCategory = allCategories.find(c => c.id && category.parentCategoryId && c.id.toString() === category.parentCategoryId.toString());
-              
-              if (parentCategory) {
-                // Hiển thị dạng "Parent > Child"
-                categoryPaths.push(`${parentCategory.name} > ${category.name}`);
-              } else {
-                // Nếu không tìm được parent, chỉ hiển thị tên category
-                categoryPaths.push(category.name);
-              }
-            } else {
-              // Nếu là category gốc (không có parent)
-              categoryPaths.push(category.name);
+          // Tạo Map để dễ tìm kiếm
+          const categoryMap = new Map();
+          allCategories.forEach(cat => {
+            if (cat.id) {
+              categoryMap.set(cat.id.toString(), cat);
             }
-          } else {
-            // Trường hợp không tìm thấy category trong allCategories
-            try {
-              // Thử gọi API riêng để lấy chi tiết category này
-              const categoryDetail = await categoryService.getById(categoryId.toString());
+          });
+          
+          // Array để lưu các path duy nhất
+          const categoryPaths: string[] = [];
+          const processedCategories = new Set<string>();
+          
+          // Debug log
+          console.log('Original categories:', categories);
+          console.log('All fetched categories:', allCategories);
+          
+          // Xử lý từng category ID và tránh duplicate
+          for (const categoryId of categories) {
+            // Bỏ qua nếu đã xử lý category này rồi
+            if (processedCategories.has(categoryId)) {
+              console.log(`Skipping duplicate category: ${categoryId}`);
+              continue;
+            }
+            
+            const category = categoryMap.get(categoryId);
+            
+            if (category) {
+              let displayPath = '';
               
-              if (categoryDetail && categoryDetail.data) {
-                const categoryData = categoryDetail.data;
-                
-                if (categoryData.parentCategoryId) {
-                  // Nếu có parent, gọi API để lấy thông tin parent
-                  const parentDetail = await categoryService.getById(categoryData.parentCategoryId.toString());
-                  
-                  if (parentDetail && parentDetail.data) {
-                    categoryPaths.push(`${parentDetail.data.name} > ${categoryData.name}`);
-                  } else {
-                    categoryPaths.push(categoryData.name);
-                  }
+              if (category.parentCategoryId) {
+                // Có parent category
+                const parentCategory = categoryMap.get(category.parentCategoryId.toString());
+                if (parentCategory) {
+                  displayPath = `${parentCategory.name} > ${category.name}`;
                 } else {
-                  categoryPaths.push(categoryData.name);
+                  displayPath = category.name;
                 }
               } else {
-                categoryPaths.push('Danh mục không tìm thấy');
+                // Category gốc
+                displayPath = category.name;
               }
-            } catch (detailError) {
-              console.error(`Failed to fetch details for category ${categoryId}:`, detailError);
-              categoryPaths.push('Không thể tải thông tin');
+              
+              // Chỉ thêm nếu chưa có path này
+              if (!categoryPaths.includes(displayPath)) {
+                categoryPaths.push(displayPath);
+                console.log(`Added path: ${displayPath}`);
+              } else {
+                console.log(`Duplicate path detected: ${displayPath}`);
+              }
+              processedCategories.add(categoryId);
+            } else {
+              // Fallback: fetch riêng nếu không tìm thấy
+              try {
+                const categoryDetail = await categoryService.getById(categoryId.toString());
+                if (categoryDetail?.data) {
+                  const categoryData = categoryDetail.data;
+                  let displayPath = categoryData.name;
+                  
+                  if (categoryData.parentCategoryId) {
+                    const parentDetail = await categoryService.getById(categoryData.parentCategoryId.toString());
+                    if (parentDetail?.data) {
+                      displayPath = `${parentDetail.data.name} > ${categoryData.name}`;
+                    }
+                  }
+                  
+                  // Chỉ thêm nếu chưa có path này
+                  if (!categoryPaths.includes(displayPath)) {
+                    categoryPaths.push(displayPath);
+                  }
+                  processedCategories.add(categoryId);
+                }
+              } catch (detailError) {
+                console.error(`Failed to fetch category ${categoryId}:`, detailError);
+                if (!categoryPaths.includes('Danh mục không xác định')) {
+                  categoryPaths.push('Danh mục không xác định');
+                }
+                processedCategories.add(categoryId);
+              }
             }
           }
+          
+          // Join các path thành chuỗi cuối cùng
+          const finalPath = categoryPaths.join(', ');
+          
+          setSelectedCategoryIds(categories);
+          setSelectedCategoryPath(finalPath);
+          
+        } catch (error) {
+          console.error("Failed to fetch category data:", error);
+          setSelectedCategoryPath('Không thể tải thông tin danh mục');
+        } finally {
+          setIsLoadingCategory(false);
         }
-        
-        // Cập nhật state
-        setSelectedCategoryIds(categories);
-        setSelectedCategoryPath(categoryPaths.join(', '));
-      } catch (error) {
-        console.error("Failed to fetch category data:", error);
-        // Fallback - Hiển thị thông báo lỗi
-        setSelectedCategoryPath('Không thể tải thông tin danh mục');
-      } finally {
-        setIsLoadingCategory(false);
-      }
-    };
-    
-    fetchCategoryData();
-  }
-}, [categories, selectedCategoryPath]);
+      };
+      
+      fetchCategoryData();
+    }
+  }, [categories, selectedCategoryPath]);
 
   // Handle publish status change
   const handlePublishToggle = (checked: boolean) => {
     setIsPublished(checked);
     
     if (checked) {
-      // Nếu bật công khai mà chưa chọn ngày, mặc định là thời gian hiện tại
       const dateToUse = publishDate || new Date();
       
-      // Đảm bảo giờ và phút được giữ nguyên nếu đã có date, hoặc đặt thời gian hiện tại
       if (!publishDate) {
         console.log('Setting publishedAt to current date/time:', dateToUse.toISOString());
       } else {
@@ -175,7 +196,6 @@ export function ProductAsideForm({
       setPublishDate(dateToUse);
       handleInputChange('publishedAt', dateToUse.toISOString());
     } else {
-      // Nếu tắt công khai, đặt publishedAt là null
       console.log('Clearing publishedAt due to publish toggle off');
       handleInputChange('publishedAt', null);
     }
@@ -185,7 +205,6 @@ export function ProductAsideForm({
   const handlePublishDateChange = (date: Date | undefined) => {
     if (!date) {
       setPublishDate(undefined);
-      // Chỉ xóa publishedAt khi đã bật chế độ công khai
       if (isPublished) {
         console.log('Clearing publishedAt due to date being cleared');
         handleInputChange('publishedAt', null);
@@ -193,16 +212,13 @@ export function ProductAsideForm({
       return;
     }
     
-    // Đảm bảo ngày giờ hợp lệ
     if (isNaN(date.getTime())) {
       console.error('Invalid date in handlePublishDateChange:', date);
       return;
     }
     
-    // Cập nhật state
     setPublishDate(date);
     
-    // Chỉ cập nhật khi đã bật chế độ công khai
     if (isPublished) {
       console.log('Updating publishedAt to:', date.toISOString());
       handleInputChange('publishedAt', date.toISOString());
@@ -216,11 +232,8 @@ export function ProductAsideForm({
 
   // Handle category selection from modal
   const handleCategoryConfirm = (categoryIds: string[], selectionPath: string) => {
-    // Cập nhật cả ID và path từ modal
     setSelectedCategoryIds(categoryIds);
     setSelectedCategoryPath(selectionPath);
-    
-    // Cập nhật form state
     handleInputChange('categories', categoryIds);
   };
 
@@ -398,21 +411,33 @@ export function ProductAsideForm({
               <Button 
                 type="button"
                 variant="outline" 
-                className="w-full justify-between font-normal text-left" 
+                className="w-full justify-between font-normal text-left h-auto min-h-[2.5rem] py-2" 
                 onClick={() => setCategoryModalOpen(true)}
                 disabled={isLoadingCategory}
               >
-                {isLoadingCategory ? (
-                  <span className="flex items-center">
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Đang tải...
-                  </span>
-                ) : (
-                  <span className="truncate">
-                    {selectedCategoryPath || 'Chọn danh mục'}
-                  </span>
-                )}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <div className="flex-1 text-left overflow-hidden">
+                  {isLoadingCategory ? (
+                    <span className="flex items-center">
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Đang tải...
+                    </span>
+                  ) : (
+                    <div className="space-y-1">
+                      <span 
+                        className="block text-sm leading-tight line-clamp-2"
+                        title={selectedCategoryPath || 'Chọn danh mục'}
+                      >
+                        {selectedCategoryPath || 'Chọn danh mục'}
+                      </span>
+                      {selectedCategoryPath && selectedCategoryIds.length > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          {selectedCategoryIds.length} danh mục
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 self-start mt-1" />
               </Button>
             </div>
           </div>

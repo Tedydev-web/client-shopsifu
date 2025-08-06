@@ -79,7 +79,7 @@ export function ProductsTable() {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-end items-center mb-4">
         <Link href="/admin/products/new">
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />
