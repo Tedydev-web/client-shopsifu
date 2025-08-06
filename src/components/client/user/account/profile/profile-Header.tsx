@@ -21,6 +21,7 @@ interface ProfileHeaderProps {
   totalOrders?: number;
   totalSpent?: number;
   memberSince?: string;
+  createdAt?: string;
 }
 
 export default function ProfileHeader({
@@ -29,6 +30,7 @@ export default function ProfileHeader({
   phone,
   birthday,
   avatar,
+  createdAt,
   totalOrders = 0,
   totalSpent = 0,
   memberSince,
@@ -106,8 +108,8 @@ export default function ProfileHeader({
 
       {/* Total Orders */}
       <div className="flex flex-1 items-center gap-4 p-4 sm:p-6 w-full border-t lg:border-t-0 lg:border-l border-gray-100">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
-          <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
+        <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
+          <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
         </div>
         <div className="flex flex-col">
           <span className="text-base sm:text-lg font-bold text-black leading-none">
@@ -124,8 +126,8 @@ export default function ProfileHeader({
 
       {/* Total Spent */}
       <div className="flex flex-1 items-center gap-4 p-4 sm:p-6 w-full border-t lg:border-t-0 lg:border-l border-gray-100">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
-          <Receipt className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
+        <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
+          <Receipt className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
         </div>
         <div className="flex flex-col">
           <span className="text-base sm:text-lg font-bold text-black leading-none">
@@ -133,7 +135,7 @@ export default function ProfileHeader({
           </span>
           <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
             Tổng tiền tích lũy
-            {formattedMemberSince && ` • Từ ${formattedMemberSince}`}
+            {createdAt && ` • Từ ${createdAt}`}
           </span>
         </div>
       </div>

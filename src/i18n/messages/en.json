@@ -416,13 +416,35 @@
         "selectImage": "Select image"
       }
     },
+    "orders" : {
+      "title": "List Orders",
+      "subtitle": "Manage all orders",
+      "searchPlaceholder": "Search orders",
+      "orderCode": "Code",
+      "orderDate": "Date",
+      "customerName": "Customer",
+      "shopName": "Shop Name",
+      "status": "Status",
+      "paymentMethod": "Payment",
+      "totalAmount": "Total",
+      "notFound": "No orders found",
+      "statuses": {
+        "pendingPayment": "Pending Payment",
+        "pendingPickup": "Pending Pickup",
+        "pendingDelivery": "Pending Delivery",
+        "delivered": "Delivered",
+        "returned": "Returned",
+        "cancelled": "Cancelled"
+      }
+    },
     "sidebar": {
       "dashboard": "Dashboard",
       "orders": {
         "orders": "Orders",
         "allOrders": "All orders",
         "newOrders": "New orders",
-        "processedOrders": "Processed orders"
+        "processedOrders": "Processed orders",
+        "listOrders": "List Orders"
       },
       "permission": {
         "permissionManager": "Permission management"

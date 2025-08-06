@@ -13,6 +13,7 @@ import {
   HelpCircle,
   MonitorCog,
   FolderClosed,
+  ScrollText,
   Undo,
   Tags // Thêm icon cho Brand
 } from 'lucide-react'
@@ -125,6 +126,18 @@ export const useSidebarConfig = (): SidebarItem[] => {
           title: t('brand.brandManager'),
           href: '/admin/brand',
           icon: <Tags className="w-4 h-4" />,
+        }
+      ],
+    },
+    {
+      title: t('orders.orders'),
+      href: '/admin/order',
+      icon: <ScrollText className="w-5 h-5" />,
+      subItems: [
+        {
+          title: t('orders.listOrders'),
+          href: '/admin/order',
+          icon: null,
         }
       ],
     },

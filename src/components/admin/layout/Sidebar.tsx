@@ -79,6 +79,8 @@ export function Sidebar({
       return true;
     if (href === "/admin/system" && pathname.startsWith("/admin/role"))
       return true;
+    if (href === "/admin/order" && pathname.startsWith("/admin/order"))
+      return true;
     return false;
   };
 
