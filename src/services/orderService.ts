@@ -37,7 +37,7 @@ export const orderService = {
   ): Promise<OrderGetAllResponse> => {
     try {
       const response = await privateAxios.get(API_ENDPOINTS.ORDERS.GETALL, {
-        params: { ...params, sortOrder: status },
+        params: { ...params, status },
         signal,
       });
       return response.data;

@@ -12,7 +12,6 @@ import {
   Order,
 } from "@/types/order.interface";
 
-// Định nghĩa type Pagination nếu chưa có
 interface Pagination {
   page: number;
   limit: number;
@@ -33,27 +32,30 @@ export function useOrder() {
   });
 
   // 🔹 Lấy tất cả đơn hàng
-  const fetchAllOrders = useCallback(async (page = 1, limit = 10, search = "") => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await orderService.getAll({ page, limit, search });
-      setOrders(res.data);
-      setPagination((prev) => ({
-        ...prev,
-        page,
-        limit,
-        total: res.metadata?.totalItems || 0,
-        search,
-      }));
-      return res;
-    } catch (err: any) {
-      setError(err.message || "Lỗi khi tải danh sách đơn hàng");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchAllOrders = useCallback(
+    async (page = 1, limit = 10, search = "") => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await orderService.getAll({ page, limit, search });
+        setOrders(res.data);
+        setPagination((prev) => ({
+          ...prev,
+          page,
+          limit,
+          total: res.metadata?.totalItems || 0,
+          search,
+        }));
+        return res;
+      } catch (err: any) {
+        setError(err.message || "Lỗi khi tải danh sách đơn hàng");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   // 🔹 Lọc theo trạng thái
   const fetchOrdersByStatus = useCallback(
@@ -82,20 +84,23 @@ export function useOrder() {
 
   // 🔹 Tìm kiếm
   const handleSearch = (searchValue: string) => {
-    setPagination((prev) => ({ ...prev, page: 1, search: searchValue }));
-    fetchAllOrders(1, pagination.limit, searchValue);
+    const page = 1;
+    const limit = pagination.limit ?? 10;
+    fetchAllOrders(page, limit, searchValue);
   };
 
   // 🔹 Chuyển trang
   const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }));
-    fetchAllOrders(page, pagination.limit, pagination.search);
+    const limit = pagination.limit ?? 10;
+    const search = pagination.search ?? "";
+    fetchAllOrders(page, limit, search);
   };
 
   // 🔹 Đổi limit
   const handleLimitChange = (limit: number) => {
-    setPagination((prev) => ({ ...prev, limit, page: 1 }));
-    fetchAllOrders(1, limit, pagination.search);
+    const page = 1;
+    const search = pagination.search ?? "";
+    fetchAllOrders(page, limit, search);
   };
 
   // 🔹 Lấy chi tiết đơn hàng

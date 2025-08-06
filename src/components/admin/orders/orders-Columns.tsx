@@ -102,27 +102,27 @@ export const OrdersColumns = ({
       const statusConfig: Record<string, { color: string; label: string }> = {
         PENDING_PAYMENT: {
           color: "bg-yellow-100 text-yellow-700",
-          label: t("admin.orders.statuses.pendingPayment"),
+          label: t("statuses.pendingPayment"),
         },
         PENDING_PICKUP: {
           color: "bg-blue-100 text-blue-700",
-          label: t("admin.orders.statuses.pendingPickup"),
+          label: t("statuses.pendingPickup"),
         },
         PENDING_DELIVERY: {
           color: "bg-purple-100 text-purple-700",
-          label: t("admin.orders.statuses.pendingDelivery"),
+          label: t("statuses.pendingDelivery"),
         },
         DELIVERED: {
           color: "bg-green-100 text-green-700",
-          label: t("admin.orders.statuses.delivered"),
+          label: t("statuses.delivered"),
         },
         RETURNED: {
           color: "bg-gray-100 text-gray-700",
-          label: t("admin.orders.statuses.returned"),
+          label: t("statuses.returned"),
         },
         CANCELLED: {
           color: "bg-red-100 text-red-700",
-          label: t("admin.orders.statuses.cancelled"),
+          label: t("statuses.cancelled"),
         },
       };
 
