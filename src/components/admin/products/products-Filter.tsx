@@ -37,33 +37,44 @@ const sizes = ["S", "M", "L", "XL", "XXL"];
 
 interface ProductsFilterProps<TData> {
   table: Table<TData>;
+  onPriceFilterChange?: (minPrice: number | null, maxPrice: number | null) => void;
 }
 
-export function ProductsFilter<TData>({ table }: ProductsFilterProps<TData>) {
+export function ProductsFilter<TData>({ table, onPriceFilterChange }: ProductsFilterProps<TData>) {
   const t = useTranslations("admin.ModuleProduct.Filter");
 
-  const categoryColumn = table.getColumn("category");
+  // const categoryColumn = table.getColumn("category");
   const priceColumn = table.getColumn("price");
   // const sizeColumn = table.getColumn("size");
 
-  const [priceRange, setPriceRange] = React.useState<[number, number]>([0, 1000]);
-
+  // Giá từ 1 nghìn đến 10 triệu VND
+  const [priceRange, setPriceRange] = React.useState<[number, number]>([1000, 10000000]);
+  
+  // Apply server-side filtering via API parameters
   const applyPriceFilter = () => {
-    priceColumn?.setFilterValue(priceRange);
+    if (onPriceFilterChange) {
+      console.log('Applying price filter with values:', priceRange);
+      // Pass min and max price to the API handler
+      onPriceFilterChange(priceRange[0], priceRange[1]);
+    }
   };
 
   const clearPriceFilter = () => {
-    setPriceRange([0, 1000]);
-    priceColumn?.setFilterValue(undefined);
+    console.log('Clearing price filter');
+    setPriceRange([1000, 10000000]);
+    if (onPriceFilterChange) {
+      // Clear the price filter by passing null values
+      onPriceFilterChange(null, null);
+    }
   };
 
-  const selectedCategories = new Set(categoryColumn?.getFilterValue() as string[]);
+  // const selectedCategories = new Set(categoryColumn?.getFilterValue() as string[]);
   // const selectedSizes = new Set(sizeColumn?.getFilterValue() as string[]);
 
   return (
     <div className="flex items-center space-x-2">
       {/* --- Bộ lọc Danh mục (Multi-select) --- */}
-      {categoryColumn && (
+      {/* {categoryColumn && (
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 border-dashed">
@@ -134,34 +145,59 @@ export function ProductsFilter<TData>({ table }: ProductsFilterProps<TData>) {
             </Command>
           </PopoverContent>
         </Popover>
-      )}
+      )} */}
 
       {/* --- Bộ lọc Giá --- */}
       {priceColumn && (
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 border-dashed">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={cn(
+                "h-8",
+                priceRange[0] !== 1000 || priceRange[1] !== 10000000 
+                  ? "border-primary/50 bg-primary/10" 
+                  : "border-dashed"
+              )}
+            >
               <PlusCircle className="mr-2 h-4 w-4" />
               {t("price")}
+              {(priceRange[0] !== 1000 || priceRange[1] !== 10000000) && (
+                <>
+                  <Separator orientation="vertical" className="mx-2 h-4" />
+                  <Badge variant="secondary" className="rounded-sm px-1 font-normal">
+                    {new Intl.NumberFormat('vi-VN', { 
+                      style: 'currency', 
+                      currency: 'VND',
+                      notation: 'compact' 
+                    }).format(priceRange[0])} - {new Intl.NumberFormat('vi-VN', { 
+                      style: 'currency', 
+                      currency: 'VND', 
+                      notation: 'compact'
+                    }).format(priceRange[1])}
+                  </Badge>
+                </>
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-4" align="start">
             <div className="space-y-4">
               <h4 className="font-medium leading-none">{t("priceRange")}</h4>
               <Slider
-                defaultValue={[0, 1000]}
+                defaultValue={[1000, 10000000]}
                 value={priceRange}
-                min={0}
-                max={1000}
-                step={50}
+                min={1000}
+                max={10000000}
+                step={100000}
                 onValueChange={(value) => setPriceRange(value as [number, number])}
               />
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  ${priceRange[0]}
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(priceRange[0])}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  ${priceRange[1]}
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(priceRange[1])}
                 </span>
               </div>
               <div className="flex justify-end space-x-2 pt-2">
@@ -176,70 +212,6 @@ export function ProductsFilter<TData>({ table }: ProductsFilterProps<TData>) {
           </PopoverContent>
         </Popover>
       )}
-
-      {/* --- Bộ lọc Kích cỡ --- */}
-      {/* {sizeColumn && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 border-dashed">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              {t("size")}
-              {selectedSizes.size > 0 && (
-                <>
-                  <Separator orientation="vertical" className="mx-2 h-4" />
-                  <Badge variant="secondary" className="rounded-sm px-1 font-normal">
-                    {selectedSizes.size}
-                  </Badge>
-                </>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-4" align="start">
-            <div className="space-y-3">
-              <h4 className="font-medium leading-none">{t("size")}</h4>
-              <div className="grid grid-cols-3 gap-2">
-                {sizes.map((size) => {
-                  const isSelected = selectedSizes.has(size);
-                  return (
-                    <Button
-                      key={size}
-                      variant={isSelected ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        if (isSelected) {
-                          selectedSizes.delete(size);
-                        } else {
-                          selectedSizes.add(size);
-                        }
-                        const filterValues = Array.from(selectedSizes);
-                        sizeColumn?.setFilterValue(
-                          filterValues.length ? filterValues : undefined
-                        );
-                      }}
-                      className="h-8"
-                    >
-                      {size}
-                    </Button>
-                  );
-                })}
-              </div>
-              {selectedSizes.size > 0 && (
-                <>
-                  <Separator />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={() => sizeColumn?.setFilterValue(undefined)}
-                  >
-                    Clear
-                  </Button>
-                </>
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
-      )} */}
     </div>
   );
 }

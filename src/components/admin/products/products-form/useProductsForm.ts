@@ -19,7 +19,7 @@ type FormSku = Partial<SkuDetail>;
 // Định nghĩa kiểu dữ liệu cho state của form
 export type FormState = Omit<ProductCreateRequest, 'skus' | 'categories' | 'brandId' | 'publishedAt' | 'images'> & {
   skus: FormSku[];
-  categories: string[];
+  categories: string[]; // Lưu dưới dạng string trong state, nhưng sẽ convert về number khi submit
   brandId: string | null; // Cho phép brandId là null, sử dụng string vì API trả về UUID
   description: string;
   publishedAt: string | null; // Thêm trường publishedAt
@@ -68,6 +68,12 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
         return '';
       }).filter(Boolean) || [];
 
+      // Xử lý categories, đảm bảo chuyển thành string để dễ xử lý trong form
+      const processedCategories = initialData.categories?.map(c => {
+        // Lấy ID từ category và đảm bảo là string
+        return c.id ? String(c.id) : '';
+      }).filter(Boolean) || [];
+
       const mappedData = {
         id: initialData.id,
         name: initialData.name || '',
@@ -76,7 +82,7 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
         virtualPrice: initialData.virtualPrice || 0,
         brandId: initialData.brand?.id?.toString() || null, // Lấy id từ object brand lồng nhau và chuyển sang string
         images: processedImages, // Lưu mảng URLs dạng string để dễ xử lý trong state
-        categories: initialData.categories?.map(c => c.id) || [], // Map từ object CategoryDetail sang mảng ID
+        categories: processedCategories, // Map từ object CategoryDetail sang mảng ID string
         variants: initialData.variants || [],
         skus: initialData.skus || [], // Gán trực tiếp mảng SkuDetail
         publishedAt: initialData.publishedAt, // Lấy trường publishedAt từ dữ liệu ban đầu
@@ -193,6 +199,20 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
     console.log('Product images từ form state:', productData.images);
     console.log('Images đã lọc (bỏ rỗng):', filteredImages);
 
+    // Lọc bỏ các giá trị không hợp lệ trong mảng categories và chuyển về dạng number (nếu API yêu cầu)
+    const validCategories = productData.categories
+      .filter(id => id && id !== 'null' && id !== 'undefined' && String(id).trim() !== '')
+      .map(id => {
+        // Thử chuyển đổi sang number và kiểm tra xem kết quả có hợp lệ không
+        const numId = Number(id) || parseInt(String(id), 10) || 0;
+        if (numId <= 0) {
+          console.warn(`Invalid category ID: ${id}, converted to ${numId}`);
+        }
+        return numId;
+      }); // Chuyển về number cho API
+    console.log('Categories trước khi lọc:', productData.categories);
+    console.log('Categories sau khi lọc:', validCategories);
+
     const submissionData = {
       name: productData.name,
       description: productData.description, // Thêm trường description vào dữ liệu gửi đi
@@ -201,7 +221,7 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
       virtualPrice: productData.virtualPrice,
       brandId: productData.brandId || '', // Dùng string rỗng nếu null
       images: filteredImages.length > 0 ? filteredImages : [], // Truyền mảng string URLs trực tiếp
-      categories: productData.categories.map(id => Number(id)), // Chuyển đổi string[] sang number[]
+      categories: validCategories, // Sử dụng mảng đã được lọc, giữ nguyên là string UUID
       variants: productData.variants,
       skus: processedSkus,
     };

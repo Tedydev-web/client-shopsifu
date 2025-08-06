@@ -44,7 +44,7 @@ export interface Product extends BaseEntity{
     images: string[];
     variants: Variant[];
     skus?: Sku[]; // Optional as it's not in the list response
-    categories?: number[]; // Optional as it's not in the list response
+    categories?: string[]; // Optional as it's not in the list response
     productTranslations: ProductTranslation[];
     message: string;
 }

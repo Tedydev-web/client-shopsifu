@@ -75,3 +75,33 @@ export function createUrl(
   const queryString = searchParams.toString();
   return queryString ? `${pathname}?${queryString}` : pathname;
 }
+
+
+
+/**
+ * Tạo slug sản phẩm từ tên và ID
+ * Format: {tên-sản-phẩm}__{id}
+ * Sử dụng "__" làm dấu phân tách giữa tên và ID để dễ dàng trích xuất ID UUID
+ * Giữ nguyên dấu và chữ hoa, chỉ thay khoảng trắng bằng dấu -
+ * @param name Tên sản phẩm
+ * @param id ID sản phẩm
+ * @returns Slug đã được format
+ */
+export function createProductSlug(name: string, id: string | number): string {
+  // Thay khoảng trắng bằng dấu gạch nối, giữ nguyên dấu và chữ hoa
+  const nameSlug = name.trim().replace(/\s+/g, "-");
+  // Mã hóa URL để xử lý các ký tự đặc biệt nhưng vẫn giữ nguyên dấu
+  const encodedNameSlug = encodeURIComponent(nameSlug);
+  return `${encodedNameSlug}__${id}`;
+}
+
+
+/**
+ * Tạo URL cho trang chi tiết sản phẩm
+ * @param name Tên sản phẩm
+ * @param id ID sản phẩm
+ * @returns URL đầy đủ đến trang chi tiết sản phẩm
+ */
+export function getProductUrl(name: string, id: string | number): string {
+  return `/products/${createProductSlug(name, id)}`;
+}

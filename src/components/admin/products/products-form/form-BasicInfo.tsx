@@ -61,7 +61,7 @@ export function ProductBasicInfoForm({ productData, handleInputChange }: Product
         {/* Giá sản phẩm */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-3">
-            <Label htmlFor="base-price">Giá gốc</Label>
+            <Label htmlFor="base-price">Giá bán</Label>
             <Input
               id="base-price"
               type="text"
@@ -71,7 +71,7 @@ export function ProductBasicInfoForm({ productData, handleInputChange }: Product
             />
           </div>
           <div className="grid gap-3">
-            <Label htmlFor="virtual-price">Giá bán</Label>
+            <Label htmlFor="virtual-price">Giá gốc</Label>
             <Input
               id="virtual-price"
               type="text"

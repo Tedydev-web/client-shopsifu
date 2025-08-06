@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { vi } from 'date-fns/locale';
+import { useState, useCallback, useEffect } from 'react';
 import { productsService } from '@/services/productsService';
 import { useServerDataTable } from '@/hooks/useServerDataTable';
 import { Product, ProductCreateRequest, ProductUpdateRequest } from '@/types/products.interface';
@@ -17,6 +18,7 @@ export type ProductColumn = {
   name: string;
   image: string;
   price: number;
+  virtualPrice: number;
   status: 'active' | 'inactive';
   category: string;
   brand: string;
@@ -34,6 +36,17 @@ export function useProducts() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<ProductColumn | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  
+  // State for price filtering
+  const [priceFilter, setPriceFilter] = useState<{minPrice: number | null, maxPrice: number | null}>({
+    minPrice: null,
+    maxPrice: null
+  });
+  
+  // Log price filter changes for debugging
+  useEffect(() => {
+    console.log('Price filter state updated:', priceFilter);
+  }, [priceFilter]);
 
   const getResponseData = useCallback((response: any) => response.data || [], []);
 
@@ -54,6 +67,7 @@ export function useProducts() {
     name: product.name,
     image: product.images?.[0] || '',
     price: product.basePrice,
+    virtualPrice: product.virtualPrice,
     status: product.publishedAt ? 'active' : 'inactive',
     category: product.categories?.[0]?.name || 'N/A',
     brand: product.brand?.name || 'N/A',
@@ -62,8 +76,27 @@ export function useProducts() {
     original: product,
   }), []);
 
+  // Custom fetchData function to include price filter parameters
+  const fetchDataWithFilters = useCallback((params: any, signal?: AbortSignal) => {
+    // Create a new params object to avoid mutation issues
+    const enhancedParams = { ...params };
+    
+    // Add price filter parameters if they exist
+    if (priceFilter.minPrice !== null) {
+      enhancedParams.minPrice = priceFilter.minPrice;
+    }
+    if (priceFilter.maxPrice !== null) {
+      enhancedParams.maxPrice = priceFilter.maxPrice;
+    }
+    
+    console.log('Fetching with params:', enhancedParams);
+    
+    // Now the productsService.getAll accepts a signal parameter
+    return productsService.getAll(enhancedParams, signal);
+  }, [priceFilter.minPrice, priceFilter.maxPrice]);
+
   const serverDataTable = useServerDataTable<PopulatedProduct, ProductColumn>({
-    fetchData: productsService.getAll,
+    fetchData: fetchDataWithFilters,
     getResponseData,
     getResponseMetadata,
     mapResponseToData,
@@ -91,6 +124,20 @@ export function useProducts() {
     setDeleteOpen(false);
     setProductToDelete(null);
   };
+  
+  // Handler for price filter changes
+  const handlePriceFilterChange = useCallback((minPrice: number | null, maxPrice: number | null) => {
+    console.log(`Price filter changed: min=${minPrice}, max=${maxPrice}`);
+    // Update the price filter state
+    setPriceFilter({ minPrice, maxPrice });
+    // Reset pagination to first page when filter changes
+    serverDataTable.handlePageChange(1);
+    // Use a longer timeout to ensure the priceFilter state is updated before refresh
+    setTimeout(() => {
+      console.log('Refreshing with price filter:', { minPrice, maxPrice });
+      serverDataTable.refreshData();
+    }, 300);
+  }, [serverDataTable]);
 
   const addProduct = async (data: ProductCreateRequest) => {
     try {
@@ -149,5 +196,7 @@ export function useProducts() {
     handleCloseDeleteModal,
     addProduct,
     editProduct,
+    handlePriceFilterChange,
+    priceFilter,
   };
 }

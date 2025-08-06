@@ -307,7 +307,8 @@
       "subtitle": "Quản lý tất cả sản phẩm tại đây",
       "DataTable": {
         "name": "Tên sản phẩm",
-        "price": "Giá",
+        "price": "Giá bán",
+        "virtualPrice": "Giá gốc",
         "category": "Danh mục",
         "stock": "Tồn kho",
         "status": "Trạng thái",

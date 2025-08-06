@@ -12,10 +12,11 @@ import {
 
 export const productsService = {
   // Lấy danh sách sản phẩm
-  getAll: async (params?: PaginationRequest): Promise<ProductsResponse> => {
+  getAll: async (params?: PaginationRequest & { minPrice?: number, maxPrice?: number }, signal?: AbortSignal): Promise<ProductsResponse> => {
     try {
       const response = await privateAxios.get(API_ENDPOINTS.MANAGE_PRODUCTS.LIST, {
         params: params,
+        signal: signal, // Add the AbortSignal support
       });
       return response.data;
     } catch (error) {

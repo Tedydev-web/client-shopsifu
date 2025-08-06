@@ -25,7 +25,7 @@ export default function SearchBrand() {
     // Nếu đang loading, hiển thị skeleton
     if (loading) {
       return (
-        <div key={`skeleton-${i}`} className="h-[113px] w-[200px] bg-gray-100 animate-pulse" />
+        <div key={`skeleton-${i}`} className="h-[113px] w-full bg-gray-100 animate-pulse" />
       );
     }
 
@@ -43,15 +43,16 @@ export default function SearchBrand() {
       <TooltipProvider key={typedBrand.id || i}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="p-0 h-[113px] w-[200px] flex items-center justify-center border hover:shadow-md transition-shadow duration-300 bg-white">
+            <div className="h-[113px] w-full flex items-center justify-center hover:bg-gray-50 transition-colors duration-200 bg-white p-2">
               {typedBrand.logo ? (
-                <Image
-                  src={typedBrand.logo}
-                  alt={name}
-                  width={180}
-                  height={100}
-                  className="object-cover w-[180px] h-[100px]"
-                />
+                <div className="w-full h-full relative">
+                  <Image
+                    src={typedBrand.logo}
+                    alt={name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <span className="text-sm text-gray-600 font-medium text-center">{name}</span>
               )}
@@ -91,19 +92,32 @@ export default function SearchBrand() {
         <CarouselContent>
           {/* Một CarouselItem duy nhất chứa cả 12 brands được chia thành 2 dòng */}
           <CarouselItem className="basis-full p-0">
-            <div className="flex flex-wrap">
-              <div className="flex w-full">
-                {/* Row 1: 6 items đầu tiên */}
+            {/* Container với border tổng thể */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+              {/* Row 1: 6 items đầu tiên */}
+              <div className="grid grid-cols-6">
                 {allItems.slice(0, 6).map((item, i) => (
-                  <div key={`row1-${i}`} className="basis-1/6">
+                  <div 
+                    key={`row1-${i}`} 
+                    className={`
+                      ${i < 5 ? 'border-r border-gray-200' : ''} 
+                      border-b border-gray-200
+                    `}
+                  >
                     {renderBrandItem(item, i)}
                   </div>
                 ))}
               </div>
-              <div className="flex w-full">
-                {/* Row 2: 6 items tiếp theo */}
+              
+              {/* Row 2: 6 items tiếp theo */}
+              <div className="grid grid-cols-6">
                 {allItems.slice(6, 12).map((item, i) => (
-                  <div key={`row2-${i}`} className="basis-1/6">
+                  <div 
+                    key={`row2-${i}`}
+                    className={`
+                      ${i < 5 ? 'border-r border-gray-200' : ''}
+                    `}
+                  >
                     {renderBrandItem(item, i + 6)}
                   </div>
                 ))}

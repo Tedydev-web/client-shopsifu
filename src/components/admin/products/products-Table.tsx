@@ -5,6 +5,7 @@ import { productsColumns } from './products-Columns';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getProductUrl } from '@/utils/slugify';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table-component/data-table';
@@ -31,6 +32,8 @@ export function ProductsTable() {
     handleOpenDelete,
     handleConfirmDelete,
     handleCloseDeleteModal,
+    handlePriceFilterChange,
+    priceFilter,
   } = useProducts();
 
   const onEdit = (product: ProductColumn) => {
@@ -38,7 +41,9 @@ export function ProductsTable() {
   };
 
   const onView = (product: ProductColumn) => {
-    router.push(`/admin/products/view/${product.id}`);
+    // Use window.open to open the client product page in a new tab
+    const productUrl = getProductUrl(product.name, product.id);
+    window.open(productUrl, '_blank');
   };
 
   const columns = productsColumns({ onEdit, onDelete: handleOpenDelete, onView });
@@ -54,7 +59,7 @@ export function ProductsTable() {
           placeholder={t('searchPlaceholder')}
           className="w-full md:max-w-sm"
         />
-        <ProductsFilter table={table} />
+        <ProductsFilter table={table} onPriceFilterChange={handlePriceFilterChange} />
       </div>
       <div className="flex items-center gap-2">
         <ProductsExportData data={data} table={table} />
