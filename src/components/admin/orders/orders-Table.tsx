@@ -10,33 +10,36 @@ import SearchInput from "@/components/ui/data-table-component/search-input";
 import DataTableViewOption from "@/components/ui/data-table-component/data-table-view-option";
 import type { Table as TanstackTable } from "@tanstack/react-table";
 import { useDataTable } from "@/hooks/useDataTable";
+import type { Order } from "@/types/order.interface";
 
 export function OrdersTable() {
   const t = useTranslations("admin.orders");
   const router = useRouter();
+
   const {
     orders,
     loading,
+    pagination,
+    handleSearch,
+    handlePageChange,
+    handleLimitChange,
     fetchAllOrders,
   } = useOrder();
 
   useEffect(() => {
-    fetchAllOrders(1, 10);
-  }, [fetchAllOrders]);
+    if (pagination.page !== undefined && pagination.limit !== undefined) {
+      fetchAllOrders(pagination.page, pagination.limit);
+    }
+  }, [fetchAllOrders, pagination.page, pagination.limit]);
 
-  const onView = (order: OrderColumn) => {
-    // ✅ Đẩy đúng cấu trúc: /admin/order/[id]
-    router.push(`/admin/order/${order.id}`);
-  };
+  const columns = OrdersColumns({ t });
 
-  const columns = OrdersColumns({ t, onView });
-  const table = useDataTable({ data: orders, columns });
+  const table = useDataTable<Order>({
+    data: orders,
+    columns,
+  });
 
-  const OrdersTableToolbar = ({
-    table,
-  }: {
-    table: TanstackTable<OrderColumn>;
-  }) => (
+  const OrdersTableToolbar = ({ table }: { table: TanstackTable<Order> }) => (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <SearchInput
@@ -64,6 +67,9 @@ export function OrdersTable() {
           metadata: pagination,
           onPageChange: handlePageChange,
           onLimitChange: handleLimitChange,
+        }}
+        onRowClick={(row: Order) => {
+          router.push(`/admin/order/${row.id}`);
         }}
       />
     </div>

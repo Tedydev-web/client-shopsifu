@@ -12,19 +12,40 @@ import {
   Order,
 } from "@/types/order.interface";
 
+// Định nghĩa type Pagination nếu chưa có
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  search?: string;
+}
+
 export function useOrder() {
   const [orders, setOrders] = useState<OrderGetAllResponse["data"]>([]);
   const [orderDetail, setOrderDetail] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    search: "",
+  });
 
   // 🔹 Lấy tất cả đơn hàng
-  const fetchAllOrders = useCallback(async (page = 1, limit = 10) => {
+  const fetchAllOrders = useCallback(async (page = 1, limit = 10, search = "") => {
     setLoading(true);
     setError(null);
     try {
-      const res = await orderService.getAll({ page, limit });
+      const res = await orderService.getAll({ page, limit, search });
       setOrders(res.data);
+      setPagination((prev) => ({
+        ...prev,
+        page,
+        limit,
+        total: res.metadata?.totalItems || 0,
+        search,
+      }));
       return res;
     } catch (err: any) {
       setError(err.message || "Lỗi khi tải danh sách đơn hàng");
@@ -34,7 +55,7 @@ export function useOrder() {
     }
   }, []);
 
-  // 🔹 Lấy đơn hàng theo trạng thái
+  // 🔹 Lọc theo trạng thái
   const fetchOrdersByStatus = useCallback(
     async (status: OrderStatus, page = 1, limit = 10) => {
       setLoading(true);
@@ -42,6 +63,12 @@ export function useOrder() {
       try {
         const res = await orderService.getByStatus(status, { page, limit });
         setOrders(res.data);
+        setPagination((prev) => ({
+          ...prev,
+          page,
+          limit,
+          total: res.metadata?.totalItems || 0,
+        }));
         return res;
       } catch (err: any) {
         setError(err.message || "Lỗi khi tải đơn hàng theo trạng thái");
@@ -53,16 +80,31 @@ export function useOrder() {
     []
   );
 
+  // 🔹 Tìm kiếm
+  const handleSearch = (searchValue: string) => {
+    setPagination((prev) => ({ ...prev, page: 1, search: searchValue }));
+    fetchAllOrders(1, pagination.limit, searchValue);
+  };
+
+  // 🔹 Chuyển trang
+  const handlePageChange = (page: number) => {
+    setPagination((prev) => ({ ...prev, page }));
+    fetchAllOrders(page, pagination.limit, pagination.search);
+  };
+
+  // 🔹 Đổi limit
+  const handleLimitChange = (limit: number) => {
+    setPagination((prev) => ({ ...prev, limit, page: 1 }));
+    fetchAllOrders(1, limit, pagination.search);
+  };
+
   // 🔹 Lấy chi tiết đơn hàng
   const fetchOrderDetail = useCallback(async (orderId: string) => {
     setLoading(true);
     setError(null);
     try {
       const res = await orderService.getById(orderId);
-
-      const firstOrder = res.data ?? null; // ✅ chọn phần tử đầu
-      setOrderDetail(firstOrder);
-
+      setOrderDetail(res.data ?? null);
       return res;
     } catch (err: any) {
       setError(err.message || "Lỗi khi tải chi tiết đơn hàng");
@@ -72,7 +114,7 @@ export function useOrder() {
     }
   }, []);
 
-  // 🔹 Tạo đơn hàng mới
+  // 🔹 Tạo đơn hàng
   const createOrder = useCallback(async (data: OrderCreateRequest) => {
     setLoading(true);
     setError(null);
@@ -107,6 +149,10 @@ export function useOrder() {
     orderDetail,
     loading,
     error,
+    pagination,
+    handleSearch,
+    handlePageChange,
+    handleLimitChange,
     fetchAllOrders,
     fetchOrdersByStatus,
     fetchOrderDetail,

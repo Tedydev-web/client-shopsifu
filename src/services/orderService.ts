@@ -32,7 +32,7 @@ export const orderService = {
   // ✅ Lấy đơn hàng theo status (PENDING_PAYMENT, DELIVERED, ...)
   getByStatus: async (
     status: OrderStatus,
-    params?: Omit<OrderGetAllParams, "sortOrder">,
+    params?: Omit<OrderGetAllParams, "status">,
     signal?: AbortSignal
   ): Promise<OrderGetAllResponse> => {
     try {

@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
-import { DataTableRowActions } from "@/components/ui/data-table-component/data-table-row-actions";
 import { format } from "date-fns";
 import { Order } from "@/types/order.interface";
 import { Badge } from "@/components/ui/badge";
@@ -18,11 +17,15 @@ export const OrdersColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("admin.orders.orderCode")}
+        title={t("orderCode")}
+        className="justify-center text-center px-2"
       />
     ),
     cell: ({ getValue }) => (
-      <div className="w-[140px] truncate" title={getValue<string>()}>
+      <div
+        className="w-[140px] truncate text-center"
+        title={getValue<string>()}
+      >
         {getValue<string>()}
       </div>
     ),
@@ -33,17 +36,18 @@ export const OrdersColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("admin.orders.orderDate")}
+        title={t("orderDate")}
+        className="justify-center text-center px-2"
       />
     ),
-    cell: ({ getValue }) => (
-      <div
-        className="w-[160px] truncate"
-        title={format(new Date(getValue<string>()), "dd/MM/yyyy HH:mm")}
-      >
-        {format(new Date(getValue<string>()), "dd/MM/yyyy HH:mm")}
-      </div>
-    ),
+    cell: ({ getValue }) => {
+      const date = format(new Date(getValue<string>()), "dd/MM/yyyy HH:mm");
+      return (
+        <div className="w-[160px] truncate text-center" title={date}>
+          {date}
+        </div>
+      );
+    },
   },
   {
     accessorFn: (row) => row.receiver?.name,
@@ -51,11 +55,15 @@ export const OrdersColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("admin.orders.customerName")}
+        title={t("customerName")}
+        className="justify-center text-center px-2"
       />
     ),
     cell: ({ getValue }) => (
-      <div className="w-[160px] truncate" title={getValue<string>()}>
+      <div
+        className="w-[160px] truncate text-center"
+        title={getValue<string>()}
+      >
         {getValue<string>()}
       </div>
     ),
@@ -66,11 +74,15 @@ export const OrdersColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("admin.orders.shopName")}
+        title={t("shopName")}
+        className="justify-center text-center px-2"
       />
     ),
     cell: ({ getValue }) => (
-      <div className="w-[160px] truncate" title={getValue<string>()}>
+      <div
+        className="w-[160px] truncate text-center"
+        title={getValue<string>()}
+      >
         {getValue<string>()}
       </div>
     ),
@@ -79,7 +91,11 @@ export const OrdersColumns = ({
     accessorFn: (row) => row.status,
     id: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t("admin.orders.status")} />
+      <DataTableColumnHeader
+        column={column}
+        title={t("status")}
+        className="justify-center text-center px-2"
+      />
     ),
     cell: ({ getValue }) => {
       const status = getValue<string>();
@@ -116,7 +132,7 @@ export const OrdersColumns = ({
       };
 
       return (
-        <div className="w-[140px] truncate" title={label}>
+        <div className="w-[140px] truncate text-center" title={label}>
           <Badge className={`${color} w-full justify-center`}>{label}</Badge>
         </div>
       );
@@ -128,11 +144,15 @@ export const OrdersColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("admin.orders.paymentMethod")}
+        title={t("paymentMethod")}
+        className="justify-center text-center px-2"
       />
     ),
     cell: ({ getValue }) => (
-      <div className="w-[140px] truncate" title={getValue<string>()}>
+      <div
+        className="w-[140px] truncate text-center"
+        title={getValue<string>()}
+      >
         {getValue<string>()}
       </div>
     ),
@@ -147,21 +167,20 @@ export const OrdersColumns = ({
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("admin.orders.totalAmount")}
+        title={t("totalAmount")}
+        className="justify-center text-center px-2"
       />
     ),
-    cell: ({ getValue }) => (
-      <div
-        className="w-[140px] font-semibold text-green-600 truncate"
-        title={`${Number(getValue<number>()).toLocaleString()}₫`}
-      >
-        {Number(getValue<number>()).toLocaleString()}₫
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    header: () => <div className="text-center w-[100px]"> </div>, // giữ layout nhưng không hiển thị chữ
-    cell: ({ row }) => <DataTableRowActions row={row} t={t} />,
+    cell: ({ getValue }) => {
+      const amount = Number(getValue<number>()).toLocaleString();
+      return (
+        <div
+          className="w-[140px] font-semibold text-green-600 truncate text-center"
+          title={`${amount}₫`}
+        >
+          {amount}₫
+        </div>
+      );
+    },
   },
 ];
