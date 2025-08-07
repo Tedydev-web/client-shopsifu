@@ -7,6 +7,7 @@ import { ProductDetail } from "@/types/products.interface";
 import { ProductBasicInfoForm } from "./form-BasicInfo";
 import { ProductAsideForm } from "./form-Aside/Aside-Index";
 import { VariantSettingsIndex } from "./form-Variant-Settings/variantSettings-Index";
+import { ProductSpecificationsForm } from "./form-Specifications";
 
 interface ProductFormProps {
   initialData?: ProductDetail | null;
@@ -42,6 +43,12 @@ function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
           skus={productData.skus}
           setVariants={setVariants}
           updateSingleSku={updateSingleSku}
+        />
+        
+        {/* Component quản lý thông số kỹ thuật sản phẩm */}
+        <ProductSpecificationsForm 
+          specifications={productData.specifications || []}
+          handleSpecificationsChange={(specs) => handleInputChange('specifications', specs)}
         />
     
       </div>

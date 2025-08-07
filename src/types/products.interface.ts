@@ -71,7 +71,11 @@ export interface ProductCreateRequest {
     virtualPrice: number;
     brandId: string; // Cập nhật sang string để phù hợp với UUID từ API
     images: string[]; // Mảng string URLs trực tiếp
-    categories: number[];
+    categories: string[]; // Cập nhật sang string[] để phù hợp với UUID từ API
+    specifications: Array<{
+      name: string;
+      value: string;
+    }>
     variants: Variant[];
     skus: Sku[];
 }
@@ -130,6 +134,10 @@ export interface ProductDetail extends BaseEntity {
   variants: Variant[];
   skus: SkuDetail[];
   categories: CategoryDetail[];
+  specifications: Array<{
+    name: string;
+    value: string;
+  }>;
   brand: BrandDetail;
   productTranslations: ProductTranslation[];
 }

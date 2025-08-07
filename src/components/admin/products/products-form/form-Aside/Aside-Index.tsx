@@ -232,6 +232,9 @@ export function ProductAsideForm({
 
   // Handle category selection from modal
   const handleCategoryConfirm = (categoryIds: string[], selectionPath: string) => {
+    // Sử dụng nguyên ID gốc, không thay đổi hoặc chuyển đổi định dạng
+    console.log('Selected category IDs (unchanged):', categoryIds);
+    
     setSelectedCategoryIds(categoryIds);
     setSelectedCategoryPath(selectionPath);
     handleInputChange('categories', categoryIds);

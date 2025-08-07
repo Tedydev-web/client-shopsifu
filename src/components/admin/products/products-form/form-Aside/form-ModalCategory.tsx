@@ -121,9 +121,15 @@ export function CategoryModal({
   }, [open, fetchParentCategories]);
 
   const handleParentSelect = (parent: Category) => {
+    console.log('Selected parent category:', parent);
+    console.log('Parent ID type:', typeof parent.id, 'Value:', parent.id);
+    
     setSelectedParent(parent);
     setSelectedChildId(null);
+    
     if (parent.id) {
+      // Log the ID that will be used for fetching children
+      console.log('Fetching child categories with parent ID:', parent.id.toString());
       fetchChildCategories(parent.id.toString());
     }
   };
@@ -133,13 +139,16 @@ export function CategoryModal({
     const categoryIds: string[] = [];
     
     if (selectedParent?.id) {
+      // Sử dụng nguyên ID gốc, không thay đổi
       categoryIds.push(selectedParent.id.toString());
     }
     
     if (selectedChildId) {
+      // Sử dụng nguyên ID gốc, không thay đổi
       categoryIds.push(selectedChildId);
     }
     
+    console.log('Sending original category IDs:', categoryIds);
     onConfirm(categoryIds, selectionPath);
     onOpenChange(false);
   };

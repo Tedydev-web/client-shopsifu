@@ -11,6 +11,7 @@ import {
 import { BaseEntity } from '@/types/base.interface';
 import { productsService } from '@/services/productsService';
 import { showToast } from '@/components/ui/toastify';
+import { spec } from 'node:test/reporters';
 
 // Định nghĩa kiểu dữ liệu cho SKU trong form state
 // Nó có thể là SkuDetail (từ API, có id) hoặc Sku (khi mới tạo, chưa có id)
@@ -34,6 +35,12 @@ const INITIAL_STATE: FormState = {
   brandId: null, // Sử dụng string | null
   images: [], // Mảng URLs dạng string
   categories: [],
+  specifications: [
+    {
+      name: '',
+      value: '',
+    }
+  ],
   variants: [],
   skus: [],
   publishedAt: null, // Mặc định là null (chưa công khai)
@@ -83,6 +90,7 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
         brandId: initialData.brand?.id?.toString() || null, // Lấy id từ object brand lồng nhau và chuyển sang string
         images: processedImages, // Lưu mảng URLs dạng string để dễ xử lý trong state
         categories: processedCategories, // Map từ object CategoryDetail sang mảng ID string
+        specifications: initialData.specifications || [],
         variants: initialData.variants || [],
         skus: initialData.skus || [], // Gán trực tiếp mảng SkuDetail
         publishedAt: initialData.publishedAt, // Lấy trường publishedAt từ dữ liệu ban đầu
@@ -199,19 +207,29 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
     console.log('Product images từ form state:', productData.images);
     console.log('Images đã lọc (bỏ rỗng):', filteredImages);
 
-    // Lọc bỏ các giá trị không hợp lệ trong mảng categories và chuyển về dạng number (nếu API yêu cầu)
+    // Lọc bỏ các giá trị không hợp lệ trong mảng categories
+    // Giữ nguyên dạng string UUID theo yêu cầu API
     const validCategories = productData.categories
-      .filter(id => id && id !== 'null' && id !== 'undefined' && String(id).trim() !== '')
-      .map(id => {
-        // Thử chuyển đổi sang number và kiểm tra xem kết quả có hợp lệ không
-        const numId = Number(id) || parseInt(String(id), 10) || 0;
-        if (numId <= 0) {
-          console.warn(`Invalid category ID: ${id}, converted to ${numId}`);
-        }
-        return numId;
-      }); // Chuyển về number cho API
+      .filter(id => id && id !== 'null' && id !== 'undefined' && String(id).trim() !== '');
+    
     console.log('Categories trước khi lọc:', productData.categories);
-    console.log('Categories sau khi lọc:', validCategories);
+    console.log('Categories sau khi lọc (giữ nguyên định dạng UUID):', validCategories);
+    console.log('Chi tiết IDs: ', productData.categories.map(id => ({
+      original: id,
+      numeric: String(id).match(/\d+/)?.[0] || 'no match',
+      converted: parseInt(String(id).match(/\d+/)?.[0] || id, 10)
+    })));
+
+    // Xử lý và lọc specifications
+    const filteredSpecifications = (productData.specifications || [])
+      .filter(spec => spec.name.trim() !== '' && spec.value.trim() !== '')
+      .map(spec => ({
+        name: spec.name.trim(),
+        value: spec.value.trim()
+      }));
+    
+    console.log('Specifications before filtering:', productData.specifications);
+    console.log('Specifications after filtering:', filteredSpecifications);
 
     const submissionData = {
       name: productData.name,
@@ -224,6 +242,7 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
       categories: validCategories, // Sử dụng mảng đã được lọc, giữ nguyên là string UUID
       variants: productData.variants,
       skus: processedSkus,
+      specifications: filteredSpecifications,
     };
 
     console.log('Submitting product data:', submissionData);
@@ -238,6 +257,21 @@ export const useProductsForm = ({ initialData, onCreateSuccess }: UseProductsFor
     // Kiểm tra bắt buộc phải có tên sản phẩm
     if (!submissionData.name || submissionData.name.trim() === '') {
       showToast('Vui lòng nhập tên sản phẩm.', 'error');
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Kiểm tra các thông số kỹ thuật bắt buộc
+    const requiredSpecNames = ['Xuất xứ', 'Chất liệu', 'Kho hàng', 'Vị trí kho', 'Gửi từ'];
+    const existingSpecNames = submissionData.specifications.map(spec => spec.name);
+    
+    const missingSpecs = requiredSpecNames.filter(reqName => 
+      !existingSpecNames.includes(reqName) || 
+      !submissionData.specifications.find(s => s.name === reqName && s.value.trim() !== '')
+    );
+    
+    if (missingSpecs.length > 0) {
+      showToast(`Vui lòng điền đầy đủ thông tin cho các trường thông số bắt buộc: ${missingSpecs.join(', ')}`, 'error');
       setIsSubmitting(false);
       return;
     }
