@@ -15,6 +15,8 @@ import {
   ChevronDown 
 } from "lucide-react";
 import { useSidebar } from '../hooks/useSidebar';
+import { createCategorySlug } from "@/utils/slugify";
+import Link from "next/link";
 
 // Dữ liệu tĩnh cho các bộ lọc
 const locations = ['Đồng Nai', 'TP. Hồ Chí Minh', 'Bình Dương', 'Bà Rịa - Vũng Tàu'];
@@ -49,6 +51,7 @@ export default function SearchSidebar({ categoryIds = [], currentCategoryId }: S
         parentCategoryId={parentCategory?.value || ""}
         items={subcategories.map(cat => cat.label)}
         itemIds={subcategories.map(cat => cat.value)}
+        subcategories={subcategories}
         selectedValue={selectedCategory}
         onParentSelect={(id, name) => handleCategorySelect(id, name, true)}
         onChildSelect={(id, name) => handleCategorySelect(id, name, false)}
@@ -94,6 +97,13 @@ export default function SearchSidebar({ categoryIds = [], currentCategoryId }: S
   );
 }
 
+interface CategoryOption {
+  value: string;
+  label: string;
+  icon?: string | null;
+  parentCategoryId?: string | null;
+}
+
 function CategorySectionWithParent({ 
   title, 
   icon,
@@ -101,6 +111,7 @@ function CategorySectionWithParent({
   parentCategoryId,
   items,
   itemIds,
+  subcategories,
   selectedValue,
   onParentSelect,
   onChildSelect,
@@ -112,6 +123,7 @@ function CategorySectionWithParent({
   parentCategoryId: string;
   items: string[];
   itemIds: string[];
+  subcategories?: CategoryOption[];
   selectedValue: string;
   onParentSelect: (id: string, name: string) => void;
   onChildSelect: (id: string, name: string) => void;
@@ -137,10 +149,12 @@ function CategorySectionWithParent({
           }`}
           onClick={() => onParentSelect(parentCategoryId, parentCategory)}
         >
-          <div className="flex items-center justify-between">
-            <span>{parentCategory}</span>
-            {selectedValue === parentCategoryId && <ChevronRight className="h-4 w-4 text-red-500" />}
-          </div>
+          <Link href={createCategorySlug(parentCategory, [parentCategoryId])} className="block">
+            <div className="flex items-center justify-between">
+              <span>{parentCategory}</span>
+              {selectedValue === parentCategoryId && <ChevronRight className="h-4 w-4 text-red-500" />}
+            </div>
+          </Link>
         </div>
         
         {/* Danh mục con */}
@@ -153,7 +167,14 @@ function CategorySectionWithParent({
         ) : (
           <div className="space-y-1">
             {displayItems.map((item, index) => {
-              const itemId = itemIds[index] || "";
+              const itemId = displayItemIds[index] || "";
+              const category = subcategories?.[index];
+              const parentId = category?.parentCategoryId || parentCategoryId;
+              
+              // Xây dựng categoryPath cho trường hợp search
+              const categoryPath = parentId ? [parentId, itemId] : [itemId];
+              const href = createCategorySlug(item, categoryPath);
+              
               return (
                 <div
                   key={item}
@@ -164,10 +185,12 @@ function CategorySectionWithParent({
                   }`}
                   onClick={() => onChildSelect(itemId, item)}
                 >
-                  <div className="flex items-center justify-between">
-                    <span>{item}</span>
-                    {selectedValue === itemId && <ChevronRight className="h-4 w-4 text-red-500" />}
-                  </div>
+                  <Link href={href} className="block">
+                    <div className="flex items-center justify-between">
+                      <span>{item}</span>
+                      {selectedValue === itemId && <ChevronRight className="h-4 w-4 text-red-500" />}
+                    </div>
+                  </Link>
                 </div>
               );
             })}

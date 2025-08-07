@@ -10,7 +10,7 @@ import {
   BarChart2,
   MessageSquare,
   FileText,
-  HelpCircle,
+  Tickets ,
   MonitorCog,
   FolderClosed,
   ScrollText,
@@ -36,28 +36,6 @@ export const useSidebarConfig = (): SidebarItem[] => {
       href: '/admin',
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
-    // {
-    //   title: t('admin.sidebar.orders.orders'),
-    //   href: '/admin/orders',
-    //   icon: <ShoppingCart className="w-5 h-5" />,
-    //   subItems: [
-    //     {
-    //       title: t('admin.sidebar.orders.allOrders'),
-    //       href: '/admin/orders',
-    //       icon: null,
-    //     },
-    //     {
-    //       title: t('admin.sidebar.orders.newOrders'),
-    //       href: '/admin/orders/new',
-    //       icon: null,
-    //     },
-    //     {
-    //       title: t('admin.sidebar.orders.processedOrders'),
-    //       href: '/admin/orders/processed',
-    //       icon: null,
-    //     },
-    //   ],
-    // },
     {
       title: t('products.products'),
       href: '/admin/products',
@@ -80,6 +58,35 @@ export const useSidebarConfig = (): SidebarItem[] => {
         },
       ],
     },  
+    {
+      title: t('orders.orders'),
+      href: '/admin/order',
+      icon: <ScrollText className="w-5 h-5" />,
+      subItems: [
+        {
+          title: t('orders.listOrders'),
+          href: '/admin/order',
+          icon: null,
+        }
+      ],
+    },
+     {
+      title: t('voucher.voucher'),
+      href: '/admin/voucher',
+      icon: <Tickets  className="w-5 h-5" />,
+      subItems: [
+        {
+          title: t('voucher.listVoucher'),
+          href: '/admin/voucher',
+          icon: null,
+        },
+        {
+          title: t('voucher.newVoucher'),
+          href: '/admin/voucher/new',
+          icon: null,
+        }
+      ],
+    },
     {
       title: t('system.system'),
       href: '/admin/system',
@@ -128,19 +135,7 @@ export const useSidebarConfig = (): SidebarItem[] => {
           icon: <Tags className="w-4 h-4" />,
         }
       ],
-    },
-    {
-      title: t('orders.orders'),
-      href: '/admin/order',
-      icon: <ScrollText className="w-5 h-5" />,
-      subItems: [
-        {
-          title: t('orders.listOrders'),
-          href: '/admin/order',
-          icon: null,
-        }
-      ],
-    },
+    }
   ]
 }
 

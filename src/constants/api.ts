@@ -164,5 +164,15 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE}/reviews`,
     UPDATE: `${API_BASE}/reviews/:reviewId`,
     DELETE: `${API_BASE}/reviews/:reviewId`
+  },
+  // QUẢN LÝ MÃ GIẢM GIÁ - DISCOUNT
+  DISCOUNT:{
+    GETALL: `${API_BASE}/manage-discount/discount`,
+    CREATE: `${API_BASE}/manage-discount/discounts`,
+    UPDATE: `${API_BASE}/manage-discount/discounts/:discountId`,
+    DELETE: `${API_BASE}/manage-discount/discounts/:discountId`,
+    GET_BY_ID: `${API_BASE}/manage-discount/discounts/:discountId`,
+    GUEST_GET_DISCOUNT_LIST: `${API_BASE}/discounts/available`,
+    VALIDATE_DISCOUNT: `${API_BASE}/discounts/validate-code`
   }
 }

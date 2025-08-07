@@ -99,10 +99,19 @@ export function useProducts({ categoryId, key }: UseProductsProps): UseProductsR
       if (searchQuery) {
         apiParams.q = searchQuery; // Sử dụng param 'q' thay vì 'search' cho API search
         
-        // Thêm tham số timestamp để đảm bảo không cache kết quả
-        apiParams._t = new Date().getTime();
+        // LUÔN sử dụng đúng timestamp từ URL để đảm bảo request khớp với URL hiện tại
+        const urlTimestamp = searchParams.get('_t');
+        if (urlTimestamp) {
+          apiParams._t = urlTimestamp;
+        }
         
-        console.log("Searching products with params:", { q: searchQuery, ...apiParams });
+        // Thêm log để debug nguồn gốc của request
+        console.log("Searching products with params:", { 
+          q: searchQuery, 
+          timestamp: apiParams._t, 
+          source: "useProducts.hook", 
+          ...apiParams 
+        });
         
         const searchResponse = await clientProductsService.searchProducts(apiParams);
         
@@ -197,11 +206,20 @@ export function useProducts({ categoryId, key }: UseProductsProps): UseProductsR
     router.push(newPath);
   };
   
-  // Force refresh data khi URL thay đổi và khi categoryId hoặc searchQuery thay đổi
+  // Sử dụng ref để theo dõi timestamp hiện tại để tránh vòng lặp
+  const currentTimestampRef = useRef<string | null>(null);
+  
+    // Force refresh data khi URL thay đổi và khi categoryId hoặc searchQuery thay đổi
   useEffect(() => {
     // Bỏ qua lần render đầu tiên (chỉ để tránh refresh không cần thiết khi mount)
     if (isFirstRenderRef.current) {
       isFirstRenderRef.current = false;
+      
+      // Nếu có search query hoặc timestamp từ URL ngay từ đầu, vẫn cần refreshData
+      if (searchQuery || searchParams.get('_t')) {
+        console.log("Initial data load with search or timestamp:", { searchQuery, timestamp: searchParams.get('_t') });
+        refreshData();
+      }
       return;
     }
     
@@ -209,22 +227,41 @@ export function useProducts({ categoryId, key }: UseProductsProps): UseProductsR
     const categoryIdChanged = categoryId !== prevCategoryIdRef.current;
     const searchQueryChanged = searchQuery !== prevSearchQueryRef.current;
     
-    // Force refresh data mỗi khi URL chứa search query thay đổi
-    if (categoryIdChanged || searchQueryChanged) {
-      console.log("Data refresh triggered:", { categoryId, searchQuery });
+    // Kiểm tra timestamp trong URL để force refresh khi cần thiết
+    const timestamp = searchParams.get('_t');
+    
+    // Chỉ coi là timestamp trigger nếu timestamp thay đổi so với lần trước
+    const timestampChanged = timestamp !== currentTimestampRef.current;
+    const hasTimestampTrigger = !!timestamp && timestampChanged;
+    
+    console.log("Change detection:", { 
+      categoryIdChanged, 
+      searchQueryChanged, 
+      hasTimestampTrigger, 
+      timestamp,
+      currentTimestamp: currentTimestampRef.current
+    });
+    
+    // Cập nhật timestamp ref để tránh vòng lặp
+    if (timestamp) {
+      currentTimestampRef.current = timestamp;
+    }
+    
+    // Force refresh data khi URL chứa search query thay đổi hoặc có timestamp trigger
+    if (categoryIdChanged || searchQueryChanged || hasTimestampTrigger) {
+      console.log("Data refresh triggered:", { categoryId, searchQuery, hasTimestampTrigger, timestampChanged });
       
       // Cập nhật refs trước khi gọi refreshData để tránh vòng lặp
       prevCategoryIdRef.current = categoryId;
       prevSearchQueryRef.current = searchQuery;
       
-      // Reset về trang 1 và refresh data ngay lập tức
-      setTimeout(() => {
-        refreshData();
-        internalHandlePageChange(1);
-      }, 0);
+      // Gọi hàm refreshData để lấy dữ liệu mới từ API và reset về trang 1
+      refreshData();
+      internalHandlePageChange(1);
       
       // Cập nhật URL với page=1 nếu đang không trong quá trình update URL từ các nơi khác
-      if (!isUpdatingUrlRef.current) {
+      // Và không cập nhật URL nếu trigger là từ timestamp (để tránh vòng lặp)
+      if (!isUpdatingUrlRef.current && !hasTimestampTrigger) {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set('page', '1');
         const pathname = window.location.pathname;

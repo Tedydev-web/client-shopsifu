@@ -452,7 +452,11 @@
     },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
-
+      "voucher":{
+        "voucher": "Mã giảm giá của Shop",
+        "listVoucher": "Danh sách mã giảm giá",
+        "newVoucher": "Thêm mới"
+      },
       "orders": {
         "orders": "Đơn hàng",
         "allOrders": "Tất cả đơn hàng",

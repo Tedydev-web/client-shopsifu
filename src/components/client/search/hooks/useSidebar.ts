@@ -97,6 +97,16 @@ export function useSidebar({ categoryIds = [], currentCategoryId }: UseSidebarPr
       if (parentCategory) {
         newPath = [parentCategory.value, categoryId];
         setSelectedCategory(categoryId);
+      } else {
+        // Trường hợp search không có parentCategory, tìm parent của category hiện tại
+        const categoryFound = subcategories.find(cat => cat.value === categoryId);
+        if (categoryFound && categoryFound.parentCategoryId) {
+          newPath = [categoryFound.parentCategoryId, categoryId];
+        } else {
+          // Nếu không tìm được parent, chỉ sử dụng ID hiện tại
+          newPath = [categoryId];
+        }
+        setSelectedCategory(categoryId);
       }
     }
     

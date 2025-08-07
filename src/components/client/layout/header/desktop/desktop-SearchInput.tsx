@@ -63,7 +63,11 @@ export function SearchInput() {
 			const controller = new AbortController();
 			const signal = controller.signal;
 			
+			// Đánh dấu request này là từ suggestions để dễ debug
+			console.log("Fetching search suggestions for:", term, "(limit: 5)");
+			
 			// Gọi API tìm kiếm với signal để có thể cancel nếu cần
+			// Gọi API gợi ý tìm kiếm (khác với API search chính)
 			const response = await clientProductsService.getSearchSuggestions(term, 5);
 			
 			// Kiểm tra nếu request đã bị hủy
@@ -102,8 +106,31 @@ export function SearchInput() {
 		if (!term.trim()) return;
 		
 		setOpenDropdown('none');
-		// Luôn chuyển hướng đến route gốc /search để reset mọi trạng thái liên quan đến category
-		router.push(`/search?q=${encodeURIComponent(term)}`);
+		
+		// Kiểm tra xem hiện tại có đang ở trang search không
+		const isOnSearchPage = window.location.pathname === '/search';
+		
+		// Lấy thông tin search term hiện tại từ URL để so sánh
+		const urlParams = new URLSearchParams(window.location.search);
+		const currentSearchTerm = urlParams.get('q');
+		
+		// Nếu search term không thay đổi và đang ở trang search, thêm/cập nhật timestamp
+		if (isOnSearchPage && currentSearchTerm === term) {
+			// Tạo timestamp mới cho mỗi lần search để đảm bảo không bị cache
+			const timestamp = new Date().getTime();
+			router.push(`/search?q=${encodeURIComponent(term)}&_t=${timestamp}`);
+		} 
+		// Nếu search term thay đổi hoặc không ở trang search
+		else {
+			if (isOnSearchPage) {
+				// Nếu đã ở trang search và search term khác, thêm timestamp
+				const timestamp = new Date().getTime();
+				router.push(`/search?q=${encodeURIComponent(term)}&_t=${timestamp}`);
+			} else {
+				// Chuyển hướng đến route gốc /search (không thêm timestamp lần đầu)
+				router.push(`/search?q=${encodeURIComponent(term)}`);
+			}
+		}
 	}, [router, setOpenDropdown]);
 	
 	// Cập nhật từ khóa tìm kiếm và giữ focus
@@ -357,14 +384,16 @@ export function SearchInput() {
 								{searchTerm && (
 									<div className='px-5 pb-5 pt-5'>
 										<div className='border-t border-gray-100 pt-4'>
-											<Link
-												href={`/search?q=${encodeURIComponent(searchTerm)}`}
-												className='flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-3.5 rounded-lg transition-colors duration-200'
-												onClick={() => setOpenDropdown('none')}
+											<div
+												className='flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-3.5 rounded-lg transition-colors duration-200 cursor-pointer'
+												onClick={() => {
+													setOpenDropdown('none');
+													navigateToSearch(searchTerm);
+												}}
 											>
 												<Search className='h-4 w-4 mr-2.5' />
 												<span>Tìm kiếm theo từ khóa "{searchTerm}"</span>
-											</Link>
+											</div>
 										</div>
 									</div>
 								)}

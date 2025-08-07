@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useMemo, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useEffect, useRef } from 'react';
 import { useProducts } from '../hooks/useProducts';
 import { ClientProduct, ClientProductsResponse } from '@/types/client.products.interface';
 import { useSearchParams } from 'next/navigation';
@@ -38,10 +38,39 @@ export function ProductsProvider({ children, currentCategoryId }: ProductsProvid
   // Nếu có search query, bỏ qua categoryId để đảm bảo tìm kiếm trên toàn bộ sản phẩm
   const effectiveCategoryId = searchQuery ? null : currentCategoryId;
   
+  // Lấy timestamp từ URL nếu có
+  const timestamp = searchParams.get('_t') || '';
+  
+  // Sử dụng useRef để theo dõi thay đổi thực sự của searchQuery và timestamp
+  const prevSearchQueryRef = useRef(searchQuery);
+  const prevTimestampRef = useRef(timestamp);
+  
   // Tạo key để force re-render khi search query hoặc categoryId thay đổi
-  // Điều này đảm bảo useProducts sẽ luôn chạy lại khi URL thay đổi
-  const dataKey = useMemo(() => `${searchQuery || ''}-${effectiveCategoryId || ''}-${sort || ''}`, 
-    [searchQuery, effectiveCategoryId, sort]);
+  // Chỉ sử dụng timestamp khi nó thay đổi so với giá trị trước đó
+  const dataKey = useMemo(() => {
+    // Kiểm tra xem searchQuery hoặc timestamp có thay đổi không
+    const searchChanged = searchQuery !== prevSearchQueryRef.current;
+    const timestampChanged = timestamp !== prevTimestampRef.current;
+    
+    // Cập nhật ref nếu có thay đổi
+    if (searchChanged) prevSearchQueryRef.current = searchQuery;
+    if (timestampChanged) prevTimestampRef.current = timestamp;
+    
+    // Chỉ bao gồm timestamp trong key khi nó thay đổi
+    const keyParts = [
+      searchQuery || '', 
+      effectiveCategoryId || '', 
+      sort || ''
+    ];
+    
+    // LUÔN thêm timestamp vào key để đảm bảo chúng ta có thể theo dõi thay đổi
+    // Điều này giúp đồng bộ hóa các request và tránh request trùng lặp
+    keyParts.push(timestamp || 'default');
+    
+    const finalKey = keyParts.join('-');
+    console.log("Generated data key:", finalKey);
+    return finalKey;
+  }, [searchQuery, effectiveCategoryId, sort, timestamp]);
   
   // useProducts sẽ được khởi tạo lại khi dataKey thay đổi
   const productsData = useProducts({ 
