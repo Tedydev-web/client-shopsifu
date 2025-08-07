@@ -52,9 +52,7 @@ export default function OrderDetail({ onBack }: { onBack?: () => void }) {
     0
   );
 
-  const showCancelButton = !["DELIVERED", "CANCELLED", "RETURNED"].includes(
-    orderDetail.status
-  );
+  const showCancelButton = orderDetail.status === "PENDING_PAYMENT";
 
   return (
     <div className="p-4 space-y-6 max-w-3xl mx-auto">
