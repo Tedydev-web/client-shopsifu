@@ -84,7 +84,7 @@ export const orderService = {
   ): Promise<OrderCancelResponse> => {
     try {
       const url = API_ENDPOINTS.ORDERS.CANCEL.replace(":orderId", orderId);
-      const response = await privateAxios.delete(url, { signal });
+      const response = await privateAxios.put(url, { signal });
       return response.data;
     } catch (error) {
       throw error;
