@@ -37,8 +37,8 @@ export default function AdminLayout({
               : "mt-16 ml-64"
         )}
       >
-        <main className="p-6">
-          <div className="max-w-[2000px] mx-auto">
+        <main>
+          <div className="max-w-[2000px] mx-auto bg-[#F6F6F6]">
             {children}
           </div>
         </main>

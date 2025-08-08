@@ -280,6 +280,15 @@
       }
     },
     "ModuleVouchers":{
+      "breadcrumb":{
+        "title": "Quản lý mã giảm giá",
+        "subtitle": "Quản lý tất cả mã giảm giá tại đây",
+        "vouchers": "Danh sách mã giảm giá",
+        "newPage": "Tạo mã giảm giá"
+      },
+      "title_shop": "Voucher toàn shop",
+      "title_product": "Voucher sản phẩm",
+      "title_private": "Voucher riêng tư",
       "title": "Quản lý mã giảm giá",
       "subtitle": "Quản lý tất cả mã giảm giá tại đây",
       "createVoucher": "Tạo Voucher",

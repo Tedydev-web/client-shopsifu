@@ -17,7 +17,7 @@ import { VoucherUseCase } from "@/components/admin/voucher/hook/useNewVoucher";
 
 export default function NewVoucherPage() {
   const router = useRouter();
-  const t = useTranslations("admin.PageVoucher.New");
+  const t = useTranslations("admin.ModuleVouchers");
   const searchParams = useSearchParams();
   const useCase = parseInt(searchParams.get('useCase') || '1', 10) as VoucherUseCase;
 

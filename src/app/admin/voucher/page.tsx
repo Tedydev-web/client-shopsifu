@@ -6,7 +6,7 @@ export default function VoucherPage() {
   const t = useTranslations()
 
   return(
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-white h-screen">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">{t("admin.ModuleVouchers.title")}</h2>
         <p className="text-muted-foreground">
