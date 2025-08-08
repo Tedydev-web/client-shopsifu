@@ -161,3 +161,28 @@ export interface OrderHandlerResult {
   paymentUrl?: string;
   error?: string;
 }
+
+
+
+
+
+
+/**
+ * @interface Calculate Order
+ * @description API Tính toán giá trị đơn hàng kèm mã giảm giá
+ */
+export interface CalculateOrderRequest{
+  cartItemIds: string[];
+  discountCodes: string[];
+}
+export interface CalculateOrderResponse{
+  statusCode: number;
+    message: string;
+    timestamp: string;
+    data: {
+        totalItemCost: number;
+        totalShippingFee: number;
+        totalVoucherDiscount: number;
+        totalPayment: number;
+    }
+}

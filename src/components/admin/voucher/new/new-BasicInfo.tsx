@@ -3,11 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, AlertCircle } from 'lucide-react';
+import { CalendarIcon, AlertCircle, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -24,10 +23,6 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
 
-  const getVoucherTitle = () => {
-    return 'Voucher toàn Shop';
-  };
-
   const handleDateSelect = (field: 'startDate' | 'endDate', date: Date | undefined) => {
     if (date) {
       updateFormData(field, format(date, 'yyyy-MM-dd'));
@@ -36,154 +31,181 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
     if (field === 'endDate') setEndDateOpen(false);
   };
 
+  const ErrorMessage = ({ error }: { error?: string }) => {
+    if (!error) return null;
+    return (
+      <div className="flex items-center gap-1.5 text-red-500 text-xs mt-1">
+        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+        <span>{error}</span>
+      </div>
+    );
+  };
+
+  const RequiredLabel = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
+    <Label htmlFor={htmlFor} className="text-sm font-medium text-gray-700 flex items-center gap-1">
+      {children}
+      <span className="text-red-500">*</span>
+    </Label>
+  );
+
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <div className="w-2 h-6 bg-red-500 rounded-sm" />
+    <Card className="w-full border-0 shadow-sm bg-white">
+      <CardHeader className="pb-6 border-b border-gray-100">
+        <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
+          <div className="w-1 h-6 bg-gradient-to-b from-red-500 to-red-600 rounded-full" />
           Thông tin cơ bản
         </CardTitle>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="px-2 py-1 bg-red-50 text-red-600 rounded text-xs font-medium">
-            Loại mã
-          </span>
-          <span className="text-red-600 font-medium">{getVoucherTitle()}</span>
+        <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg">
+            <Tag className="w-3.5 h-3.5 text-red-600" />
+            <span className="text-xs font-medium text-red-700">Voucher toàn Shop</span>
+          </div>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-6">
+      <CardContent className="p-6 space-y-6">
         {/* Tên chương trình giảm giá */}
         <div className="space-y-2">
-          <Label htmlFor="voucher-name" className="text-sm font-medium">
+          <RequiredLabel htmlFor="voucher-name">
             Tên chương trình giảm giá
-            <span className="text-red-500 ml-1">*</span>
-          </Label>
+          </RequiredLabel>
           <div className="relative">
             <Input
               id="voucher-name"
-              placeholder="Tên Voucher 28 không được hiển thị cho Người mua"
+              placeholder="Nhập tên chương trình giảm giá..."
               value={formData.name}
               onChange={(e) => updateFormData('name', e.target.value)}
               className={cn(
-                "pr-16",
-                errors.name && "border-red-500 focus:border-red-500"
+                "pr-16 h-11 transition-all duration-200",
+                "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                errors.name && "border-red-500 focus:border-red-500 focus:ring-red-100"
               )}
               maxLength={100}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-              {formData.name.length}/100
-            </span>
-          </div>
-          {errors.name && (
-            <div className="flex items-center gap-1 text-red-500 text-xs">
-              <AlertCircle className="w-3 h-3" />
-              {errors.name}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <span className={cn(
+                "text-xs px-2 py-0.5 rounded-full transition-colors",
+                formData.name.length > 90 ? "bg-red-100 text-red-600" :
+                formData.name.length > 70 ? "bg-orange-100 text-orange-600" :
+                "bg-gray-100 text-gray-500"
+              )}>
+                {formData.name.length}/100
+              </span>
             </div>
-          )}
+          </div>
+          <p className="text-xs text-gray-500">
+            Tên này không được hiển thị cho người mua
+          </p>
+          <ErrorMessage error={errors.name} />
         </div>
 
         {/* Mã voucher */}
         <div className="space-y-2">
-          <Label htmlFor="voucher-code" className="text-sm font-medium">
+          <RequiredLabel htmlFor="voucher-code">
             Mã voucher
-            <span className="text-red-500 ml-1">*</span>
-          </Label>
+          </RequiredLabel>
           <div className="relative">
             <Input
               id="voucher-code"
-              placeholder="DARK"
+              placeholder="VD: GIAMGIA50, FREESHIP..."
               value={formData.code}
               onChange={(e) => updateFormData('code', e.target.value.toUpperCase())}
               className={cn(
-                "pr-16",
-                errors.code && "border-red-500 focus:border-red-500"
+                "pr-16 h-11 font-mono transition-all duration-200",
+                "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                errors.code && "border-red-500 focus:border-red-500 focus:ring-red-100"
               )}
               maxLength={20}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-              {formData.code.length}/20
-            </span>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <span className={cn(
+                "text-xs px-2 py-0.5 rounded-full transition-colors",
+                formData.code.length > 15 ? "bg-red-100 text-red-600" :
+                formData.code.length > 10 ? "bg-orange-100 text-orange-600" :
+                "bg-gray-100 text-gray-500"
+              )}>
+                {formData.code.length}/20
+              </span>
+            </div>
           </div>
           <p className="text-xs text-gray-500">
-            Vui lòng chỉ nhập các ký tự chữ cái (a-z), số (0-9), dấu gạch dưới (_) và dấu gạch ngang (-). Mã giảm giá đây chỉ có thể DARK
+            Chỉ được sử dụng chữ cái (a-z), số (0-9), dấu gạch dưới (_) và dấu gạch ngang (-)
           </p>
-          {errors.code && (
-            <div className="flex items-center gap-1 text-red-500 text-xs">
-              <AlertCircle className="w-3 h-3" />
-              {errors.code}
-            </div>
-          )}
+          <ErrorMessage error={errors.code} />
         </div>
 
         {/* Thời gian sử dụng mã */}
         <div className="space-y-4">
-          <Label className="text-sm font-medium">
-            Thời gian sử dụng mã
-            <span className="text-red-500 ml-1">*</span>
-          </Label>
+          <RequiredLabel>
+            Thời gian sử dụng
+          </RequiredLabel>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Ngày bắt đầu */}
             <div className="space-y-2">
-              <Label className="text-xs text-gray-600">Từ</Label>
+              <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                Từ ngày
+              </Label>
               <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !formData.startDate && "text-muted-foreground",
+                      "w-full h-11 justify-start text-left font-normal transition-all duration-200",
+                      "border-gray-200 hover:border-red-300 hover:bg-red-50",
+                      !formData.startDate && "text-gray-400",
+                      formData.startDate && "text-gray-700",
                       errors.startDate && "border-red-500"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
                     {formData.startDate ? (
                       format(new Date(formData.startDate), 'dd/MM/yyyy', { locale: vi })
                     ) : (
-                      "14:05 08-08-2025"
+                      "Chọn ngày bắt đầu"
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 shadow-lg border-gray-200" align="start">
                   <Calendar
                     mode="single"
                     selected={formData.startDate ? new Date(formData.startDate) : undefined}
                     onSelect={(date) => handleDateSelect('startDate', date)}
                     disabled={(date) => date < new Date()}
                     initialFocus
+                    className="rounded-lg"
                   />
                 </PopoverContent>
               </Popover>
-              {errors.startDate && (
-                <div className="flex items-center gap-1 text-red-500 text-xs">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.startDate}
-                </div>
-              )}
+              <ErrorMessage error={errors.startDate} />
             </div>
 
             {/* Ngày kết thúc */}
             <div className="space-y-2">
-              <Label className="text-xs text-gray-600">Đến</Label>
+              <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                Đến ngày
+              </Label>
               <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !formData.endDate && "text-muted-foreground",
+                      "w-full h-11 justify-start text-left font-normal transition-all duration-200",
+                      "border-gray-200 hover:border-red-300 hover:bg-red-50",
+                      !formData.endDate && "text-gray-400",
+                      formData.endDate && "text-gray-700",
                       errors.endDate && "border-red-500"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
                     {formData.endDate ? (
                       format(new Date(formData.endDate), 'dd/MM/yyyy', { locale: vi })
                     ) : (
-                      "15:05 08-08-2025"
+                      "Chọn ngày kết thúc"
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 shadow-lg border-gray-200" align="start">
                   <Calendar
                     mode="single"
                     selected={formData.endDate ? new Date(formData.endDate) : undefined}
@@ -194,21 +216,20 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
                       return date < today || date < startDate;
                     }}
                     initialFocus
+                    className="rounded-lg"
                   />
                 </PopoverContent>
               </Popover>
-              {errors.endDate && (
-                <div className="flex items-center gap-1 text-red-500 text-xs">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.endDate}
-                </div>
-              )}
+              <ErrorMessage error={errors.endDate} />
             </div>
           </div>
           
-          <p className="text-xs text-gray-500">
-            Cho phép lưu mã trước Thời gian sử dụng
-          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-xs text-blue-700 flex items-start gap-2">
+              <div className="w-1 h-1 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+              Voucher có thể được lưu trước thời gian sử dụng
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>

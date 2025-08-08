@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from "react";
 import DesktopCartHeader from "./cart-ProductTitle";
 import CartFooter from "./cart-Footer";
 import { Loader2 } from "lucide-react";
-import { VoucherButton } from "./cart-ModalVoucher";
+import { VoucherButton } from "../../checkout/shared/cart-ModalVoucher";
 import { useCart } from "@/providers/CartContext";
 import { ShopCart, CartItem } from "@/types/cart.interface";
 import { ProductInfo } from '@/types/order.interface';

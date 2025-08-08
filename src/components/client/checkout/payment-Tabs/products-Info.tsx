@@ -5,7 +5,7 @@ import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
 import { ProductInfo } from '@/types/order.interface';
 import Image from 'next/image';
 import { PiStorefrontLight } from 'react-icons/pi';
-import { VoucherButton } from '@/components/client/cart/desktop/cart-ModalVoucher';
+import { VoucherButton } from '@/components/client/checkout/shared/cart-ModalVoucher';
 
 // Header component for the product list - desktop only
 function ProductHeader() {
