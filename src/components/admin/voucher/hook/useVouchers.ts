@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { Voucher, VoucherCreateRequest, VoucherUpdateRequest } from '@/types/admin/voucher.interface';
-import { mockVouchers, mockPagination } from './voucher-Mockdata';
+import { mockVouchers, mockPagination } from '../voucher-Mockdata';
 
 export function useVouchers() {
   const t = useTranslations('admin.ModuleVouchers');

@@ -35,14 +35,14 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <StoreProvider>
             {/* <ClientLayout> */}
-              <AuthGuard>
+              {/* <AuthGuard> */}
                 <Toast/>
                 <TrustDeviceModal />
                 {/* <TokenManager /> */}
                 <CartProvider>
                   {children}
                 </CartProvider>
-              </AuthGuard>
+              {/* </AuthGuard> */}
               <Toaster position="bottom-right" />
             {/* </ClientLayout> */}
           </StoreProvider>

@@ -279,6 +279,31 @@
         }
       }
     },
+    "ModuleVouchers":{
+      "title": "Quản lý mã giảm giá",
+      "subtitle": "Quản lý tất cả mã giảm giá tại đây",
+      "createVoucher": "Tạo Voucher",
+      "createVoucherDesc": "Tạo Mã giảm giá toàn shop hoặc Mã giảm giá sản phẩm ngay bây giờ để thu hút người mua.",
+      "shopVoucher": "Voucher toàn shop",
+      "productVoucher": "Voucher sản phẩm",
+      "privateVoucher": "Voucher riêng tư",
+      "shopVoucherDesc": "Voucher áp dụng cho tất cả các shop của bạn",
+      "productVoucherDesc": "Voucher áp dụng cho sản phẩm nhất định do shop chọn",
+      "privateVoucherDesc": "Voucher áp dụng cho người dùng riêng tư",
+      "create": "Tạo",
+      "Table":{
+        "name": "Tên voucher",
+        "code": "Mã voucher",
+        "discount": "Giảm giá",
+        "type": "Loại voucher",
+        "status": "Trạng thái",
+        "actions": {
+          "edit": "Chỉnh sửa",
+          "delete": "Xóa"
+        },
+        "searchPlaceholder": "Tìm kiếm theo tên voucher"
+      }
+    },
     "ModuleUsers": {
       "Table": {
         "role": "Vai trò",
