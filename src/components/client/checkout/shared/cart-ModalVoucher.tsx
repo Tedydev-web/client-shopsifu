@@ -73,15 +73,19 @@ const VoucherCard = ({ voucher, onSelect, isSelected }: VoucherCardProps) => {
 interface VoucherModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onApplyVoucher: (shopId: string, voucher: AppliedVoucherInfo) => void;
+  shopId: string;
   shopName: string;
-  onApplyVoucher: (data: AppliedVoucherInfo | null) => void;
+  cartItemIds: string[];
 }
 
 const VoucherModal = ({ 
   isOpen, 
   onClose, 
+  onApplyVoucher, 
+  shopId, 
   shopName,
-  onApplyVoucher 
+  cartItemIds
 }: VoucherModalProps) => {
   const [vouchers, setVouchers] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(false);
@@ -89,8 +93,6 @@ const VoucherModal = ({
   const [error, setError] = useState<string | null>(null);
   const [selectedVoucher, setSelectedVoucher] = useState<Discount | null>(null);
   const [voucherCode, setVoucherCode] = useState("");
-  const shopOrders = useSelector(selectShopOrders);
-  const cartItemIds = shopOrders.flatMap((order: any) => order.cartItemIds);
 
   useEffect(() => {
     if (isOpen) {
@@ -124,7 +126,7 @@ const VoucherModal = ({
       setVoucherCode("");
       setError(null);
     }
-  }, [isOpen, shopOrders]);
+  }, [isOpen, cartItemIds]);
 
   const handleValidateVoucher = async (code: string) => {
     if (!code) {
@@ -142,7 +144,8 @@ const VoucherModal = ({
           discount: response.data.discount,
           discountAmount: response.data.discountAmount,
         };
-        onApplyVoucher(appliedVoucher);
+        // Pass both shopId and voucher information back to the parent
+        onApplyVoucher(shopId, appliedVoucher);
         toast.success(`Áp dụng voucher '${appliedVoucher.code}' thành công!`);
         onClose();
       } else {
@@ -251,7 +254,7 @@ const VoucherModal = ({
 }
 
 
-export function VoucherButton({ shopName, onApplyVoucher }: Omit<VoucherModalProps, 'isOpen' | 'onClose'>) {
+export function VoucherButton({ shopName, onApplyVoucher, shopId, cartItemIds }: Omit<VoucherModalProps, 'isOpen' | 'onClose'>) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -274,6 +277,8 @@ export function VoucherButton({ shopName, onApplyVoucher }: Omit<VoucherModalPro
         onClose={() => setIsModalOpen(false)}
         shopName={shopName}
         onApplyVoucher={onApplyVoucher}
+        shopId={shopId}
+        cartItemIds={cartItemIds}
       />
     </>
   );

@@ -77,7 +77,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     if (customerProvince && provinces.length > 0 && !isLoadingProvinces) {
       const selectedProvince = provinces.find(p => p.value === customerProvince);
       if (selectedProvince) {
-        console.log('🔍 Found province:', selectedProvince); // Debug log
         setCustomerProvinceName(selectedProvince.label);
       }
     }
@@ -88,7 +87,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     if (customerDistrict && customerDistricts.length > 0 && !isLoadingCustomerDistricts) {
       const selectedDistrict = customerDistricts.find(d => d.value === customerDistrict);
       if (selectedDistrict) {
-        console.log('🔍 Found district:', selectedDistrict); // Debug log
         setCustomerDistrictName(selectedDistrict.label);
       }
     }
@@ -99,7 +97,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     if (customerWard && customerWards.length > 0 && !isLoadingCustomerWards) {
       const selectedWard = customerWards.find(w => w.value === customerWard);
       if (selectedWard) {
-        console.log('🔍 Found ward:', selectedWard); // Debug log
         setCustomerWardName(selectedWard.label);
       }
     }
@@ -313,8 +310,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
         }
       } as React.ChangeEvent<HTMLInputElement>;
       handleChange(evt);
-    } else {
-      console.warn('⚠️ Shipping province name not found for code:', value);
     }
   };
 
@@ -335,7 +330,7 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
       } as React.ChangeEvent<HTMLInputElement>;
       handleChange(evt);
     } else {
-      console.warn('⚠️ Shipping district name not found for code:', value);
+      console.warn('⚠️ Shipping district name not found for code:', value); 
     }
   };
 

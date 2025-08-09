@@ -8,6 +8,8 @@ import { CheckCircle2, Home, Loader2, ShoppingBag, XCircle } from 'lucide-react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { clearCheckoutState } from '@/store/features/checkout/ordersSilde';
 import { orderService } from '@/services/orderService';
 import { OrderStatus } from '@/types/order.interface';
 
@@ -21,6 +23,7 @@ interface PaymentStatusProps {
 // Main component to orchestrate views
 export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMethod }: PaymentStatusProps) {
   const [status, setStatus] = useState(initialStatus);
+  const dispatch = useDispatch();
   
   // Log để debug initialStatus và paymentMethod
   useEffect(() => {
@@ -37,6 +40,14 @@ export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMeth
     console.log('[Payment Status] initialStatus updated:', initialStatus);
     setStatus(initialStatus);
   }, [initialStatus]);
+
+  // Clear Redux state on successful payment
+  useEffect(() => {
+    if (status === 'success') {
+      console.log('[Payment Success] Clearing checkout state from Redux.');
+      dispatch(clearCheckoutState());
+    }
+  }, [status, dispatch]);
 
   // Theo dõi trạng thái thanh toán nếu là pending
   useEffect(() => {

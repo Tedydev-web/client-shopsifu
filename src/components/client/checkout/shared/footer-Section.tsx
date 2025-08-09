@@ -11,10 +11,12 @@ import {
   selectTotalDiscountAmount,
   selectAppliedPlatformVoucher,
   removePlatformVoucher,
+  setCommonInfo,
 } from '@/store/features/checkout/ordersSilde';
 import { formatCurrency } from '@/utils/formatter';
 import { useEffect, useState } from 'react';
 import { PlatformVoucherModal } from './cart-PlatformVoucher';
+import { AppliedVoucherInfo } from '@/types/order.interface';
 
 interface FooterSectionProps {
   variant?: 'default' | 'mobile';
@@ -61,13 +63,20 @@ export function FooterSection({
 
   // Calculate the final total
   const totalPayment = subtotal + shippingFee - totalDiscount;
+
+  const handleApplyPlatformVoucher = (voucher: AppliedVoucherInfo) => {
+    // The actual application logic is likely in the modal, this is for closing
+    setPlatformModalOpen(false);
+  };
   
   // Gửi tổng tiền thanh toán lên component cha nếu có callback
   useEffect(() => {
     if (onTotalChange) {
       onTotalChange(totalPayment);
     }
-  }, [totalPayment, onTotalChange]);
+    // Cập nhật tổng số tiền vào Redux state mỗi khi nó thay đổi
+    dispatch(setCommonInfo({ amount: totalPayment }));
+  }, [totalPayment, onTotalChange, dispatch]);
 
   const getButtonText = () => {
     if (isSubmitting) return 'Đang xử lý...';
@@ -124,53 +133,47 @@ export function FooterSection({
   }
 
   return (
-    <div className="bg-white rounded-lg border p-6">
-      <h2 className="text-base font-medium mb-6">Tóm tắt đơn hàng</h2>
+    <div className="bg-white rounded-lg border p-6 space-y-4">
+      {/* Platform Voucher Section */}
+      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md border">
+        <div className="flex items-center gap-2">
+          <Tag className="w-5 h-5 text-primary" />
+          <span className="text-sm font-medium">Voucher Sàn</span>
+        </div>
+        {appliedPlatformVoucher ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-green-600 bg-green-100 px-2 py-1 rounded">
+              {appliedPlatformVoucher.code}
+            </span>
+            <button onClick={() => dispatch(removePlatformVoucher())} className="p-1 hover:bg-gray-200 rounded-full">
+              <X className="w-4 h-4 text-gray-500" />
+            </button>
+          </div>
+        ) : (
+          <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setPlatformModalOpen(true)}>
+            Chọn hoặc nhập mã
+          </Button>
+        )}
+      </div>
 
-      <div className="space-y-6">
-        {/* Desktop Order Summary */}
+      <h2 className="text-lg font-semibold">Tóm tắt đơn hàng</h2>
+      <div className="space-y-2">
         <div className="space-y-3">
           <PriceLine label="Tổng tiền hàng" value={formatCurrency(subtotal)} />
           <PriceLine label="Tổng giảm giá" value={`-${formatCurrency(totalDiscount)}`} />
         </div>
 
-        <Separator />
+        <PriceLine label="Phí vận chuyển" value={formatCurrency(shippingFee)} />
 
-        {/* Platform Voucher Section */}
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 flex items-center gap-1.5">
-              <Tag className="h-4 w-4 text-primary" /> Voucher Sàn
-            </span>
-            <Button variant="link" className="text-sm p-0 h-auto text-blue-600" onClick={() => setPlatformModalOpen(true)}>
-              Chọn hoặc nhập mã
-            </Button>
-          </div>
-          {appliedPlatformVoucher && (
-            <div className="flex justify-between items-center bg-green-50 border border-green-200 text-green-800 text-sm rounded-md p-2 pl-3">
-              <span>
-                Đã áp dụng mã: <span className="font-semibold">{appliedPlatformVoucher.code}</span>
-              </span>
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-green-800 hover:bg-green-100 hover:text-green-900" onClick={() => dispatch(removePlatformVoucher())}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <Separator />
-
-        {/* Desktop Total */}
-        <div>
-          <div className="my-3"></div>
-          <PriceLine label="Tổng thanh toán" value={formatCurrency(totalPayment)} isBold={true} />
-        </div>
+        <Separator className="my-3" />
+        <PriceLine label="Tổng thanh toán" value={formatCurrency(totalPayment)} isBold={true} />
       </div>
 
       {isPlatformModalOpen && (
-        <PlatformVoucherModal
+        <PlatformVoucherModal 
           isOpen={isPlatformModalOpen}
           onClose={() => setPlatformModalOpen(false)}
+          onApplyVoucher={handleApplyPlatformVoucher}
         />
       )}
 

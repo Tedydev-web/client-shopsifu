@@ -67,9 +67,10 @@ const VoucherCard = ({ voucher, onSelect, isSelected }: VoucherCardProps) => {
 interface PlatformVoucherModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onApplyVoucher: (voucher: AppliedVoucherInfo) => void;
 }
 
-export function PlatformVoucherModal({ isOpen, onClose }: PlatformVoucherModalProps) {
+export function PlatformVoucherModal({ isOpen, onClose, onApplyVoucher }: PlatformVoucherModalProps) {
   const dispatch = useDispatch();
   const [vouchers, setVouchers] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(false);
@@ -132,6 +133,7 @@ export function PlatformVoucherModal({ isOpen, onClose }: PlatformVoucherModalPr
           discountAmount: response.data.discountAmount,
         };
         dispatch(applyPlatformVoucher(appliedVoucher));
+        onApplyVoucher(appliedVoucher);
         onClose();
       } else {
         toast.error(response.data.message || "Voucher không hợp lệ hoặc không thể áp dụng.");
@@ -253,6 +255,7 @@ export function PlatformVoucherButton() {
       <PlatformVoucherModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onApplyVoucher={() => {}} // Dummy function to satisfy prop requirement
       />
     </>
   );

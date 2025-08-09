@@ -85,12 +85,10 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
   const shopName = products.length > 0 ? products[0].shopName : 'Shop';
   const shopTotal = products.reduce((sum, item) => sum + item.subtotal, 0);
   const finalTotal = shopTotal - (appliedVoucher?.discountAmount || 0);
+  const cartItemIds = products.map(p => p.id);
 
-  const handleApplyVoucher = (voucherInfo: AppliedVoucherInfo | null) => {
-    if (voucherInfo) {
-      dispatch(applyVoucher({ shopId, voucherInfo }));
-    } 
-    // Optional: handle voucher removal if needed
+  const handleApplyVoucher = (shopId: string, voucherInfo: AppliedVoucherInfo) => {
+    dispatch(applyVoucher({ shopId, voucherInfo }));
   };
 
   return (
@@ -113,7 +111,12 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
       <div className="px-4 lg:px-6 py-4 bg-gray-50/50 border-t">
         <div className="flex flex-col gap-3">
           <div className="">
-            <VoucherButton shopName={shopName} onApplyVoucher={handleApplyVoucher} />
+            <VoucherButton 
+              shopName={shopName} 
+              onApplyVoucher={handleApplyVoucher} 
+              shopId={shopId}
+              cartItemIds={cartItemIds}
+            />
           </div>
           
           {appliedVoucher && (

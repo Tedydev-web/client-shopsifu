@@ -209,6 +209,7 @@ export default function DesktopCartPageMobile() {
     // 4b. Tạo payload cho Redux action `setShopProducts`
     const shopProductsPayload = selectedShopCarts.reduce((acc: Record<string, ProductInfo[]>, shopCart: ShopCart) => {
       acc[shopCart.shop.id] = shopCart.cartItems.map((item: CartItem) => ({
+        id: item.id,
         name: item.sku.product.name,
         image: item.sku.image, // Lấy ảnh từ SKU
         variation: item.sku.value,

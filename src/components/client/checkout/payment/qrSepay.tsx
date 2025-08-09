@@ -7,7 +7,7 @@ import { AlertCircle, Clock, QrCode, CheckCircle2, X } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
-import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
+import { selectCommonOrderInfo, selectShopProducts } from '@/store/features/checkout/ordersSilde';
 import { orderService } from '@/services/orderService';
 import { useRouter } from 'next/navigation';
 import { Order, OrderStatus } from '@/types/order.interface';
@@ -26,19 +26,11 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [isExpired, setIsExpired] = useState(false);
   const { payments, connect, disconnect } = useShopsifuSocket();
-  const shopProducts = useSelector(selectShopProducts);
+  const commonInfo = useSelector(selectCommonOrderInfo);
   const router = useRouter();
 
-  // Calculate total amount from Redux state
-  const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
-    return total + shopProducts.reduce((shopTotal, product) => {
-      return shopTotal + (product.price * product.quantity);
-    }, 0);
-  }, 0);
-
-  const shippingFee = 0;
-  const voucherDiscount = 0;
-  const totalAmount = subtotal + shippingFee - voucherDiscount;
+  // Lấy tổng số tiền cuối cùng từ Redux state
+  const totalAmount = commonInfo.amount;
 
   // Environment variables for Sepay
   const SEPAY_ACCOUNT = process.env.NEXT_PUBLIC_SEPAY_ACCOUNT || '565615056666';
@@ -151,7 +143,7 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
   };
 
   const handlePaymentCancel = () => {
-    onPaymentCancel();
+    router.push(`/user/orders`);
   };
 
   if (isExpired) {

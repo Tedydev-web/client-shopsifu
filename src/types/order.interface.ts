@@ -99,6 +99,10 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
+  totalItemCost: number;
+  totalShippingFee: number;
+  totalVoucherDiscount: number;
+  totalPayment: number;
 }
 
 /**
@@ -106,6 +110,7 @@ export interface Order {
  * @description Thông tin chi tiết sản phẩm cho trang checkout
  */
 export interface ProductInfo {
+  id: string;
   shopName: string;
   name: string;
   image: string;
