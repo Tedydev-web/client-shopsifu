@@ -1,11 +1,17 @@
 'use client';
 
-import { useSelector } from 'react-redux';
-import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
-import { ProductInfo } from '@/types/order.interface';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { 
+  selectShopProducts, 
+  applyVoucher, 
+  selectAppliedVouchers, 
+  
+} from '@/store/features/checkout/ordersSilde';
+import { ProductInfo, AppliedVoucherInfo } from '@/types/order.interface';
 import Image from 'next/image';
-import { PiStorefrontLight } from 'react-icons/pi';
-import { VoucherButton } from '@/components/client/checkout/shared/cart-ModalVoucher';
+import { PiStorefrontLight } from "react-icons/pi";
+import { VoucherButton } from "@/components/client/checkout/shared/cart-ModalVoucher";
 
 // Header component for the product list - desktop only
 function ProductHeader() {
@@ -72,8 +78,20 @@ function ProductItem({ item }: { item: ProductInfo }) {
 
 // Component to display a shop and its products
 function ShopSection({ shopId, products }: { shopId: string; products: ProductInfo[] }) {
+  const dispatch = useDispatch();
+  const appliedVouchers = useSelector<RootState, Record<string, AppliedVoucherInfo>>(selectAppliedVouchers);
+  const appliedVoucher = appliedVouchers[shopId];
+
   const shopName = products.length > 0 ? products[0].shopName : 'Shop';
   const shopTotal = products.reduce((sum, item) => sum + item.subtotal, 0);
+  const finalTotal = shopTotal - (appliedVoucher?.discountAmount || 0);
+
+  const handleApplyVoucher = (voucherInfo: AppliedVoucherInfo | null) => {
+    if (voucherInfo) {
+      dispatch(applyVoucher({ shopId, voucherInfo }));
+    } 
+    // Optional: handle voucher removal if needed
+  };
 
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
@@ -95,12 +113,22 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
       <div className="px-4 lg:px-6 py-4 bg-gray-50/50 border-t">
         <div className="flex flex-col gap-3">
           <div className="">
-            <VoucherButton shopId={shopId} shopName={shopName} />
+            <VoucherButton shopName={shopName} onApplyVoucher={handleApplyVoucher} />
           </div>
+          
+          {appliedVoucher && (
+            <div className="flex items-center justify-end gap-3">
+              <span className="text-sm text-gray-600">Giảm giá:</span>
+              <span className="text-lg font-semibold text-green-600">
+                -₫{appliedVoucher.discountAmount.toLocaleString()}
+              </span>
+            </div>
+          )}
+
           <div className="flex items-center justify-end gap-3">
             <span className="text-sm text-gray-600">Tổng tiền:</span>
             <span className="text-xl font-bold text-primary">
-              ₫{shopTotal.toLocaleString()}
+              ₫{finalTotal.toLocaleString()}
             </span>
           </div>
         </div>
@@ -110,7 +138,7 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
 }
 
 export function ProductsInfo() {
-  const shopProducts = useSelector(selectShopProducts);
+  const shopProducts = useSelector<RootState, Record<string, ProductInfo[]>>(selectShopProducts);
 
   if (Object.keys(shopProducts).length === 0) {
     return <p>Không có sản phẩm nào trong giỏ hàng.</p>;

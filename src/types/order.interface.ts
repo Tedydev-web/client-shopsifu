@@ -1,12 +1,11 @@
-import { PaginationRequest } from "@/types/base.interface";
+import { PaginationRequest, PaginationMetadata } from "@/types/base.interface";
+import { Discount } from './discount.interface';
 
 export interface OrderGetAllParams extends PaginationRequest {
   sortOrder?: OrderStatus;
   sortBy?: "asc" | "desc";
   search?: string;
 }
-
-import { PaginationMetadata } from "./base.interface";
 
 export enum OrderStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
@@ -185,4 +184,10 @@ export interface CalculateOrderResponse{
         totalVoucherDiscount: number;
         totalPayment: number;
     }
+}
+
+export interface AppliedVoucherInfo {
+  code: string;
+  discount: Discount;
+  discountAmount: number;
 }

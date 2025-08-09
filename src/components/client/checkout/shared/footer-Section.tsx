@@ -3,12 +3,18 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Tag, ArrowLeft } from 'lucide-react';
+import { Tag, ArrowLeft, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSelector } from 'react-redux';
-import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectShopProducts,
+  selectTotalDiscountAmount,
+  selectAppliedPlatformVoucher,
+  removePlatformVoucher,
+} from '@/store/features/checkout/ordersSilde';
 import { formatCurrency } from '@/utils/formatter';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { PlatformVoucherModal } from './cart-PlatformVoucher';
 
 interface FooterSectionProps {
   variant?: 'default' | 'mobile';
@@ -37,7 +43,11 @@ export function FooterSection({
   isSubmitting = false,
   onTotalChange
 }: FooterSectionProps) {
+  const dispatch = useDispatch();
   const shopProducts = useSelector(selectShopProducts);
+  const totalDiscount = useSelector(selectTotalDiscountAmount);
+  const appliedPlatformVoucher = useSelector(selectAppliedPlatformVoucher);
+  const [isPlatformModalOpen, setPlatformModalOpen] = useState(false);
 
   // Calculate subtotal from all products in all shops
   const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
@@ -46,12 +56,11 @@ export function FooterSection({
     }, 0);
   }, 0);
 
-  // For now, shipping and discount are not implemented
+  // For now, shipping is not implemented
   const shippingFee = 0;
-  const voucherDiscount = 0;
 
   // Calculate the final total
-  const totalPayment = subtotal + shippingFee - voucherDiscount;
+  const totalPayment = subtotal + shippingFee - totalDiscount;
   
   // Gửi tổng tiền thanh toán lên component cha nếu có callback
   useEffect(() => {
@@ -122,33 +131,31 @@ export function FooterSection({
         {/* Desktop Order Summary */}
         <div className="space-y-3">
           <PriceLine label="Tổng tiền hàng" value={formatCurrency(subtotal)} />
+          <PriceLine label="Tổng giảm giá" value={`-${formatCurrency(totalDiscount)}`} />
         </div>
 
         <Separator />
 
-        {/* Desktop Voucher Section */}
+        {/* Platform Voucher Section */}
         <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <Input
-                placeholder="Nhập mã giảm giá"
-                className="h-9 text-sm"
-              />
-            </div>
-            <Button
-              variant="secondary"
-              className="h-9 px-4 text-sm font-medium"
-            >
-              Áp dụng
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600 flex items-center gap-1.5">
+              <Tag className="h-4 w-4 text-primary" /> Voucher Sàn
+            </span>
+            <Button variant="link" className="text-sm p-0 h-auto text-blue-600" onClick={() => setPlatformModalOpen(true)}>
+              Chọn hoặc nhập mã
             </Button>
           </div>
-
-          <div className="flex justify-end">
-            <p className="text-xs text-blue-600 hover:text-blue-700 font-medium cursor-pointer flex items-center gap-1.5 hover:underline transition-colors">
-              <Tag className="h-3.5 w-3.5" />
-              Xem thêm mã giảm giá
-            </p>
-          </div>
+          {appliedPlatformVoucher && (
+            <div className="flex justify-between items-center bg-green-50 border border-green-200 text-green-800 text-sm rounded-md p-2 pl-3">
+              <span>
+                Đã áp dụng mã: <span className="font-semibold">{appliedPlatformVoucher.code}</span>
+              </span>
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-green-800 hover:bg-green-100 hover:text-green-900" onClick={() => dispatch(removePlatformVoucher())}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
 
         <Separator />
@@ -159,6 +166,13 @@ export function FooterSection({
           <PriceLine label="Tổng thanh toán" value={formatCurrency(totalPayment)} isBold={true} />
         </div>
       </div>
+
+      {isPlatformModalOpen && (
+        <PlatformVoucherModal
+          isOpen={isPlatformModalOpen}
+          onClose={() => setPlatformModalOpen(false)}
+        />
+      )}
 
       {/* Desktop Navigation */}
       <div className="pt-6 mt-6 border-t">

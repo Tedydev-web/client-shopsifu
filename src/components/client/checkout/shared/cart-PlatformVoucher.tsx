@@ -5,8 +5,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from 'sonner';
-import { useSelector } from 'react-redux';
-import { selectShopOrders} from '@/store/features/checkout/ordersSilde';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectShopOrders, applyPlatformVoucher } from '@/store/features/checkout/ordersSilde';
 import { discountService } from '@/services/discountService';
 import { AppliedVoucherInfo } from '@/types/order.interface';
 import { Discount, GetGuestDiscountListRequest } from '@/types/discount.interface';
@@ -21,68 +21,56 @@ interface VoucherCardProps {
 const VoucherCard = ({ voucher, onSelect, isSelected }: VoucherCardProps) => {
   return (
     <div
-    className={`flex items-center border rounded-lg p-4 mb-3 cursor-pointer transition-all duration-200 ${
-      isSelected
-        ? "border-blue-500 bg-blue-50 shadow-sm"
-        : "border-gray-200 hover:border-gray-300"
-    }`}
-    onClick={() => onSelect(voucher)}
-  >
-    {/* Icon bên trái */}
-    <div className="w-12 h-12 mr-4 flex-shrink-0">
-      <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-        <Ticket className="w-6 h-6 text-gray-500" />
+      className={`flex items-center border rounded-lg p-4 mb-3 cursor-pointer transition-all duration-200 ${
+        isSelected
+          ? "border-blue-500 bg-blue-50 shadow-sm"
+          : "border-gray-200 hover:border-gray-300"
+      }`}
+      onClick={() => onSelect(voucher)}
+    >
+      <div className="w-12 h-12 mr-4 flex-shrink-0">
+        <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+          <Ticket className="w-6 h-6 text-gray-500" />
+        </div>
       </div>
-    </div>
-  
-    {/* Nội dung voucher */}
-    <div className="flex-grow space-y-1">
-      <div className="flex items-center justify-between">
-        <h4 className="font-semibold text-sm text-gray-800">{voucher.name}</h4>
-        <span className="text-[11px] px-2 py-0.5 rounded bg-blue-100 text-blue-600 font-medium">
-          {voucher.code}
-        </span>
-      </div>
-  
-      {voucher.description && (
-        <p className="text-xs text-gray-600">{voucher.description}</p>
-      )}
-  
-      <div className="flex flex-wrap items-center gap-2 text-xs mt-1">
-        <span className="text-gray-500">
-          HSD:{" "}
-          <span className="font-medium text-gray-700">
-            {new Date(voucher.endDate).toLocaleDateString("vi-VN")}
+      <div className="flex-grow space-y-1">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-sm text-gray-800">{voucher.name}</h4>
+          <span className="text-[11px] px-2 py-0.5 rounded bg-blue-100 text-blue-600 font-medium">
+            {voucher.code}
           </span>
-        </span>
-        {voucher.minOrderValue && (
+        </div>
+        {voucher.description && (
+          <p className="text-xs text-gray-600">{voucher.description}</p>
+        )}
+        <div className="flex flex-wrap items-center gap-2 text-xs mt-1">
           <span className="text-gray-500">
-            Đơn tối thiểu:{" "}
+            HSD:{" "}
             <span className="font-medium text-gray-700">
-              {voucher.minOrderValue.toLocaleString("vi-VN")}₫
+              {new Date(voucher.endDate).toLocaleDateString("vi-VN")}
             </span>
           </span>
-        )}
+          {voucher.minOrderValue && (
+            <span className="text-gray-500">
+              Đơn tối thiểu:{" "}
+              <span className="font-medium text-gray-700">
+                {voucher.minOrderValue.toLocaleString("vi-VN")}₫
+              </span>
+            </span>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-  
   );
 };
 
-interface VoucherModalProps {
+interface PlatformVoucherModalProps {
   isOpen: boolean;
   onClose: () => void;
-  shopName: string;
-  onApplyVoucher: (data: AppliedVoucherInfo | null) => void;
 }
 
-const VoucherModal = ({ 
-  isOpen, 
-  onClose, 
-  shopName,
-  onApplyVoucher 
-}: VoucherModalProps) => {
+export function PlatformVoucherModal({ isOpen, onClose }: PlatformVoucherModalProps) {
+  const dispatch = useDispatch();
   const [vouchers, setVouchers] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
@@ -104,7 +92,7 @@ const VoucherModal = ({
             return;
           }
           const params: GetGuestDiscountListRequest = {
-            onlyShopDiscounts: true,
+            onlyPlatformDiscounts: true,
             cartItemIds: cartItemIds.join(','),
           };
 
@@ -117,36 +105,37 @@ const VoucherModal = ({
           setLoading(false);
         }
       };
-
       fetchVouchers();
-    } else {
-      setSelectedVoucher(null);
-      setVoucherCode("");
-      setError(null);
     }
-  }, [isOpen, shopOrders]);
+  }, [isOpen]);
 
   const handleValidateVoucher = async (code: string) => {
     if (!code) {
-      toast.info("Vui lòng nhập hoặc chọn một mã voucher.");
+      toast.error("Vui lòng nhập mã voucher.");
       return;
     }
 
     setIsValidating(true);
     try {
+      if (cartItemIds.length === 0) {
+        toast.error("Không có sản phẩm trong giỏ hàng để kiểm tra voucher.");
+        return;
+      }
+
       const response = await discountService.validate({ code, cartItemIds });
 
       if (response.data.isValid && response.data.discount && response.data.discountAmount !== undefined) {
+        toast.success("Áp dụng voucher thành công!");
         const appliedVoucher: AppliedVoucherInfo = {
           code: response.data.discount.code,
           discount: response.data.discount,
           discountAmount: response.data.discountAmount,
         };
-        onApplyVoucher(appliedVoucher);
-        toast.success(`Áp dụng voucher '${appliedVoucher.code}' thành công!`);
+        dispatch(applyPlatformVoucher(appliedVoucher));
         onClose();
       } else {
-        toast.error("Mã voucher không hợp lệ hoặc không đủ điều kiện áp dụng.");
+        toast.error(response.data.message || "Voucher không hợp lệ hoặc không thể áp dụng.");
+        dispatch(applyPlatformVoucher(null));
       }
     } catch (err) {
       toast.error("Đã có lỗi xảy ra khi xác thực voucher.");
@@ -201,79 +190,69 @@ const VoucherModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-  <DialogContent className="sm:max-w-md flex flex-col h-[70vh] p-0">
-    <DialogHeader className="px-6 pt-6 pb-2 border-b">
-      <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-        <Ticket className="w-5 h-5 text-red-500" />
-        <span>Mã giảm giá của {shopName}</span>
-      </DialogTitle>
-    </DialogHeader>
+      <DialogContent className="sm:max-w-md flex flex-col h-[70vh] p-0">
+        <DialogHeader className="px-6 pt-6 pb-2 border-b">
+          <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
+            <Ticket className="w-5 h-5 text-red-500" />
+            <span>Voucher từ Shopsifu</span>
+          </DialogTitle>
+        </DialogHeader>
 
-    <div className="flex items-center gap-2 p-4">
-      <div className="relative flex-1">
-        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        <Input
-          placeholder="Nhập mã voucher"
-          value={voucherCode}
-          onChange={(e) => setVoucherCode(e.target.value)}
-          className="pl-9"
-        />
-      </div>
-      <Button size="sm" onClick={() => handleValidateVoucher(voucherCode)} className="min-w-[80px]" disabled={isValidating}>
-        {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Áp dụng"}
-      </Button>
-    </div>
+        <div className="flex items-center gap-2 p-4">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Nhập mã voucher"
+              value={voucherCode}
+              onChange={(e) => setVoucherCode(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Button size="sm" onClick={() => handleValidateVoucher(voucherCode)} className="min-w-[80px]" disabled={isValidating}>
+            {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Áp dụng"}
+          </Button>
+        </div>
 
-    <div className="flex-1 overflow-y-auto p-4 items-center justify-center">
-      {renderContent()}
-    </div>
+        <div className="flex-1 overflow-y-auto p-4 items-center justify-center">
+          {renderContent()}
+        </div>
 
-    <DialogFooter className="gap-2 sm:gap-2 p-4 border-t">
-      <Button
-        variant="outline"
-        onClick={onClose}
-        className="w-full sm:w-auto"
-      >
-        Hủy
-      </Button>
-      <Button
-        onClick={() => handleValidateVoucher(selectedVoucher!.code)}
-        className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
-        disabled={!selectedVoucher || isValidating}
-      >
-        {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Xác nhận"}
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
+        <DialogFooter className="gap-2 sm:gap-2 p-4 border-t">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={() => handleValidateVoucher(selectedVoucher!.code)}
+            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
+            disabled={!selectedVoucher || isValidating}
+          >
+            {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Xác nhận"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-
-export function VoucherButton({ shopName, onApplyVoucher }: Omit<VoucherModalProps, 'isOpen' | 'onClose'>) {
+export function PlatformVoucherButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
-      <div className="flex items-center justify-between px-4 py-3 text-base">
-        <div className="flex items-center gap-4 text-gray-500">
-          <Ticket className="w-5 h-5 text-red-500" />
-          <span className="text-black">Mã giảm giá của {shopName}</span>
-        </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="text-blue-600 hover:underline text-base"
-        >
-          Xem thêm voucher
-        </button>
-      </div>
+      <button 
+        onClick={() => setIsModalOpen(true)}
+        className="text-blue-600 hover:underline text-sm font-medium"
+      >
+        Xem thêm voucher
+      </button>
 
-      <VoucherModal
+      <PlatformVoucherModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        shopName={shopName}
-        onApplyVoucher={onApplyVoucher}
       />
     </>
   );
