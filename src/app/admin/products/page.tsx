@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 export default function ProductsPage() {
   const t = useTranslations('admin.ModuleProduct')
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-white h-screen">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
         <p className="text-muted-foreground">

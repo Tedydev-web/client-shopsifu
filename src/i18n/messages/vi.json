@@ -279,6 +279,40 @@
         }
       }
     },
+    "ModuleVouchers":{
+      "breadcrumb":{
+        "title": "Quản lý mã giảm giá",
+        "subtitle": "Quản lý tất cả mã giảm giá tại đây",
+        "vouchers": "Danh sách mã giảm giá",
+        "newPage": "Tạo mã giảm giá"
+      },
+      "title_shop": "Voucher toàn shop",
+      "title_product": "Voucher sản phẩm",
+      "title_private": "Voucher riêng tư",
+      "title": "Quản lý mã giảm giá",
+      "subtitle": "Quản lý tất cả mã giảm giá tại đây",
+      "createVoucher": "Tạo Voucher",
+      "createVoucherDesc": "Tạo Mã giảm giá toàn shop hoặc Mã giảm giá sản phẩm ngay bây giờ để thu hút người mua.",
+      "shopVoucher": "Voucher toàn shop",
+      "productVoucher": "Voucher sản phẩm",
+      "privateVoucher": "Voucher riêng tư",
+      "shopVoucherDesc": "Voucher áp dụng cho tất cả các shop của bạn",
+      "productVoucherDesc": "Voucher áp dụng cho sản phẩm nhất định do shop chọn",
+      "privateVoucherDesc": "Voucher áp dụng cho người dùng riêng tư",
+      "create": "Tạo",
+      "Table":{
+        "name": "Tên voucher",
+        "code": "Mã voucher",
+        "discount": "Giảm giá",
+        "type": "Loại voucher",
+        "status": "Trạng thái",
+        "actions": {
+          "edit": "Chỉnh sửa",
+          "delete": "Xóa"
+        },
+        "searchPlaceholder": "Tìm kiếm theo tên voucher"
+      }
+    },
     "ModuleUsers": {
       "Table": {
         "role": "Vai trò",
@@ -307,7 +341,8 @@
       "subtitle": "Quản lý tất cả sản phẩm tại đây",
       "DataTable": {
         "name": "Tên sản phẩm",
-        "price": "Giá",
+        "price": "Giá bán",
+        "virtualPrice": "Giá gốc",
         "category": "Danh mục",
         "stock": "Tồn kho",
         "status": "Trạng thái",
@@ -358,7 +393,17 @@
         "edit": "Sửa thông tin",
         "delete": "Xóa sản phẩm",
         "notFound": "Không tìm thấy sản phẩm",
-        "priceRange": "Khoảng giá"
+        "priceRange": "Khoảng giá",
+        "clear": "Xóa bộ lọc",
+        "applyFilter": "Áp dụng bộ lọc",
+        "apply": "Áp dụng",
+        "clearFilter": "Xóa bộ lọc",
+        "activeFilter": "Bộ lọc đang áp dụng",
+        "searchCategory": "Tìm kiếm danh mục",
+        "Search category...": "Tìm kiếm danh mục",
+        "noResults": "Không có kết quả",
+        "loading":"Đang tải dữ liệu...",
+        "clearFilters": "Xóa tất cả bộ lọc"
       },
       "AddNew": {
         "page": {
@@ -441,7 +486,11 @@
     },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
-
+      "voucher":{
+        "voucher": "Mã giảm giá của Shop",
+        "listVoucher": "Danh sách mã giảm giá",
+        "newVoucher": "Thêm mới"
+      },
       "orders": {
         "orders": "Đơn hàng",
         "allOrders": "Tất cả đơn hàng",

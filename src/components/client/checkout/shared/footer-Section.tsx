@@ -3,12 +3,20 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Tag, ArrowLeft } from 'lucide-react';
+import { Tag, ArrowLeft, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSelector } from 'react-redux';
-import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectShopProducts,
+  selectTotalDiscountAmount,
+  selectAppliedPlatformVoucher,
+  removePlatformVoucher,
+  setCommonInfo,
+} from '@/store/features/checkout/ordersSilde';
 import { formatCurrency } from '@/utils/formatter';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { PlatformVoucherModal } from './cart-PlatformVoucher';
+import { AppliedVoucherInfo } from '@/types/order.interface';
 
 interface FooterSectionProps {
   variant?: 'default' | 'mobile';
@@ -37,7 +45,11 @@ export function FooterSection({
   isSubmitting = false,
   onTotalChange
 }: FooterSectionProps) {
+  const dispatch = useDispatch();
   const shopProducts = useSelector(selectShopProducts);
+  const totalDiscount = useSelector(selectTotalDiscountAmount);
+  const appliedPlatformVoucher = useSelector(selectAppliedPlatformVoucher);
+  const [isPlatformModalOpen, setPlatformModalOpen] = useState(false);
 
   // Calculate subtotal from all products in all shops
   const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
@@ -46,19 +58,25 @@ export function FooterSection({
     }, 0);
   }, 0);
 
-  // For now, shipping and discount are not implemented
+  // For now, shipping is not implemented
   const shippingFee = 0;
-  const voucherDiscount = 0;
 
   // Calculate the final total
-  const totalPayment = subtotal + shippingFee - voucherDiscount;
+  const totalPayment = subtotal + shippingFee - totalDiscount;
+
+  const handleApplyPlatformVoucher = (voucher: AppliedVoucherInfo) => {
+    // The actual application logic is likely in the modal, this is for closing
+    setPlatformModalOpen(false);
+  };
   
   // Gửi tổng tiền thanh toán lên component cha nếu có callback
   useEffect(() => {
     if (onTotalChange) {
       onTotalChange(totalPayment);
     }
-  }, [totalPayment, onTotalChange]);
+    // Cập nhật tổng số tiền vào Redux state mỗi khi nó thay đổi
+    dispatch(setCommonInfo({ amount: totalPayment }));
+  }, [totalPayment, onTotalChange, dispatch]);
 
   const getButtonText = () => {
     if (isSubmitting) return 'Đang xử lý...';
@@ -115,50 +133,49 @@ export function FooterSection({
   }
 
   return (
-    <div className="bg-white rounded-lg border p-6">
-      <h2 className="text-base font-medium mb-6">Tóm tắt đơn hàng</h2>
+    <div className="bg-white rounded-lg border p-6 space-y-4">
+      {/* Platform Voucher Section */}
+      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md border">
+        <div className="flex items-center gap-2">
+          <Tag className="w-5 h-5 text-primary" />
+          <span className="text-sm font-medium">Voucher Sàn</span>
+        </div>
+        {appliedPlatformVoucher ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-green-600 bg-green-100 px-2 py-1 rounded">
+              {appliedPlatformVoucher.code}
+            </span>
+            <button onClick={() => dispatch(removePlatformVoucher())} className="p-1 hover:bg-gray-200 rounded-full">
+              <X className="w-4 h-4 text-gray-500" />
+            </button>
+          </div>
+        ) : (
+          <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setPlatformModalOpen(true)}>
+            Chọn hoặc nhập mã
+          </Button>
+        )}
+      </div>
 
-      <div className="space-y-6">
-        {/* Desktop Order Summary */}
+      <h2 className="text-lg font-semibold">Tóm tắt đơn hàng</h2>
+      <div className="space-y-2">
         <div className="space-y-3">
           <PriceLine label="Tổng tiền hàng" value={formatCurrency(subtotal)} />
+          <PriceLine label="Tổng giảm giá" value={`-${formatCurrency(totalDiscount)}`} />
         </div>
 
-        <Separator />
+        <PriceLine label="Phí vận chuyển" value={formatCurrency(shippingFee)} />
 
-        {/* Desktop Voucher Section */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <Input
-                placeholder="Nhập mã giảm giá"
-                className="h-9 text-sm"
-              />
-            </div>
-            <Button
-              variant="secondary"
-              className="h-9 px-4 text-sm font-medium"
-            >
-              Áp dụng
-            </Button>
-          </div>
-
-          <div className="flex justify-end">
-            <p className="text-xs text-blue-600 hover:text-blue-700 font-medium cursor-pointer flex items-center gap-1.5 hover:underline transition-colors">
-              <Tag className="h-3.5 w-3.5" />
-              Xem thêm mã giảm giá
-            </p>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Desktop Total */}
-        <div>
-          <div className="my-3"></div>
-          <PriceLine label="Tổng thanh toán" value={formatCurrency(totalPayment)} isBold={true} />
-        </div>
+        <Separator className="my-3" />
+        <PriceLine label="Tổng thanh toán" value={formatCurrency(totalPayment)} isBold={true} />
       </div>
+
+      {isPlatformModalOpen && (
+        <PlatformVoucherModal 
+          isOpen={isPlatformModalOpen}
+          onClose={() => setPlatformModalOpen(false)}
+          onApplyVoucher={handleApplyPlatformVoucher}
+        />
+      )}
 
       {/* Desktop Navigation */}
       <div className="pt-6 mt-6 border-t">

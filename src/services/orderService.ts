@@ -9,7 +9,9 @@ import {
   OrderCancelResponse,
   OrderStatus,
   CreatePaymentVnPayUrl,
-  CreatePaymentVnPayUrlResponse
+  CreatePaymentVnPayUrlResponse,
+  CalculateOrderRequest,
+  CalculateOrderResponse
 } from "@/types/order.interface";
 
 export const orderService = {
@@ -93,9 +95,9 @@ export const orderService = {
 
   // ✅ Tính toán đơn hàng
   calculateOrder: async (
-    data: OrderCreateRequest,
+    data: CalculateOrderRequest,
     signal?: AbortSignal
-  ): Promise<OrderCreateResponse> => {
+  ): Promise<CalculateOrderResponse> => {
     try {
       const response = await privateAxios.post(
         API_ENDPOINTS.ORDERS.CALCULATE_ORDER,

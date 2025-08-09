@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { FilterFn } from "@tanstack/react-table";
 import { Product } from "@/types/products.interface";
 import { ProductColumn } from "./useProducts";
+import { getProductUrl } from "@/utils/slugify";
 
 const priceInRange: FilterFn<any> = (row, columnId, value, addMeta) => {
   const price = row.getValue(columnId) as number;
@@ -28,7 +29,7 @@ const getProductActions = (
 ): ActionItem<ProductColumn>[] => [
   {
     type: "command",
-    label: t("DataTable.view"),
+    label: t("DataTable.view") + " (Trang sản phẩm)",
     icon: <Eye />,
     onClick: () => onView(product),
   },
@@ -89,14 +90,21 @@ export const productsColumns = ({
         header: () => t("DataTable.image"),
         cell: ({ row }) => {
             const imageUrl = row.original.image || '/images/image-placeholder.jpg';
+            const productUrl = getProductUrl(row.original.name, row.original.id);
             return (
-                <Image
-                    src={imageUrl}
-                    alt={row.original.name ?? 'Product image'}
-                    width={65}
-                    height={65}
-                    className="rounded-sm object-cover"
-                />
+                <div 
+                    className="cursor-pointer" 
+                    onClick={() => window.open(productUrl, '_blank')}
+                    title={`Xem sản phẩm: ${row.original.name}`}
+                >
+                    <Image
+                        src={imageUrl}
+                        alt={row.original.name ?? 'Product image'}
+                        width={65}
+                        height={65}
+                        className="rounded-sm object-cover hover:opacity-80 transition-opacity"
+                    />
+                </div>
             )
         },
         enableSorting: false,
@@ -105,20 +113,29 @@ export const productsColumns = ({
     {
         accessorKey: "name",
         header: () => t("DataTable.name"),
-        cell: ({ row }) => (
-            <span className="font-medium line-clamp-3 w-40 whitespace-normal">{row.original.name}</span>
-        ),
+        cell: ({ row }) => {
+            const productUrl = getProductUrl(row.original.name, row.original.id);
+            return (
+                <span 
+                    className="font-medium line-clamp-3 w-40 whitespace-normal cursor-pointer hover:underline"
+                    title={`Click để mở trang: ${productUrl}`}
+                    onClick={() => window.open(productUrl, '_blank')}
+                >
+                    {row.original.name}
+                </span>
+            );
+        },
         enableSorting: true,
         enableHiding: true,
     },
 
-    {
-        accessorKey: "category",
-        header: () => t("DataTable.category"),
-        cell: ({ row }) => <div className="w-[100px] line-clamp-3 whitespace-normal">{row.original.category}</div>,
-        enableSorting: true,
-        enableHiding: true,
-    },
+    // {
+    //     accessorKey: "category",
+    //     header: () => t("DataTable.category"),
+    //     cell: ({ row }) => <div className="w-[100px] line-clamp-3 whitespace-normal">{row.original.category}</div>,
+    //     enableSorting: true,
+    //     enableHiding: true,
+    // },
     {
         accessorKey: "price",
         header: ({ column }) => (
@@ -126,6 +143,19 @@ export const productsColumns = ({
         ),
         cell: ({ row }) => {
             const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(row.original.price || 0);
+            return <div className="w-[100px]">{formattedPrice}</div>;
+        },
+        enableSorting: true,
+        enableHiding: true,
+        filterFn: priceInRange,
+    },
+        {
+        accessorKey: "virtualPrice",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title={t("DataTable.virtualPrice")} />
+        ),
+        cell: ({ row }) => {
+            const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(row.original.virtualPrice || 0);
             return <div className="w-[100px]">{formattedPrice}</div>;
         },
         enableSorting: true,

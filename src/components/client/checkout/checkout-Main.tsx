@@ -46,16 +46,18 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [redirectingTo, setRedirectingTo] = useState<string | null>(null);
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  const [activePaymentId, setActivePaymentId] = useState<string | null>(null);
+  const [activePaymentId, setActivePaymentId] = useState<number | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [orderResult, setOrderResult] = useState<{
     success: boolean;
     paymentMethod?: string;
     orderData?: { 
-      id: string; 
-      [key: string]: any 
+      [key: string]: any;
+      orders?: any[];
+      paymentId?: number;
     };
-    paymentId?: string;
+    paymentId?: number;
+    orderId?: string;
     paymentUrl?: string;
     error?: string;
   } | null>(null);
@@ -87,7 +89,7 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
         if (result.paymentMethod === 'sepay') {
           // Hiển thị QR Sepay cho thanh toán chuyển khoản
           setShowQrSepay(true);
-        } else if (result.paymentMethod === 'vnpay' && result.paymentUrl && result.orderData) {
+        } else if (result.paymentMethod === 'vnpay' && result.paymentUrl && result.orderId) {
           // Hiển thị loading và chuẩn bị chuyển hướng đến VNPay
           setIsRedirecting(true);
           setRedirectingTo('vnpay');
@@ -95,15 +97,13 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
           // Lưu paymentId và orderId để socket có thể theo dõi trạng thái
           if (result.paymentId) {
             setActivePaymentId(result.paymentId);
-            setActiveOrderId(result.orderData.id);
-            
-            // Kết nối tới socket với paymentId
+            setActiveOrderId(result.orderId || '');
             console.log(`[VNPay] Connecting to socket with paymentId: ${result.paymentId}`);
-            connect(result.paymentId);
+            connect(result.paymentId.toString()); // Convert to string for connect function
           }
           
           // Lưu thông tin về đơn hàng để xử lý sau khi redirect về
-          sessionStorage.setItem('lastOrderId', result.orderData.id);
+          sessionStorage.setItem('lastOrderId', result.orderId || '');
           sessionStorage.setItem('orderAmount', totalAmount.toString());
           
           // Sau 1.5 giây, chuyển hướng đến VNPay
@@ -111,9 +111,9 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
             // Chuyển hướng đến trang thanh toán VNPay
             window.location.href = result.paymentUrl as string;
           }, 1500);
-        } else if (result.orderData) {
+        } else if (result.orderId) {
           // Các phương thức khác (COD, ...)
-          router.push(`/checkout/payment-success?orderId=${result.orderData.id}&status=success&totalAmount=${totalAmount}`);
+          router.push(`/checkout/payment-success?orderId=${result.orderId}&status=success&totalAmount=${totalAmount}`);
         }
       } else {
         console.error('❌ Order creation failed:', result);
@@ -163,7 +163,7 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
       console.log(`[Polling] Checking VNPay payment status for orderId: ${activeOrderId}...`);
       try {
         const order = await orderService.getById(activeOrderId);
-        if (order && order.status === OrderStatus.PENDING_PICKUP) {
+        if (order && order.data.status === OrderStatus.PENDING_PICKUP) {
           clearInterval(intervalId);
           toast.success('Thanh toán VNPay thành công!');
           router.push(`/checkout/payment-success?orderId=${activeOrderId}&totalAmount=${totalAmount}`);
@@ -197,8 +197,12 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
   
   // 5. Xử lý khi user xác nhận đã chuyển tiền (QR Sepay)
   const handlePaymentConfirm = () => {
-    // Chuyển đến trang đơn hàng
-    router.push('/user/dashboard');
+    // If we have order ID, redirect to order success page, otherwise go to dashboard
+    if (orderResult?.orderId) {
+      router.push(`/checkout/payment-success?orderId=${orderResult.orderId}&totalAmount=${totalAmount}`);
+    } else {
+      router.push('/user/dashboard');
+    }
   };
   
   // 6. Xử lý khi user hủy thanh toán (QR Sepay)
@@ -214,12 +218,12 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
   };
 
   // Nếu đang hiển thị QR Sepay, render component QR
-  if (showQrSepay && orderResult && orderResult.paymentId && orderResult.orderData) {
+  if (showQrSepay && orderResult && orderResult.paymentId && orderResult.orderId) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <QrSepay
-          paymentId={orderResult.paymentId}
-          orderId={orderResult.orderData.id}
+          paymentId={orderResult.paymentId.toString()}
+          orderId={orderResult.orderId}
           onPaymentConfirm={handlePaymentConfirm}
           onPaymentCancel={handlePaymentCancel}
         />
@@ -228,7 +232,7 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
   }
   
   // Nếu đang chuyển hướng đến VNPay, hiển thị màn hình loading
-  if (isRedirecting && redirectingTo === 'vnpay' && orderResult && orderResult.paymentUrl && orderResult.orderData) {
+  if (isRedirecting && redirectingTo === 'vnpay' && orderResult && orderResult.paymentUrl) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="w-full max-w-md mx-auto border-blue-200 shadow-lg">

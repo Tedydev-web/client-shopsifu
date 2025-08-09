@@ -11,19 +11,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'shopsifu.s3.ap-southeast-1.amazonaws.com',
+        hostname: '**', // ✅ Cho phép tất cả hostname với HTTPS
       },
       {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-      },
-      {
-        protocol: 'https',
-        hostname: 'down-vn.img.susercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'mms.vod.susercontent.com',
+        protocol: 'http',
+        hostname: '**', // ✅ Cho phép tất cả hostname với HTTP
       },
     ],
   },

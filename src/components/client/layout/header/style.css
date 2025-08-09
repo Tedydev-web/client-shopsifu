@@ -71,10 +71,6 @@ header {
   margin-left: -6px;
   top: -7px;
 }
-  /* border: 1px solid transparent;
-  position: relative;
-  overflow: hidden;
-} */
 
 .items-hover::before {
   content: '';

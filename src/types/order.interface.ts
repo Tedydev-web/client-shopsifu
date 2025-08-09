@@ -1,12 +1,11 @@
-import { PaginationRequest } from "@/types/base.interface";
+import { PaginationRequest, PaginationMetadata } from "@/types/base.interface";
+import { Discount } from './discount.interface';
 
 export interface OrderGetAllParams extends PaginationRequest {
   sortOrder?: OrderStatus;
   sortBy?: "asc" | "desc";
   search?: string;
 }
-
-import { PaginationMetadata } from "./base.interface";
 
 export enum OrderStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
@@ -35,18 +34,29 @@ interface OrderCreationInfo {
 export type OrderCreateRequest = OrderCreationInfo[];
 
 export interface OrderCreateResponse {
-  success: boolean;
+  statusCode: number;
   message: string;
+  timestamp: string;
   data: {
-    id: string;
-    paymentId: string;
-    shopId: string;
-    userId: string;
-    status: OrderStatus;
-    items: OrderItem[];
-    finalTotal: number;
-    createdAt: string;
-    updatedAt: string;
+    orders: {
+      id: string;
+      userId: string;
+      status: OrderStatus;
+      receiver: {
+        name: string;
+        phone: string;
+        address: string;
+      };
+      shopId: string;
+      paymentId: number;
+      createdById: string;
+      updatedById: string | null;
+      deletedById: string | null;
+      deletedAt: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }[];
+    paymentId: number;
   }
 }
 
@@ -89,6 +99,10 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
+  totalItemCost: number;
+  totalShippingFee: number;
+  totalVoucherDiscount: number;
+  totalPayment: number;
 }
 
 /**
@@ -96,6 +110,7 @@ export interface Order {
  * @description Thông tin chi tiết sản phẩm cho trang checkout
  */
 export interface ProductInfo {
+  id: string;
   shopName: string;
   name: string;
   image: string;
@@ -141,11 +156,43 @@ export interface OrderHandlerResult {
   success: boolean;
   paymentMethod?: string;
   orderData?: {
-    id: string;
-    paymentId?: string;
+    orders?: any[];
+    paymentId?: number;
     [key: string]: any;
   };
-  paymentId?: string;
+  orderId?: string; // The ID of the order (from the first order in orders array)
+  paymentId?: number;
   paymentUrl?: string;
   error?: string;
+}
+
+
+
+
+
+
+/**
+ * @interface Calculate Order
+ * @description API Tính toán giá trị đơn hàng kèm mã giảm giá
+ */
+export interface CalculateOrderRequest{
+  cartItemIds: string[];
+  discountCodes: string[];
+}
+export interface CalculateOrderResponse{
+  statusCode: number;
+    message: string;
+    timestamp: string;
+    data: {
+        totalItemCost: number;
+        totalShippingFee: number;
+        totalVoucherDiscount: number;
+        totalPayment: number;
+    }
+}
+
+export interface AppliedVoucherInfo {
+  code: string;
+  discount: Discount;
+  discountAmount: number;
 }

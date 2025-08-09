@@ -69,16 +69,12 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
     order.items?.reduce((sum, item) => sum + item.quantity, 0) ??
     0;
 
-  const discount = 234000;
-  const shippingFee: number = 0;
+  const discount = order.totalVoucherDiscount;
+  const shippingFee: number = order.totalShippingFee;
 
-  const totalAmount: number =
-    order.items?.reduce(
-      (sum: number, item: OrderItem) => sum + item.skuPrice * item.quantity,
-      0
-    ) ?? 0;
+  const totalAmount = order.totalItemCost;
 
-  const finalAmount = totalAmount - discount;
+  const finalAmount = order.totalPayment;
 
   return (
     <div className="mx-auto bg-[#f5f5f5] space-y-4 text-sm rounded-md">
@@ -251,7 +247,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
             </div>
             <div className="flex px-2 justify-between border-b pb-2 text-green-600">
               <span>Giảm giá:</span>
-              <span>-{discount.toLocaleString()}đ</span>
+              <span>{discount.toLocaleString()}đ</span>
             </div>
             <div className="flex px-2 justify-between text-green-600">
               <span>Phí vận chuyển:</span>
@@ -277,7 +273,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
             </p>
             <div className="flex px-2 justify-between text-red-600">
               <span>Tổng số tiền đã thanh toán</span>
-              <span>0đ</span>
+              <span>{order.status === "PENDING_PICKUP" || order.status === "PENDING_DELIVERY" || order.status === "DELIVERED" ? order.totalPayment.toLocaleString() : "0"}đ</span>
             </div>
           </div>
         </section>

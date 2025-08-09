@@ -53,7 +53,6 @@ export function ShippingAddress({
           
           // Xóa phần tự động chọn địa chỉ mặc định
           // Chỉ hiển thị các địa chỉ và để người dùng chọn
-          console.log('[ShippingAddress] Addresses loaded:', response.data);
         }
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
@@ -66,16 +65,9 @@ export function ShippingAddress({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Debug useEffect để theo dõi sự thay đổi của formData
+  // Track formData changes
   useEffect(() => {
-    console.log('[ShippingAddress] formData changed:', {
-      receiverName: formData.receiverName,
-      receiverPhone: formData.receiverPhone,
-      province: formData.province,
-      district: formData.district,
-      ward: formData.ward,
-      address: formData.address
-    });
+    // Monitor formData changes silently
   }, [formData]);
   
   // Theo dõi khi selectedAddressId thay đổi để cập nhật dữ liệu - 
@@ -84,7 +76,7 @@ export function ShippingAddress({
     if (selectedAddressId && isSelectingAddress) {
       const selected = savedAddresses.find(addr => addr.id === selectedAddressId);
       if (selected) {
-        console.log('[ShippingAddress] Address selected by ID change:', selected);
+        // Address selected by ID change
         
         // Chỉ log thông tin, không thực hiện cập nhật ở đây để tránh vòng lặp vô hạn
         const provinceName = getProvinceName(selected.province);

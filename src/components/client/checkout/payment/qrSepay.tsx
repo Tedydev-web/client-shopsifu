@@ -7,7 +7,7 @@ import { AlertCircle, Clock, QrCode, CheckCircle2, X } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
-import { selectShopProducts } from '@/store/features/checkout/ordersSilde';
+import { selectCommonOrderInfo, selectShopProducts } from '@/store/features/checkout/ordersSilde';
 import { orderService } from '@/services/orderService';
 import { useRouter } from 'next/navigation';
 import { Order, OrderStatus } from '@/types/order.interface';
@@ -26,19 +26,11 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [isExpired, setIsExpired] = useState(false);
   const { payments, connect, disconnect } = useShopsifuSocket();
-  const shopProducts = useSelector(selectShopProducts);
+  const commonInfo = useSelector(selectCommonOrderInfo);
   const router = useRouter();
 
-  // Calculate total amount from Redux state
-  const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
-    return total + shopProducts.reduce((shopTotal, product) => {
-      return shopTotal + (product.price * product.quantity);
-    }, 0);
-  }, 0);
-
-  const shippingFee = 0;
-  const voucherDiscount = 0;
-  const totalAmount = subtotal + shippingFee - voucherDiscount;
+  // Lấy tổng số tiền cuối cùng từ Redux state
+  const totalAmount = commonInfo.amount;
 
   // Environment variables for Sepay
   const SEPAY_ACCOUNT = process.env.NEXT_PUBLIC_SEPAY_ACCOUNT || '565615056666';
@@ -58,24 +50,14 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentId]);
 
-  // Console log để debug data truyền vào QrSepay
+  // Initialize component with payment data
   useEffect(() => {
-    console.log('🔗 QR Sepay Data Debug:', {
-      paymentId,
-      totalAmount,
-      SEPAY_ACCOUNT,
-      SEPAY_BANK,
-      qrUrl,
-      shopProducts: Object.keys(shopProducts).length,
-      subtotal,
-      finalAmount: totalAmount
-    });
+    // Initialize payment component silently
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Listen for WebSocket payment success events
   useEffect(() => {
-        console.log(`[WebSocket] Checking for payment events. Total events: ${payments.length}`);
     if (payments.length === 0) return;
 
     const latestPayment = payments[payments.length - 1];
@@ -87,7 +69,6 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
       latestPayment.status === 'success' &&
       latestPayment.gateway === 'sepay'
     ) {
-      console.log('✅ Payment success event received via WebSocket for order:', orderId);
       toast.success('Thanh toán thành công!');
       console.clear();
       // Redirect to the success page
@@ -115,33 +96,11 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  // Poll for payment status
+  // Removed automatic polling - We'll only check payment status when the user clicks the button
   useEffect(() => {
-    if (!orderId) return;
-
-        const checkPaymentStatus = async () => {
-      console.log(`[Polling] Checking payment status for orderId: ${orderId}...`);
-      try {
-        const order: Order = await orderService.getById(orderId);
-        if (order && order.status === OrderStatus.PENDING_PICKUP) {
-          clearInterval(intervalId);
-          toast.success('Thanh toán thành công!');
-          console.clear();
-          router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
-        }
-      } catch (error) {
-        console.error('Lỗi khi kiểm tra trạng thái thanh toán:', error);
-        // Optionally stop polling on certain errors
-      }
-    };
-
-    const intervalId = setInterval(checkPaymentStatus, 3000); // Check every 3 seconds
-
-    // Cleanup on component unmount
-    return () => {
-      clearInterval(intervalId);
-    };
-    }, [orderId, router, totalAmount]);
+    // No automatic polling - WebSocket will handle real-time updates
+    // and manual button click will check the status on demand
+  }, []);
 
   // Format time display
   const formatTime = (seconds: number) => {
@@ -150,16 +109,41 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const handlePaymentConfirm = () => {
+  const handlePaymentConfirm = async () => {
     if (isExpired) {
       toast.error('Mã QR đã hết hạn. Vui lòng thử lại.');
       return;
     }
-    onPaymentConfirm();
+    
+    // Kiểm tra trạng thái đơn hàng khi người dùng xác nhận đã chuyển tiền
+    try {
+      if (!orderId) {
+        toast.error('Không tìm thấy thông tin đơn hàng');
+        return;
+      }
+      
+      toast.loading('Đang kiểm tra thanh toán...');
+      const Order = await orderService.getById(orderId);
+      
+      if (Order.data.status === OrderStatus.PENDING_PICKUP) {
+        toast.dismiss();
+        toast.success('Thanh toán thành công!');
+        router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
+      } else {
+        toast.dismiss();
+        toast.info('Hệ thống đang xử lý thanh toán của bạn. Vui lòng đợi trong giây lát.');
+        // Vẫn gọi onPaymentConfirm để xử lý luồng hiện tại
+        onPaymentConfirm();
+      }
+    } catch (error) {
+      toast.dismiss();
+      console.error('Lỗi khi kiểm tra trạng thái thanh toán:', error);
+      toast.error('Không thể kiểm tra trạng thái thanh toán. Vui lòng thử lại sau.');
+    }
   };
 
   const handlePaymentCancel = () => {
-    onPaymentCancel();
+    router.push(`/user/orders`);
   };
 
   if (isExpired) {

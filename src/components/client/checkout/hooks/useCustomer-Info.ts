@@ -53,14 +53,9 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
   } = useProvinces();
   
   // Debug log để kiểm tra khi nào data được load
+  // Debug logging removed
   useEffect(() => {
-    console.log('🚀 useCustomer-Info Debug:', {
-      customerProvince,
-      customerProvinceName,
-      provincesCount: provinces.length,
-      isLoadingProvinces,
-      provinces: provinces.slice(0, 3) // Log 3 provinces đầu tiên
-    });
+    // Track province changes silently
   }, [customerProvince, customerProvinceName, provinces.length, isLoadingProvinces]);
   
   // Separate instance for shipping address
@@ -82,7 +77,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     if (customerProvince && provinces.length > 0 && !isLoadingProvinces) {
       const selectedProvince = provinces.find(p => p.value === customerProvince);
       if (selectedProvince) {
-        console.log('🔍 Found province:', selectedProvince); // Debug log
         setCustomerProvinceName(selectedProvince.label);
       }
     }
@@ -93,7 +87,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     if (customerDistrict && customerDistricts.length > 0 && !isLoadingCustomerDistricts) {
       const selectedDistrict = customerDistricts.find(d => d.value === customerDistrict);
       if (selectedDistrict) {
-        console.log('🔍 Found district:', selectedDistrict); // Debug log
         setCustomerDistrictName(selectedDistrict.label);
       }
     }
@@ -104,7 +97,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     if (customerWard && customerWards.length > 0 && !isLoadingCustomerWards) {
       const selectedWard = customerWards.find(w => w.value === customerWard);
       if (selectedWard) {
-        console.log('🔍 Found ward:', selectedWard); // Debug log
         setCustomerWardName(selectedWard.label);
       }
     }
@@ -207,19 +199,16 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
 
   // Các hàm xử lý thay đổi giá trị dropdown cho địa chỉ khách hàng
   const handleProvinceChange = (value: string) => {
-    console.log('🏗️ handleProvinceChange called with:', value);
     setCustomerProvince(value);
     
     // Lấy tên tỉnh/thành phố từ danh sách provinces
     const selectedProvince = provinces.find(p => p.value === value);
     const provinceName = selectedProvince ? selectedProvince.label : '';
-    console.log('🔍 Found province name:', provinceName, 'from', selectedProvince);
     setCustomerProvinceName(provinceName);
     
     // Ensure we have a valid provinceName before updating form data
     if (provinceName) {
       // Cập nhật form data với cả code và name
-      console.log('✅ Updating province in form data:', `${value}|${provinceName}`);
       const evt = {
         target: {
           name: 'province',
@@ -244,19 +233,16 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
   };
 
   const handleDistrictChange = (value: string) => {
-    console.log('🏢 handleDistrictChange called with:', value);
     setCustomerDistrict(value);
     
     // Lấy tên quận/huyện từ danh sách customerDistricts
     const selectedDistrict = customerDistricts.find(d => d.value === value);
     const districtName = selectedDistrict ? selectedDistrict.label : '';
-    console.log('🔍 Found district name:', districtName, 'from', selectedDistrict);
     setCustomerDistrictName(districtName);
     
     // Ensure we have a valid districtName before updating form data
     if (districtName) {
       // Cập nhật form data với cả code và name
-      console.log('✅ Updating district in form data:', `${value}|${districtName}`);
       const evt = {
         target: {
           name: 'district',
@@ -279,19 +265,16 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
   };
 
   const handleWardChange = (value: string) => {
-    console.log('🏠 handleWardChange called with:', value);
     setCustomerWard(value);
     
     // Lấy tên phường/xã từ danh sách customerWards
     const selectedWard = customerWards.find(w => w.value === value);
     const wardName = selectedWard ? selectedWard.label : '';
-    console.log('🔍 Found ward name:', wardName, 'from', selectedWard);
     setCustomerWardName(wardName);
     
     // Ensure we have a valid wardName before updating form data
     if (wardName) {
       // Cập nhật form data với cả code và name
-      console.log('✅ Updating ward in form data:', `${value}|${wardName}`);
       const evt = {
         target: {
           name: 'ward',
@@ -320,7 +303,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     // Ensure we have a valid provinceName before updating form data
     if (provinceName) {
       // Cập nhật form data với cả code và name
-      console.log('✅ Updating shipping province in form data:', `${value}|${provinceName}`);
       const evt = {
         target: {
           name: 'receiverProvince',
@@ -328,8 +310,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
         }
       } as React.ChangeEvent<HTMLInputElement>;
       handleChange(evt);
-    } else {
-      console.warn('⚠️ Shipping province name not found for code:', value);
     }
   };
 
@@ -342,7 +322,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     // Ensure we have a valid districtName before updating form data
     if (districtName) {
       // Cập nhật form data với cả code và name
-      console.log('✅ Updating shipping district in form data:', `${value}|${districtName}`);
       const evt = {
         target: {
           name: 'receiverDistrict',
@@ -351,7 +330,7 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
       } as React.ChangeEvent<HTMLInputElement>;
       handleChange(evt);
     } else {
-      console.warn('⚠️ Shipping district name not found for code:', value);
+      console.warn('⚠️ Shipping district name not found for code:', value); 
     }
   };
 
@@ -364,7 +343,6 @@ export function useCustomerInfo(formData: CustomerFormData, handleChange: (e: Re
     // Ensure we have a valid wardName before updating form data
     if (wardName) {
       // Cập nhật form data với cả code và name
-      console.log('✅ Updating shipping ward in form data:', `${value}|${wardName}`);
       const evt = {
         target: {
           name: 'receiverWard',

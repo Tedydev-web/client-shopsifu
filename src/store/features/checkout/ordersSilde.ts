@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { OrderCreateRequest, ProductInfo } from '@/types/order.interface';
+import { OrderCreateRequest, ProductInfo, AppliedVoucherInfo } from '@/types/order.interface';
 
 // --- Interfaces cho State ---
 
@@ -23,17 +23,15 @@ interface ShopOrderInfo {
   discountCodes: string[];
 }
 
-
-
-// Cấu trúc state tổng thể cho slice này
 // Cấu trúc state tổng thể cho slice này
 interface CheckoutState {
   commonInfo: CommonOrderInfo;
   shopOrders: ShopOrderInfo[];
   shopProducts: Record<string, ProductInfo[]>; // Key là shopId
+  appliedVouchers: Record<string, AppliedVoucherInfo>; // Key là shopId
+  appliedPlatformVoucher: AppliedVoucherInfo | null; // For platform-wide voucher
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
-
 }
 
 // --- Initial State ---
@@ -46,6 +44,8 @@ const initialState: CheckoutState = {
   },
   shopOrders: [],
   shopProducts: {},
+  appliedVouchers: {},
+  appliedPlatformVoucher: null,
   status: 'idle',
   error: null,
 };
@@ -79,6 +79,27 @@ const checkoutSlice = createSlice({
     },
     // Reset state về ban đầu (sau khi thanh toán thành công hoặc hủy bỏ)
     clearCheckoutState: () => initialState,
+
+    // Áp dụng voucher cho một shop cụ thể
+    applyVoucher(state, action: PayloadAction<{ shopId: string; voucherInfo: AppliedVoucherInfo }>) {
+      const { shopId, voucherInfo } = action.payload;
+      state.appliedVouchers[shopId] = voucherInfo;
+    },
+
+    // Xóa voucher cho một shop cụ thể
+    removeVoucher(state, action: PayloadAction<{ shopId: string }>) {
+      delete state.appliedVouchers[action.payload.shopId];
+    },
+
+    // Áp dụng voucher cho toàn sàn
+    applyPlatformVoucher(state, action: PayloadAction<AppliedVoucherInfo | null>) {
+      state.appliedPlatformVoucher = action.payload;
+    },
+
+    // Xóa voucher của sàn
+    removePlatformVoucher(state) {
+      state.appliedPlatformVoucher = null;
+    },
   },
 });
 
@@ -89,11 +110,23 @@ export const {
   setShopOrders,
   updateDiscountForShop,
   clearCheckoutState,
+  applyVoucher,
+  removeVoucher,
+  applyPlatformVoucher,
+  removePlatformVoucher,
 } = checkoutSlice.actions;
 
 // --- Selectors ---
 
-const selectCheckoutState = (state: RootState) => state.checkout;
+const selectCheckoutState = (state: RootState) => state.orders;
+
+// Selector để lấy voucher của sàn đã áp dụng
+export const selectAppliedPlatformVoucher = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.appliedPlatformVoucher
+);
+
+
 
 // Selector để lấy thông tin chung
 export const selectCommonOrderInfo = createSelector(
@@ -130,6 +163,35 @@ export const selectOrderCreateRequest = createSelector(
       discountCodes: shopOrder.discountCodes,
       paymentGateway: commonInfo.paymentGateway!,
     }));
+  }
+);
+
+// Selector để lấy các voucher đã áp dụng
+export const selectAppliedVouchers = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.appliedVouchers
+);
+
+// Selector để tính tổng số tiền giảm giá từ tất cả các voucher (shop và platform)
+export const selectTotalDiscountAmount = createSelector(
+  [selectAppliedVouchers, selectAppliedPlatformVoucher],
+  (appliedVouchers, appliedPlatformVoucher) => {
+    let totalDiscount = 0;
+
+    // Tính tổng giảm giá từ voucher của các shop
+    totalDiscount += Object.values(appliedVouchers).reduce((total, voucher) => {
+      if (voucher && typeof voucher.discountAmount === 'number') {
+        return total + voucher.discountAmount;
+      }
+      return total;
+    }, 0);
+
+    // Cộng thêm giảm giá từ voucher của sàn nếu có
+    if (appliedPlatformVoucher && typeof appliedPlatformVoucher.discountAmount === 'number') {
+      totalDiscount += appliedPlatformVoucher.discountAmount;
+    }
+
+    return totalDiscount;
   }
 );
 

@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useCbbCategory } from '@/hooks/combobox/useCbbCategory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDropdown } from '../dropdown-context';
+import { createCategorySlug } from '@/utils/slugify';
 import '../style.css';
 
 
@@ -217,7 +218,10 @@ export function Categories() {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-base font-bold text-gray-800">{activeCategory.label}</h3>
-                    <Link href={`/category/${activeCategory.value}`} className="flex items-center text-sm text-red-600 hover:underline font-medium">
+                    <Link 
+                      href={createCategorySlug(activeCategory.label, [activeCategory.value])}
+                      className="flex items-center text-sm text-red-600 hover:underline font-medium"
+                    >
                       Xem tất cả
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </Link>
@@ -226,7 +230,7 @@ export function Categories() {
                                         {subCategories.map((item: CategoryOption) => (
                       <Link
                         key={item.value}
-                        href={`/product/${item.value}`}
+                        href={createCategorySlug(item.label, [activeCategory.value, item.value])} 
                         className="group block text-center p-2 rounded-lg transition-all duration-200"
                       >
                         <div className="w-full aspect-square relative mb-2 rounded-full overflow-hidden border border-gray-100 bg-gray-50">

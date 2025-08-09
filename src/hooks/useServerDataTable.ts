@@ -20,8 +20,8 @@ interface UseServerDataTableProps<T, U> {
   mapResponseToData?: (item: any) => U;
   /** Cấu hình sắp xếp ban đầu */
   initialSort?: {
-    sortBy: string;
-    sortOrder: 'asc' | 'desc';
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
     createdById?: number;
   };
   /** Giới hạn mặc định số lượng items mỗi trang */
@@ -60,7 +60,7 @@ export function useServerDataTable<T, U = T>({
   getResponseData,
   getResponseMetadata,
   mapResponseToData,
-  initialSort = { sortBy: 'id', sortOrder: 'asc' },
+  initialSort = { },
   defaultLimit = 10,
   requestConfig = {
     includeSearch: true,

@@ -15,6 +15,7 @@ import { useCbbCategory } from '@/hooks/combobox/useCbbCategory';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { createCategorySlug } from '@/utils/slugify';
 
 interface CategoryOption {
   value: string;
@@ -99,7 +100,7 @@ export function MobileCategories({ children }: MobileCategoriesProps) {
                   {selectedParent && (
                      <SheetClose asChild>
                         <Link
-                          href={`/category/${selectedParent.value}`}
+                          href={createCategorySlug(selectedParent.label, [selectedParent.value])}
                           className="block px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-gray-100 rounded-md"
                         >
                           Xem tất cả {selectedParent.label}
@@ -109,7 +110,7 @@ export function MobileCategories({ children }: MobileCategoriesProps) {
                   {subCategories.map((category) => (
                     <SheetClose asChild key={category.value}>
                       <Link
-                        href={`/category/${category.value}`}
+                        href={createCategorySlug(category.label, selectedParent?.value ? [selectedParent.value, category.value] : [category.value])}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
                       >
                         {category.label}

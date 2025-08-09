@@ -17,7 +17,7 @@ export const useCbbBrand = () => {
     const fetchBrands = async () => {
       try {
         setLoading(true);
-        const response = await getAllBrands({ page: 1, limit: 100 });
+        const response = await getAllBrands({ page: 1, limit: 1000 });
         if (response.data) {
           const formattedBrands = response.data.map((brand) => ({
             value: brand.id, // Giữ nguyên id dạng string từ API

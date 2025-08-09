@@ -50,7 +50,7 @@ const stats = [
 export const metadata: Metadata = metadataConfig['/admin']
 export default function AdminDashboard() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 h-screen bg-white">
       <div>
         <h1 className="text-3xl font-bold">Tổng quan</h1>
         <p className="text-muted-foreground">

@@ -3,7 +3,9 @@ import { API_ENDPOINTS } from "@/constants/api";
 import { 
   ClientProductsResponse, 
   ClientProductDetail, 
-  ClientProductsListParams 
+  ClientProductsListParams,
+  ClientSearchResponse,
+  ClientSearchParams
 } from "@/types/client.products.interface";
 
 export const clientProductsService = {
@@ -34,6 +36,40 @@ export const clientProductsService = {
       return response.data.data;
     } catch (error) {
       console.error(`Error fetching client product detail with id ${id}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Search for products based on query string and other filters
+   * @param params - Search parameters including query string and filters
+   * @returns Promise with search results
+   */
+  searchProducts: async (params: ClientSearchParams): Promise<ClientSearchResponse> => {
+    try {
+      const response = await publicAxios.get(API_ENDPOINTS.PRODUCTS.SEARCH, { params });
+      return response.data;
+    } catch (error) {
+      console.error("Error searching products:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get search suggestions based on a query string
+   * Used for autocomplete in search inputs
+   * @param query - The search query
+   * @param limit - Maximum number of results to return
+   * @returns Promise with search suggestions
+   */
+  getSearchSuggestions: async (query: string, limit: number = 5): Promise<ClientSearchResponse> => {
+    try {
+      const response = await publicAxios.get(API_ENDPOINTS.PRODUCTS.SEARCH, { 
+        params: { q: query, limit } 
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching search suggestions:", error);
       throw error;
     }
   }
