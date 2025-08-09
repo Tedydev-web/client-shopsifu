@@ -3,186 +3,129 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { Voucher, VoucherCreateRequest, VoucherUpdateRequest } from '@/types/admin/voucher.interface';
-import { mockVouchers, mockPagination } from '../voucher-Mockdata';
+import { useDebounce } from '@/hooks/useDebounce';
+import { Discount, CreateDiscountRequest, UpdateDiscountRequest } from '@/types/discount.interface';
+import { discountService } from '@/services/discountService';
 
 export function useVouchers() {
   const t = useTranslations('admin.ModuleVouchers');
-
-  // Data state
-  const [data, setData] = useState<Voucher[]>([]);
+  const [data, setData] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
-    total: 0,
+    totalItems: 0,
     page: 1,
     limit: 10,
     totalPages: 1,
-    search: ''
+    search: '',
   });
+  const [debouncedSearch] = useDebounce(pagination.search, 500);
 
-  // Modal states
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [voucherToDelete, setVoucherToDelete] = useState<Voucher | null>(null);
+  const [voucherToDelete, setVoucherToDelete] = useState<Discount | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
   const [upsertOpen, setUpsertOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [voucherToEdit, setVoucherToEdit] = useState<Voucher | null>(null);
+  const [voucherToEdit, setVoucherToEdit] = useState<Discount | null>(null);
 
-  // Fetch mock data
-  useEffect(() => {
+  const fetchData = async () => {
     setLoading(true);
-    // Simulate API call delay
-    setTimeout(() => {
-      setData(mockVouchers);
-      setPagination({
-        ...pagination,
-        total: mockPagination.total,
-        totalPages: mockPagination.totalPages
+    try {
+      const response = await discountService.getAll({
+        page: pagination.page,
+        limit: pagination.limit,
+        search: debouncedSearch,
       });
+      setData(response.data);
+      setPagination(prev => ({
+        ...prev,
+        totalItems: response.metadata?.totalItems ?? 0,
+        totalPages: response.metadata?.totalPages ?? 1,
+      }));
+    } catch (error) {
+      console.error('Failed to fetch vouchers', error);
+      toast.error('Failed to fetch vouchers');
+    } finally {
       setLoading(false);
-    }, 500);
-  }, []);
-
-  // Data handling functions
-  const handleSearch = (search: string) => {
-    setPagination({...pagination, search, page: 1});
-    // Mock search in local data
-    if (search) {
-      const filteredData = mockVouchers.filter(voucher => 
-        voucher.code.toLowerCase().includes(search.toLowerCase()) || 
-        voucher.name.toLowerCase().includes(search.toLowerCase())
-      );
-      setData(filteredData);
-    } else {
-      setData(mockVouchers);
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [pagination.page, pagination.limit, debouncedSearch]);
+
+  const handleSearch = (search: string) => {
+    setPagination(prev => ({ ...prev, search, page: 1 }));
+  };
+
   const handlePageChange = (page: number) => {
-    setPagination({...pagination, page});
+    setPagination(prev => ({ ...prev, page }));
   };
 
   const handleLimitChange = (limit: number) => {
-    setPagination({...pagination, limit, page: 1});
+    setPagination(prev => ({ ...prev, limit, page: 1 }));
   };
 
-  const refreshData = () => {
-    // Re-fetch mock data
-    setData([...mockVouchers]);
-  };
-
-  // Open delete modal
-  const handleOpenDelete = (voucher: Voucher) => {
+  const handleOpenDelete = (voucher: Discount) => {
     setVoucherToDelete(voucher);
     setDeleteOpen(true);
   };
 
-  // Close delete modal
   const handleCloseDeleteModal = () => {
     setDeleteOpen(false);
     setVoucherToDelete(null);
   };
 
-  // Confirm delete action
   const handleConfirmDelete = async () => {
     if (!voucherToDelete) return;
-    
     setDeleteLoading(true);
     try {
-      // Simulate API deletion
-      setTimeout(() => {
-        // Filter out the deleted voucher
-        setData(data.filter(item => item.id !== voucherToDelete.id));
-        
-        toast(t('Table.deleteConfirm.success'), {
-          description: t('Table.deleteConfirm.successDesc', { code: voucherToDelete.code }),
-        });
-        
-        setDeleteLoading(false);
-        handleCloseDeleteModal();
-      }, 500);
+      await discountService.delete(voucherToDelete.id);
+      toast.success(t('Form.deleteSuccess'), {
+        description: t('Form.deleteSuccessDesc', { code: voucherToDelete.code }),
+      });
+      handleCloseDeleteModal();
+      fetchData(); // Re-fetch data
     } catch (error) {
       console.error('Error deleting voucher:', error);
-      toast(t('Table.deleteConfirm.error'), {
-        description: t('Table.deleteConfirm.errorDesc')
-      });
+      toast.error(t('Form.deleteError'));
+    } finally {
       setDeleteLoading(false);
-      handleCloseDeleteModal();
     }
   };
 
-  // Open add/edit modal
-  const handleOpenUpsertModal = (mode: 'add' | 'edit', voucher?: Voucher) => {
+  const handleOpenUpsertModal = (mode: 'add' | 'edit', voucher?: Discount) => {
     setModalMode(mode);
-    if (mode === 'edit' && voucher) {
-      setVoucherToEdit(voucher);
-    } else {
-      setVoucherToEdit(null);
-    }
+    setVoucherToEdit(voucher || null);
     setUpsertOpen(true);
   };
 
-  // Close add/edit modal
   const handleCloseUpsertModal = () => {
     setUpsertOpen(false);
     setVoucherToEdit(null);
   };
 
-  // Add voucher
-  const addVoucher = async (formData: VoucherCreateRequest) => {
+  const handleConfirmUpsert = async (values: CreateDiscountRequest | Partial<UpdateDiscountRequest>) => {
+    setLoading(true);
     try {
-      // Simulate API creation
-      setTimeout(() => {
-        // Create a new voucher with a generated ID
-        const newVoucher = {
-          ...formData,
-          id: `new-${Date.now()}`,
-          usageCount: 0,
-          discountStatus: 'ACTIVE',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        } as unknown as Voucher;
-        
-        // Add the new voucher to the data
-        setData([newVoucher, ...data]);
-        
-        toast(t('Form.addSuccess'), {
-          description: t('Form.addSuccessDesc', { code: formData.code }),
+      if (modalMode === 'add') {
+        await discountService.create(values as CreateDiscountRequest);
+        toast.success(t('Form.addSuccess'), {
+          description: t('Form.addSuccessDesc', { code: (values as CreateDiscountRequest).code }),
         });
-        
-        handleCloseUpsertModal();
-      }, 500);
-    } catch (error) {
-      console.error('Error adding voucher:', error);
-      toast(t('Form.addError'), {
-        description: t('Form.addErrorDesc'),
-      });
-    }
-  };
-
-  // Edit voucher
-  const editVoucher = async (formData: Voucher) => {
-    try {
-      // Simulate API update
-      setTimeout(() => {
-        // Update the voucher in the data
-        const updatedData = data.map(item => 
-          item.id === formData.id ? { ...item, ...formData, updatedAt: new Date().toISOString() } : item
-        );
-        
-        setData(updatedData);
-        
-        toast(t('Form.editSuccess'), {
-          description: t('Form.editSuccessDesc', { code: formData.code }),
+      } else if (voucherToEdit?.id) {
+        await discountService.update(voucherToEdit.id, values as Partial<UpdateDiscountRequest>);
+        toast.success(t('Form.editSuccess'), {
+          description: t('Form.editSuccessDesc', { code: values.code || voucherToEdit.code }),
         });
-        
-        handleCloseUpsertModal();
-      }, 500);
+      }
+      handleCloseUpsertModal();
+      fetchData(); // Re-fetch data
     } catch (error) {
-      console.error('Error updating voucher:', error);
-      toast(t('Form.editError'), {
-        description: t('Form.editErrorDesc'),
-      });
+      console.error('Error saving voucher:', error);
+      toast.error(t('Form.addError'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -204,7 +147,6 @@ export function useVouchers() {
     voucherToEdit,
     handleOpenUpsertModal,
     handleCloseUpsertModal,
-    addVoucher,
-    editVoucher,
+    handleConfirmUpsert,
   };
 }

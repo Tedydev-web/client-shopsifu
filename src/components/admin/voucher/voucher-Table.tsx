@@ -36,17 +36,8 @@ export default function VoucherTable() {
     voucherToEdit,
     handleOpenUpsertModal,
     handleCloseUpsertModal,
-    addVoucher,
-    editVoucher,
+    handleConfirmUpsert,
   } = useVouchers();
-
-  const handleSubmit = async (formData: Voucher | VoucherCreateRequest) => {
-    if (modalMode === 'edit') {
-      await editVoucher(formData as Voucher);
-    } else {
-      await addVoucher(formData as VoucherCreateRequest);
-    }
-  };
 
   const table = useDataTable({
       data: data,

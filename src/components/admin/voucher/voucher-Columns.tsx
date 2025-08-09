@@ -1,7 +1,7 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { Voucher } from '@/types/admin/voucher.interface'
+import { Discount, DiscountStatus, DiscountType } from '@/types/discount.interface'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/ui/data-table-component/data-table-column-header'
@@ -11,29 +11,29 @@ import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
 
 const getVoucherActions = (
-  onDelete: (voucher: Voucher) => void,
-  onEdit: (voucher: Voucher) => void,
+  onDelete: (voucher: Discount) => void,
+  onEdit: (voucher: Discount) => void,
   t: (key: string) => string
-): ActionItem<Voucher>[] => [
+): ActionItem<Discount>[] => [
   {
     type: 'command',
     label: t('actions.edit'),
     icon: <Edit className="w-4 h-4" />,
-    onClick: (voucher) => onEdit(voucher),
+    onClick: (voucher) => onEdit(voucher as Discount),
   },
   { type: 'separator' },
   {
     type: 'command',
     label: t('actions.delete'),
     icon: <Trash2 className="w-4 h-4" />,
-    onClick: (voucher) => onDelete(voucher),
+    onClick: (voucher) => onDelete(voucher as Discount),
     className: 'text-red-500 hover:!text-red-500',
   },
 ]
 
 export const voucherColumns = (
-  { onDelete, onEdit }: { onDelete: (voucher: Voucher) => void; onEdit: (voucher: Voucher) => void }
-): ColumnDef<Voucher>[] => {
+  { onDelete, onEdit }: { onDelete: (voucher: Discount) => void; onEdit: (voucher: Discount) => void }
+): ColumnDef<Discount>[] => {
   const t = useTranslations("admin.ModuleVouchers.Table");
 
   return [
@@ -86,38 +86,39 @@ export const voucherColumns = (
       },
     },
     {
-      accessorKey: 'discountValue',
+      accessorKey: 'value',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('discountValue')} />,
       cell: ({ row }) => {
-        const value = row.original.id || 0;
+        const value = row.original.value || 0;
         const type = row.original.discountType;
-        return <div>{type === 'PERCENTAGE' ? `${value}%` : `${value.toLocaleString()}₫`}</div>;
+        return <div>{type === DiscountType.PERCENTAGE ? `${value}%` : `${value.toLocaleString()}₫`}</div>;
       },
     },
     {
-      accessorKey: 'status',
+      accessorKey: 'discountStatus',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('status')} />,
       cell: ({ row }) => {
-        const status = row.getValue('status');
+        const status = row.getValue('discountStatus') as DiscountStatus;
         let badgeClass = 'border-gray-500 text-gray-500 bg-gray-50';
-        let statusText = 'Không hoạt động';
-        
-        if (status === 'ACTIVE') {
-          badgeClass = 'border-green-600 text-green-600 bg-green-50';
-          statusText = 'Hoạt động';
-        } else if (status === 'EXPIRED') {
-          badgeClass = 'border-orange-500 text-orange-500 bg-orange-50';
-          statusText = 'Hết hạn';
-        } else if (status === 'USED') {
-          badgeClass = 'border-blue-500 text-blue-500 bg-blue-50';
-          statusText = 'Đã sử dụng';
+        let statusText = 'Không xác định';
+
+        switch (status) {
+          case DiscountStatus.ACTIVE:
+            badgeClass = 'border-green-600 text-green-600 bg-green-50';
+            statusText = 'Hoạt động';
+            break;
+          case DiscountStatus.INACTIVE:
+            badgeClass = 'border-gray-500 text-gray-500 bg-gray-50';
+            statusText = 'Không hoạt động';
+            break;
+          case DiscountStatus.EXPIRED:
+            badgeClass = 'border-orange-500 text-orange-500 bg-orange-50';
+            statusText = 'Hết hạn';
+            break;
         }
-        
+
         return (
-          <Badge
-            variant="outline"
-            className={badgeClass}
-          >
+          <Badge variant="outline" className={badgeClass}>
             {statusText}
           </Badge>
         );
@@ -125,18 +126,18 @@ export const voucherColumns = (
       filterFn: (row, id, value) => value.includes(row.getValue(id)),
     },
     {
-      accessorKey: 'validFrom',
+      accessorKey: 'startDate',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('validFrom')} />,
       cell: ({ row }) => {
-        const date = new Date(row.getValue('validFrom'));
+        const date = new Date(row.getValue('startDate'));
         return <span>{format(date, 'dd/MM/yyyy')}</span>;
       },
     },
     {
-      accessorKey: 'validTo',
+      accessorKey: 'endDate',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('validTo')} />,
       cell: ({ row }) => {
-        const date = new Date(row.getValue('validTo'));
+        const date = new Date(row.getValue('endDate'));
         return <span>{format(date, 'dd/MM/yyyy')}</span>;
       },
     },
