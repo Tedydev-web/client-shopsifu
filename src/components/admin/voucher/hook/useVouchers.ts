@@ -1,72 +1,75 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { useDebounce } from '@/hooks/useDebounce';
-import { Discount, CreateDiscountRequest, UpdateDiscountRequest } from '@/types/discount.interface';
+import { Discount, CreateDiscountRequest, UpdateDiscountRequest, DiscountStatus, DiscountType, DiscountGetAllResponse } from '@/types/discount.interface';
 import { discountService } from '@/services/discountService';
+import { useUserData } from '@/hooks/useGetData-UserLogin';
+import { useServerDataTable } from '@/hooks/useServerDataTable';
+import { PaginationRequest } from '@/types/base.interface';
+
+export type VoucherColumn = {
+  id: string;
+  name: string;
+  code: string;
+  discountType: DiscountType;
+  value: number;
+  startDate: string;
+  endDate: string;
+  discountStatus: DiscountStatus;
+  createdAt: string;
+  updatedAt: string;
+  original: Discount;
+};
 
 export function useVouchers() {
   const t = useTranslations('admin.ModuleVouchers');
-  const [data, setData] = useState<Discount[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    totalItems: 0,
-    page: 1,
-    limit: 10,
-    totalPages: 1,
-    search: '',
-  });
-  const [debouncedSearch] = useDebounce(pagination.search, 500);
+  const user = useUserData();
 
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [voucherToDelete, setVoucherToDelete] = useState<Discount | null>(null);
+  const [voucherToDelete, setVoucherToDelete] = useState<VoucherColumn | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [upsertOpen, setUpsertOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [voucherToEdit, setVoucherToEdit] = useState<Discount | null>(null);
+  const [voucherToEdit, setVoucherToEdit] = useState<VoucherColumn | null>(null);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await discountService.getAll({
-        page: pagination.page,
-        limit: pagination.limit,
-        search: debouncedSearch,
-      });
-      setData(response.data);
-      setPagination(prev => ({
-        ...prev,
-        totalItems: response.metadata?.totalItems ?? 0,
-        totalPages: response.metadata?.totalPages ?? 1,
-      }));
-    } catch (error) {
-      console.error('Failed to fetch vouchers', error);
-      toast.error('Failed to fetch vouchers');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data,
+    loading,
+    pagination,
+    handleSearch,
+    handlePageChange,
+    handleLimitChange,
+    refreshData,
+  } = useServerDataTable<Discount, VoucherColumn>({
+    fetchData: useCallback((params: PaginationRequest) => {
+        if (!user?.id) {
+            // Return a promise that resolves to an empty response
+            return Promise.resolve({ data: [], metadata: { totalItems: 0, totalPages: 1, page: 1, limit: 10 } } as DiscountGetAllResponse);
+        }
+        return discountService.getAll({ ...params, createdById: user.id });
+    }, [user?.id]),
+    getResponseData: (response) => response.data,
+    getResponseMetadata: (response) => response.metadata,
+    mapResponseToData: (item: Discount): VoucherColumn => ({
+      id: item.id,
+      name: item.name,
+      code: item.code,
+      discountType: item.discountType,
+      value: item.value,
+      startDate: item.startDate,
+      endDate: item.endDate,
+      discountStatus: item.discountStatus,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      original: item,
+    }),
+    initialSort: { createdById: user?.id },
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [pagination.page, pagination.limit, debouncedSearch]);
-
-  const handleSearch = (search: string) => {
-    setPagination(prev => ({ ...prev, search, page: 1 }));
-  };
-
-  const handlePageChange = (page: number) => {
-    setPagination(prev => ({ ...prev, page }));
-  };
-
-  const handleLimitChange = (limit: number) => {
-    setPagination(prev => ({ ...prev, limit, page: 1 }));
-  };
-
-  const handleOpenDelete = (voucher: Discount) => {
+  const handleOpenDelete = (voucher: VoucherColumn) => {
     setVoucherToDelete(voucher);
     setDeleteOpen(true);
   };
@@ -85,7 +88,7 @@ export function useVouchers() {
         description: t('Form.deleteSuccessDesc', { code: voucherToDelete.code }),
       });
       handleCloseDeleteModal();
-      fetchData(); // Re-fetch data
+      refreshData(); // Re-fetch data
     } catch (error) {
       console.error('Error deleting voucher:', error);
       toast.error(t('Form.deleteError'));
@@ -94,7 +97,7 @@ export function useVouchers() {
     }
   };
 
-  const handleOpenUpsertModal = (mode: 'add' | 'edit', voucher?: Discount) => {
+  const handleOpenUpsertModal = (mode: 'add' | 'edit', voucher?: VoucherColumn) => {
     setModalMode(mode);
     setVoucherToEdit(voucher || null);
     setUpsertOpen(true);
@@ -106,7 +109,6 @@ export function useVouchers() {
   };
 
   const handleConfirmUpsert = async (values: CreateDiscountRequest | Partial<UpdateDiscountRequest>) => {
-    setLoading(true);
     try {
       if (modalMode === 'add') {
         await discountService.create(values as CreateDiscountRequest);
@@ -120,12 +122,10 @@ export function useVouchers() {
         });
       }
       handleCloseUpsertModal();
-      fetchData(); // Re-fetch data
+      refreshData(); // Re-fetch data
     } catch (error) {
       console.error('Error saving voucher:', error);
       toast.error(t('Form.addError'));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -148,5 +148,6 @@ export function useVouchers() {
     handleOpenUpsertModal,
     handleCloseUpsertModal,
     handleConfirmUpsert,
+    refreshData,
   };
 }

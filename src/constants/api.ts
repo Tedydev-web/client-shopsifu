@@ -167,7 +167,7 @@ export const API_ENDPOINTS = {
   },
   // QUẢN LÝ MÃ GIẢM GIÁ - DISCOUNT
   DISCOUNT:{
-    GETALL: `${API_BASE}/manage-discount/discount`,
+    GETALL: `${API_BASE}/manage-discount/discounts`,
     CREATE: `${API_BASE}/manage-discount/discounts`,
     UPDATE: `${API_BASE}/manage-discount/discounts/:discountId`,
     DELETE: `${API_BASE}/manage-discount/discounts/:discountId`,

@@ -301,6 +301,11 @@
       "privateVoucherDesc": "Voucher áp dụng cho người dùng riêng tư",
       "create": "Tạo",
       "Table":{
+        "discountValue": "Giá trị giảm",
+        "validFrom": "Valid from",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "validTo": "Valid to",
         "name": "Tên voucher",
         "code": "Mã voucher",
         "discount": "Giảm giá",
@@ -310,7 +315,14 @@
           "edit": "Chỉnh sửa",
           "delete": "Xóa"
         },
-        "searchPlaceholder": "Tìm kiếm theo tên voucher"
+        "searchPlaceholder": "Tìm kiếm theo tên voucher",
+        "notFound": "Không tìm thấy voucher",
+        "deleteConfirm":{
+          "title": "Xác nhận xóa voucher",
+          "description": "Bạn có chắc chắn muốn xóa voucher này không? Hành động này không thể hoàn tác.",
+          "deleteAction": "Xóa ngay",
+          "cancel": "Hủy bỏ"
+        }
       }
     },
     "ModuleUsers": {

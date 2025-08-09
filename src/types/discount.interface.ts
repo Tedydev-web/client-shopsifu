@@ -4,12 +4,12 @@ import { BaseResponse, PaginationRequest, PaginationMetadata } from "./base.inte
 // ENUMS
 // ==================================================
 export enum DiscountType {
-  PERCENTAGE = 'percentage',
-  FIXED_AMOUNT = 'fixed_amount',
+  PERCENTAGE = 'PERCENTAGE',
+  FIXED_AMOUNT = 'FIXED_AMOUNT',
 }
 
 export enum DiscountApplyType {
-  ALL = 'all',
+  ALL = 'ALL',
   SPECIFIC = 'specific',
 }
 
@@ -20,9 +20,9 @@ export enum VoucherType {
 }
 
 export enum DiscountStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  EXPIRED = 'expired',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  EXPIRED = 'EXPIRED',
 }
 
 // ==================================================

@@ -198,7 +198,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               </Button>
             </div>
             <div className="flex justify-between">
-              <span>Bảo hành tại CellphoneS</span>
+              <span>Bảo hành tại Shopsifu</span>
               <Button variant="link" className="text-primary px-0">
                 Truy cập
               </Button>
