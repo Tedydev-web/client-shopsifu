@@ -198,7 +198,7 @@ export function ProductSpecificationsForm({ specifications, handleSpecifications
   }).length;
 
   return (
-    <Card className="border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors">
+    <Card className="border border-gray-200 hover:border-gray-300 transition-colors">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
