@@ -8,6 +8,7 @@ import { OrderStatus } from "@/types/order.interface";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+import { createProductSlug } from "@/components/client/products/shared/productSlug";
 
 const statusLabel: Record<OrderStatus, string> = {
   PENDING_PAYMENT: "Chờ thanh toán",
@@ -52,12 +53,6 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   return (
     <>
       {tabs.map((value) => (
-        // <TabsContent
-        //   key={value}
-        //   value={value}
-        //   className="bg-white rounded-xl min-h-[60vh] sm:min-h-[70vh] px-2 sm:px-4 pb-2
-        //              data-[state=active]:shadow-lg transition-all"
-        // >
         <TabsContent
           key={value}
           value={value}
@@ -121,8 +116,8 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                     {/* Right: Status + Price */}
                     <div
                       className="flex flex-row sm:flex-col items-center sm:items-end 
-                                    justify-between sm:justify-start 
-                                    gap-2 mt-3 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
+             justify-between sm:justify-start 
+             gap-2 mt-3 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
                     >
                       <div className="text-gray-400">
                         {statusLabel[order.status]}
@@ -133,6 +128,26 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                           {totalAmount.toLocaleString()}đ
                         </span>
                       </div>
+                      {order.status === "DELIVERED" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-orange-500 border-orange-500 hover:bg-orange-50"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Tạo slug từ tên và id sản phẩm
+                            const productSlug = createProductSlug(
+                              firstItem.productName,
+                              firstItem.productId
+                            );
+                            router.push(
+                              `/products/${productSlug}?showReview=true`
+                            );
+                          }}
+                        >
+                          Đánh giá
+                        </Button>
+                      )}
                       <div className="text-blue-500">Xem chi tiết →</div>
                     </div>
                   </div>
