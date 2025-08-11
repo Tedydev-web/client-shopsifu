@@ -20,17 +20,22 @@ export const useProductReview = (productId: string) => {
   // Lấy danh sách review theo productId
   const fetchReviews = useCallback(
     async (params?: PaginationRequest) => {
+      if (!productId) return; // tránh gọi API khi chưa có productId
       try {
         setLoading(true);
         setError(null);
-        const res = await reviewService.getReviewsByProductId(productId, params);
+        const res = await reviewService.getReviewsByProductId(
+          productId,
+          params
+        );
         const data: GetReviewsResponse = res.data;
-        setReviews(data.data);
+        setReviews(data.data || []);
         setTotalItems(data.metadata?.totalItems ?? 0);
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
         setError(
-          axiosError.response?.data?.message || "Không thể tải danh sách đánh giá"
+          axiosError.response?.data?.message ||
+            "Không thể tải danh sách đánh giá"
         );
       } finally {
         setLoading(false);
