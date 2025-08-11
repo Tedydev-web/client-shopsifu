@@ -116,8 +116,8 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                     {/* Right: Status + Price + Actions */}
                     <div
                       className="flex flex-row sm:flex-col items-center sm:items-end 
-                                    justify-between sm:justify-start 
-                                    gap-2 mt-3 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
+             justify-between sm:justify-start 
+             gap-2 mt-3 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
                     >
                       <div className="text-gray-400">
                         {statusLabel[order.status]}
@@ -128,6 +128,26 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                           {totalAmount.toLocaleString()}đ
                         </span>
                       </div>
+                      {order.status === "DELIVERED" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-orange-500 border-orange-500 hover:bg-orange-50"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Tạo slug từ tên và id sản phẩm
+                            const productSlug = createProductSlug(
+                              firstItem.productName,
+                              firstItem.productId
+                            );
+                            router.push(
+                              `/products/${productSlug}?showReview=true`
+                            );
+                          }}
+                        >
+                          Đánh giá
+                        </Button>
+                      )}
                       <div className="text-blue-500">Xem chi tiết →</div>
 
                       {/* Nút Đánh giá sản phẩm */}
