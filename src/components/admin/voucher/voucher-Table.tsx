@@ -1,23 +1,16 @@
 'use client'
-import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
-import { DataTable } from '@/components/ui/data-table-component/data-table'
-import { voucherColumns } from './voucher-Columns'
-import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal'
-// import VoucherModalUpsert from './voucher-ModalUpsert'
-import { useVouchers } from './hook/useVouchers'
-import SearchInput from '@/components/ui/data-table-component/search-input'
-import { PlusIcon } from 'lucide-react'
-import { Voucher, VoucherCreateRequest } from '@/types/admin/voucher.interface'
-import { useDataTable } from '@/hooks/useDataTable'
-import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option'
-import VoucherFormCreate from './voucher-FormCreate'
-import { useState } from 'react'
+import { useTranslations } from 'next-intl';
+import { DataTable } from '@/components/ui/data-table-component/data-table';
+import { voucherColumns } from './voucher-Columns';
+import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal';
+import { useVouchers } from './hook/useVouchers';
+import SearchInput from '@/components/ui/data-table-component/search-input';
+import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option';
+import VoucherFormCreate from './voucher-FormCreate';
+import { useDataTable } from '@/hooks/useDataTable';
 
 export default function VoucherTable() {
   const t = useTranslations("admin.ModuleVouchers.Table");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  
   const {
     data,
     loading,
@@ -31,17 +24,17 @@ export default function VoucherTable() {
     handleOpenDelete,
     handleConfirmDelete,
     handleCloseDeleteModal,
-    upsertOpen,
-    modalMode,
-    voucherToEdit,
     handleOpenUpsertModal,
-    handleCloseUpsertModal,
-    handleConfirmUpsert,
   } = useVouchers();
+
+  const columns = voucherColumns({ 
+    onEdit: (voucher) => handleOpenUpsertModal('edit', voucher),
+    onDelete: handleOpenDelete 
+  });
 
   const table = useDataTable({
       data: data,
-      columns: voucherColumns({ onEdit: (voucher) => handleOpenUpsertModal('edit', voucher), onDelete: handleOpenDelete }),
+      columns: columns,
     });
   return (
     <div className="w-full space-y-4">
@@ -54,7 +47,7 @@ export default function VoucherTable() {
         <div className="flex-1">
           <SearchInput
             value={pagination.search || ""}
-            onValueChange={(value) => handleSearch(value)}
+            onValueChange={handleSearch}
             placeholder={t("searchPlaceholder")}
             className="w-full md:max-w-sm"
           />
@@ -66,7 +59,7 @@ export default function VoucherTable() {
       <div className="relative">
         <DataTable
           table={table}
-          columns={voucherColumns({ onEdit: (voucher) => handleOpenUpsertModal('edit', voucher), onDelete: handleOpenDelete })}
+          columns={columns}
           loading={loading}
           notFoundMessage={t('notFound')}
           pagination={{

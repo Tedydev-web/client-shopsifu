@@ -57,6 +57,12 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
     return;
   }
 
+  // Validate payment method
+  if (!context.state.paymentMethod) {
+    toast.error('Vui lòng chọn phương thức thanh toán.');
+    return;
+  }
+
   // Check if we have orders from Redux
   if (!shopOrders || shopOrders.length === 0) {
     toast.error('Không có sản phẩm nào để đặt hàng.');
@@ -65,8 +71,8 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
     const getPaymentGatewayId = (paymentMethod: string): string => {
       // Map payment method IDs to the correct gateway format
       const paymentGatewayMap: { [key: string]: string } = {
-        'cod': 'COD',
-        'momo': 'momo',
+        // 'cod': 'COD',
+        // 'momo': 'momo',
         'sepay': 'sepay',
         'vnpay': 'vnpay'
       };

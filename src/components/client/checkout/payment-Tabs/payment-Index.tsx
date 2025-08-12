@@ -102,7 +102,7 @@ export function PaymentTabs({ onPrevious }: PaymentTabsProps) {
 
       {/* Phương thức thanh toán */}
       <PaymentMethods 
-        paymentMethod={state.paymentMethod}
+        paymentMethod={state.paymentMethod || ''}
         handlePaymentMethodChange={handlePaymentMethodChange}
       />
     </div>

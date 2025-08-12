@@ -1,7 +1,8 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { Discount, DiscountStatus, DiscountType } from '@/types/discount.interface'
+import { DiscountStatus, DiscountType } from '@/types/discount.interface'
+import { VoucherColumn } from './hook/useVouchers'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/ui/data-table-component/data-table-column-header'
@@ -11,29 +12,29 @@ import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
 
 const getVoucherActions = (
-  onDelete: (voucher: Discount) => void,
-  onEdit: (voucher: Discount) => void,
+  onDelete: (voucher: VoucherColumn) => void,
+  onEdit: (voucher: VoucherColumn) => void,
   t: (key: string) => string
-): ActionItem<Discount>[] => [
+): ActionItem<VoucherColumn>[] => [
   {
     type: 'command',
     label: t('actions.edit'),
     icon: <Edit className="w-4 h-4" />,
-    onClick: (voucher) => onEdit(voucher as Discount),
+    onClick: (voucher) => onEdit(voucher as VoucherColumn),
   },
   { type: 'separator' },
   {
     type: 'command',
     label: t('actions.delete'),
     icon: <Trash2 className="w-4 h-4" />,
-    onClick: (voucher) => onDelete(voucher as Discount),
+    onClick: (voucher) => onDelete(voucher as VoucherColumn),
     className: 'text-red-500 hover:!text-red-500',
   },
 ]
 
 export const voucherColumns = (
-  { onDelete, onEdit }: { onDelete: (voucher: Discount) => void; onEdit: (voucher: Discount) => void }
-): ColumnDef<Discount>[] => {
+  { onDelete, onEdit }: { onDelete: (voucher: VoucherColumn) => void; onEdit: (voucher: VoucherColumn) => void }
+): ColumnDef<VoucherColumn>[] => {
   const t = useTranslations("admin.ModuleVouchers.Table");
 
   return [

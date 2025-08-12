@@ -34,7 +34,7 @@ interface CheckoutState {
   receiverInfo: ReceiverInfo;
   shippingMethod: ShippingMethod;
   shippingAddress: ShippingAddress | null;
-  paymentMethod: PaymentMethod;
+  paymentMethod: PaymentMethod | null;
   discounts: DiscountInfo[];
   acceptTerms: boolean;
 }
@@ -60,7 +60,7 @@ const initialState: CheckoutState = {
   },
   shippingMethod: 'delivery',
   shippingAddress: null,
-  paymentMethod: 'cod',
+  paymentMethod: null,
   discounts: [],
   acceptTerms: false,
 };
