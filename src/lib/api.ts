@@ -11,7 +11,6 @@ import { API_ENDPOINTS } from '@/constants/api';
 import { useLogout } from '@/hooks/useLogout';
 import { ROUTES } from '@/constants/route';
 import { getStore } from '@/store/store';
-import { cookies } from 'next/headers';
 import { clearProfile } from '@/store/features/auth/profileSlide';
 // import { useClearGlobalState } from '@/hooks/useClearGlobalState';
 import { clearClientState } from '@/utils/stateManager';
