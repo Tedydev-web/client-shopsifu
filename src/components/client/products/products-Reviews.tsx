@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Star, ThumbsUp } from "lucide-react";
+import { Star } from "lucide-react";
 import Image from "next/image";
 import { format, isValid } from "date-fns";
 import { useProductReview } from "./hooks/useProductReview";
@@ -26,6 +26,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import useUploadMedia from "@/hooks/useUploadMedia";
 
 const StarRating = ({
   rating,
@@ -91,10 +92,6 @@ const ReviewItem = ({ review }: { review: Review }) => {
               ))}
             </div>
           )}
-          {/* <div className="flex items-center text-gray-500 mt-3">
-            <ThumbsUp className="h-4 w-4 mr-1" />
-            <span className="text-sm">{review.likes || 0}</span>
-          </div> */}
         </div>
       </div>
     </div>
@@ -106,19 +103,23 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<File[]>([]);
   const [page, setPage] = useState(1);
   const limit = 5;
 
   const searchParams = useSearchParams();
+  const { reviews, totalItems, loading, error, fetchReviews, createReview } =
+    useProductReview(productId);
+
+  // Upload media hook
   const {
-    reviews,
-    totalItems,
-    loading,
-    error,
-    fetchReviews,
-    createReview,
-  } = useProductReview(productId);
+    files,
+    uploadedUrls,
+    isUploading,
+    progress,
+    handleAddFiles,
+    handleRemoveFile,
+    handleRemoveAllFiles,
+  } = useUploadMedia();
 
   useEffect(() => {
     if (searchParams.get("showReview") === "true") {
@@ -126,7 +127,6 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
     }
   }, [searchParams]);
 
-  // Fetch khi thay đổi page hoặc filter
   useEffect(() => {
     fetchReviews({
       page,
@@ -146,16 +146,16 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
       orderId: searchParams.get("orderId") || "",
       rating,
       content,
-      medias: images.map((file) => ({
-        url: URL.createObjectURL(file), // tạm, backend cần upload file thật
+      medias: uploadedUrls.map((url) => ({
+        url,
         type: "IMAGE" as const,
       })),
     });
     setIsReviewOpen(false);
     setRating(5);
     setContent("");
-    setImages([]);
-    setPage(1); // load lại từ đầu
+    handleRemoveAllFiles();
+    setPage(1);
   };
 
   const totalPages = Math.ceil(totalItems / limit);
@@ -219,7 +219,7 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
             <span className="font-bold text-3xl">
               {summary.average.toFixed(1)}
             </span>{" "}
-            trên 5
+            /5
           </p>
           <div className="flex justify-center">
             <StarRating rating={Math.round(summary.average)} size={6} />
@@ -277,7 +277,9 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
                         e.preventDefault();
                         if (page > 1) setPage((p) => p - 1);
                       }}
-                      className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                      className={
+                        page === 1 ? "pointer-events-none opacity-50" : ""
+                      }
                     />
                   </PaginationItem>
                   {[...Array(totalPages)].map((_, i) => (
@@ -302,7 +304,9 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
                         if (page < totalPages) setPage((p) => p + 1);
                       }}
                       className={
-                        page === totalPages ? "pointer-events-none opacity-50" : ""
+                        page === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : ""
                       }
                     />
                   </PaginationItem>
@@ -343,10 +347,41 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
                 type="file"
                 multiple
                 accept="image/*"
-                onChange={(e) =>
-                  setImages(Array.from(e.target.files || []))
-                }
+                onChange={(e) => {
+                  if (e.target.files) handleAddFiles(e.target.files);
+                }}
               />
+
+              {/* Preview ảnh */}
+              <div className="flex flex-wrap gap-2 mt-2">
+                {files.map((file) => (
+                  <div
+                    key={file.name}
+                    className="relative w-20 h-20 border rounded overflow-hidden"
+                  >
+                    <Image
+                      src={file.preview!}
+                      alt={file.name}
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bg-black bg-opacity-50 text-white p-1 text-xs"
+                      onClick={() => handleRemoveFile(file.name)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Tiến trình upload */}
+              {isUploading && (
+                <div className="mt-1 text-sm text-gray-500">
+                  Đang tải lên... {progress}%
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-2">
               <Button
@@ -359,7 +394,7 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
               <Button
                 type="submit"
                 className="bg-red-600 hover:bg-red-700 text-white"
-                disabled={loading}
+                disabled={loading || isUploading}
               >
                 {loading ? "Đang gửi..." : "Gửi đánh giá"}
               </Button>

@@ -29,7 +29,7 @@ export const useProductReview = (productId: string) => {
           params
         );
         const data: GetReviewsResponse = res.data;
-        setReviews(data.data || []);
+        setReviews((data.data || []).map(item => item.data));
         setTotalItems(data.metadata?.totalItems ?? 0);
       } catch (err) {
         const axiosError = err as AxiosError<{ message?: string }>;
