@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertCircle, Info, Settings, Percent, DollarSign, Users, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VoucherFormData, VoucherUseCase } from '../hook/useNewVoucher';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useState } from 'react';
 
 interface DiscountSettingsProps {
   formData: VoucherFormData;
@@ -58,6 +60,22 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
     </Label>
   );
 
+  const [isMaxDiscountLimited, setIsMaxDiscountLimited] = useState(true);
+
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\./g, '');
+    if (!isNaN(Number(rawValue))) {
+      updateFormData('discountValue', Number(rawValue));
+    }
+  };
+
+  const handleMaxDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\./g, '');
+    if (!isNaN(Number(rawValue))) {
+      updateFormData('maxDiscountValue', Number(rawValue));
+    }
+  };
+
   return (
     <Card className="w-full border-0 shadow-sm bg-white">
       <CardHeader className="pb-6 border-b border-gray-100">
@@ -96,25 +114,20 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
               <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
                 Loại giảm
               </Label>
-              <Select value="percentage" onValueChange={() => {}}>
-                <SelectTrigger className="h-11 border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100">
-                  <SelectValue placeholder="Chọn loại" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="percentage">
-                    <div className="flex items-center gap-2">
-                      <Percent className="w-4 h-4" />
-                      Theo phần trăm
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="fixed">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4" />
-                      Theo giá trị
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <RadioGroup
+                value={formData.discountType || 'percentage'}
+                onValueChange={(value) => updateFormData('discountType', value)}
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="percentage" id="percentage" />
+                  <Label htmlFor="percentage">Theo phần trăm</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="fixed" id="fixed" />
+                  <Label htmlFor="fixed">Theo giá trị</Label>
+                </div>
+              </RadioGroup>
             </div>
             
             <div className="md:col-span-2 space-y-2">
@@ -123,10 +136,10 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
               </Label>
               <div className="relative">
                 <Input
-                  type="number"
+                  type={formData.discountType === 'percentage' ? 'number' : 'text'}
                   placeholder="Nhập mức giảm giá..."
-                  value={formData.discountValue || ''}
-                  onChange={(e) => updateFormData('discountValue', parseFloat(e.target.value) || 0)}
+                  value={formData.discountType === 'percentage' ? formData.discountValue || '' : formatCurrency(formData.discountValue || '')}
+                  onChange={handleValueChange}
                   className={cn(
                     "h-11 pr-12 transition-all duration-200",
                     "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
@@ -143,6 +156,38 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
             </div>
           </div>
         </div>
+
+        {formData.discountType === 'percentage' && (
+          <div className="space-y-3 p-4 border rounded-md bg-gray-50/50">
+            <Label className="text-sm font-medium">Mức giảm tối đa</Label>
+            <RadioGroup
+              value={isMaxDiscountLimited ? 'limited' : 'unlimited'}
+              onValueChange={(value) => setIsMaxDiscountLimited(value === 'limited')}
+              className="flex space-x-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="limited" id="limited" />
+                <Label htmlFor="limited">Giới hạn</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="unlimited" id="unlimited" />
+                <Label htmlFor="unlimited">Không giới hạn</Label>
+              </div>
+            </RadioGroup>
+            {isMaxDiscountLimited && (
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Nhập số tiền giảm tối đa"
+                  value={formatCurrency(formData.maxDiscountValue || '')}
+                  onChange={handleMaxDiscountChange}
+                  className="pr-12"
+                />
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">VNĐ</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Điều kiện đơn hàng */}
         <div className="space-y-4">

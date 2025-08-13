@@ -3,28 +3,32 @@ import { BaseResponse, PaginationRequest, PaginationMetadata } from "./base.inte
 // ==================================================
 // ENUMS
 // ==================================================
-export enum DiscountType {
-  PERCENTAGE = 'PERCENTAGE',
-  FIXED_AMOUNT = 'FIXED_AMOUNT',
-}
 
+export enum DisplayType {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE',
+}
+export enum VoucherType {
+  SHOP = 'SHOP',
+  PRODUCT = 'PRODUCT',
+  PRIVATE = 'PRIVATE',
+  PLATFORM = 'PLATFORM',
+  CATEGORY = 'CATEGORY',
+  BRAND = 'BRAND',
+}
 export enum DiscountApplyType {
   ALL = 'ALL',
-  SPECIFIC = 'specific',
+  SPECIFIC = 'SPECIFIC',
 }
-
-export enum VoucherType {
-  SHOP = 'shop',
-  PRODUCT = 'product',
-  PRIVATE = 'private',
-}
-
 export enum DiscountStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   EXPIRED = 'EXPIRED',
 }
-
+export enum DiscountType {
+  PERCENTAGE = 'PERCENTAGE',
+  FIXED_AMOUNT = 'FIXED_AMOUNT',
+}
 // ==================================================
 // BASE INTERFACE
 // ==================================================
