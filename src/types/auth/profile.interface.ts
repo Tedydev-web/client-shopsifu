@@ -77,7 +77,7 @@ export interface DeleteAddressResponse {
 
 
 export interface UserProfile {
-  id: number;
+  id: string;
   email: string;
   name: string;
   role: {

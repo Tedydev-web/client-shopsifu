@@ -27,7 +27,7 @@ export enum DiscountStatus {
 }
 export enum DiscountType {
   PERCENTAGE = 'PERCENTAGE',
-  FIXED_AMOUNT = 'FIXED_AMOUNT',
+  FIX_AMOUNT = 'FIX_AMOUNT',
 }
 // ==================================================
 // BASE INTERFACE
@@ -38,7 +38,7 @@ export interface Discount {
   description: string;
   code: string;
   value: number;
-  maxDiscountValue?: number;
+  maxDiscountValue?: number | null; // Có thể null cho trường hợp không giới hạn
   minOrderValue: number;
   startDate: string;
   endDate: string;
@@ -46,12 +46,16 @@ export interface Discount {
   usesCount: number;
   maxUsesPerUser: number;
   usersUsed: string[];
-  shopId: string;
+  shopId: string | null; // PLATFORM voucher có thể có shopId = null
   isPlatform: boolean;
   voucherType: VoucherType;
   discountType: DiscountType;
   discountApplyType: DiscountApplyType;
   discountStatus: DiscountStatus;
+  displayType?: DisplayType;
+  productIds?: string[];
+  categories?: string[];
+  brands?: string[];
   createdAt: string;
   updatedAt: string;
 }

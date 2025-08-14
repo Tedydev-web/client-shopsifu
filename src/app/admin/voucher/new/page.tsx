@@ -13,13 +13,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import VoucherFormWrapper from "@/components/admin/voucher/new/voucher-form-Wrapper";
-import { VoucherUseCase } from "@/components/admin/voucher/hook/useNewVoucher";
+import { VoucherUseCase } from "@/components/admin/voucher/hook/voucher-config";
 
 export default function NewVoucherPage() {
   const router = useRouter();
   const t = useTranslations("admin.ModuleVouchers");
   const searchParams = useSearchParams();
-  const useCase = parseInt(searchParams.get('useCase') || '1', 10) as VoucherUseCase;
+  const useCase = parseInt(searchParams.get('useCase') || '1', 10) as unknown as VoucherUseCase;
 
   const getTitle = () => {
     switch (useCase) {

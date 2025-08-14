@@ -103,6 +103,7 @@ export interface Order {
   totalShippingFee: number;
   totalVoucherDiscount: number;
   totalPayment: number;
+  totalPrice: number;
 }
 
 /**

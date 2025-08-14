@@ -6,20 +6,35 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, AlertCircle, Tag } from 'lucide-react';
+import { Calendar as CalendarIcon, AlertCircle, Tag } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import { VoucherFormData } from '../hook/useNewVoucher';
+import { VoucherFormState } from '../hook/useNewVoucher';
+import { VoucherUseCase } from '../hook/voucher-config';
 
 interface BasicInfoProps {
-  formData: VoucherFormData;
-  updateFormData: (field: keyof VoucherFormData, value: any) => void;
+  formData: VoucherFormState;
+  updateFormData: (field: keyof VoucherFormState, value: any) => void;
   errors: Record<string, string>;
+  useCase: VoucherUseCase;
 }
 
-export default function VoucherBasicInfo({ formData, updateFormData, errors }: BasicInfoProps) {
+const getVoucherTypeName = (useCase: VoucherUseCase) => {
+  switch (useCase) {
+    case VoucherUseCase.SHOP:
+      return 'Voucher toàn Shop';
+    case VoucherUseCase.PRODUCT:
+      return 'Voucher sản phẩm';
+    case VoucherUseCase.PRIVATE:
+      return 'Voucher riêng tư';
+    default:
+      return 'Voucher';
+  }
+};
+
+export default function VoucherBasicInfo({ formData, updateFormData, errors, useCase }: BasicInfoProps) {
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
 
@@ -42,7 +57,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
   };
 
   const RequiredLabel = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
-    <Label htmlFor={htmlFor} className="text-sm font-medium text-gray-700 flex items-center gap-1">
+    <Label htmlFor={htmlFor} className="text-sm font-medium text-gray-900 flex items-center gap-1">
       {children}
       <span className="text-red-500">*</span>
     </Label>
@@ -58,7 +73,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
         <div className="flex items-center gap-2 mt-2">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg">
             <Tag className="w-3.5 h-3.5 text-red-600" />
-            <span className="text-xs font-medium text-red-700">Voucher toàn Shop</span>
+            <span className="text-xs font-medium text-red-700">{getVoucherTypeName(useCase)}</span>
           </div>
         </div>
       </CardHeader>
@@ -76,8 +91,8 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
               value={formData.name}
               onChange={(e) => updateFormData('name', e.target.value)}
               className={cn(
-                "pr-16 h-11 transition-all duration-200",
-                "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                "pr-16 h-11 transition-all duration-200 text-gray-900",
+                "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
                 errors.name && "border-red-500 focus:border-red-500 focus:ring-red-100"
               )}
               maxLength={100}
@@ -87,13 +102,13 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
                 "text-xs px-2 py-0.5 rounded-full transition-colors",
                 formData.name.length > 90 ? "bg-red-100 text-red-600" :
                 formData.name.length > 70 ? "bg-orange-100 text-orange-600" :
-                "bg-gray-100 text-gray-500"
+                "bg-gray-100 text-gray-600"
               )}>
                 {formData.name.length}/100
               </span>
             </div>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-600">
             Tên này không được hiển thị cho người mua
           </p>
           <ErrorMessage error={errors.name} />
@@ -111,8 +126,8 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
               value={formData.code}
               onChange={(e) => updateFormData('code', e.target.value.toUpperCase())}
               className={cn(
-                "pr-16 h-11 font-mono transition-all duration-200",
-                "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                "pr-16 h-11 font-mono transition-all duration-200 text-gray-900",
+                "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
                 errors.code && "border-red-500 focus:border-red-500 focus:ring-red-100"
               )}
               maxLength={20}
@@ -122,13 +137,13 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
                 "text-xs px-2 py-0.5 rounded-full transition-colors",
                 formData.code.length > 15 ? "bg-red-100 text-red-600" :
                 formData.code.length > 10 ? "bg-orange-100 text-orange-600" :
-                "bg-gray-100 text-gray-500"
+                "bg-gray-100 text-gray-600"
               )}>
                 {formData.code.length}/20
               </span>
             </div>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-600">
             Chỉ được sử dụng chữ cái (a-z), số (0-9), dấu gạch dưới (_) và dấu gạch ngang (-)
           </p>
           <ErrorMessage error={errors.code} />
@@ -143,7 +158,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Ngày bắt đầu */}
             <div className="space-y-2">
-              <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+              <Label className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                 Từ ngày
               </Label>
               <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
@@ -152,13 +167,13 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
                     variant="outline"
                     className={cn(
                       "w-full h-11 justify-start text-left font-normal transition-all duration-200",
-                      "border-gray-200 hover:border-red-300 hover:bg-red-50",
-                      !formData.startDate && "text-gray-400",
-                      formData.startDate && "text-gray-700",
+                      "border-gray-300 hover:border-red-300 hover:bg-red-50",
+                      !formData.startDate && "text-gray-500",
+                      formData.startDate && "text-gray-900",
                       errors.startDate && "border-red-500"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" />
                     {formData.startDate ? (
                       format(new Date(formData.startDate), 'dd/MM/yyyy', { locale: vi })
                     ) : (
@@ -182,7 +197,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
 
             {/* Ngày kết thúc */}
             <div className="space-y-2">
-              <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+              <Label className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                 Đến ngày
               </Label>
               <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
@@ -191,13 +206,13 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
                     variant="outline"
                     className={cn(
                       "w-full h-11 justify-start text-left font-normal transition-all duration-200",
-                      "border-gray-200 hover:border-red-300 hover:bg-red-50",
-                      !formData.endDate && "text-gray-400",
-                      formData.endDate && "text-gray-700",
+                      "border-gray-300 hover:border-red-300 hover:bg-red-50",
+                      !formData.endDate && "text-gray-500",
+                      formData.endDate && "text-gray-900",
                       errors.endDate && "border-red-500"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" />
                     {formData.endDate ? (
                       format(new Date(formData.endDate), 'dd/MM/yyyy', { locale: vi })
                     ) : (
@@ -225,10 +240,10 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors }: B
           </div>
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-xs text-blue-700 flex items-start gap-2">
-              <div className="w-1 h-1 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              Voucher có thể được lưu trước thời gian sử dụng
-            </p>
+            <div className="text-xs text-blue-800 flex items-start gap-2">
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1 flex-shrink-0"></div>
+              <span>Voucher có thể được lưu trước thời gian sử dụng</span>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -1,6 +1,6 @@
 import { BaseEntity } from '../base.interface';
 
-export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
+export type DiscountType = 'PERCENTAGE' | 'FIX_AMOUNT';
 export type DiscountStatus = 'ACTIVE' | 'INACTIVE' | 'EXPIRED' | 'USED';
 export type VoucherType = 'SHOP' | 'PRODUCT' | 'ORDER' | 'SHIPPING';
 export type DisplayType = 'PUBLIC' | 'PRIVATE' | 'HIDDEN';

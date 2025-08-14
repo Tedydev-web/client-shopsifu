@@ -7,13 +7,14 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertCircle, Info, Settings, Percent, DollarSign, Users, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { VoucherFormData, VoucherUseCase } from '../hook/useNewVoucher';
+import { VoucherFormState } from '../hook/useNewVoucher';
+import { VoucherUseCase } from '../hook/voucher-config';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useState } from 'react';
 
 interface DiscountSettingsProps {
-  formData: VoucherFormData;
-  updateFormData: (field: keyof VoucherFormData, value: any) => void;
+  formData: VoucherFormState;
+  updateFormData: (field: keyof VoucherFormState, value: any) => void;
   errors: Record<string, string>;
   useCase: VoucherUseCase;
   voucherType: string;
@@ -21,7 +22,10 @@ interface DiscountSettingsProps {
 
 export default function VoucherDiscountSettings({ formData, updateFormData, errors, useCase, voucherType }: DiscountSettingsProps) {
 
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | null | undefined) => {
+    if (value === null || value === undefined) {
+      return '';
+    }
     return new Intl.NumberFormat('vi-VN').format(value);
   };
 
@@ -40,16 +44,16 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
   };
 
   const RequiredLabel = ({ children, icon: Icon, htmlFor }: { children: React.ReactNode; icon?: any; htmlFor?: string }) => (
-    <Label htmlFor={htmlFor} className="text-sm font-medium text-gray-700 flex items-center gap-2">
-      {Icon && <Icon className="w-4 h-4 text-gray-500" />}
+    <Label htmlFor={htmlFor} className="text-sm font-medium text-gray-900 flex items-center gap-2">
+      {Icon && <Icon className="w-4 h-4 text-gray-600" />}
       {children}
       <span className="text-red-500">*</span>
     </Label>
   );
 
   const InfoLabel = ({ children, icon: Icon }: { children: React.ReactNode; icon?: any }) => (
-    <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-      {Icon && <Icon className="w-4 h-4 text-gray-500" />}
+    <Label className="text-sm font-medium text-gray-900 flex items-center gap-2">
+      {Icon && <Icon className="w-4 h-4 text-gray-600" />}
       {children}
       <div className="group relative">
         <Info className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help transition-colors" />
@@ -60,20 +64,21 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
     </Label>
   );
 
-  const [isMaxDiscountLimited, setIsMaxDiscountLimited] = useState(true);
+  const [isMaxDiscountLimited, setIsMaxDiscountLimited] = useState(!!formData.maxDiscountValue);
 
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/\./g, '');
-    if (!isNaN(Number(rawValue))) {
-      updateFormData('discountValue', Number(rawValue));
+    if (formData.discountType === 'FIX_AMOUNT') {
+      updateFormData('value', parseCurrency(e.target.value));
+    } else {
+      const rawValue = e.target.value;
+      if (!isNaN(Number(rawValue))) {
+        updateFormData('value', rawValue === '' ? 0 : Number(rawValue));
+      }
     }
   };
 
   const handleMaxDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/\./g, '');
-    if (!isNaN(Number(rawValue))) {
-      updateFormData('maxDiscountValue', Number(rawValue));
-    }
+    updateFormData('maxDiscountValue', parseCurrency(e.target.value));
   };
 
   return (
@@ -98,92 +103,92 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
               className="data-[state=checked]:bg-blue-600"
             />
           </div>
-          <p className="text-xs text-gray-500 ml-6">
+          <p className="text-xs text-gray-600 ml-6">
             Hệ thống sẽ tự động tối ưu hiệu quả sử dụng voucher
           </p>
         </div>
 
-        {/* Loại giảm giá & Mức giảm */}
+        {/* Loại giảm giá & Mức giảm - Improved Layout */}
         <div className="space-y-4">
-          <RequiredLabel icon={Percent}>
+          <RequiredLabel icon={Percent} htmlFor="discountType">
             Loại giảm giá & Mức giảm
           </RequiredLabel>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                Loại giảm
-              </Label>
-              <RadioGroup
-                value={formData.discountType || 'percentage'}
+          {/* Combined row for select and input */}
+          <div className="flex gap-3">
+            {/* Select for discount type */}
+            <div className="flex-shrink-0 w-40">
+              <Select
+                value={formData.discountType || 'PERCENTAGE'}
                 onValueChange={(value) => updateFormData('discountType', value)}
-                className="flex space-x-4"
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="percentage" id="percentage" />
-                  <Label htmlFor="percentage">Theo phần trăm</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="fixed" id="fixed" />
-                  <Label htmlFor="fixed">Theo giá trị</Label>
-                </div>
-              </RadioGroup>
+                <SelectTrigger id="discountType" className="h-full border-gray-300 text-gray-900">
+                  <SelectValue placeholder="Chọn loại" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="FIX_AMOUNT">Theo số tiền</SelectItem>
+                  <SelectItem value="PERCENTAGE">Theo phần trăm</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div className="md:col-span-2 space-y-2">
-              <Label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                Mức giảm
-              </Label>
-              <div className="relative">
-                <Input
-                  type={formData.discountType === 'percentage' ? 'number' : 'text'}
-                  placeholder="Nhập mức giảm giá..."
-                  value={formData.discountType === 'percentage' ? formData.discountValue || '' : formatCurrency(formData.discountValue || '')}
-                  onChange={handleValueChange}
-                  className={cn(
-                    "h-11 pr-12 transition-all duration-200",
-                    "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
-                    errors.discountValue && "border-red-500 focus:border-red-500 focus:ring-red-100"
-                  )}
-                  min="0"
-                  max={formData.discountType === 'percentage' ? "100" : undefined}
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">
-                  {formData.discountType === 'percentage' ? '%' : '₫'}
-                </span>
-              </div>
-              <ErrorMessage error={errors.discountValue} />
+
+            {/* Input for discount value */}
+            <div className="flex-1 relative">
+              <Input
+                type={formData.discountType === 'PERCENTAGE' ? 'number' : 'text'}
+                placeholder={formData.discountType === 'PERCENTAGE' ? "VD: 10" : "VD: 50.000"}
+                value={formData.discountType === 'PERCENTAGE' ? (formData.value || '') : formatCurrency(formData.value)}
+                onChange={handleValueChange}
+                className={cn(
+                  "h-11 pr-12 transition-all duration-200 text-gray-900",
+                  "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                  errors.value && "border-red-500 focus:border-red-500 focus:ring-red-100"
+                )}
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-700 font-medium">
+                {formData.discountType === 'PERCENTAGE' ? '%' : '₫'}
+              </span>
             </div>
           </div>
+          
+          <ErrorMessage error={errors.discountValue} />
         </div>
 
-        {formData.discountType === 'percentage' && (
-          <div className="space-y-3 p-4 border rounded-md bg-gray-50/50">
-            <Label className="text-sm font-medium">Mức giảm tối đa</Label>
+        {formData.discountType === 'PERCENTAGE' && (
+          <div className="space-y-3 p-4 border border-gray-300 rounded-md bg-gray-50/50">
+            <Label className="text-sm font-medium text-gray-900">Mức giảm tối đa</Label>
             <RadioGroup
               value={isMaxDiscountLimited ? 'limited' : 'unlimited'}
-              onValueChange={(value) => setIsMaxDiscountLimited(value === 'limited')}
-              className="flex space-x-4"
+              onValueChange={(value) => {
+                const isLimited = value === 'limited';
+                setIsMaxDiscountLimited(isLimited);
+                if (!isLimited) {
+                  updateFormData('maxDiscountValue', null); // Set null thay vì undefined
+                }
+              }}
+              className="flex flex-col space-y-2 pt-1"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="limited" id="limited" />
-                <Label htmlFor="limited">Giới hạn</Label>
+                <RadioGroupItem value="unlimited" id="unlimited" />
+                <Label htmlFor="unlimited" className="font-normal cursor-pointer text-gray-900">Không giới hạn</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="unlimited" id="unlimited" />
-                <Label htmlFor="unlimited">Không giới hạn</Label>
+                <RadioGroupItem value="limited" id="limited" />
+                <Label htmlFor="limited" className="font-normal cursor-pointer text-gray-900">Giới hạn</Label>
               </div>
             </RadioGroup>
             {isMaxDiscountLimited && (
-              <div className="relative">
+              <div className="relative pl-7 pt-2">
                 <Input
                   type="text"
                   placeholder="Nhập số tiền giảm tối đa"
-                  value={formatCurrency(formData.maxDiscountValue || '')}
+                  value={formatCurrency(formData.maxDiscountValue)}
                   onChange={handleMaxDiscountChange}
-                  className="pr-12"
+                  className="pr-12 h-11 border-gray-300 text-gray-900"
                 />
-                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">VNĐ</span>
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-700">
+                  VNĐ
+                </span>
               </div>
             )}
           </div>
@@ -194,23 +199,23 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
           <RequiredLabel icon={ShoppingCart}>
             Giá trị đơn hàng tối thiểu
           </RequiredLabel>
-          
-          <div className="relative">
+          <div className="relative mt-2">
             <Input
-              placeholder="Nhập giá trị tối thiểu..."
-              value={formData.minOrderValue ? formatCurrency(formData.minOrderValue) : ''}
+              type="text"
+              placeholder="VD: 100.000"
+              value={formatCurrency(formData.minOrderValue)}
               onChange={(e) => updateFormData('minOrderValue', parseCurrency(e.target.value))}
               className={cn(
-                "h-11 pr-12 transition-all duration-200",
-                "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                "h-11 pr-12 transition-all duration-200 text-gray-900",
+                "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
                 errors.minOrderValue && "border-red-500 focus:border-red-500 focus:ring-red-100"
               )}
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-700 font-medium">
               ₫
             </span>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-600">
             Đơn hàng phải đạt giá trị này để áp dụng voucher
           </p>
           <ErrorMessage error={errors.minOrderValue} />
@@ -219,59 +224,61 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
         {/* Giới hạn sử dụng */}
         <div className="space-y-6">
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Giới hạn sử dụng</span>
+            <Users className="w-4 h-4 text-gray-600" />
+            <span className="text-sm font-medium text-gray-900">Giới hạn sử dụng</span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {/* Tổng lượt sử dụng */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                Tổng lượt sử dụng tối đa
-                <span className="text-red-500">*</span>
-              </Label>
-              
-              <Input
-                type="number"
-                placeholder="VD: 100"
-                value={formData.usageLimit || ''}
-                onChange={(e) => updateFormData('usageLimit', parseInt(e.target.value) || 1)}
-                className={cn(
-                  "h-11 transition-all duration-200",
-                  "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
-                  errors.usageLimit && "border-red-500 focus:border-red-500 focus:ring-red-100"
-                )}
-                min="1"
-              />
-              <p className="text-xs text-gray-500">
-                Tổng số lần voucher có thể được sử dụng
-              </p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-gray-900 flex items-center gap-1 whitespace-nowrap">
+                  Tổng lượt sử dụng tối đa
+                  <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="100"
+                  value={formData.maxUses || ''}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    updateFormData('maxUses', isNaN(value) ? 1 : value);
+                  }}
+                  className={cn(
+                    "h-10 w-28 text-center text-gray-900",
+                    "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                    errors.usageLimit && "border-red-500 focus:border-red-500 focus:ring-red-100"
+                  )}
+                  min="1"
+                />
+              </div>
               <ErrorMessage error={errors.usageLimit} />
             </div>
 
             {/* Lượt sử dụng per user */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                Lượt sử dụng/Người mua
-                <span className="text-red-500">*</span>
-              </Label>
-              
-              <Input
-                type="number"
-                placeholder="VD: 1"
-                value={formData.usagePerUser || ''}
-                onChange={(e) => updateFormData('usagePerUser', parseInt(e.target.value) || 1)}
-                className={cn(
-                  "h-11 transition-all duration-200",
-                  "border-gray-200 focus:border-red-400 focus:ring-2 focus:ring-red-100",
-                  errors.usagePerUser && "border-red-500 focus:border-red-500 focus:ring-red-100"
-                )}
-                min="1"
-              />
-              <p className="text-xs text-gray-500">
-                Số lần tối đa một khách hàng có thể sử dụng
-              </p>
-              <ErrorMessage error={errors.usagePerUser} />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-gray-900 flex items-center gap-1 whitespace-nowrap">
+                  Lượt sử dụng/Người mua
+                  <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="1"
+                  value={formData.maxUsesPerUser || ''}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    updateFormData('maxUsesPerUser', isNaN(value) ? 1 : value);
+                  }}
+                  className={cn(
+                    "h-10 w-28 text-center text-gray-900",
+                    "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
+                    errors.maxUsesPerUser && "border-red-500 focus:border-red-500 focus:ring-red-100"
+                  )}
+                  min="1"
+                />
+              </div>
+              <ErrorMessage error={errors.maxUsesPerUser} />
             </div>
           </div>
         </div>
@@ -281,12 +288,12 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
           <div className="flex items-start gap-3">
             <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
             <div className="space-y-1">
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-gray-900">
                 Tóm tắt thiết lập
               </p>
-              <p className="text-xs text-gray-600">
-                {formData.discountValue && formData.minOrderValue ? 
-                  `Giảm ${formData.discountValue}${formData.discountType === 'percentage' ? '%' : '₫'} cho đơn hàng từ ${formatCurrency(formData.minOrderValue)}₫` :
+              <p className="text-xs text-gray-700">
+                {formData.value && formData.minOrderValue ? 
+                  `Giảm ${formData.value}${formData.discountType === 'PERCENTAGE' ? '%' : '₫'} cho đơn hàng từ ${formatCurrency(formData.minOrderValue)}₫` :
                   'Vui lòng điền đầy đủ thông tin để xem tóm tắt'
                 }
               </p>

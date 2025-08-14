@@ -40,7 +40,7 @@ const mockDiscounts: Discount[] = [
     shopId: '', // Platform voucher
     isPlatform: true,
     voucherType: VoucherType.SHOP, // Or any other relevant type for platform
-    discountType: DiscountType.FIXED_AMOUNT,
+    discountType: DiscountType.FIX_AMOUNT,
     discountApplyType: DiscountApplyType.ALL,
     discountStatus: DiscountStatus.ACTIVE,
     createdAt: new Date().toISOString(),
@@ -63,7 +63,7 @@ const mockDiscounts: Discount[] = [
     shopId: '',
     isPlatform: true,
     voucherType: VoucherType.PRODUCT, // Assuming freeship is a type of product voucher
-    discountType: DiscountType.FIXED_AMOUNT,
+    discountType: DiscountType.FIX_AMOUNT,
     discountApplyType: DiscountApplyType.ALL,
     discountStatus: DiscountStatus.EXPIRED,
     createdAt: new Date().toISOString(),
@@ -85,7 +85,7 @@ const mockDiscounts: Discount[] = [
     shopId: 'shop2',
     isPlatform: false,
     voucherType: VoucherType.PRIVATE,
-    discountType: DiscountType.FIXED_AMOUNT,
+    discountType: DiscountType.FIX_AMOUNT,
     discountApplyType: DiscountApplyType.SPECIFIC,
     discountStatus: DiscountStatus.INACTIVE,
     createdAt: new Date().toISOString(),

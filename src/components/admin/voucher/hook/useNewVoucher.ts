@@ -1,43 +1,49 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { VoucherUseCase } from './voucher-config';
+import {
+  CreateDiscountRequest,
+  DiscountApplyType,
+  DiscountStatus,
+  DiscountType,
+  VoucherType,
+  DisplayType,
+} from '@/types/discount.interface';
+import { discountService } from '@/services/discountService';
+import { toast } from 'sonner';
 
-// Enum cho các loại voucher
-export enum VoucherUseCase {
-  SHOP = 1,
-  PRODUCT = 2,
-  PRIVATE = 3
-}
-
-// Interface cho voucher data
-export interface VoucherFormData {
-  // Thông tin cơ bản
+// The explicit and complete state for the voucher form.
+// This approach avoids using Partial<> to prevent downstream 'undefined' errors.
+export type VoucherFormState = {
   name: string;
   code: string;
   description: string;
-  displayName: string;
-  discountType: 'percentage' | 'fixed';
-  discountValue: number;
+  discountType: 'PERCENTAGE' | 'FIX_AMOUNT';
+  value: number;
   minOrderValue: number;
-  usageLimit: number;
-  usagePerUser: number;
+  maxDiscountValue?: number | null; // Cho phép null
+  maxUses: number;
+  maxUsesPerUser: number;
   startDate: string;
   endDate: string;
-  isPrivate: boolean;
   isActive: boolean;
-  showOnProductPage: boolean;
-  selectedProducts: Array<{
-    id: string;
-    name: string;
-    price: number;
-    image: string;
-  }>;
-}
+  discountApplyType: DiscountApplyType;
 
-// Interface cho hook return
+  // UI-specific fields
+  showOnProductPage?: boolean;
+  selectedProducts?: Array<{ id: string; name: string; price: number; image: string; }>;
+  categories?: string[];
+  brands?: string[];
+  displayType?: 'PUBLIC' | 'PRIVATE';
+  isPrivate?: boolean;
+  maxDiscountType?: 'limited' | 'unlimited';
+};
+
+// Interface for the hook's return value
 export interface UseNewVoucherReturn {
-  formData: VoucherFormData;
-  updateFormData: (field: keyof VoucherFormData, value: any) => void;
+  formData: VoucherFormState;
+  updateFormData: (field: keyof VoucherFormState, value: any) => void;
   resetForm: () => void;
   submitVoucher: () => Promise<void>;
   isLoading: boolean;
@@ -46,38 +52,74 @@ export interface UseNewVoucherReturn {
   voucherType: string;
 }
 
-const initialFormData: VoucherFormData = {
+const initialFormData: VoucherFormState = {
   name: '',
   code: '',
   description: '',
-  displayName: '',
-  discountType: 'percentage',
-  discountValue: 0,
+  discountType: 'PERCENTAGE',
+  value: 0,
   minOrderValue: 0,
-  usageLimit: 1,
-  usagePerUser: 1,
+  maxUses: 1,
+  maxUsesPerUser: 1,
   startDate: '',
   endDate: '',
-  isPrivate: false,
   isActive: true,
   showOnProductPage: true,
   selectedProducts: [],
+  categories: [],
+  brands: [],
+  discountApplyType: DiscountApplyType.ALL,
+  maxDiscountType: 'unlimited',
+  maxDiscountValue: null, // Set null thay vì 0
 };
 
 interface UseNewVoucherProps {
   useCase: VoucherUseCase;
+  owner: 'PLATFORM' | 'SHOP'; // Giữ lại cho tương thích, nhưng sẽ override bằng userData.role
+  userData: any; // Nhận userData từ component cha
   onCreateSuccess?: () => void;
 }
 
-export function useNewVoucher({ useCase, onCreateSuccess }: UseNewVoucherProps): UseNewVoucherReturn {
-  const [formData, setFormData] = useState<VoucherFormData>(initialFormData);
+export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: UseNewVoucherProps): UseNewVoucherReturn {
+  const [formData, setFormData] = useState<VoucherFormState>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // userData được truyền từ component cha
+
+  // Helper function để xử lý API error messages
+  const parseErrorMessage = (error: any): string => {
+    const defaultMessage = 'Đã xảy ra lỗi khi tạo voucher. Vui lòng thử lại.';
+    
+    if (!error?.response?.data?.message) {
+      return error?.message || defaultMessage;
+    }
+
+    const apiMessage = error.response.data.message;
+    
+    // Kiểm tra nếu message là array (validation errors từ backend)
+    if (Array.isArray(apiMessage)) {
+      // Kết hợp tất cả error messages, hoặc chỉ lấy cái đầu tiên
+      const validationErrors = apiMessage
+        .map(err => err.message || err)
+        .filter(Boolean)
+        .join('. ');
+      
+      return validationErrors || defaultMessage;
+    }
+    
+    // Nếu message là string thông thường
+    if (typeof apiMessage === 'string') {
+      return apiMessage;
+    }
+    
+    return defaultMessage;
+  };
 
   const getVoucherType = (uc: VoucherUseCase) => {
-    if (uc === VoucherUseCase.PRODUCT) return 'product';
-    if (uc === VoucherUseCase.PRIVATE) return 'private';
-    return 'shop';
+    if (uc === VoucherUseCase.PRODUCT) return VoucherType.PRODUCT;
+    if (uc === VoucherUseCase.PRIVATE) return VoucherType.SHOP; // PRIVATE vẫn là SHOP type nhưng displayType khác
+    return VoucherType.SHOP;
   };
   const voucherType = getVoucherType(useCase);
 
@@ -86,14 +128,53 @@ export function useNewVoucher({ useCase, onCreateSuccess }: UseNewVoucherProps):
     console.log('useNewVoucher initialized:', {
       useCase, voucherType
     });
-  }, [useCase, voucherType]);
+
+    // Sanitize form data based on use case
+    setFormData(prev => {
+      const newFormData = { ...initialFormData, name: prev.name, code: prev.code }; // Reset to initial but keep name/code
+
+      switch (useCase) {
+        case VoucherUseCase.SHOP:
+          newFormData.discountApplyType = DiscountApplyType.ALL;
+          newFormData.selectedProducts = [];
+          newFormData.displayType = 'PUBLIC';
+          newFormData.isPrivate = false;
+          break;
+        
+        case VoucherUseCase.PRODUCT:
+          newFormData.discountApplyType = DiscountApplyType.SPECIFIC;
+          newFormData.selectedProducts = []; // Start with empty selection
+          newFormData.displayType = 'PUBLIC';
+          newFormData.isPrivate = false;
+          break;
+
+        case VoucherUseCase.PRIVATE:
+          newFormData.displayType = 'PRIVATE';
+          newFormData.isPrivate = true;
+          newFormData.discountApplyType = DiscountApplyType.ALL; // Default to all
+          newFormData.selectedProducts = [];
+          break;
+      }
+      return newFormData;
+    });
+
+  }, [useCase]);
 
   // Cập nhật form data
-  const updateFormData = (field: keyof VoucherFormData, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const updateFormData = (field: keyof VoucherFormState, value: any) => {
+    setFormData(prev => {
+      const newFormData = {
+        ...prev,
+        [field]: value
+      };
+
+      // Khi người dùng chọn áp dụng cho tất cả sản phẩm, xóa danh sách sản phẩm đã chọn
+      if (field === 'discountApplyType' && value === 'ALL') {
+        newFormData.selectedProducts = [];
+      }
+
+      return newFormData;
+    });
 
     // Clear error khi user nhập lại
     if (errors[field]) {
@@ -115,56 +196,87 @@ export function useNewVoucher({ useCase, onCreateSuccess }: UseNewVoucherProps):
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Tên chương trình giảm giá là bắt buộc';
+    if (!formData.name?.trim()) {
+      toast.error('Tên chương trình giảm giá là bắt buộc');
+      return false;
     }
 
-    if (!formData.code.trim()) {
-      newErrors.code = 'Mã voucher là bắt buộc';
+    if (!formData.code?.trim()) {
+      toast.error('Mã voucher là bắt buộc');
+      return false;
     }
 
-    if (!formData.displayName.trim()) {
-      newErrors.displayName = 'Tên hiển thị là bắt buộc';
+    // Validate mã voucher format
+    const codePattern = /^[A-Z0-9_-]+$/;
+    if (formData.code && !codePattern.test(formData.code)) {
+      toast.error('Mã voucher chỉ được chứa chữ hoa, số, dấu gạch dưới (_) và dấu gạch ngang (-)');
+      return false;
     }
 
     if (!formData.startDate) {
-      newErrors.startDate = 'Ngày bắt đầu là bắt buộc';
+      toast.error('Ngày bắt đầu là bắt buộc');
+      return false;
     }
 
     if (!formData.endDate) {
-      newErrors.endDate = 'Ngày kết thúc là bắt buộc';
+      toast.error('Ngày kết thúc là bắt buộc');
+      return false;
     }
 
     if (formData.startDate && formData.endDate && new Date(formData.startDate) >= new Date(formData.endDate)) {
-      newErrors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
+      toast.error('Ngày kết thúc phải sau ngày bắt đầu');
+      return false;
     }
 
-    if (formData.discountValue <= 0) {
-      newErrors.discountValue = 'Mức giảm phải lớn hơn 0';
+    if (formData.value <= 0) {
+      toast.error('Mức giảm phải lớn hơn 0');
+      return false;
     }
 
-    if (formData.discountType === 'percentage' && formData.discountValue > 100) {
-      newErrors.discountValue = 'Phần trăm giảm không được vượt quá 100%';
+    if (formData.discountType === 'PERCENTAGE' && formData.value > 100) {
+      toast.error('Phần trăm giảm không được vượt quá 100%');
+      return false;
     }
 
-    if (formData.minOrderValue < 0) {
-      newErrors.minOrderValue = 'Giá trị đơn hàng tối thiểu không được âm';
+    if ((formData.minOrderValue ?? 0) < 0) {
+      toast.error('Giá trị đơn hàng tối thiểu không được âm');
+      return false;
     }
 
-    if (formData.usageLimit < 1) {
-      newErrors.usageLimit = 'Tổng lượt sử dụng phải ít nhất là 1';
+    if (formData.maxUses < 1) {
+      toast.error('Tổng lượt sử dụng phải ít nhất là 1');
+      return false;
     }
 
-    if (formData.usagePerUser < 1) {
-      newErrors.usagePerUser = 'Lượt sử dụng mỗi người phải ít nhất là 1';
+    if (formData.maxUsesPerUser < 1) {
+      toast.error('Lượt sử dụng mỗi người phải ít nhất là 1');
+      return false;
     }
 
-    if (useCase === VoucherUseCase.PRODUCT && formData.selectedProducts.length === 0) {
-      newErrors.selectedProducts = 'Vui lòng chọn ít nhất một sản phẩm để áp dụng.';
+    // Validation: maxUsesPerUser không được vượt quá maxUses
+    if (formData.maxUsesPerUser > formData.maxUses) {
+      toast.error('Số lần sử dụng tối đa per user không được vượt quá số lần sử dụng tối đa');
+      return false;
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    // Validation cho voucher sản phẩm
+    if (useCase === VoucherUseCase.PRODUCT && 
+        formData.discountApplyType === DiscountApplyType.SPECIFIC && 
+        (formData.selectedProducts ?? []).length === 0) {
+      toast.error('Vui lòng chọn ít nhất một sản phẩm để áp dụng voucher');
+      return false;
+    }
+
+    // Validation cho maxDiscountValue khi discountType là PERCENTAGE
+    if (formData.discountType === 'PERCENTAGE' && 
+        formData.maxDiscountValue !== null && 
+        formData.maxDiscountValue !== undefined &&
+        formData.maxDiscountValue <= 0) {
+      toast.error('Mức giảm tối đa phải lớn hơn 0');
+      return false;
+    }
+
+    return true;
   };
 
   // Submit voucher
@@ -173,33 +285,104 @@ export function useNewVoucher({ useCase, onCreateSuccess }: UseNewVoucherProps):
       return;
     }
 
-    setIsLoading(true);
+    // Kiểm tra có userData không
+    if (!userData) {
+      toast.error('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.');
+      return;
+    }
 
+    // Xác định owner thực tế dựa trên role của user (override owner param)
+    // ADMIN role = PLATFORM voucher, các role khác = SHOP voucher
+    const actualOwner = userData?.role?.name === 'ADMIN' ? 'PLATFORM' : 'SHOP';
+    const isPlatformVoucher = actualOwner === 'PLATFORM';
+
+    // Kiểm tra shopId khi là shop voucher
+    if (!isPlatformVoucher && !userData?.id) {
+      toast.error('Không thể lấy thông tin shop. Vui lòng đăng nhập lại.');
+      return;
+    }
+
+    console.log('Debug userData structure:', {
+      userData,
+      userId: userData?.id,
+      userRole: userData?.role?.name,
+    });
+
+    setIsLoading(true);
     try {
-      // Tạo payload dựa trên useCase
-      const payload = {
-        ...formData,
-        useCase,
-        type: voucherType
+      // Chuẩn bị payload theo format API
+      const payload: CreateDiscountRequest = {
+        name: formData.name,
+        description: formData.description || formData.name, // Nếu không có description thì dùng name
+        code: formData.code,
+        value: formData.value,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        maxUsesPerUser: formData.maxUsesPerUser,
+        minOrderValue: formData.minOrderValue,
+        maxUses: formData.maxUses,
+        shopId: isPlatformVoucher ? null : userData.id, // PLATFORM = null, SHOP = userData.id
+        isPlatform: isPlatformVoucher,
+        voucherType: voucherType,
+        discountApplyType: formData.discountApplyType,
+        discountStatus: formData.isActive ? DiscountStatus.ACTIVE : DiscountStatus.INACTIVE,
+        discountType: formData.discountType === 'FIX_AMOUNT' ? DiscountType.FIX_AMOUNT : DiscountType.PERCENTAGE,
       };
+
+      // Thêm các trường tùy chọn
+      // Chỉ thêm maxDiscountValue khi có giá trị và discountType là PERCENTAGE
+      if (formData.discountType === 'PERCENTAGE' && 
+          formData.maxDiscountValue !== null && 
+          formData.maxDiscountValue !== undefined &&
+          formData.maxDiscountValue > 0) {
+        payload.maxDiscountValue = formData.maxDiscountValue;
+      } else {
+        // Nếu không có hoặc không phải PERCENTAGE thì set null
+        payload.maxDiscountValue = null;
+      }
+
+      // Xử lý displayType dựa trên useCase
+      if (useCase === VoucherUseCase.PRIVATE) {
+        payload.displayType = DisplayType.PRIVATE;
+      } else {
+        payload.displayType = formData.displayType === 'PRIVATE' ? DisplayType.PRIVATE : DisplayType.PUBLIC;
+      }
+
+      // Xử lý productIds cho voucher sản phẩm
+      if (useCase === VoucherUseCase.PRODUCT && formData.discountApplyType === DiscountApplyType.SPECIFIC) {
+        payload.productIds = formData.selectedProducts?.map(p => p.id) || [];
+      }
+
+      console.log('User role and owner logic:', {
+        userRole: userData?.role?.name,
+        ownerParam: owner,
+        actualOwner,
+        isPlatformVoucher,
+        shopId: isPlatformVoucher ? null : userData.id
+      });
+
+      console.log('Submitting voucher with payload:', payload);
       
-      console.log('Submitting voucher:', payload);
+      // Gọi API
+      const response = await discountService.create(payload);
       
-      // TODO: Gọi API tạo voucher
-      // await voucherService.createVoucher(payload);
+      console.log('Voucher created successfully:', response);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Hiển thị thông báo thành công
+      toast.success('Tạo voucher thành công!');
       
-      console.log('Voucher created successfully');
-      
-      // Reset form sau khi tạo thành công và gọi callback
+      // Reset form sau khi tạo thành công
       resetForm();
-      onCreateSuccess?.();
       
-    } catch (error) {
+      // Callback success nếu có
+      onCreateSuccess?.();
+
+    } catch (error: any) {
       console.error('Error creating voucher:', error);
-      setErrors({ submit: 'Có lỗi xảy ra khi tạo voucher. Vui lòng thử lại.' });
+      
+      // Sử dụng helper function để parse error message
+      const errorMessage = parseErrorMessage(error);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -213,6 +396,6 @@ export function useNewVoucher({ useCase, onCreateSuccess }: UseNewVoucherProps):
     isLoading,
     errors,
     useCase,
-    voucherType,
+    voucherType: voucherType.toString(),
   };
 }
