@@ -28,12 +28,13 @@ const ProductsContext = createContext<ProductsContextValue | undefined>(undefine
 interface ProductsProviderProps {
   children: ReactNode;
   currentCategoryId?: string | null;
+  querySearch?: string;
 }
 
-export function ProductsProvider({ children, currentCategoryId }: ProductsProviderProps) {
+export function ProductsProvider({ children, currentCategoryId, querySearch }: ProductsProviderProps) {
   const searchParams = useSearchParams();
   const sort = searchParams.get('sort') || 'relevance';
-  const searchQuery = searchParams.get('q') || '';
+  const searchQuery = querySearch || searchParams.get('q') || '';
   
   // Nếu có search query, bỏ qua categoryId để đảm bảo tìm kiếm trên toàn bộ sản phẩm
   const effectiveCategoryId = searchQuery ? null : currentCategoryId;
@@ -75,19 +76,19 @@ export function ProductsProvider({ children, currentCategoryId }: ProductsProvid
   // useProducts sẽ được khởi tạo lại khi dataKey thay đổi
   const productsData = useProducts({ 
     categoryId: effectiveCategoryId, 
-    key: dataKey // Truyền key để làm điểm phân biệt
-  });
+    key: dataKey, // Truyền key để làm điểm phân biệt,
+    querySearch: searchQuery})
   
   // Thêm các giá trị bổ sung cho context
   // useEffect để log khi searchQuery hoặc categoryId thay đổi
-  useEffect(() => {
-    console.log("ProductsContext detected changes:", { 
-      searchQuery, 
-      currentCategoryId, 
-      effectiveCategoryId,
-      dataKey 
-    });
-  }, [searchQuery, currentCategoryId, effectiveCategoryId, dataKey]);
+  // useEffect(() => {
+  //   console.log("ProductsContext detected changes:", { 
+  //     searchQuery, 
+  //     currentCategoryId, 
+  //     effectiveCategoryId,
+  //     dataKey 
+  //   });
+  // }, [searchQuery, currentCategoryId, effectiveCategoryId, dataKey]);
   
   const contextValue = useMemo(() => ({
     ...productsData,

@@ -53,10 +53,29 @@ export default function ProfileHeader({
     : "";
 
   const getUserLevel = (totalSpent: number) => {
-    if (totalSpent >= 10000000) return { level: "VIP Diamond", color: "from-purple-500 to-pink-500", icon: Crown };
-    if (totalSpent >= 5000000) return { level: "VIP Gold", color: "from-yellow-500 to-orange-500", icon: Star };
-    if (totalSpent >= 2000000) return { level: "VIP Silver", color: "from-gray-400 to-gray-600", icon: Star };
-    return { level: "Thành viên", color: "from-blue-500 to-cyan-500", icon: User };
+    if (totalSpent >= 10000000)
+      return {
+        level: "VIP Diamond",
+        color: "from-purple-500 to-pink-500",
+        icon: Crown,
+      };
+    if (totalSpent >= 5000000)
+      return {
+        level: "VIP Gold",
+        color: "from-yellow-500 to-orange-500",
+        icon: Star,
+      };
+    if (totalSpent >= 2000000)
+      return {
+        level: "VIP Silver",
+        color: "from-gray-400 to-gray-600",
+        icon: Star,
+      };
+    return {
+      level: "Thành viên",
+      color: "from-blue-500 to-cyan-500",
+      icon: User,
+    };
   };
 
   const userLevel = getUserLevel(totalSpent);
@@ -64,7 +83,6 @@ export default function ProfileHeader({
 
   return (
     <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col lg:flex-row min-h-[200px] overflow-hidden items-center border border-gray-100 relative">
-      
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#D70018] to-[#FF6B35] rounded-full -translate-x-16 -translate-y-16"></div>
@@ -89,9 +107,11 @@ export default function ProfileHeader({
               {name?.[0]?.toUpperCase() || "U"}
             </div>
           )}
-          
+
           {/* User Level Badge */}
-          <div className={`absolute -bottom-2 -right-2 px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${userLevel.color} shadow-lg flex items-center gap-1`}>
+          <div
+            className={`absolute -bottom-2 -right-2 px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${userLevel.color} shadow-lg flex items-center gap-1`}
+          >
             <LevelIcon className="w-3 h-3" />
             <span className="hidden sm:inline">{userLevel.level}</span>
           </div>
@@ -108,7 +128,9 @@ export default function ProfileHeader({
                 {name}
                 <div className="hidden sm:flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-emerald-100 to-green-100 rounded-full">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium text-green-700">Đã xác minh</span>
+                  <span className="text-xs font-medium text-green-700">
+                    Đã xác minh
+                  </span>
                 </div>
               </h2>
             </div>
@@ -116,15 +138,15 @@ export default function ProfileHeader({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="flex items-center gap-3 group">
-              <div className="p-2 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                <Mail className="w-4 h-4 text-blue-600" />
+              <div className="p-2 rounded-lg bg-red-50 group-hover:bg-red-100 transition-colors">
+                <Mail className="w-4 h-4 text-red-500" />
               </div>
               <span className="text-sm text-gray-600 truncate">{email}</span>
             </div>
 
             <div className="flex items-center gap-3 group">
-              <div className="p-2 rounded-lg bg-green-50 group-hover:bg-green-100 transition-colors">
-                <Phone className="w-4 h-4 text-green-600" />
+              <div className="p-2 rounded-lg bg-red-50 group-hover:bg-red-100 transition-colors">
+                <Phone className="w-4 h-4 text-red-500" />
               </div>
               <span className="text-sm text-gray-600">
                 {showPhone ? phone : maskPhone(phone)}
@@ -133,7 +155,11 @@ export default function ProfileHeader({
                 onClick={() => setShowPhone(!showPhone)}
                 className="ml-1 p-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
               >
-                {showPhone ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPhone ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
 
@@ -160,11 +186,13 @@ export default function ProfileHeader({
         {/* Total Orders */}
         <div className="flex flex-1 items-center gap-4 p-6 sm:p-8 w-full border-t lg:border-t-0 border-gray-100 group hover:bg-gradient-to-br hover:from-blue-50 hover:to-transparent transition-all duration-300">
           <div className="relative">
-            <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
-              <ShoppingCart className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+            <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
+              <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
             </div>
             <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-white">{totalOrders > 99 ? '99+' : totalOrders}</span>
+              <span className="text-xs font-bold text-white">
+                {totalOrders > 99 ? "99+" : totalOrders}
+              </span>
             </div>
           </div>
           <div className="flex flex-col">
@@ -188,8 +216,8 @@ export default function ProfileHeader({
         {/* Total Spent */}
         <div className="flex flex-1 items-center gap-4 p-6 sm:p-8 w-full border-t lg:border-t-0 border-gray-100 group hover:bg-gradient-to-br hover:from-emerald-50 hover:to-transparent transition-all duration-300">
           <div className="relative">
-            <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
-              <Receipt className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+            <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-full bg-gradient-to-br from-red-100 to-white flex items-center justify-center">
+              <Receipt className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
             </div>
             {totalSpent >= 1000000 && (
               <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
@@ -205,9 +233,7 @@ export default function ProfileHeader({
               Tổng tích lũy
             </span>
             {createdAt && (
-              <span className="text-xs text-gray-400 mt-1">
-                Từ {createdAt}
-              </span>
+              <span className="text-xs text-gray-400 mt-1">Từ {createdAt}</span>
             )}
           </div>
         </div>

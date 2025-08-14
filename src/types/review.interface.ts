@@ -67,5 +67,7 @@ export interface UpdateReviewRequest {
 // ====================================
 
 export interface GetReviewsResponse extends BaseResponse {
-  data: Review[];
+  data: {
+    data: Review;
+  }[];
 }

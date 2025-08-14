@@ -47,6 +47,7 @@ export const clientProductsService = {
    */
   searchProducts: async (params: ClientSearchParams): Promise<ClientSearchResponse> => {
     try {
+      console.log("🔍 Searching products with params:", params);
       const response = await publicAxios.get(API_ENDPOINTS.PRODUCTS.SEARCH, { params });
       return response.data;
     } catch (error) {
@@ -62,10 +63,11 @@ export const clientProductsService = {
    * @param limit - Maximum number of results to return
    * @returns Promise with search suggestions
    */
-  getSearchSuggestions: async (query: string, limit: number = 5): Promise<ClientSearchResponse> => {
+  getSearchSuggestions: async (query: string, limit: number = 5, options: any): Promise<ClientSearchResponse> => {
     try {
       const response = await publicAxios.get(API_ENDPOINTS.PRODUCTS.SEARCH, { 
-        params: { q: query, limit } 
+        params: { q: query, limit },
+        signal: options?.signal // <-- truyền signal vào đây
       });
       return response.data;
     } catch (error) {

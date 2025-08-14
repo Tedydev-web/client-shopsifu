@@ -8,9 +8,11 @@ import { Phone, ChevronLeft } from "lucide-react";
 import { useOrder } from "./useOrder";
 import { Order, OrderItem } from "@/types/order.interface";
 import Link from "next/link";
+import { createProductSlug } from "@/components/client/products/shared/productSlug"; // Đường dẫn đến hàm tạo slug
 
 interface OrderDetailProps {
   orderId: string;
+  status?: string; // Thêm prop status nếu cần
 }
 
 export default function OrderDetail({ orderId }: OrderDetailProps) {
@@ -18,7 +20,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
 
-  const { fetchOrderDetail, loading } = useOrder();
+  const { fetchOrderDetail, cancelOrder, loading } = useOrder();
   const [order, setOrder] = useState<Order | null>(null);
 
   useEffect(() => {
@@ -26,19 +28,19 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
       if (!orderId) return;
       try {
         const res = await fetchOrderDetail(orderId);
-        console.log("📦 API response:", res);
         setOrder(res?.data ?? null);
-      } catch (err) {
-        console.error("❌ Lỗi khi load chi tiết đơn:", err);
-      }
+      } catch (err) {}
     };
 
     loadOrder();
   }, [orderId, fetchOrderDetail]);
 
-  useEffect(() => {
-    console.log("🔄 Updated order state:", order);
-  }, [order]);
+  const handleCancel = async () => {
+    if (!orderId) return;
+    await cancelOrder(orderId);
+    const res = await fetchOrderDetail(orderId);
+    setOrder(res?.data ?? null);
+  };
 
   if (loading || !order) {
     return <div>Đang tải...</div>;
@@ -76,7 +78,6 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
 
   return (
     <div className="mx-auto bg-[#f5f5f5] space-y-4 text-sm rounded-md">
-      {/* Breadcrumb */}
       <Link
         href="/user/orders"
         className="flex items-center gap-1 text-muted-foreground text-sm bg-white rounded-lg p-4 border cursor-pointer"
@@ -128,15 +129,36 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               </span>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-2">
             <span className="text-sm">Số lượng: {totalQuantity}</span>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-[#d70018] text-[#d70018] hover:bg-[#d70018] hover:text-white"
-            >
-              Mua lại
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-[#d70018] text-[#d70018] hover:bg-[#d70018] hover:text-white"
+                onClick={() => {
+                  if (selectedItem) {
+                    const slug = createProductSlug(
+                      selectedItem.productName,
+                      selectedItem.productId
+                    );
+                    router.push(`/products/${slug}`);
+                  }
+                }}
+              >
+                Mua lại
+              </Button>
+
+              {order.status === "PENDING_PAYMENT" && (
+                <Button
+                  variant="outline"
+                  className="text-red-500 border-red-500 hover:bg-red-50"
+                  onClick={handleCancel}
+                >
+                  Hủy đơn hàng
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </section>

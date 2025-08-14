@@ -57,11 +57,11 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
           key={value}
           value={value}
           className="
-    bg-white rounded-none shadow-none
-    min-h-[70vh] px-2 pb-2
-    md:rounded-xl md:shadow-sm md:min-h-[85vh]
-    transition-all
-  "
+            bg-white rounded-none shadow-none
+            min-h-[70vh] px-2 pb-2
+            md:rounded-xl md:shadow-sm md:min-h-[85vh]
+            transition-all
+          "
         >
           {value !== currentTab ? null : loading ? (
             <div className="h-full flex items-center justify-center text-muted-foreground text-sm sm:text-base">
@@ -113,7 +113,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                       </div>
                     </div>
 
-                    {/* Right: Status + Price */}
+                    {/* Right: Status + Price + Actions */}
                     <div
                       className="flex flex-row sm:flex-col items-center sm:items-end 
              justify-between sm:justify-start 
@@ -149,6 +149,25 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                         </Button>
                       )}
                       <div className="text-blue-500">Xem chi tiết →</div>
+
+                      {/* Nút Đánh giá sản phẩm */}
+                      {order.status === OrderStatus.DELIVERED && firstItem && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white mt-1"
+                          onClick={(e) => {
+                            e.stopPropagation(); // tránh trigger xem chi tiết
+                            const slug = createProductSlug(
+                              firstItem.productName,
+                              firstItem.productId
+                            );
+                            router.push(`/products/${slug}?writeReview=true`);
+                          }}
+                        >
+                          Đánh giá sản phẩm
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );
