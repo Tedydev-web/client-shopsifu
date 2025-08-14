@@ -9,18 +9,7 @@ import {
 } from "@/types/client.products.interface";
 import { clientProductsService } from "@/services/clientProductsService";
 import { useServerDataTable } from "@/hooks/useServerDataTable";
-
-// Định nghĩa interface cho params API
-interface ApiParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sortBy?: string;
-  sortOrder?: string;
-  createdById?: number;
-  categories?: string;
-  [key: string]: any;
-}
+import { PaginationRequest } from "@/types/base.interface";
 
 // Định nghĩa interface cho pagination để tránh lỗi undefined
 interface PaginationData {
@@ -93,18 +82,18 @@ export function useProducts({
     refreshData,
   } = useServerDataTable<ClientProduct | ClientSearchResultItem, ClientProduct>(
     {
-      fetchData: async (params: ApiParams) => {
+      fetchData: async (params: PaginationRequest, signal?: AbortSignal) => {
         // Thêm các params đặc biệt
         console.log("Fetching products with params:", params);
-        const apiParams: ApiParams = { ...params };
+        const apiParams: any = { ...params };
 
         // Nếu có từ khóa tìm kiếm, ưu tiên API search và bỏ qua category filter
         if (searchQuery) {
           // Xóa category param nếu đang tìm kiếm để đảm bảo tìm kiếm trên toàn bộ sản phẩm
-          delete apiParams.categories;
+          delete apiParams.categoryId;
         } else if (categoryId) {
           // Chỉ áp dụng filter theo category khi không có search query
-          apiParams.categories = categoryId;
+          apiParams.categoryId = categoryId;
         }
 
         // Nếu có từ khóa tìm kiếm, sử dụng API search

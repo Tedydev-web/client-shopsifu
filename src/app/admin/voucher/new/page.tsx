@@ -19,7 +19,23 @@ export default function NewVoucherPage() {
   const router = useRouter();
   const t = useTranslations("admin.ModuleVouchers");
   const searchParams = useSearchParams();
-  const useCase = parseInt(searchParams.get('useCase') || '1', 10) as unknown as VoucherUseCase;
+  const useCaseParam = searchParams.get('usecase') || '1';
+  
+  // Convert string to VoucherUseCase enum
+  const getUseCase = (param: string): VoucherUseCase => {
+    switch (param) {
+      case '1':
+        return VoucherUseCase.SHOP;
+      case '2':
+        return VoucherUseCase.PRODUCT;
+      case '3':
+        return VoucherUseCase.PRIVATE;
+      default:
+        return VoucherUseCase.SHOP;
+    }
+  };
+  
+  const useCase = getUseCase(useCaseParam);
 
   const getTitle = () => {
     switch (useCase) {

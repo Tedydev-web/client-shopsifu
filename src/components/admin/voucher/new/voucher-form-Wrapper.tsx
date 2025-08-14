@@ -1,6 +1,6 @@
 'use client'
 import dynamic from "next/dynamic";
-import { VoucherUseCase } from "@/components/admin/voucher/hook/useNewVoucher";
+import { VoucherUseCase } from "@/components/admin/voucher/hook/voucher-config";
 
 interface VoucherFormWrapperProps {
   useCase: VoucherUseCase;
@@ -8,7 +8,7 @@ interface VoucherFormWrapperProps {
 }
 
 const VoucherFormDynamic = dynamic(
-  () => import("./new-Index"),
+  () => import("./new-Index").then(mod => ({ default: mod.VoucherNewIndex })),
   { ssr: false }
 );
 

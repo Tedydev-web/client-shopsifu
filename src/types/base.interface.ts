@@ -28,7 +28,7 @@ export interface PaginationRequest {
   search?: string;
   sortBy?: string;
   sortOrder?: string;
-  createdById?: number;
+  createdById?: string;
 }
 
 export interface PaginationMetadata {
@@ -42,7 +42,7 @@ export interface PaginationMetadata {
   search?: string;
   sortBy?: string;
   sortOrder?: string;
-  createdById?: number;
+  createdById?: string;
 }
 
 /**

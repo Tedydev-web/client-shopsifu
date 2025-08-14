@@ -22,7 +22,7 @@ interface UseServerDataTableProps<T, U> {
   initialSort?: {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
-    createdById?: number;
+    createdById?: string;
   };
   /** Giới hạn mặc định số lượng items mỗi trang */
   defaultLimit?: number;

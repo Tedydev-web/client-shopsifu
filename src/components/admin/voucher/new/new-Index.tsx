@@ -11,6 +11,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { useUserData } from '@/hooks/useGetData-UserLogin';
 
+interface VoucherNewIndexProps {
+  useCase?: VoucherUseCase;
+  onCreateSuccess?: () => void;
+}
+
 function getUseCase(param: string | null): VoucherUseCase {
   switch (param) {
     case '1':
@@ -25,7 +30,7 @@ function getUseCase(param: string | null): VoucherUseCase {
 }
 
 
-function VoucherNewContent() {
+function VoucherNewContent({ useCase: propUseCase, onCreateSuccess: propOnCreateSuccess }: VoucherNewIndexProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const useCaseParam = searchParams.get('usecase');
@@ -34,7 +39,8 @@ function VoucherNewContent() {
   // Lấy userData từ Redux state
   const userData = useUserData();
 
-  const useCase = getUseCase(useCaseParam);
+  // Sử dụng useCase từ props nếu có, nếu không thì lấy từ URL params
+  const useCase = propUseCase || getUseCase(useCaseParam);
   const owner = (ownerParam === 'PLATFORM' || ownerParam === 'SHOP') ? ownerParam : 'SHOP';
 
   const { 
@@ -49,10 +55,10 @@ function VoucherNewContent() {
     useCase, 
     owner,
     userData, // Truyền userData vào hook
-    onCreateSuccess: () => {
+    onCreateSuccess: propOnCreateSuccess || (() => {
       // Redirect về trang danh sách voucher sau khi tạo thành công
       router.push('/admin/voucher');
-    }
+    })
   });
 
   const handleCancel = () => {
@@ -91,10 +97,10 @@ function VoucherNewContent() {
   );
 }
 
-export function VoucherNewIndex() {
+export function VoucherNewIndex({ useCase, onCreateSuccess }: VoucherNewIndexProps = {}) {
   return (
     <Suspense fallback={<div>Đang tải...</div>}>
-      <VoucherNewContent />
+      <VoucherNewContent useCase={useCase} onCreateSuccess={onCreateSuccess} />
     </Suspense>
   );
 }

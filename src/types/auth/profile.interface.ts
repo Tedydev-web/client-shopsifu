@@ -109,7 +109,7 @@ export interface UserProfile {
  */
 export interface UserProfileResponse extends BaseResponse {
   data: {
-    id: number;
+    id: string;
     email: string;
     name: string;
     role: {
