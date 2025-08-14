@@ -31,6 +31,8 @@ interface UseServerDataTableProps<T, U> {
    * Sử dụng khi API không hỗ trợ một số tham số
    */
   requestConfig?: {
+    /** Tự động fetch dữ liệu khi có thay đổi search */
+    autoFetchSearch?: boolean;
     /** Có gửi tham số search trong request không */
     includeSearch?: boolean;
     /** Có gửi các tham số sắp xếp (sortBy, sortOrder) không */
@@ -63,6 +65,7 @@ export function useServerDataTable<T, U = T>({
   initialSort = { },
   defaultLimit = 10,
   requestConfig = {
+    autoFetchSearch: true,
     includeSearch: true,
     includeSort: true,
     includeCreatedById: true
@@ -93,10 +96,16 @@ export function useServerDataTable<T, U = T>({
   const activeRequestRef = useRef<AbortController | null>(null);
   
   // Lưu trữ các hàm callback để không tạo lại mỗi lần render
-  const stableFetchData = useRef(fetchData).current;
-  const stableGetResponseData = useRef(getResponseData).current;
-  const stableGetResponseMetadata = useRef(getResponseMetadata).current;
-  const stableMapResponseToData = useRef(mapResponseToData).current;
+const fetchDataRef = useRef(fetchData);
+const getResponseDataRef = useRef(getResponseData);
+const getResponseMetadataRef = useRef(getResponseMetadata);
+const mapResponseToDataRef = useRef(mapResponseToData);
+
+useEffect(() => { fetchDataRef.current = fetchData; }, [fetchData]);
+useEffect(() => { getResponseDataRef.current = getResponseData; }, [getResponseData]);
+useEffect(() => { getResponseMetadataRef.current = getResponseMetadata; }, [getResponseMetadata]);
+useEffect(() => { mapResponseToDataRef.current = mapResponseToData; }, [mapResponseToData]);
+
 
   // Effect để fetch data khi pagination thay đổi
   useEffect(() => {
@@ -144,44 +153,19 @@ export function useServerDataTable<T, U = T>({
         }
         
         // Gọi API và lấy response với AbortSignal
-        const response = await stableFetchData(requestParams, controller.signal);
-        
-        // Xóa timeout vì request đã hoàn thành
-        clearTimeout(timeoutId);
-        
-        // Kiểm tra nếu request đã bị hủy
-        if (controller.signal.aborted) return;
-        
-        // Log response và request params để debug
-        console.log("API Response:", response);
-        console.log("Request Params:", requestParams);
-        
-        // Trích xuất dữ liệu từ response
-        let responseData: T[] = [];
-        try {
-          responseData = stableGetResponseData(response);
-          if (!Array.isArray(responseData)) {
-            console.error("Response data is not an array:", responseData);
-            responseData = [];
-          }
-        } catch (error) {
-          console.error("Error extracting data from response:", error);
-        }
-        
-        // Map data nếu có hàm map được cung cấp
-        const mappedData: U[] = stableMapResponseToData 
-          ? responseData.map(stableMapResponseToData) 
-          : responseData as unknown as U[];
-        
-        // Kiểm tra lại nếu request đã bị hủy
-        if (controller.signal.aborted) return;
-        
-        setData(mappedData);
-        
-        // Cập nhật metadata nếu có
-        if (stableGetResponseMetadata) {
-          try {
-            const metadata = stableGetResponseMetadata(response);
+       const response = await fetchDataRef.current(requestParams, controller.signal);
+
+let responseData: T[] = [];
+responseData = getResponseDataRef.current(response);
+
+const mappedData: U[] = mapResponseToDataRef.current
+  ? responseData.map(mapResponseToDataRef.current)
+  : (responseData as unknown as U[]);
+
+if (getResponseMetadataRef.current) {
+  const metadata = getResponseMetadataRef.current(response);
+
+try {
             if (metadata) {
               setPagination(prev => ({
                 ...prev,
@@ -203,10 +187,10 @@ export function useServerDataTable<T, U = T>({
         clearTimeout(timeoutId);
         
         // Chỉ xử lý lỗi nếu không phải do abort request
-        if (!controller.signal.aborted) {
-          console.error("Error fetching data:", error);
-          showToast(parseApiError(error), 'error');
-        }
+        // if (!controller.signal.aborted) {
+        //   console.error("Error fetching data:", error);
+        //   showToast(parseApiError(error), 'error');
+        // }
       } finally {
         // Chỉ reset loading nếu đây là request mới nhất
         if (activeRequestRef.current === controller) {
@@ -233,6 +217,7 @@ export function useServerDataTable<T, U = T>({
     ...(requestConfig.includeSort ? [pagination.sortBy, pagination.sortOrder] : []),
     // Chỉ thêm createdById vào dependency khi includeCreatedById = true
     ...(requestConfig.includeCreatedById ? [pagination.createdById] : []),
+    ...(requestConfig.includeSearch && (requestConfig.autoFetchSearch ?? true) ? [debouncedSearch] : []),
     refreshTrigger, // Thêm trigger vào dependency để force re-fetch
     // Loại bỏ các callback ra khỏi dependency array vì đã dùng useRef để ổn định chúng
   ]);
@@ -246,9 +231,13 @@ export function useServerDataTable<T, U = T>({
     setPagination(prev => ({ ...prev, limit, page: 1 }));
   };
 
-  const handleSearch = (search: string) => {
-    setPagination(prev => ({ ...prev, search, page: 1 }));
-  };
+const handleSearch = (search: string) => {
+  setPagination(prev => ({ ...prev, search, page: 1 }));
+  if (requestConfig.includeSearch && (requestConfig.autoFetchSearch === false)) {
+    setRefreshTrigger(prev => prev + 1); // fetch ngay khi user bấm Search
+  }
+};
+
 
   const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
     setPagination(prev => ({ ...prev, sortBy, sortOrder }));

@@ -75,7 +75,7 @@ export default function SearchProductGrid({ categoryId }: SearchProductGridProps
   }
 
   // Hiển thị khi không có sản phẩm
-  if (products.length === 0) {
+  if (products.length === 0 && !isLoading) {
     const searchParams = new URLSearchParams(window.location.search);
     const searchQuery = searchParams.get('q');
     
