@@ -110,7 +110,7 @@ export default function ProfileHeader({
 
           {/* User Level Badge */}
           <div
-            className={`absolute -bottom-2 -right-2 px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${userLevel.color} shadow-lg flex items-center gap-1`}
+            className={`absolute -bottom-2 px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${userLevel.color} shadow-lg flex items-center gap-1`}
           >
             <LevelIcon className="w-3 h-3" />
             <span className="hidden sm:inline">{userLevel.level}</span>

@@ -1,8 +1,26 @@
-const locations = ['Đồng Nai', 'TP. Hồ Chí Minh', 'Bình Dương', 'Bà Rịa - Vũng Tàu'];
-const categories = ['Nhà Cửa & Đời Sống', 'Phụ Kiện Nữ', 'Thời Trang Nữ', 'Sắc Đẹp'];
-const shippingOptions = ['Nhanh', 'Tiết Kiệm'];
+const locations = [
+  "Đồng Nai",
+  "TP. Hồ Chí Minh",
+  "Bình Dương",
+  "Bà Rịa - Vũng Tàu",
+];
+const categories = [
+  "Nhà Cửa & Đời Sống",
+  "Phụ Kiện Nữ",
+  "Thời Trang Nữ",
+  "Sắc Đẹp",
+];
+const shippingOptions = ["Nhanh", "Tiết Kiệm"];
 
-export default function SearchSidebar() {
+interface SearchSidebarProps {
+  categoryIds?: string[];
+  currentCategoryId?: string | null;
+}
+
+export default function SearchSidebar({
+  categoryIds = [],
+  currentCategoryId,
+}: SearchSidebarProps) {
   return (
     <aside className="w-full lg:w-64 shrink-0 space-y-6 text-sm hidden lg:block">
       <FilterSection title="Nơi Bán" items={locations} />

@@ -25,11 +25,11 @@ export function SearchContent({ categoryIds = [], currentCategoryId }: SearchCon
 
   return (
     <div className="w-full h-full">
-      {/* {isMobileView ? (
-        // <SearchMobileIndex categoryIds={categoryIds} currentCategoryId={currentCategoryId} /> 
-      ) : ( */}
+      {isMobileView ? (
+        <SearchMobileIndex categoryIds={categoryIds} currentCategoryId={currentCategoryId} /> 
+      ) : (
         <SearchDesktopIndex categoryIds={categoryIds} currentCategoryId={currentCategoryId} />
-      {/* )} */}
+      )}
     </div>
   );
 }
