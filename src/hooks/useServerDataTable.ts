@@ -162,6 +162,9 @@ const mappedData: U[] = mapResponseToDataRef.current
   ? responseData.map(mapResponseToDataRef.current)
   : (responseData as unknown as U[]);
 
+// Cập nhật data state với mapped data
+setData(mappedData);
+
 if (getResponseMetadataRef.current) {
   const metadata = getResponseMetadataRef.current(response);
 
@@ -259,5 +262,7 @@ const handleSearch = (search: string) => {
     handleSearch,
     handleSortChange,
     refreshData,
+    // Expose setPagination for external control (e.g., infinite scroll)
+    setPagination,
   };
 }

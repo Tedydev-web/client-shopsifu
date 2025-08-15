@@ -293,7 +293,7 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
               </p>
               <p className="text-xs text-gray-700">
                 {formData.value && formData.minOrderValue ? 
-                  `Giảm ${formData.value}${formData.discountType === 'PERCENTAGE' ? '%' : '₫'} cho đơn hàng từ ${formatCurrency(formData.minOrderValue)}₫` :
+                  `Giảm ${formatCurrency(formData.value)}${formData.discountType === 'PERCENTAGE' ? '%' : '₫'} cho đơn hàng từ ${formatCurrency(formData.minOrderValue)}₫` :
                   'Vui lòng điền đầy đủ thông tin để xem tóm tắt'
                 }
               </p>

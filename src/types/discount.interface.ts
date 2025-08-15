@@ -69,6 +69,7 @@ export interface DiscountGetAllParams extends PaginationRequest {
   status?: DiscountStatus;
   type?: DiscountType;
   search?: string;
+  createdById?: string;
 }
 export interface DiscountGetAllResponse extends BaseResponse {
   data: Discount[];

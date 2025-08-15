@@ -25,35 +25,54 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   onChange,
   ...rest
 }) => {
-  const [internalValue, setInternalValue] = React.useState(controlledValue || "");
-  const isControlled = controlledValue !== undefined;
-  const value = isControlled ? controlledValue : internalValue;
+  const [localValue, setLocalValue] = React.useState(controlledValue || "");
   const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Đồng bộ giá trị khi controlledValue thay đổi
+  // Sync local value với controlled value khi thay đổi từ bên ngoài
   React.useEffect(() => {
-    if (isControlled) setInternalValue(controlledValue!);
-    // eslint-disable-next-line
+    if (controlledValue !== undefined) {
+      setLocalValue(controlledValue);
+    }
   }, [controlledValue]);
 
-  // Xử lý thay đổi input
+  // Cleanup debounce timeout khi component unmount
+  React.useEffect(() => {
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+    };
+  }, []);
+
+  // Xử lý thay đổi input - luôn update local state ngay lập tức để UX mượt
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    if (!isControlled) setInternalValue(newValue);
+    
+    // Luôn update local state ngay lập tức để typing mượt mà
+    setLocalValue(newValue);
+    
+    // Clear debounce timeout cũ
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    // Nếu có debounce, delay việc gọi onValueChange
     if (debounce > 0) {
-      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
       debounceTimeout.current = setTimeout(() => {
         onValueChange?.(newValue);
       }, debounce);
     } else {
+      // Không debounce thì gọi ngay
       onValueChange?.(newValue);
     }
+    
+    // Gọi onChange callback nếu có
     onChange?.(e);
   };
 
   // Xử lý khi nhấn Enter hoặc icon search
   const handleSearch = () => {
-    onSearch?.(value);
+    onSearch?.(localValue);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -66,7 +85,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     <div className={cn("relative flex items-center", className)}>
       <Input
         type="text"
-        value={value}
+        value={localValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}

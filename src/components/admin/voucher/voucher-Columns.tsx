@@ -1,7 +1,7 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { DiscountStatus, DiscountType } from '@/types/discount.interface'
+import { DiscountStatus, DiscountType, VoucherType, DisplayType } from '@/types/discount.interface'
 import { VoucherColumn } from './hook/useVouchers'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -96,6 +96,103 @@ export const voucherColumns = (
       },
     },
     {
+      accessorKey: 'discountType',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('discountType')} />,
+      cell: ({ row }) => {
+        const type = row.getValue('discountType') as DiscountType;
+        let badgeClass = 'border-blue-500 text-blue-500 bg-blue-50';
+        let typeText = 'Không xác định';
+
+        switch (type) {
+          case DiscountType.PERCENTAGE:
+            badgeClass = 'border-green-600 text-green-600 bg-green-50';
+            typeText = 'Phần trăm';
+            break;
+          case DiscountType.FIX_AMOUNT:
+            badgeClass = 'border-blue-600 text-blue-600 bg-blue-50';
+            typeText = 'Số tiền cố định';
+            break;
+        }
+
+        return (
+          <Badge variant="outline" className={badgeClass}>
+            {typeText}
+          </Badge>
+        );
+      },
+      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    },
+    {
+      accessorKey: 'voucherType',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('voucherType')} />,
+      cell: ({ row }) => {
+        const type = row.getValue('voucherType') as VoucherType;
+        let badgeClass = 'border-purple-500 text-purple-500 bg-purple-50';
+        let typeText = 'Không xác định';
+
+        switch (type) {
+          case VoucherType.SHOP:
+            badgeClass = 'border-purple-600 text-purple-600 bg-purple-50';
+            typeText = 'Cửa hàng';
+            break;
+          case VoucherType.PRODUCT:
+            badgeClass = 'border-indigo-600 text-indigo-600 bg-indigo-50';
+            typeText = 'Sản phẩm';
+            break;
+          case VoucherType.PLATFORM:
+            badgeClass = 'border-red-600 text-red-600 bg-red-50';
+            typeText = 'Nền tảng';
+            break;
+          case VoucherType.CATEGORY:
+            badgeClass = 'border-yellow-600 text-yellow-600 bg-yellow-50';
+            typeText = 'Danh mục';
+            break;
+          case VoucherType.BRAND:
+            badgeClass = 'border-pink-600 text-pink-600 bg-pink-50';
+            typeText = 'Thương hiệu';
+            break;
+          case VoucherType.PRIVATE:
+            badgeClass = 'border-gray-600 text-gray-600 bg-gray-50';
+            typeText = 'Riêng tư';
+            break;
+        }
+
+        return (
+          <Badge variant="outline" className={badgeClass}>
+            {typeText}
+          </Badge>
+        );
+      },
+      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    },
+    {
+      accessorKey: 'displayType',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('displayType')} />,
+      cell: ({ row }) => {
+        const type = row.getValue('displayType') as DisplayType;
+        let badgeClass = 'border-teal-500 text-teal-500 bg-teal-50';
+        let typeText = 'Không xác định';
+
+        switch (type) {
+          case DisplayType.PUBLIC:
+            badgeClass = 'border-green-600 text-green-600 bg-green-50';
+            typeText = 'Công khai';
+            break;
+          case DisplayType.PRIVATE:
+            badgeClass = 'border-gray-600 text-gray-600 bg-gray-50';
+            typeText = 'Riêng tư';
+            break;
+        }
+
+        return (
+          <Badge variant="outline" className={badgeClass}>
+            {typeText}
+          </Badge>
+        );
+      },
+      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    },
+    {
       accessorKey: 'discountStatus',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('status')} />,
       cell: ({ row }) => {
@@ -142,22 +239,22 @@ export const voucherColumns = (
         return <span>{format(date, 'dd/MM/yyyy')}</span>;
       },
     },
-    {
-      accessorKey: 'createdAt',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('createdAt')} />,
-      cell: ({ row }) => {
-        const date = new Date(row.getValue('createdAt'));
-        return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
-      },
-    },
-    {
-      accessorKey: 'updatedAt',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('updatedAt')} />,
-      cell: ({ row }) => {
-        const date = new Date(row.getValue('updatedAt'));
-        return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
-      },
-    },
+    // {
+    //   accessorKey: 'createdAt',
+    //   header: ({ column }) => <DataTableColumnHeader column={column} title={t('createdAt')} />,
+    //   cell: ({ row }) => {
+    //     const date = new Date(row.getValue('createdAt'));
+    //     return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
+    //   },
+    // },
+    // {
+    //   accessorKey: 'updatedAt',
+    //   header: ({ column }) => <DataTableColumnHeader column={column} title={t('updatedAt')} />,
+    //   cell: ({ row }) => {
+    //     const date = new Date(row.getValue('updatedAt'));
+    //     return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
+    //   },
+    // },
     {
       id: 'actions',
       cell: ({ row }) => (

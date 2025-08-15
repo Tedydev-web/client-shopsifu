@@ -301,11 +301,14 @@
       "privateVoucherDesc": "Voucher áp dụng cho người dùng riêng tư",
       "create": "Tạo",
       "Table":{
+        "discountType": "Loại giảm giá",
+        "voucherType": "Loại voucher",
+        "displayType": "Loại hiển thị",
         "discountValue": "Giá trị giảm",
-        "validFrom": "Valid from",
+        "validFrom": "Từ ngày",
         "createdAt": "Ngày tạo",
         "updatedAt": "Ngày cập nhật",
-        "validTo": "Valid to",
+        "validTo": "Đến ngày",
         "name": "Tên voucher",
         "code": "Mã voucher",
         "discount": "Giảm giá",
@@ -412,7 +415,6 @@
         "clearFilter": "Xóa bộ lọc",
         "activeFilter": "Bộ lọc đang áp dụng",
         "searchCategory": "Tìm kiếm danh mục",
-        "Search category...": "Tìm kiếm danh mục",
         "noResults": "Không có kết quả",
         "loading":"Đang tải dữ liệu...",
         "clearFilters": "Xóa tất cả bộ lọc"
@@ -476,6 +478,7 @@
       }
     },
     "orders": {
+      "products": "Sản phẩm",
       "title": "Danh sách đơn hàng",
       "subtitle": "Quản lý tất cả đơn hàng",
       "searchPlaceholder": "Tìm kiếm đơn hàng",

@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { Discount, CreateDiscountRequest, UpdateDiscountRequest, DiscountStatus, DiscountType, DiscountGetAllResponse } from '@/types/discount.interface';
+import { Discount, CreateDiscountRequest, UpdateDiscountRequest, DiscountStatus, DiscountType, DiscountGetAllResponse, VoucherType, DisplayType } from '@/types/discount.interface';
 import { discountService } from '@/services/discountService';
 import { useUserData } from '@/hooks/useGetData-UserLogin';
 import { useServerDataTable } from '@/hooks/useServerDataTable';
@@ -14,6 +14,8 @@ export type VoucherColumn = {
   name: string;
   code: string;
   discountType: DiscountType;
+  voucherType: VoucherType;
+  displayType: DisplayType;
   value: number;
   startDate: string;
   endDate: string;
@@ -45,27 +47,38 @@ export function useVouchers() {
     refreshData,
   } = useServerDataTable<Discount, VoucherColumn>({
     fetchData: useCallback((params: PaginationRequest) => {
-        if (!user?.id) {
-            // Return a promise that resolves to an empty response
-            return Promise.resolve({ data: [], metadata: { totalItems: 0, totalPages: 1, page: 1, limit: 10 } } as DiscountGetAllResponse);
-        }
-        return discountService.getAll({ ...params, createdById: user.id });
+        console.log('Fetching vouchers with params:', params);
+        
+        // Gọi API 
+        const apiParams = { ...params };
+        
+        return discountService.getAll(apiParams);
     }, [user?.id]),
-    getResponseData: (response) => response.data,
-    getResponseMetadata: (response) => response.metadata,
-    mapResponseToData: (item: Discount): VoucherColumn => ({
-      id: item.id,
-      name: item.name,
-      code: item.code,
-      discountType: item.discountType,
-      value: item.value,
-      startDate: item.startDate,
-      endDate: item.endDate,
-      discountStatus: item.discountStatus,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-      original: item,
-    }),
+    getResponseData: (response) => {
+      console.log('Raw API response:', response);
+      return response.data;
+    },
+    getResponseMetadata: (response) => {
+      return response.metadata;
+    },
+    mapResponseToData: (item: Discount): VoucherColumn => {
+      const mapped = {
+        id: item.id,
+        name: item.name,
+        code: item.code,
+        discountType: item.discountType,
+        voucherType: item.voucherType,
+        displayType: item.displayType || DisplayType.PUBLIC,
+        value: item.value,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        discountStatus: item.discountStatus,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        original: item,
+      };
+      return mapped;
+    },
     initialSort: { createdById: user?.id },
   });
 

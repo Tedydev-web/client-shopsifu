@@ -110,14 +110,12 @@ export function ProductsFilter<TData>({
   // Apply server-side filtering via API parameters
   const applyPriceFilter = () => {
     if (onPriceFilterChange) {
-      console.log('Applying price filter with values:', priceRange);
       // Pass min and max price to the API handler
       onPriceFilterChange(priceRange[0], priceRange[1]);
     }
   };
 
   const clearPriceFilter = () => {
-    console.log('Clearing price filter');
     setPriceRange([defaultMinPrice, defaultMaxPrice]);
     if (onPriceFilterChange) {
       // Clear the price filter by passing null values
@@ -163,7 +161,7 @@ export function ProductsFilter<TData>({
               )}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
-              {t("category")}
+              {t("category") || "Danh mục"}
               {currentCategoryFilter && (
                 <>
                   <Separator orientation="vertical" className="mx-2 h-4" />
@@ -176,13 +174,13 @@ export function ProductsFilter<TData>({
           </PopoverTrigger>
           <PopoverContent className="w-[200px] p-0" align="start">
             <Command>
-              <CommandInput placeholder={t("searchCategory") || "Search category..."} />
+              <CommandInput placeholder={t("searchCategory") || "Tìm kiếm danh mục..."} />
               <CommandList>
-                <CommandEmpty>{t("noResults") || "No results found."}</CommandEmpty>
+                <CommandEmpty>{t("noResults") || "Không tìm thấy kết quả."}</CommandEmpty>
                 <CommandGroup>
                   {loadingCategories ? (
                     <CommandItem disabled>
-                      <span className="opacity-70">{t("loading") || "Loading..."}</span>
+                      <span className="opacity-70">{t("loading") || "Đang tải..."}</span>
                     </CommandItem>
                   ) : (
                     categories.map((category) => {
@@ -217,7 +215,7 @@ export function ProductsFilter<TData>({
                         onSelect={clearCategoryFilter}
                         className="justify-center text-center"
                       >
-                        {t("clearFilters") || "Clear filters"}
+                        {t("clearFilters") || "Xóa bộ lọc"}
                       </CommandItem>
                     </CommandGroup>
                   </>
@@ -243,7 +241,7 @@ export function ProductsFilter<TData>({
               )}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
-              {t("price")}
+              {t("price") || "Giá"}
               {(priceRange[0] !== defaultMinPrice || priceRange[1] !== defaultMaxPrice) && (
                 <>
                   <Separator orientation="vertical" className="mx-2 h-4" />
@@ -264,7 +262,7 @@ export function ProductsFilter<TData>({
           </PopoverTrigger>
           <PopoverContent className="w-64 p-4" align="start">
             <div className="space-y-4">
-              <h4 className="font-medium leading-none">{t("priceRange")}</h4>
+              <h4 className="font-medium leading-none">{t("priceRange") || "Khoảng giá"}</h4>
               <Slider
                 defaultValue={[1000, 10000000]}
                 value={priceRange}
@@ -284,7 +282,7 @@ export function ProductsFilter<TData>({
               <div className="flex flex-col gap-2 pt-2">
                 {(currentPriceFilter?.minPrice !== null || currentPriceFilter?.maxPrice !== null) && (
                   <p className="text-sm text-muted-foreground italic">
-                    {t("activeFilter")}: {currentPriceFilter?.minPrice?.toLocaleString('vi-VN')} - {currentPriceFilter?.maxPrice?.toLocaleString('vi-VN')} VND
+                    {t("activeFilter") || "Bộ lọc đang áp dụng"}: {currentPriceFilter?.minPrice?.toLocaleString('vi-VN')} - {currentPriceFilter?.maxPrice?.toLocaleString('vi-VN')} VND
                   </p>
                 )}
                 <div className="flex justify-end space-x-2">
@@ -292,16 +290,16 @@ export function ProductsFilter<TData>({
                     variant="ghost" 
                     size="sm" 
                     onClick={clearPriceFilter}
-                    title={t("clearFilter") || "Clear filter"}
+                    title={t("clearFilter") || "Xóa bộ lọc"}
                   >
-                    {t("clear") || "Clear"}
+                    {t("clear") || "Xóa"}
                   </Button>
                   <Button 
                     size="sm" 
                     onClick={applyPriceFilter}
-                    title={t("applyFilter") || "Apply filter"}
+                    title={t("applyFilter") || "Áp dụng bộ lọc"}
                   >
-                    {t("apply") || "Apply"}
+                    {t("apply") || "Áp dụng"}
                   </Button>
                 </div>
               </div>

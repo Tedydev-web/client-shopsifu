@@ -293,8 +293,12 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
 
     // Xác định owner thực tế dựa trên role của user (override owner param)
     // ADMIN role = PLATFORM voucher, các role khác = SHOP voucher
-    const actualOwner = userData?.role?.name === 'ADMIN' ? 'PLATFORM' : 'SHOP';
+    const actualOwner = userData?.role?.name === 'SHOP' ? 'PLATFORM' : 'SHOP';
     const isPlatformVoucher = actualOwner === 'PLATFORM';
+
+    // Xác định voucherType dựa trên role
+    // Nếu là ADMIN thì voucherType = PLATFORM, còn không thì dùng logic useCase cũ
+    const finalVoucherType = userData?.role?.name === 'SHOP' ? VoucherType.PLATFORM : voucherType;
 
     // Kiểm tra shopId khi là shop voucher
     if (!isPlatformVoucher && !userData?.id) {
@@ -323,7 +327,7 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
         maxUses: formData.maxUses,
         shopId: isPlatformVoucher ? null : userData.id, // PLATFORM = null, SHOP = userData.id
         isPlatform: isPlatformVoucher,
-        voucherType: voucherType,
+        voucherType: finalVoucherType, // Sử dụng finalVoucherType thay vì voucherType
         discountApplyType: formData.discountApplyType,
         discountStatus: formData.isActive ? DiscountStatus.ACTIVE : DiscountStatus.INACTIVE,
         discountType: formData.discountType === 'FIX_AMOUNT' ? DiscountType.FIX_AMOUNT : DiscountType.PERCENTAGE,
@@ -348,9 +352,9 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
         payload.displayType = formData.displayType === 'PRIVATE' ? DisplayType.PRIVATE : DisplayType.PUBLIC;
       }
 
-      // Xử lý productIds cho voucher sản phẩm
+      // Xử lý products cho voucher sản phẩm
       if (useCase === VoucherUseCase.PRODUCT && formData.discountApplyType === DiscountApplyType.SPECIFIC) {
-        payload.productIds = formData.selectedProducts?.map(p => p.id) || [];
+        (payload as any).products = formData.selectedProducts?.map(p => p.id) || [];
       }
 
       console.log('User role and owner logic:', {
@@ -358,7 +362,9 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
         ownerParam: owner,
         actualOwner,
         isPlatformVoucher,
-        shopId: isPlatformVoucher ? null : userData.id
+        shopId: isPlatformVoucher ? null : userData.id,
+        originalVoucherType: voucherType,
+        finalVoucherType: finalVoucherType
       });
 
       console.log('Submitting voucher with payload:', payload);

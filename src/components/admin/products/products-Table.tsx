@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useProducts, ProductColumn } from './useProducts';
 import { productsColumns } from './products-Columns';
 import { useTranslations } from 'next-intl';
@@ -52,30 +53,37 @@ export function ProductsTable() {
   const columns = productsColumns({ onEdit, onDelete: handleOpenDelete, onView });
   const table = useDataTable({ data, columns });
 
-  // Toolbar component to pass into DataTable
-  const ProductsTableToolbar = ({ table }: { table: TanstackTable<ProductColumn> }) => (
+  // Tạo component riêng cho Search và Filter để tránh re-render
+  const SearchAndFilterSection = React.memo(() => (
+    <div className="flex items-center space-x-2">
+      <SearchInput
+        value={searchQuery || ''}
+        onValueChange={handleSearch}
+        placeholder={t('searchPlaceholder')}
+        className="w-full md:max-w-sm"
+      />
+      <ProductsFilter 
+        table={table} 
+        onPriceFilterChange={handlePriceFilterChange}
+        currentPriceFilter={priceFilter}
+        onCategoryFilterChange={handleCategoryFilterChange}
+        currentCategoryFilter={categoryFilter}
+      />
+    </div>
+  ));
+
+  // Toolbar component - chỉ chứa Export và View options
+  const ProductsTableToolbar = React.useCallback(({ table }: { table: TanstackTable<ProductColumn> }) => (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        <SearchInput
-          value={searchQuery || ''}
-          onValueChange={handleSearch}
-          placeholder={t('searchPlaceholder')}
-          className="w-full md:max-w-sm"
-        />
-        <ProductsFilter 
-          table={table} 
-          onPriceFilterChange={handlePriceFilterChange}
-          currentPriceFilter={priceFilter}
-          onCategoryFilterChange={handleCategoryFilterChange}
-          currentCategoryFilter={categoryFilter}
-        />
+        <SearchAndFilterSection />
       </div>
       <div className="flex items-center gap-2">
         <ProductsExportData data={data} table={table} />
         <DataTableViewOption table={table} />
       </div>
     </div>
-  );
+  ), [data]);
 
   return (
     <div className="w-full space-y-4">

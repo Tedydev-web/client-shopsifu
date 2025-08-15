@@ -5,11 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Plus, X, Search, Package } from 'lucide-react';
+import { Plus, X, Search, Package, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { VoucherFormState } from '../hook/useNewVoucher';
 import { VoucherUseCase } from '../hook/voucher-config';
+import { useProductsForVoucher } from '../hook/useProductsForVoucher';
+import { Product } from '@/types/products.interface';
 
 interface ShowVoucherProps {
   formData: VoucherFormState;
@@ -21,31 +23,59 @@ interface ShowVoucherProps {
 
 export default function VoucherShowSettings({ formData, updateFormData, useCase }: ShowVoucherProps) {
   const [showProductSearch, setShowProductSearch] = useState(false);
-  const [productSearchTerm, setProductSearchTerm] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Mock products for demonstration
-  const mockProducts = [
-    { id: '1', name: 'iPhone 15 Pro Max', price: 29990000, image: '/placeholder-product.jpg' },
-    { id: '2', name: 'Samsung Galaxy S24 Ultra', price: 26990000, image: '/placeholder-product.jpg' },
-    { id: '3', name: 'MacBook Air M3', price: 28990000, image: '/placeholder-product.jpg' },
-  ];
+  // Convert formData.selectedProducts to Product[] format for the hook
+  const initialSelectedProducts: Product[] = (formData.selectedProducts || []).map(p => ({
+    id: p.id,
+    name: p.name,
+    basePrice: p.price,
+    virtualPrice: p.price,
+    images: p.image ? [p.image] : [],
+    // Add other required Product fields with default values
+    publishedAt: null,
+    brandId: 0,
+    variants: [],
+    productTranslations: [],
+    message: '',
+    createdAt: '',
+    updatedAt: '',
+    createdById: 0, // number type
+    updatedById: null,
+    deletedById: null,
+    deletedAt: null,
+  }));
 
-  const filteredProducts = mockProducts.filter(product => 
-    product.name.toLowerCase().includes(productSearchTerm.toLowerCase())
-  );
+  const {
+    products,
+    loading,
+    hasMore,
+    searchTerm,
+    setSearchTerm,
+    loadMore,
+    selectedProducts,
+    toggleProduct,
+    clearSelection,
+  } = useProductsForVoucher({
+    initialSelected: initialSelectedProducts,
+    onSelectionChange: (products: Product[]) => {
+      // Convert back to the format expected by formData
+      const formattedProducts = products.map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.basePrice || p.virtualPrice || 0,
+        image: p.images?.[0] || '',
+      }));
+      updateFormData('selectedProducts', formattedProducts);
+    },
+  });
 
-  const addProduct = (product: typeof mockProducts[0]) => {
-    const currentProducts = formData.selectedProducts || [];
-    if (!currentProducts.find(p => p.id === product.id)) {
-      updateFormData('selectedProducts', [...currentProducts, product]);
+  // Handle infinite scroll
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight + 10 && hasMore && !loading) {
+      loadMore();
     }
-    setProductSearchTerm('');
-    setShowProductSearch(false);
-  };
-
-  const removeProduct = (productId: string) => {
-    const currentProducts = formData.selectedProducts || [];
-    updateFormData('selectedProducts', currentProducts.filter(p => p.id !== productId));
   };
 
   const formatCurrency = (value: number) => {
@@ -76,62 +106,124 @@ export default function VoucherShowSettings({ formData, updateFormData, useCase 
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <Input
               placeholder="Tìm kiếm sản phẩm..."
-              value={productSearchTerm}
-              onChange={(e) => setProductSearchTerm(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 border-gray-300 text-gray-900"
             />
           </div>
           
-          <div className="max-h-40 overflow-y-auto space-y-2">
-            {filteredProducts.map((product) => (
-              <div 
-                key={product.id} 
-                className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => addProduct(product)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Package className="w-5 h-5 text-gray-500" />
+          <div 
+            ref={scrollRef}
+            className="max-h-60 overflow-y-auto space-y-2"
+            onScroll={handleScroll}
+          >
+            {products.map((product) => {
+              const isSelected = selectedProducts.find(p => p.id === product.id);
+              return (
+                <div 
+                  key={product.id} 
+                  className={cn(
+                    "flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors",
+                    isSelected 
+                      ? "bg-blue-50 border-blue-200" 
+                      : "bg-white border-gray-200 hover:bg-gray-50"
+                  )}
+                  onClick={() => toggleProduct(product)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                      {product.images?.[0] ? (
+                        <img 
+                          src={product.images[0]} 
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <Package className="w-5 h-5 text-gray-500" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                      <div className="text-xs text-gray-600">
+                        {formatCurrency(product.basePrice || product.virtualPrice || 0)}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                    <div className="text-xs text-gray-600">{formatCurrency(product.price)}</div>
+                  <div className={cn(
+                    "w-5 h-5 rounded border-2 flex items-center justify-center",
+                    isSelected 
+                      ? "bg-blue-500 border-blue-500" 
+                      : "border-gray-300"
+                  )}>
+                    {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
                   </div>
                 </div>
-                <Plus className="w-4 h-4 text-gray-500" />
-              </div>
-            ))}
+              );
+            })}
             
-            {filteredProducts.length === 0 && productSearchTerm && (
+            {loading && (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+                <span className="ml-2 text-sm text-gray-500">Đang tải...</span>
+              </div>
+            )}
+            
+            {!loading && products.length === 0 && searchTerm && (
               <div className="text-center py-8 text-gray-600 text-sm">
                 Không tìm thấy sản phẩm nào
+              </div>
+            )}
+
+            {!loading && !hasMore && products.length > 0 && (
+              <div className="text-center py-2 text-gray-500 text-xs">
+                Đã hiển thị tất cả sản phẩm
               </div>
             )}
           </div>
         </div>
       )}
 
-      {formData.selectedProducts && formData.selectedProducts.length > 0 && (
+      {selectedProducts.length > 0 && (
         <div className="space-y-3 border border-gray-300 rounded-lg p-4 bg-gray-50">
-          <div className="text-sm text-gray-700 font-medium">
-            Đã chọn {formData.selectedProducts.length} sản phẩm
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-700 font-medium">
+              Đã chọn {selectedProducts.length} sản phẩm
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearSelection}
+              className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8"
+            >
+              Xóa tất cả
+            </Button>
           </div>
           <div className="space-y-2">
-            {formData.selectedProducts.map((product) => (
+            {selectedProducts.map((product) => (
               <div key={product.id} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Package className="w-5 h-5 text-gray-500" />
+                    {product.images?.[0] ? (
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.name}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <Package className="w-5 h-5 text-gray-500" />
+                    )}
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                    <div className="text-xs text-gray-600">{formatCurrency(product.price)}</div>
+                    <div className="text-xs text-gray-600">
+                      {formatCurrency(product.basePrice || product.virtualPrice || 0)}
+                    </div>
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => removeProduct(product.id)}
+                  onClick={() => toggleProduct(product)}
                   className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
                 >
                   <X className="w-4 h-4" />

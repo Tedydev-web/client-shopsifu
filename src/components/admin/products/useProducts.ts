@@ -262,21 +262,28 @@ export function useProducts() {
     serverDataTable.refreshData();
   }, [serverDataTable]);
   
-  // Create debounce function for search
-  const debounce = (func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  };
+  // Create debounce function for search - tối ưu hơn
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Debounced search handler with 500ms delay (more responsive)
-  const debouncedSearch = useCallback(
-    debounce((query: string) => {
-      // Update state and ref
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Optimized debounced search handler
+  const debouncedSearch = useCallback((query: string) => {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    // Set timer để delay API call
+    debounceTimerRef.current = setTimeout(() => {
+      // Update search state
       setSearchQuery(query);
       searchQueryRef.current = query;
       
@@ -292,18 +299,17 @@ export function useProducts() {
       
       // Refresh data
       serverDataTable.refreshData();
-    }, 500), // 500ms debounce delay for better responsiveness
-    [serverDataTable]
-  );
+    }, 300); // Giảm delay xuống 300ms cho responsive hơn
+  }, [serverDataTable]);
   
-  // Handle search input changes
+  // Handle search input changes - tách riêng visual update và API call
   const handleSearch = useCallback((query: string) => {
     console.log(`Search query changed: ${query}`);
     
-    // Show visual feedback immediately
+    // Update visual state ngay lập tức để typing mượt
     setSearchQuery(query); 
     
-    // But only trigger API call after debounce
+    // Debounce API call
     debouncedSearch(query);
   }, [debouncedSearch]);
 

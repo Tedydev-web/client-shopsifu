@@ -122,7 +122,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
           <div className="relative">
             <Input
               id="voucher-code"
-              placeholder="VD: GIAMGIA50, FREESHIP..."
+              placeholder="VD: GIAM1, FREES"
               value={formData.code}
               onChange={(e) => updateFormData('code', e.target.value.toUpperCase())}
               className={cn(
@@ -130,7 +130,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
                 "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
                 errors.code && "border-red-500 focus:border-red-500 focus:ring-red-100"
               )}
-              maxLength={20}
+              maxLength={5}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
               <span className={cn(
@@ -139,12 +139,12 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
                 formData.code.length > 10 ? "bg-orange-100 text-orange-600" :
                 "bg-gray-100 text-gray-600"
               )}>
-                {formData.code.length}/20
+                {formData.code.length}/5
               </span>
             </div>
           </div>
           <p className="text-xs text-gray-600">
-            Chỉ được sử dụng chữ cái (a-z), số (0-9), dấu gạch dưới (_) và dấu gạch ngang (-)
+            Chỉ được sử dụng chữ cái viết hoa(A-Z), số (0-9)
           </p>
           <ErrorMessage error={errors.code} />
         </div>
