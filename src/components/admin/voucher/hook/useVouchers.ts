@@ -20,6 +20,9 @@ export type VoucherColumn = {
   startDate: string;
   endDate: string;
   discountStatus: DiscountStatus;
+  maxUses: number;
+  usesCount: number;
+  usersUsed: string[];
   createdAt: string;
   updatedAt: string;
   original: Discount;
@@ -73,6 +76,9 @@ export function useVouchers() {
         startDate: item.startDate,
         endDate: item.endDate,
         discountStatus: item.discountStatus,
+        maxUses: item.maxUses || 0,
+        usesCount: item.usesCount || 0,
+        usersUsed: item.usersUsed || [],
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         original: item,

@@ -301,6 +301,7 @@
       "privateVoucherDesc": "Voucher áp dụng cho người dùng riêng tư",
       "create": "Tạo",
       "Table":{
+        "voucherInfo": "Thông tin voucher",
         "discountType": "Loại giảm giá",
         "voucherType": "Loại voucher",
         "displayType": "Loại hiển thị",

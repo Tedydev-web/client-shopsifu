@@ -10,6 +10,7 @@ import { DataTableRowActions, ActionItem } from '@/components/ui/data-table-comp
 import { Edit, Trash2, Ticket } from 'lucide-react'
 import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
+import { useUserData } from '@/hooks/useGetData-UserLogin'
 
 const getVoucherActions = (
   onDelete: (voucher: VoucherColumn) => void,
@@ -36,8 +37,12 @@ export const voucherColumns = (
   { onDelete, onEdit }: { onDelete: (voucher: VoucherColumn) => void; onEdit: (voucher: VoucherColumn) => void }
 ): ColumnDef<VoucherColumn>[] => {
   const t = useTranslations("admin.ModuleVouchers.Table");
+  const userData = useUserData();
+  
+  // Check if user is ADMIN
+  const isAdmin = userData?.role?.name?.toLowerCase() === 'admin';
 
-  return [
+  const baseColumns: ColumnDef<VoucherColumn>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -58,32 +63,48 @@ export const voucherColumns = (
       enableHiding: false,
     },
     {
-      id: 'icon',
-      header: () => null,
-      cell: ({ row }) => {
-        return (
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
-            <Ticket className="w-5 h-5 text-primary" />
-          </div>
-        );
-      },
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: 'code',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('code')} />,
-      cell: ({ row }) => {
-        const code = row.original.code || '';
-        return <div className="font-medium uppercase">{code.trim() || 'N/A'}</div>;
-      },
-    },
-    {
       accessorKey: 'name',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('name')} />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('voucherInfo')} />,
       cell: ({ row }) => {
         const name = row.original.name || '';
-        return <div>{name}</div>;
+        const code = row.original.code || '';
+        const startDate = new Date(row.original.startDate);
+        const endDate = new Date(row.original.endDate);
+        const now = new Date();
+        
+        // Tự động tính trạng thái dựa vào thời gian
+        let status = DiscountStatus.INACTIVE;
+        let statusText = 'Chưa hoạt động';
+        let statusClass = 'bg-gray-100 text-gray-600';
+        
+        if (now >= startDate && now <= endDate) {
+          status = DiscountStatus.ACTIVE;
+          statusText = 'Đang diễn ra';
+          statusClass = 'bg-green-100 text-green-600';
+        } else if (now > endDate) {
+          status = DiscountStatus.EXPIRED;
+          statusText = 'Hết hạn';
+          statusClass = 'bg-red-100 text-red-600';
+        }
+
+        return (
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 flex-shrink-0">
+              <Ticket className="w-5 h-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className={`px-2 py-1 rounded text-xs font-medium ${statusClass}`}>
+                  {statusText}
+                </span>
+              </div>
+              <div className="font-medium text-sm truncate">{name}</div>
+              <div className="text-xs text-gray-500 uppercase font-mono">
+                Mã voucher: {code.trim() || 'N/A'}
+              </div>
+            </div>
+          </div>
+        );
       },
     },
     {
@@ -95,76 +116,54 @@ export const voucherColumns = (
         return <div>{type === DiscountType.PERCENTAGE ? `${value}%` : `${value.toLocaleString()}₫`}</div>;
       },
     },
-    {
-      accessorKey: 'discountType',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('discountType')} />,
-      cell: ({ row }) => {
-        const type = row.getValue('discountType') as DiscountType;
-        let badgeClass = 'border-blue-500 text-blue-500 bg-blue-50';
-        let typeText = 'Không xác định';
+  ];
 
-        switch (type) {
-          case DiscountType.PERCENTAGE:
-            badgeClass = 'border-green-600 text-green-600 bg-green-50';
-            typeText = 'Phần trăm';
-            break;
-          case DiscountType.FIX_AMOUNT:
-            badgeClass = 'border-blue-600 text-blue-600 bg-blue-50';
-            typeText = 'Số tiền cố định';
-            break;
-        }
+  // Cột voucherType chỉ hiển thị khi user là ADMIN
+  const voucherTypeColumn: ColumnDef<VoucherColumn> = {
+    accessorKey: 'voucherType',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('voucherType')} />,
+    cell: ({ row }) => {
+      const type = row.getValue('voucherType') as VoucherType;
+      let badgeClass = 'border-purple-500 text-purple-500 bg-purple-50';
+      let typeText = 'Không xác định';
 
-        return (
-          <Badge variant="outline" className={badgeClass}>
-            {typeText}
-          </Badge>
-        );
-      },
-      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+      switch (type) {
+        case VoucherType.SHOP:
+          badgeClass = 'border-purple-600 text-purple-600 bg-purple-50';
+          typeText = 'Cửa hàng';
+          break;
+        case VoucherType.PRODUCT:
+          badgeClass = 'border-indigo-600 text-indigo-600 bg-indigo-50';
+          typeText = 'Sản phẩm';
+          break;
+        case VoucherType.PLATFORM:
+          badgeClass = 'border-red-600 text-red-600 bg-red-50';
+          typeText = 'Nền tảng';
+          break;
+        case VoucherType.CATEGORY:
+          badgeClass = 'border-yellow-600 text-yellow-600 bg-yellow-50';
+          typeText = 'Danh mục';
+          break;
+        case VoucherType.BRAND:
+          badgeClass = 'border-pink-600 text-pink-600 bg-pink-50';
+          typeText = 'Thương hiệu';
+          break;
+        case VoucherType.PRIVATE:
+          badgeClass = 'border-gray-600 text-gray-600 bg-gray-50';
+          typeText = 'Riêng tư';
+          break;
+      }
+
+      return (
+        <Badge variant="outline" className={badgeClass}>
+          {typeText}
+        </Badge>
+      );
     },
-    {
-      accessorKey: 'voucherType',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('voucherType')} />,
-      cell: ({ row }) => {
-        const type = row.getValue('voucherType') as VoucherType;
-        let badgeClass = 'border-purple-500 text-purple-500 bg-purple-50';
-        let typeText = 'Không xác định';
+    filterFn: (row, id, value) => value.includes(row.getValue(id)),
+  };
 
-        switch (type) {
-          case VoucherType.SHOP:
-            badgeClass = 'border-purple-600 text-purple-600 bg-purple-50';
-            typeText = 'Cửa hàng';
-            break;
-          case VoucherType.PRODUCT:
-            badgeClass = 'border-indigo-600 text-indigo-600 bg-indigo-50';
-            typeText = 'Sản phẩm';
-            break;
-          case VoucherType.PLATFORM:
-            badgeClass = 'border-red-600 text-red-600 bg-red-50';
-            typeText = 'Nền tảng';
-            break;
-          case VoucherType.CATEGORY:
-            badgeClass = 'border-yellow-600 text-yellow-600 bg-yellow-50';
-            typeText = 'Danh mục';
-            break;
-          case VoucherType.BRAND:
-            badgeClass = 'border-pink-600 text-pink-600 bg-pink-50';
-            typeText = 'Thương hiệu';
-            break;
-          case VoucherType.PRIVATE:
-            badgeClass = 'border-gray-600 text-gray-600 bg-gray-50';
-            typeText = 'Riêng tư';
-            break;
-        }
-
-        return (
-          <Badge variant="outline" className={badgeClass}>
-            {typeText}
-          </Badge>
-        );
-      },
-      filterFn: (row, id, value) => value.includes(row.getValue(id)),
-    },
+  const remainingColumns: ColumnDef<VoucherColumn>[] = [
     {
       accessorKey: 'displayType',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('displayType')} />,
@@ -193,68 +192,37 @@ export const voucherColumns = (
       filterFn: (row, id, value) => value.includes(row.getValue(id)),
     },
     {
-      accessorKey: 'discountStatus',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('status')} />,
+      accessorKey: 'startDate',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Thời gian lưu Mã giảm giá" />
+      ),
       cell: ({ row }) => {
-        const status = row.getValue('discountStatus') as DiscountStatus;
-        let badgeClass = 'border-gray-500 text-gray-500 bg-gray-50';
-        let statusText = 'Không xác định';
-
-        switch (status) {
-          case DiscountStatus.ACTIVE:
-            badgeClass = 'border-green-600 text-green-600 bg-green-50';
-            statusText = 'Hoạt động';
-            break;
-          case DiscountStatus.INACTIVE:
-            badgeClass = 'border-gray-500 text-gray-500 bg-gray-50';
-            statusText = 'Không hoạt động';
-            break;
-          case DiscountStatus.EXPIRED:
-            badgeClass = 'border-orange-500 text-orange-500 bg-orange-50';
-            statusText = 'Hết hạn';
-            break;
-        }
+        const startDate = new Date(row.original.startDate);
+        const endDate = new Date(row.original.endDate);
 
         return (
-          <Badge variant="outline" className={badgeClass}>
-            {statusText}
-          </Badge>
+          <div className="text-sm w-[280px] whitespace-nowrap">
+            {format(startDate, 'HH:mm dd/MM/yyyy')} - {format(endDate, 'HH:mm dd/MM/yyyy')}
+          </div>
         );
       },
-      filterFn: (row, id, value) => value.includes(row.getValue(id)),
     },
     {
-      accessorKey: 'startDate',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('validFrom')} />,
+      accessorKey: 'maxUses',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Tổng lượt sử dụng tối đa" />,
       cell: ({ row }) => {
-        const date = new Date(row.getValue('startDate'));
-        return <span>{format(date, 'dd/MM/yyyy')}</span>;
+        const maxUses = row.original.maxUses || 0;
+        return <div className="text-center">{maxUses === 0 ? '∞' : maxUses}</div>;
       },
     },
     {
-      accessorKey: 'endDate',
-      header: ({ column }) => <DataTableColumnHeader column={column} title={t('validTo')} />,
+      accessorKey: 'usersUsed',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Đã dùng" />,
       cell: ({ row }) => {
-        const date = new Date(row.getValue('endDate'));
-        return <span>{format(date, 'dd/MM/yyyy')}</span>;
+        const usersUsed = row.original.usersUsed || [];
+        return <div className="text-center">{Array.isArray(usersUsed) ? usersUsed.length : 0}</div>;
       },
     },
-    // {
-    //   accessorKey: 'createdAt',
-    //   header: ({ column }) => <DataTableColumnHeader column={column} title={t('createdAt')} />,
-    //   cell: ({ row }) => {
-    //     const date = new Date(row.getValue('createdAt'));
-    //     return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
-    //   },
-    // },
-    // {
-    //   accessorKey: 'updatedAt',
-    //   header: ({ column }) => <DataTableColumnHeader column={column} title={t('updatedAt')} />,
-    //   cell: ({ row }) => {
-    //     const date = new Date(row.getValue('updatedAt'));
-    //     return <span>{format(date, 'dd/MM/yyyy HH:mm')}</span>;
-    //   },
-    // },
     {
       id: 'actions',
       cell: ({ row }) => (
@@ -264,5 +232,14 @@ export const voucherColumns = (
         />
       ),
     },
-  ]
+  ];
+
+  // Kết hợp các columns dựa trên role của user
+  const allColumns = [
+    ...baseColumns,
+    ...(isAdmin ? [voucherTypeColumn] : []),
+    ...remainingColumns,
+  ];
+
+  return allColumns;
 }
