@@ -1,5 +1,5 @@
 'use client'
-import VoucherTable from "@/components/admin/voucher/voucher-Table";
+import RolesDynamic from "@/components/admin/voucher/voucher-Wrapper";
 import { useTranslations } from "next-intl";
 
 export default function VoucherPage() {
@@ -13,7 +13,7 @@ export default function VoucherPage() {
           {t("admin.ModuleVouchers.subtitle")}
         </p>
       </div>
-      <VoucherTable />  
+      <RolesDynamic />  
     </div>
   )
 }

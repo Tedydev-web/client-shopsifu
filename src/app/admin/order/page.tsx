@@ -1,5 +1,5 @@
 'use client'
-import { OrdersTable } from "@/components/admin/orders/orders-Table";
+import OrdersDynamic from "@/components/admin/orders/orders-Wrapper";
 import { useTranslations } from "next-intl";
 
 export default function OrdersPage() {
@@ -12,7 +12,7 @@ export default function OrdersPage() {
           {t("admin.orders.subtitle")}
         </p>
       </div>
-      <OrdersTable />
+      <OrdersDynamic />
     </div>
   )
 }
