@@ -1,5 +1,6 @@
 'use client'
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { DataTable } from '@/components/ui/data-table-component/data-table';
 import { voucherColumns } from './voucher-Columns';
 import { ConfirmDeleteModal } from '@/components/ui/confirm-delete-modal';
@@ -11,6 +12,7 @@ import { useDataTable } from '@/hooks/useDataTable';
 
 export default function VoucherTable() {
   const t = useTranslations("admin.ModuleVouchers.Table");
+  const router = useRouter();
   const {
     data,
     loading,
@@ -27,8 +29,13 @@ export default function VoucherTable() {
     handleOpenUpsertModal,
   } = useVouchers();
 
+  // Handle edit voucher - redirect to edit page
+  const handleEditVoucher = (voucher: any) => {
+    router.push(`/admin/voucher/edit/${voucher.id}`);
+  };
+
   const columns = voucherColumns({ 
-    onEdit: (voucher) => handleOpenUpsertModal('edit', voucher),
+    onEdit: handleEditVoucher, // Sử dụng handleEditVoucher thay vì handleOpenUpsertModal
     onDelete: handleOpenDelete 
   });
 

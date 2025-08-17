@@ -20,6 +20,7 @@ interface BasicInfoProps {
   updateFormData: (field: keyof VoucherFormState, value: any) => void;
   errors: Record<string, string>;
   useCase: VoucherUseCase;
+  isEdit?: boolean; // Thêm prop isEdit
 }
 
 const getVoucherTypeName = (useCase: VoucherUseCase) => {
@@ -45,7 +46,7 @@ const getVoucherTypeName = (useCase: VoucherUseCase) => {
   }
 };
 
-export default function VoucherBasicInfo({ formData, updateFormData, errors, useCase }: BasicInfoProps) {
+export default function VoucherBasicInfo({ formData, updateFormData, errors, useCase, isEdit = false }: BasicInfoProps) {
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
 
@@ -163,8 +164,23 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
       <CardHeader className="pb-6 border-b border-gray-100">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
           <div className="w-1 h-6 bg-gradient-to-b from-red-500 to-red-600 rounded-full" />
-          Thông tin cơ bản
+          {isEdit ? 'Chỉnh sửa thông tin cơ bản' : 'Thông tin cơ bản'}
         </CardTitle>
+        {isEdit && (
+          <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-amber-800">
+                <p className="font-medium">Một số thông tin không thể chỉnh sửa:</p>
+                <ul className="mt-1 list-disc list-inside text-xs space-y-0.5">
+                  <li>Mã voucher và thời gian bắt đầu</li>
+                  <li>Loại giảm giá và giá trị giảm giá</li>
+                  <li>Lượt sử dụng tối đa và lượt sử dụng/người</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="flex items-center gap-2 mt-2">
           <div className={cn("flex items-center gap-2 px-3 py-1.5 rounded-lg", badgeStyle.container)}>
             <Tag className={cn("w-3.5 h-3.5", badgeStyle.icon)} />
@@ -229,9 +245,11 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
               className={cn(
                 "pr-16 h-11 font-mono transition-all duration-200 text-gray-900",
                 "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
-                errors.code && "border-red-500 focus:border-red-500 focus:ring-red-100"
+                errors.code && "border-red-500 focus:border-red-500 focus:ring-red-100",
+                isEdit && "bg-gray-100 cursor-not-allowed" // Readonly style when edit
               )}
               maxLength={5}
+              readOnly={isEdit} // Readonly khi edit
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
               <span className={cn(
@@ -245,7 +263,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
             </div>
           </div>
           <p className="text-xs text-gray-600">
-            Chỉ được sử dụng chữ cái viết hoa(A-Z), số (0-9)
+            {isEdit ? "Mã voucher không thể thay đổi khi chỉnh sửa" : "Chỉ được sử dụng chữ cái viết hoa(A-Z), số (0-9)"}
           </p>
           <ErrorMessage error={errors.code} />
         </div>
@@ -262,16 +280,18 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
               <Label className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                 Từ ngày
               </Label>
-              <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+              <Popover open={!isEdit && startDateOpen} onOpenChange={!isEdit ? setStartDateOpen : undefined}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
+                    disabled={isEdit} // Disable khi edit
                     className={cn(
                       "w-full h-11 justify-start text-left font-normal transition-all duration-200",
                       "border-gray-300 hover:border-red-300 hover:bg-red-50",
                       !formData.startDate && "text-gray-500",
                       formData.startDate && "text-gray-900",
-                      errors.startDate && "border-red-500"
+                      errors.startDate && "border-red-500",
+                      isEdit && "bg-gray-100 cursor-not-allowed hover:bg-gray-100 hover:border-gray-300" // Readonly style
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" />

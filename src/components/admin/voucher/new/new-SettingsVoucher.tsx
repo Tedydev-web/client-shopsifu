@@ -18,9 +18,10 @@ interface DiscountSettingsProps {
   errors: Record<string, string>;
   useCase: VoucherUseCase;
   voucherType: string;
+  isEdit?: boolean; // Thêm prop isEdit
 }
 
-export default function VoucherDiscountSettings({ formData, updateFormData, errors, useCase, voucherType }: DiscountSettingsProps) {
+export default function VoucherDiscountSettings({ formData, updateFormData, errors, useCase, voucherType, isEdit = false }: DiscountSettingsProps) {
 
   const formatCurrency = (value: number | null | undefined) => {
     if (value === null || value === undefined) {
@@ -86,8 +87,28 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
       <CardHeader className="pb-6 border-b border-gray-100">
         <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
           <div className="w-1 h-6 bg-gradient-to-b from-red-500 to-red-600 rounded-full" />
-          Thiết lập mã giảm giá
+          {isEdit ? 'Cài đặt mã giảm giá (Một số thông tin không thể sửa)' : 'Thiết lập mã giảm giá'}
         </CardTitle>
+        {isEdit && (
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-red-800">
+                <p className="font-medium">Các thông tin sau không thể chỉnh sửa:</p>
+                <ul className="mt-1 list-disc list-inside text-xs space-y-0.5">
+                  <li>Loại giảm giá (Phần trăm/Số tiền)</li>
+                  <li>Giá trị giảm giá</li>
+                  <li>Mức giảm tối đa (nếu có)</li>
+                  <li>Giá trị đơn hàng tối thiểu</li>
+                  <li>Lượt sử dụng/người</li>
+                </ul>
+                <p className="mt-1 text-xs text-green-700">
+                  ✅ Có thể chỉnh sửa: Tổng lượt sử dụng tối đa
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </CardHeader>
       
       <CardContent className="p-6 space-y-8">
@@ -121,8 +142,12 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
               <Select
                 value={formData.discountType || 'PERCENTAGE'}
                 onValueChange={(value) => updateFormData('discountType', value)}
+                disabled={isEdit} // Disable khi edit
               >
-                <SelectTrigger id="discountType" className="h-full border-gray-300 text-gray-900">
+                <SelectTrigger id="discountType" className={cn(
+                  "h-full border-gray-300 text-gray-900",
+                  isEdit && "bg-gray-100 cursor-not-allowed"
+                )}>
                   <SelectValue placeholder="Chọn loại" />
                 </SelectTrigger>
                 <SelectContent>
@@ -139,10 +164,12 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
                 placeholder={formData.discountType === 'PERCENTAGE' ? "VD: 10" : "VD: 50.000"}
                 value={formData.discountType === 'PERCENTAGE' ? (formData.value || '') : formatCurrency(formData.value)}
                 onChange={handleValueChange}
+                readOnly={isEdit} // Readonly khi edit
                 className={cn(
                   "h-11 pr-12 transition-all duration-200 text-gray-900",
                   "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
-                  errors.value && "border-red-500 focus:border-red-500 focus:ring-red-100"
+                  errors.value && "border-red-500 focus:border-red-500 focus:ring-red-100",
+                  isEdit && "bg-gray-100 cursor-not-allowed"
                 )}
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-700 font-medium">
@@ -155,11 +182,17 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
         </div>
 
         {formData.discountType === 'PERCENTAGE' && (
-          <div className="space-y-3 p-4 border border-gray-300 rounded-md bg-gray-50/50">
-            <Label className="text-sm font-medium text-gray-900">Mức giảm tối đa</Label>
+          <div className={cn(
+            "space-y-3 p-4 border border-gray-300 rounded-md",
+            isEdit ? "bg-gray-100" : "bg-gray-50/50"
+          )}>
+            <Label className="text-sm font-medium text-gray-900">
+              Mức giảm tối đa {isEdit && <span className="text-xs text-gray-500">(Không thể chỉnh sửa)</span>}
+            </Label>
             <RadioGroup
               value={isMaxDiscountLimited ? 'limited' : 'unlimited'}
               onValueChange={(value) => {
+                if (isEdit) return; // Prevent change when editing
                 const isLimited = value === 'limited';
                 setIsMaxDiscountLimited(isLimited);
                 if (!isLimited) {
@@ -167,14 +200,21 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
                 }
               }}
               className="flex flex-col space-y-2 pt-1"
+              disabled={isEdit} // Disable when editing
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="unlimited" id="unlimited" />
-                <Label htmlFor="unlimited" className="font-normal cursor-pointer text-gray-900">Không giới hạn</Label>
+                <RadioGroupItem value="unlimited" id="unlimited" disabled={isEdit} />
+                <Label htmlFor="unlimited" className={cn(
+                  "font-normal cursor-pointer text-gray-900",
+                  isEdit && "cursor-not-allowed text-gray-500"
+                )}>Không giới hạn</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="limited" id="limited" />
-                <Label htmlFor="limited" className="font-normal cursor-pointer text-gray-900">Giới hạn</Label>
+                <RadioGroupItem value="limited" id="limited" disabled={isEdit} />
+                <Label htmlFor="limited" className={cn(
+                  "font-normal cursor-pointer text-gray-900",
+                  isEdit && "cursor-not-allowed text-gray-500"
+                )}>Giới hạn</Label>
               </div>
             </RadioGroup>
             {isMaxDiscountLimited && (
@@ -184,7 +224,11 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
                   placeholder="Nhập số tiền giảm tối đa"
                   value={formatCurrency(formData.maxDiscountValue)}
                   onChange={handleMaxDiscountChange}
-                  className="pr-12 h-11 border-gray-300 text-gray-900"
+                  readOnly={isEdit} // Readonly khi edit
+                  className={cn(
+                    "pr-12 h-11 border-gray-300 text-gray-900",
+                    isEdit && "bg-gray-100 cursor-not-allowed"
+                  )}
                 />
                 <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-700">
                   VNĐ
@@ -197,7 +241,7 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
         {/* Điều kiện đơn hàng */}
         <div className="space-y-4">
           <RequiredLabel icon={ShoppingCart}>
-            Giá trị đơn hàng tối thiểu
+            Giá trị đơn hàng tối thiểu {isEdit && <span className="text-xs text-gray-500">(Không thể chỉnh sửa)</span>}
           </RequiredLabel>
           <div className="relative mt-2">
             <Input
@@ -205,10 +249,12 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
               placeholder="VD: 100.000"
               value={formatCurrency(formData.minOrderValue)}
               onChange={(e) => updateFormData('minOrderValue', parseCurrency(e.target.value))}
+              readOnly={isEdit} // Readonly khi edit
               className={cn(
                 "h-11 pr-12 transition-all duration-200 text-gray-900",
                 "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
-                errors.minOrderValue && "border-red-500 focus:border-red-500 focus:ring-red-100"
+                errors.minOrderValue && "border-red-500 focus:border-red-500 focus:ring-red-100",
+                isEdit && "bg-gray-100 cursor-not-allowed"
               )}
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-700 font-medium">
@@ -244,6 +290,7 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
                     const value = parseInt(e.target.value);
                     updateFormData('maxUses', isNaN(value) ? 1 : value);
                   }}
+                  // Cho phép edit maxUses
                   className={cn(
                     "h-10 w-28 text-center text-gray-900",
                     "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
@@ -270,10 +317,12 @@ export default function VoucherDiscountSettings({ formData, updateFormData, erro
                     const value = parseInt(e.target.value);
                     updateFormData('maxUsesPerUser', isNaN(value) ? 1 : value);
                   }}
+                  readOnly={isEdit} // Readonly khi edit
                   className={cn(
                     "h-10 w-28 text-center text-gray-900",
                     "border-gray-300 focus:border-red-400 focus:ring-2 focus:ring-red-100",
-                    errors.maxUsesPerUser && "border-red-500 focus:border-red-500 focus:ring-red-100"
+                    errors.maxUsesPerUser && "border-red-500 focus:border-red-500 focus:ring-red-100",
+                    isEdit && "bg-gray-100 cursor-not-allowed"
                   )}
                   min="1"
                 />

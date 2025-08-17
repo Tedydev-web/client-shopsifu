@@ -22,9 +22,10 @@ interface ShowVoucherProps {
   errors: Record<string, string>;
   useCase: VoucherUseCase;
   voucherType: string;
+  isEdit?: boolean; // Thêm prop isEdit
 }
 
-export default function VoucherShowSettings({ formData, updateFormData, useCase }: ShowVoucherProps) {
+export default function VoucherShowSettings({ formData, updateFormData, useCase, isEdit = false }: ShowVoucherProps) {
   const [showProductSearch, setShowProductSearch] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
