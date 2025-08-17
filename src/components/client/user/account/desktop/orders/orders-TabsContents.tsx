@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { createProductSlug } from "@/components/client/products/shared/productSlug";
+import { ReviewsModal } from "@/components/client/products/products-ReviewsModal";
 
 const statusLabel: Record<OrderStatus, string> = {
   PENDING_PAYMENT: "Chờ thanh toán",
@@ -29,6 +30,14 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   const { orders, loading, error, fetchAllOrders, fetchOrdersByStatus } =
     useOrder();
   const [visibleCount, setVisibleCount] = useState(6);
+
+  // state mở modal review
+  const [reviewProduct, setReviewProduct] = useState<{
+    productId: string;
+    productName: string;
+    productSlug: string;
+    orderId: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!currentTab) onTabChange("all");
@@ -83,91 +92,90 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                 return (
                   <div
                     key={order.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center 
-                               justify-between border rounded-lg 
-                               p-3 sm:p-4 bg-white hover:bg-gray-50 cursor-pointer
-                               text-xs sm:text-sm"
+                    className="group border rounded-lg p-3 sm:p-4 bg-white hover:border-[#D70018]/30 hover:shadow-lg transition-all duration-300 cursor-pointer
+                               text-xs sm:text-sm transition-all duration-200 hover:from-[#D70018]/5 hover:to-[#FF6B35]/5"
                     onClick={() => handleViewDetail(order.id)}
                   >
-                    {/* Left: Image + Info */}
-                    <div className="flex items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                      <img
-                        src={firstItem?.image}
-                        alt={firstItem?.productName}
-                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs sm:text-sm text-gray-500 truncate">
-                          Đơn hàng:{" "}
-                          <span className="font-semibold">{order.id}</span>
+                    <div className="flex justify-between items-center gap-4">
+                      {/* Left: Image + Info */}
+                      <div className="flex gap-3 items-center flex-1 min-w-0">
+                        <div className="relative group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
+                          <img
+                            src={firstItem?.image || "/static/no-image.png"}
+                            alt={firstItem?.productName || "Sản phẩm"}
+                            className="w-12 h-12 sm:w-[60px] sm:h-[60px] object-cover rounded-lg shadow-sm border border-gray-100"
+                          />
+                          <div className="absolute inset-0 rounded-lg bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                         </div>
-                        <div className="text-xs sm:text-sm text-gray-500">
-                          Ngày đặt:{" "}
-                          {new Date(order.createdAt).toLocaleDateString(
-                            "vi-VN"
-                          )}
-                        </div>
-                        <div className="font-medium text-gray-800 mt-1 text-sm truncate">
-                          {firstItem?.productName}
+                        <div className="text-left flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-gray-800 truncate mb-1 group-hover:text-[#D70018] transition-colors duration-200">
+                            {firstItem?.productName}
+                          </h4>
+                          <p className="text-xs text-gray-500 truncate">
+                            Đơn hàng:{" "}
+                            <span className="font-semibold">{order.id}</span>
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Ngày đặt:{" "}
+                            {new Date(order.createdAt).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </p>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Right: Status + Price + Actions */}
-                    <div
-                      className="flex flex-row sm:flex-col items-center sm:items-end 
-             justify-between sm:justify-start 
-             gap-2 mt-3 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
-                    >
-                      <div className="text-gray-400">
-                        {statusLabel[order.status]}
+                      {/* Right: Status + Price + Actions */}
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        <div className="text-gray-400 text-xs sm:text-sm">
+                          {statusLabel[order.status]}
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 mb-1">
+                            Tổng thanh toán
+                          </p>
+                          <p className="text-base font-bold text-[#D70018] bg-gradient-to-r from-[#D70018] to-[#FF6B35] bg-clip-text text-transparent">
+                            {totalAmount.toLocaleString()}đ
+                          </p>
+                        </div>
+                        <div className="inline-flex items-center text-sm text-[#D70018] font-semibold hover:text-[#B8001A] transition-colors duration-200 group/link">
+                          Xem chi tiết
+                          <svg
+                            className="w-4 h-4 ml-1 group-hover/link:translate-x-1 transition-transform duration-200"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M17 8l4 4m0 0l-4 4m4-4H3"
+                            />
+                          </svg>
+                        </div>
+                        {order.status === "DELIVERED" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-orange-500 border-orange-500 hover:bg-orange-50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const productSlug = createProductSlug(
+                                firstItem.productName,
+                                firstItem.productId
+                              );
+                              setReviewProduct({
+                                productId: firstItem.productId,
+                                productName: firstItem.productName,
+                                productSlug,
+                                orderId: order.id,
+                              });
+                            }}
+                          >
+                            Đánh giá
+                          </Button>
+                        )}
                       </div>
-                      <div className="font-medium text-gray-700">
-                        Tổng:{" "}
-                        <span className="text-[#D70018] font-semibold">
-                          {totalAmount.toLocaleString()}đ
-                        </span>
-                      </div>
-                      {order.status === "DELIVERED" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-orange-500 border-orange-500 hover:bg-orange-50"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Tạo slug từ tên và id sản phẩm
-                            const productSlug = createProductSlug(
-                              firstItem.productName,
-                              firstItem.productId
-                            );
-                            router.push(
-                              `/products/${productSlug}?showReview=true`
-                            );
-                          }}
-                        >
-                          Đánh giá
-                        </Button>
-                      )}
-                      <div className="text-blue-500">Xem chi tiết →</div>
-
-                      {/* Nút Đánh giá sản phẩm */}
-                      {order.status === OrderStatus.DELIVERED && firstItem && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white mt-1"
-                          onClick={(e) => {
-                            e.stopPropagation(); // tránh trigger xem chi tiết
-                            const slug = createProductSlug(
-                              firstItem.productName,
-                              firstItem.productId
-                            );
-                            router.push(`/products/${slug}?writeReview=true`);
-                          }}
-                        >
-                          Đánh giá sản phẩm
-                        </Button>
-                      )}
                     </div>
                   </div>
                 );
@@ -191,6 +199,15 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
           )}
         </TabsContent>
       ))}
+
+      {/* Review Modal */}
+      {reviewProduct && (
+        <ReviewsModal
+          open={!!reviewProduct}
+          onOpenChange={(open) => !open && setReviewProduct(null)}
+          product={reviewProduct}
+        />
+      )}
     </>
   );
 };

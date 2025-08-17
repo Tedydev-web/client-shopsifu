@@ -9,34 +9,30 @@ import {
   GetReviewsResponse,
 } from "@/types/review.interface";
 import { PaginationRequest } from "@/types/base.interface";
-import { AxiosError } from "axios";
+import { showToast } from "@/components/ui/toastify";
+import { parseApiError } from "@/utils/error";
+import { t } from "i18next";
 
 export const useProductReview = (productId: string) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // Lấy danh sách review theo productId
   const fetchReviews = useCallback(
     async (params?: PaginationRequest) => {
-      if (!productId) return; // tránh gọi API khi chưa có productId
+      if (!productId) return;
       try {
         setLoading(true);
-        setError(null);
         const res = await reviewService.getReviewsByProductId(
           productId,
           params
         );
         const data: GetReviewsResponse = res.data;
-        setReviews((data.data || []).map(item => item.data));
+        setReviews((data.data || []).map((item) => item.data));
         setTotalItems(data.metadata?.totalItems ?? 0);
-      } catch (err) {
-        const axiosError = err as AxiosError<{ message?: string }>;
-        setError(
-          axiosError.response?.data?.message ||
-            "Không thể tải danh sách đánh giá"
-        );
+      } catch (error) {
+        showToast(parseApiError(error), "error");
       } finally {
         setLoading(false);
       }
@@ -49,14 +45,11 @@ export const useProductReview = (productId: string) => {
     async (payload: CreateReviewRequest) => {
       try {
         setLoading(true);
-        setError(null);
         await reviewService.createReview(payload);
-        await fetchReviews(); // refetch sau khi tạo
-      } catch (err) {
-        const axiosError = err as AxiosError<{ message?: string }>;
-        setError(
-          axiosError.response?.data?.message || "Không thể tạo đánh giá mới"
-        );
+        showToast(t("client.showToast.review.createSuccessful"), "success");
+        await fetchReviews();
+      } catch (error) {
+        showToast(parseApiError(error), "error");
       } finally {
         setLoading(false);
       }
@@ -69,14 +62,11 @@ export const useProductReview = (productId: string) => {
     async (reviewId: string, payload: UpdateReviewRequest) => {
       try {
         setLoading(true);
-        setError(null);
         await reviewService.updateReview(reviewId, payload);
-        await fetchReviews(); // refetch sau khi update
-      } catch (err) {
-        const axiosError = err as AxiosError<{ message?: string }>;
-        setError(
-          axiosError.response?.data?.message || "Không thể cập nhật đánh giá"
-        );
+        showToast(t("client.showToast.review.updateSuccessful"), "success");
+        await fetchReviews();
+      } catch (error) {
+        showToast(parseApiError(error), "error");
       } finally {
         setLoading(false);
       }
@@ -89,14 +79,11 @@ export const useProductReview = (productId: string) => {
     async (reviewId: string) => {
       try {
         setLoading(true);
-        setError(null);
         await reviewService.deleteReview(reviewId);
-        await fetchReviews(); // refetch sau khi xóa
-      } catch (err) {
-        const axiosError = err as AxiosError<{ message?: string }>;
-        setError(
-          axiosError.response?.data?.message || "Không thể xóa đánh giá"
-        );
+        showToast(t("client.showToast.review.deleteSuccessful"), "success");
+        await fetchReviews();
+      } catch (error) {
+        showToast(parseApiError(error), "error");
       } finally {
         setLoading(false);
       }
@@ -108,7 +95,6 @@ export const useProductReview = (productId: string) => {
     reviews,
     totalItems,
     loading,
-    error,
     fetchReviews,
     createReview,
     updateReview,
