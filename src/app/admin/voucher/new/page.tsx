@@ -30,6 +30,16 @@ export default function NewVoucherPage() {
         return VoucherUseCase.PRODUCT;
       case '3':
         return VoucherUseCase.PRIVATE;
+      case '4':
+        return VoucherUseCase.PLATFORM;
+      case '5':
+        return VoucherUseCase.CATEGORIES;
+      case '6':
+        return VoucherUseCase.BRAND;
+      case '7':
+        return VoucherUseCase.SHOP_ADMIN;
+      case '8':
+        return VoucherUseCase.PRODUCT_ADMIN;
       default:
         return VoucherUseCase.SHOP;
     }
@@ -43,6 +53,16 @@ export default function NewVoucherPage() {
         return t('title_product');
       case VoucherUseCase.PRIVATE:
         return t('title_private');
+      case VoucherUseCase.PLATFORM:
+        return 'Tạo Voucher Toàn Nền Tảng';
+      case VoucherUseCase.CATEGORIES:
+        return 'Tạo Voucher Theo Danh Mục';
+      case VoucherUseCase.BRAND:
+        return 'Tạo Voucher Theo Thương Hiệu';
+      case VoucherUseCase.SHOP_ADMIN:
+        return 'Tạo Voucher Shop (Admin)';
+      case VoucherUseCase.PRODUCT_ADMIN:
+        return 'Tạo Voucher Sản Phẩm (Admin)';
       default:
         return t('title_shop');
     }

@@ -33,6 +33,9 @@ export type VoucherFormState = {
   // UI-specific fields
   showOnProductPage?: boolean;
   selectedProducts?: Array<{ id: string; name: string; price: number; image: string; }>;
+  selectedBrands?: Array<{ value: string; label: string; image?: string | null; }>;
+  selectedCategories?: Array<{ value: string; label: string; icon?: string | null; parentCategoryId?: string | null; }>;
+  selectedShopUser?: { value: string; label: string; email?: string | null; phone?: string | null; } | null;
   categories?: string[];
   brands?: string[];
   displayType?: 'PUBLIC' | 'PRIVATE';
@@ -52,26 +55,39 @@ export interface UseNewVoucherReturn {
   voucherType: string;
 }
 
-const initialFormData: VoucherFormState = {
-  name: '',
-  code: '',
-  description: '',
-  discountType: 'PERCENTAGE',
-  value: 0,
-  minOrderValue: 0,
-  maxUses: 1,
-  maxUsesPerUser: 1,
-  startDate: '',
-  endDate: '',
-  isActive: true,
-  showOnProductPage: true,
-  selectedProducts: [],
-  categories: [],
-  brands: [],
-  discountApplyType: DiscountApplyType.ALL,
-  maxDiscountType: 'unlimited',
-  maxDiscountValue: null, // Set null thay vì 0
+const getInitialFormData = (): VoucherFormState => {
+  // Set thời gian mặc định: startDate = hiện tại, endDate = +1 ngày
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(23, 59, 0, 0); // Set 23:59 cho endDate
+  
+  return {
+    name: '',
+    code: '',
+    description: '',
+    discountType: 'PERCENTAGE',
+    value: 0,
+    minOrderValue: 0,
+    maxUses: 1,
+    maxUsesPerUser: 1,
+    startDate: now.toISOString(),
+    endDate: tomorrow.toISOString(),
+    isActive: true,
+    showOnProductPage: true,
+    selectedProducts: [],
+    selectedBrands: [],
+    selectedCategories: [],
+    selectedShopUser: null,
+    categories: [],
+    brands: [],
+    discountApplyType: DiscountApplyType.ALL,
+    maxDiscountType: 'unlimited',
+    maxDiscountValue: null, // Set null thay vì 0
+  };
 };
+
+const initialFormData: VoucherFormState = getInitialFormData();
 
 interface UseNewVoucherProps {
   useCase: VoucherUseCase;
@@ -131,7 +147,9 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
 
     // Sanitize form data based on use case
     setFormData(prev => {
-      const newFormData = { ...initialFormData, name: prev.name, code: prev.code }; // Reset to initial but keep name/code
+      const newFormData = { ...getInitialFormData(), name: prev.name, code: prev.code }; // Reset to initial but keep name/code
+
+      // Thời gian mặc định đã được set trong getInitialFormData()
 
       switch (useCase) {
         case VoucherUseCase.SHOP:
@@ -188,7 +206,7 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
 
   // Reset form
   const resetForm = () => {
-    setFormData(initialFormData);
+    setFormData(getInitialFormData());
     setErrors({});
   };
 
@@ -267,6 +285,37 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
       return false;
     }
 
+    // Validation cho voucher CATEGORIES
+    if (useCase === VoucherUseCase.CATEGORIES && 
+        (formData.selectedCategories ?? []).length === 0) {
+      toast.error('Vui lòng chọn ít nhất một danh mục để áp dụng voucher');
+      return false;
+    }
+
+    // Validation cho voucher BRAND
+    if (useCase === VoucherUseCase.BRAND && 
+        (formData.selectedBrands ?? []).length === 0) {
+      toast.error('Vui lòng chọn ít nhất một thương hiệu để áp dụng voucher');
+      return false;
+    }
+
+    // Validation cho voucher SHOP_ADMIN
+    if (useCase === VoucherUseCase.SHOP_ADMIN && 
+        !formData.selectedShopUser) {
+      toast.error('Vui lòng chọn một người dùng (shop) để áp dụng voucher');
+      return false;
+    }
+
+    // Validation cho voucher PRODUCT_ADMIN khi chọn sản phẩm cụ thể
+    if (useCase === VoucherUseCase.PRODUCT_ADMIN && 
+        formData.selectedProducts && 
+        formData.selectedProducts.length > 0 &&
+        formData.discountApplyType === DiscountApplyType.SPECIFIC && 
+        formData.selectedProducts.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một sản phẩm để áp dụng voucher');
+      return false;
+    }
+
     // Validation cho maxDiscountValue khi discountType là PERCENTAGE
     if (formData.discountType === 'PERCENTAGE' && 
         formData.maxDiscountValue !== null && 
@@ -291,17 +340,26 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
       return;
     }
 
-    // Xác định owner thực tế dựa trên role của user (override owner param)
-    // ADMIN role = PLATFORM voucher, các role khác = SHOP voucher
-    const actualOwner = userData?.role?.name === 'SHOP' ? 'PLATFORM' : 'SHOP';
-    const isPlatformVoucher = actualOwner === 'PLATFORM';
+    // Xác định owner thực tế dựa trên role của user và useCase
+    // Chỉ case PLATFORM (4) mới có isPlatform = true
+    // Các case khác (5-8) đều có isPlatform = false nhưng shopId = null
+    const isAdminCase = userData?.role?.name === 'ADMIN' && 
+                       [VoucherUseCase.PLATFORM, VoucherUseCase.CATEGORIES, VoucherUseCase.BRAND, 
+                        VoucherUseCase.SHOP_ADMIN, VoucherUseCase.PRODUCT_ADMIN].includes(useCase);
+    
+    const isPlatformVoucher = (useCase === VoucherUseCase.PLATFORM); // Chỉ case PLATFORM mới true
+    const actualOwner = isPlatformVoucher ? 'PLATFORM' : 'SHOP';
 
-    // Xác định voucherType dựa trên role
-    // Nếu là ADMIN thì voucherType = PLATFORM, còn không thì dùng logic useCase cũ
-    const finalVoucherType = userData?.role?.name === 'SHOP' ? VoucherType.PLATFORM : voucherType;
+    // Xác định voucherType dựa trên useCase
+    let finalVoucherType: VoucherType;
+    if (useCase === VoucherUseCase.PLATFORM) {
+      finalVoucherType = VoucherType.PLATFORM;
+    } else {
+      finalVoucherType = getVoucherType(useCase);
+    }
 
-    // Kiểm tra shopId khi là shop voucher
-    if (!isPlatformVoucher && !userData?.id) {
+    // Kiểm tra shopId khi là shop voucher (chỉ cho SELLER)
+    if (!isAdminCase && !isPlatformVoucher && !userData?.id) {
       toast.error('Không thể lấy thông tin shop. Vui lòng đăng nhập lại.');
       return;
     }
@@ -314,7 +372,7 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
 
     setIsLoading(true);
     try {
-      // Chuẩn bị payload theo format API
+      // Chuẩn bị payload base theo format API
       const payload: CreateDiscountRequest = {
         name: formData.name,
         description: formData.description || formData.name, // Nếu không có description thì dùng name
@@ -325,13 +383,71 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
         maxUsesPerUser: formData.maxUsesPerUser,
         minOrderValue: formData.minOrderValue,
         maxUses: formData.maxUses,
-        shopId: isPlatformVoucher ? null : userData.id, // PLATFORM = null, SHOP = userData.id
-        isPlatform: isPlatformVoucher,
-        voucherType: finalVoucherType, // Sử dụng finalVoucherType thay vì voucherType
+        shopId: null, // Sẽ được set lại trong switch statement
+        isPlatform: isPlatformVoucher, // Chỉ true cho case PLATFORM
+        voucherType: finalVoucherType, // Set giá trị mặc định, sẽ override trong switch
         discountApplyType: formData.discountApplyType,
         discountStatus: formData.isActive ? DiscountStatus.ACTIVE : DiscountStatus.INACTIVE,
         discountType: formData.discountType === 'FIX_AMOUNT' ? DiscountType.FIX_AMOUNT : DiscountType.PERCENTAGE,
       };
+
+      // Xử lý voucherType dựa trên useCase
+      switch (useCase) {
+        case VoucherUseCase.PLATFORM:
+          payload.voucherType = VoucherType.PLATFORM;
+          payload.isPlatform = true;
+          payload.shopId = null;
+          payload.discountApplyType = DiscountApplyType.ALL; // Platform voucher luôn áp dụng cho tất cả
+          break;
+        
+        case VoucherUseCase.CATEGORIES:
+          payload.voucherType = VoucherType.CATEGORY;
+          payload.isPlatform = false;
+          payload.shopId = null;
+          payload.discountApplyType = DiscountApplyType.SPECIFIC;
+          // Thêm categories nếu có
+          if (formData.selectedCategories && formData.selectedCategories.length > 0) {
+            (payload as any).categories = formData.selectedCategories.map(c => c.value);
+          }
+          break;
+        
+        case VoucherUseCase.BRAND:
+          payload.voucherType = VoucherType.BRAND;
+          payload.isPlatform = false;
+          payload.shopId = null;
+          payload.discountApplyType = DiscountApplyType.SPECIFIC;
+          // Thêm brands nếu có
+          if (formData.selectedBrands && formData.selectedBrands.length > 0) {
+            (payload as any).brands = formData.selectedBrands.map(b => b.value);
+          }
+          break;
+        
+        case VoucherUseCase.SHOP_ADMIN:
+          // Case 7: Voucher shop được tạo bởi Admin (giống SELLER SHOP nhưng có quyền admin)
+          payload.voucherType = VoucherType.SHOP;
+          payload.isPlatform = false;
+          payload.shopId = formData.selectedShopUser?.value || null; // Admin chọn user cụ thể
+          payload.discountApplyType = DiscountApplyType.ALL;
+          break;
+          
+        case VoucherUseCase.PRODUCT_ADMIN:
+          // Case 8: Voucher sản phẩm được tạo bởi Admin (giống SELLER PRODUCT nhưng có quyền admin)
+          payload.voucherType = VoucherType.PRODUCT;
+          payload.isPlatform = false;
+          payload.shopId = null; // Admin có thể tạo cho sản phẩm bất kỳ, không cần shopId cụ thể
+          // Nếu có sản phẩm được chọn thì SPECIFIC, không thì ALL
+          payload.discountApplyType = (formData.selectedProducts && formData.selectedProducts.length > 0) 
+            ? DiscountApplyType.SPECIFIC 
+            : DiscountApplyType.ALL;
+          break;
+        
+        default:
+          // Các case SELLER (1-3) - cần shopId từ userData
+          payload.voucherType = finalVoucherType;
+          payload.shopId = userData.id; // SELLER cần shopId
+          payload.isPlatform = false;
+          break;
+      }
 
       // Thêm các trường tùy chọn
       // Chỉ thêm maxDiscountValue khi có giá trị và discountType là PERCENTAGE
@@ -357,17 +473,91 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
         (payload as any).products = formData.selectedProducts?.map(p => p.id) || [];
       }
 
+      // Xử lý products cho PRODUCT_ADMIN (admin có thể chọn sản phẩm từ toàn platform)
+      if (useCase === VoucherUseCase.PRODUCT_ADMIN && formData.selectedProducts && formData.selectedProducts.length > 0) {
+        (payload as any).products = formData.selectedProducts.map(p => p.id);
+        payload.discountApplyType = DiscountApplyType.SPECIFIC;
+      }
+
       console.log('User role and owner logic:', {
         userRole: userData?.role?.name,
-        ownerParam: owner,
-        actualOwner,
+        useCase,
+        isAdminCase,
         isPlatformVoucher,
-        shopId: isPlatformVoucher ? null : userData.id,
+        shopId: payload.shopId,
         originalVoucherType: voucherType,
         finalVoucherType: finalVoucherType
       });
 
       console.log('Submitting voucher with payload:', payload);
+      
+      // Debug specific cho các case ADMIN
+      if (useCase === VoucherUseCase.PLATFORM) {
+        console.log('🔥 PLATFORM VOUCHER DEBUG:', {
+          useCase: 'PLATFORM (4)',
+          isPlatform: payload.isPlatform,
+          voucherType: payload.voucherType,
+          shopId: payload.shopId,
+          discountApplyType: payload.discountApplyType,
+          expectedFormat: {
+            isPlatform: true,
+            voucherType: 'PLATFORM',
+            shopId: null,
+            discountApplyType: 'ALL'
+          }
+        });
+      }
+
+      if (useCase === VoucherUseCase.CATEGORIES) {
+        console.log('🔥 CATEGORIES VOUCHER DEBUG:', {
+          useCase: 'CATEGORIES (5)',
+          isPlatform: payload.isPlatform,
+          voucherType: payload.voucherType,
+          shopId: payload.shopId,
+          categories: (payload as any).categories,
+          discountApplyType: payload.discountApplyType,
+          expectedFormat: {
+            isPlatform: false,
+            voucherType: 'CATEGORY',
+            shopId: null,
+            discountApplyType: 'SPECIFIC'
+          }
+        });
+      }
+
+      if (useCase === VoucherUseCase.BRAND) {
+        console.log('🔥 BRAND VOUCHER DEBUG:', {
+          useCase: 'BRAND (6)',
+          isPlatform: payload.isPlatform,
+          voucherType: payload.voucherType,
+          shopId: payload.shopId,
+          brands: (payload as any).brands,
+          discountApplyType: payload.discountApplyType,
+          expectedFormat: {
+            isPlatform: false,
+            voucherType: 'BRAND',
+            shopId: null,
+            discountApplyType: 'SPECIFIC'
+          }
+        });
+      }
+
+      if (useCase === VoucherUseCase.SHOP_ADMIN) {
+        console.log('🔥 SHOP_ADMIN VOUCHER DEBUG:', {
+          useCase: 'SHOP_ADMIN (7)',
+          isPlatform: payload.isPlatform,
+          voucherType: payload.voucherType,
+          shopId: payload.shopId,
+          selectedShopUser: formData.selectedShopUser,
+          discountApplyType: payload.discountApplyType,
+          expectedFormat: {
+            isPlatform: false,
+            voucherType: 'SHOP',
+            shopId: 'user_id_selected',
+            discountApplyType: 'ALL'
+          }
+        });
+      }
       
       // Gọi API
       const response = await discountService.create(payload);

@@ -12,6 +12,9 @@ import { VoucherFormState } from '../hook/useNewVoucher';
 import { VoucherUseCase } from '../hook/voucher-config';
 import { useProductsForVoucher } from '../hook/useProductsForVoucher';
 import { Product } from '@/types/products.interface';
+import { MultiSelectBrand } from '@/components/ui/combobox/multi-select-brand';
+import { MultiSelectCategory } from '@/components/ui/combobox/multi-select-category';
+import { SingleSelectUser } from '@/components/ui/combobox/single-select-user';
 
 interface ShowVoucherProps {
   formData: VoucherFormState;
@@ -237,6 +240,15 @@ export default function VoucherShowSettings({ formData, updateFormData, useCase 
   );
 
   const renderDisplaySettings = () => {
+    // Các case ADMIN platform vouchers luôn PUBLIC
+    const isAdminPlatformCase = [
+      VoucherUseCase.PLATFORM, 
+      VoucherUseCase.CATEGORIES, 
+      VoucherUseCase.BRAND, 
+      VoucherUseCase.SHOP_ADMIN, 
+      VoucherUseCase.PRODUCT_ADMIN
+    ].includes(useCase);
+
     if (useCase === VoucherUseCase.PRIVATE) {
       // For PRIVATE case, show a disabled 'Không công khai' option.
       return (
@@ -248,6 +260,27 @@ export default function VoucherShowSettings({ formData, updateFormData, useCase 
               <Label htmlFor="display-private" className="font-normal text-gray-900">
                 Không công khai
                 <p className="text-xs text-gray-600 mt-1">Voucher sẽ không được hiển thị ở bất cứ đâu trên Shop.</p>
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+      );
+    }
+
+    if (isAdminPlatformCase) {
+      // For ADMIN platform cases, show a disabled 'PUBLIC' option with admin styling.
+      return (
+        <div className="flex items-start space-x-6">
+          <RequiredLabel htmlFor="display-type" className="mt-3 whitespace-nowrap">Cài đặt hiển thị</RequiredLabel>
+          <RadioGroup value="PUBLIC" className="w-full">
+            <div className="flex items-center space-x-2 p-3 rounded-lg bg-red-50 border border-red-200">
+              <RadioGroupItem value="PUBLIC" id="display-public-admin" checked={true} disabled />
+              <Label htmlFor="display-public-admin" className="font-normal text-gray-900">
+                <div className="flex items-center gap-2">
+                  <span>Hiển thị công khai (Toàn nền tảng)</span>
+                  <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Admin</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">Voucher sẽ được hiển thị công khai trên toàn bộ nền tảng.</p>
               </Label>
             </div>
           </RadioGroup>
@@ -301,6 +334,123 @@ export default function VoucherShowSettings({ formData, updateFormData, useCase 
           <div className="flex items-start space-x-6">
             <RequiredLabel className="mt-3 whitespace-nowrap">Sản phẩm được áp dụng</RequiredLabel>
             {renderProductSelector()}
+          </div>
+        );
+      case VoucherUseCase.BRAND:
+        // For BRAND case, show brand selector with admin styling.
+        return (
+          <div className="flex items-start space-x-6">
+            <RequiredLabel className="mt-3 whitespace-nowrap">Thương hiệu được áp dụng</RequiredLabel>
+            <div className="w-full space-y-3">
+              <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-red-800 font-medium">🏷️ Voucher theo thương hiệu (Admin)</span>
+                  <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Platform</span>
+                </div>
+                <p className="text-xs text-red-600 mt-1">
+                  Chọn một hoặc nhiều thương hiệu để áp dụng voucher trên toàn nền tảng.
+                </p>
+              </div>
+              <MultiSelectBrand
+                selectedBrands={formData.selectedBrands || []}
+                onSelectionChange={(brands) => updateFormData('selectedBrands', brands)}
+                placeholder="Chọn thương hiệu để áp dụng voucher..."
+              />
+            </div>
+          </div>
+        );
+      case VoucherUseCase.CATEGORIES:
+        // For CATEGORIES case, show category selector with admin styling.
+        return (
+          <div className="flex items-start space-x-6">
+            <RequiredLabel className="mt-3 whitespace-nowrap">Danh mục được áp dụng</RequiredLabel>
+            <div className="w-full space-y-3">
+              <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-red-800 font-medium">📂 Voucher theo danh mục (Admin)</span>
+                  <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Platform</span>
+                </div>
+                <p className="text-xs text-red-600 mt-1">
+                  Chọn một hoặc nhiều danh mục để áp dụng voucher trên toàn nền tảng.
+                </p>
+              </div>
+              <MultiSelectCategory
+                selectedCategories={formData.selectedCategories || []}
+                onSelectionChange={(categories) => updateFormData('selectedCategories', categories)}
+                placeholder="Chọn danh mục để áp dụng voucher..."
+              />
+            </div>
+          </div>
+        );
+      case VoucherUseCase.PLATFORM:
+        // For PLATFORM case, show all platform products with admin styling.
+        return (
+          <div className="flex items-start space-x-6">
+            <RequiredLabel className="mt-3 whitespace-nowrap">Phạm vi áp dụng</RequiredLabel>
+            <RadioGroup value="PLATFORM" className="w-full">
+              <div className="flex items-center space-x-2 p-4 rounded-lg bg-red-50 border border-red-200">
+                <RadioGroupItem value="PLATFORM" id="apply-platform" checked={true} disabled />
+                <Label htmlFor="apply-platform" className="font-normal text-gray-900">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Toàn bộ nền tảng</span>
+                    <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Platform Admin</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">Voucher áp dụng cho tất cả sản phẩm trên toàn bộ nền tảng.</p>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+      case VoucherUseCase.SHOP_ADMIN:
+        // For SHOP_ADMIN case, show user selector for choosing shop owner.
+        return (
+          <div className="flex items-start space-x-6">
+            <RequiredLabel className="mt-3 whitespace-nowrap">Cửa hàng được áp dụng</RequiredLabel>
+            <div className="w-full space-y-3">
+              <div className="p-4 rounded-lg bg-orange-50 border border-orange-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm text-orange-800 font-medium">🏪 Voucher Shop Admin</span>
+                  <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full">Admin</span>
+                </div>
+                <p className="text-xs text-orange-600">
+                  Chọn một người dùng cụ thể để tạo voucher cho cửa hàng của họ.
+                </p>
+              </div>
+              <SingleSelectUser
+                selectedUser={formData.selectedShopUser}
+                onSelectionChange={(user) => updateFormData('selectedShopUser', user)}
+                placeholder="Chọn chủ cửa hàng để áp dụng voucher..."
+              />
+              {formData.selectedShopUser && (
+                <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-green-800 font-medium">✅ Áp dụng cho tất cả sản phẩm</span>
+                  </div>
+                  <p className="text-xs text-green-600 mt-1">
+                    Voucher sẽ áp dụng cho tất cả sản phẩm trong cửa hàng của {formData.selectedShopUser.label}.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      case VoucherUseCase.PRODUCT_ADMIN:
+        // For PRODUCT_ADMIN case, show product selector with admin privileges.
+        return (
+          <div className="flex items-start space-x-6">
+            <RequiredLabel className="mt-3 whitespace-nowrap">Sản phẩm được áp dụng (Admin)</RequiredLabel>
+            <div className="w-full space-y-3">
+              <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm text-blue-800 font-medium">👑 Quyền Admin - Chọn sản phẩm từ toàn bộ nền tảng</span>
+                  <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">Super Admin</span>
+                </div>
+                <p className="text-xs text-blue-600">
+                  Bạn có thể chọn bất kỳ sản phẩm nào từ tất cả các cửa hàng trên nền tảng để áp dụng voucher.
+                </p>
+              </div>
+              {renderProductSelector()}
+            </div>
           </div>
         );
       case VoucherUseCase.PRIVATE:

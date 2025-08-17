@@ -24,8 +24,18 @@ function getUseCase(param: string | null): VoucherUseCase {
       return VoucherUseCase.PRODUCT;
     case '3':
       return VoucherUseCase.PRIVATE;
+    case '4':
+      return VoucherUseCase.PLATFORM;
+    case '5':
+      return VoucherUseCase.CATEGORIES;
+    case '6':
+      return VoucherUseCase.BRAND;
+    case '7':
+      return VoucherUseCase.SHOP_ADMIN;
+    case '8':
+      return VoucherUseCase.PRODUCT_ADMIN;
     default:
-      return VoucherUseCase.SHOP; // Mặc định là voucher shop nếu param không hợp lệ
+      return VoucherUseCase.SHOP;
   }
 }
 

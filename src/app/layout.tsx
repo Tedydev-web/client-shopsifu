@@ -11,6 +11,7 @@ import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { CartProvider } from '@/providers/CartContext';
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,19 +34,21 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className={`${inter.variable} antialiased`}>
         <NextIntlClientProvider>
-          <StoreProvider>
-            {/* <ClientLayout> */}
-              {/* <AuthGuard> */}
-                <Toast/>
-                <TrustDeviceModal />
-                {/* <TokenManager /> */}
-                <CartProvider>
-                  {children}
-                </CartProvider>
-              {/* </AuthGuard> */}
-              <Toaster position="bottom-right" />
-            {/* </ClientLayout> */}
-          </StoreProvider>
+          <ReactQueryProvider>
+            <StoreProvider>
+              {/* <ClientLayout> */}
+                {/* <AuthGuard> */}
+                  <Toast/>
+                  <TrustDeviceModal />
+                  {/* <TokenManager /> */}
+                  <CartProvider>
+                    {children}
+                  </CartProvider>
+                {/* </AuthGuard> */}
+                <Toaster position="bottom-right" />
+              {/* </ClientLayout> */}
+            </StoreProvider>
+          </ReactQueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>

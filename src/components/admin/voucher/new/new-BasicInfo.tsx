@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, AlertCircle, Tag } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar as CalendarIcon, AlertCircle, Tag, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,16 @@ const getVoucherTypeName = (useCase: VoucherUseCase) => {
       return 'Voucher sản phẩm';
     case VoucherUseCase.PRIVATE:
       return 'Voucher riêng tư';
+    case VoucherUseCase.PLATFORM:
+      return 'Voucher toàn nền tảng';
+    case VoucherUseCase.CATEGORIES:
+      return 'Voucher theo danh mục';
+    case VoucherUseCase.BRAND:
+      return 'Voucher theo thương hiệu';
+    case VoucherUseCase.SHOP_ADMIN:
+      return 'Voucher shop (Admin)';
+    case VoucherUseCase.PRODUCT_ADMIN:
+      return 'Voucher sản phẩm (Admin)';
     default:
       return 'Voucher';
   }
@@ -38,12 +49,69 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
 
+  // Debug log để kiểm tra useCase
+  console.log('VoucherBasicInfo useCase:', useCase, typeof useCase);
+  console.log('VoucherTypeName:', getVoucherTypeName(useCase));
+
+  // Helper function để tạo danh sách giờ
+  const generateHours = () => {
+    return Array.from({ length: 24 }, (_, i) => {
+      const hour = i.toString().padStart(2, '0');
+      return { value: hour, label: `${hour}:00` };
+    });
+  };
+
+  // Helper function để tạo danh sách phút
+  const generateMinutes = () => {
+    return Array.from({ length: 60 }, (_, i) => {
+      const minute = i.toString().padStart(2, '0');
+      return { value: minute, label: minute };
+    });
+  };
+
   const handleDateSelect = (field: 'startDate' | 'endDate', date: Date | undefined) => {
     if (date) {
-      updateFormData(field, format(date, 'yyyy-MM-dd'));
+      // Giữ nguyên thời gian hiện tại nếu có, hoặc set mặc định là 00:00
+      const currentDateTime = formData[field] ? new Date(formData[field]) : null;
+      const selectedDate = new Date(date);
+      
+      if (currentDateTime) {
+        selectedDate.setHours(currentDateTime.getHours());
+        selectedDate.setMinutes(currentDateTime.getMinutes());
+      } else {
+        // Set thời gian mặc định
+        if (field === 'startDate') {
+          selectedDate.setHours(0, 0, 0, 0); // 00:00 cho ngày bắt đầu
+        } else {
+          selectedDate.setHours(23, 59, 0, 0); // 23:59 cho ngày kết thúc
+        }
+      }
+      
+      updateFormData(field, selectedDate.toISOString());
     }
     if (field === 'startDate') setStartDateOpen(false);
     if (field === 'endDate') setEndDateOpen(false);
+  };
+
+  const handleTimeChange = (field: 'startDate' | 'endDate', type: 'hour' | 'minute', value: string) => {
+    const currentDate = formData[field] ? new Date(formData[field]) : new Date();
+    
+    if (type === 'hour') {
+      currentDate.setHours(parseInt(value));
+    } else {
+      currentDate.setMinutes(parseInt(value));
+    }
+    
+    updateFormData(field, currentDate.toISOString());
+  };
+
+  // Helper để lấy giá trị giờ phút từ datetime
+  const getTimeValue = (dateTimeString: string, type: 'hour' | 'minute') => {
+    if (!dateTimeString) return type === 'hour' ? '00' : '00';
+    const date = new Date(dateTimeString);
+    return type === 'hour' 
+      ? date.getHours().toString().padStart(2, '0')
+      : date.getMinutes().toString().padStart(2, '0');
   };
 
   const ErrorMessage = ({ error }: { error?: string }) => {
@@ -55,6 +123,33 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
       </div>
     );
   };
+
+  // Helper function để xác định màu sắc badge theo useCase
+  const getBadgeStyle = (useCase: VoucherUseCase) => {
+    const isAdminCase = [
+      VoucherUseCase.PLATFORM, 
+      VoucherUseCase.CATEGORIES, 
+      VoucherUseCase.BRAND, 
+      VoucherUseCase.SHOP_ADMIN, 
+      VoucherUseCase.PRODUCT_ADMIN
+    ].includes(useCase);
+
+    if (isAdminCase) {
+      return {
+        container: "bg-gradient-to-r from-red-50 to-red-100 border border-red-200",
+        icon: "text-red-600",
+        text: "text-red-700"
+      };
+    }
+
+    return {
+      container: "bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200",
+      icon: "text-blue-600", 
+      text: "text-blue-700"
+    };
+  };
+
+  const badgeStyle = getBadgeStyle(useCase);
 
   const RequiredLabel = ({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) => (
     <Label htmlFor={htmlFor} className="text-sm font-medium text-gray-900 flex items-center gap-1">
@@ -71,10 +166,16 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
           Thông tin cơ bản
         </CardTitle>
         <div className="flex items-center gap-2 mt-2">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg">
-            <Tag className="w-3.5 h-3.5 text-red-600" />
-            <span className="text-xs font-medium text-red-700">{getVoucherTypeName(useCase)}</span>
+          <div className={cn("flex items-center gap-2 px-3 py-1.5 rounded-lg", badgeStyle.container)}>
+            <Tag className={cn("w-3.5 h-3.5", badgeStyle.icon)} />
+            <span className={cn("text-xs font-medium", badgeStyle.text)}>{getVoucherTypeName(useCase)}</span>
           </div>
+          {/* Thêm badge admin nếu là case admin */}
+          {[VoucherUseCase.PLATFORM, VoucherUseCase.CATEGORIES, VoucherUseCase.BRAND, VoucherUseCase.SHOP_ADMIN, VoucherUseCase.PRODUCT_ADMIN].includes(useCase) && (
+            <div className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">
+              Admin Only
+            </div>
+          )}
         </div>
       </CardHeader>
       
@@ -175,21 +276,67 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" />
                     {formData.startDate ? (
-                      format(new Date(formData.startDate), 'dd/MM/yyyy', { locale: vi })
+                      <div className="flex items-center gap-2">
+                        <span>{format(new Date(formData.startDate), 'dd/MM/yyyy', { locale: vi })}</span>
+                        <div className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-0.5 rounded">
+                          <Clock className="w-3 h-3" />
+                          {format(new Date(formData.startDate), 'HH:mm')}
+                        </div>
+                      </div>
                     ) : (
-                      "Chọn ngày bắt đầu"
+                      "Chọn ngày và giờ bắt đầu"
                     )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 shadow-lg border-gray-200" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.startDate ? new Date(formData.startDate) : undefined}
-                    onSelect={(date) => handleDateSelect('startDate', date)}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                    className="rounded-lg"
-                  />
+                  <div className="flex">
+                    <Calendar
+                      mode="single"
+                      selected={formData.startDate ? new Date(formData.startDate) : undefined}
+                      onSelect={(date) => handleDateSelect('startDate', date)}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                      className="rounded-l-lg border-r"
+                    />
+                    <div className="p-4 space-y-4 w-32">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium text-gray-700">Giờ</Label>
+                        <Select
+                          value={getTimeValue(formData.startDate, 'hour')}
+                          onValueChange={(value) => handleTimeChange('startDate', 'hour', value)}
+                        >
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="00" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {generateHours().map(hour => (
+                              <SelectItem key={hour.value} value={hour.value}>
+                                {hour.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium text-gray-700">Phút</Label>
+                        <Select
+                          value={getTimeValue(formData.startDate, 'minute')}
+                          onValueChange={(value) => handleTimeChange('startDate', 'minute', value)}
+                        >
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="00" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {generateMinutes().map(minute => (
+                              <SelectItem key={minute.value} value={minute.value}>
+                                {minute.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
                 </PopoverContent>
               </Popover>
               <ErrorMessage error={errors.startDate} />
@@ -214,25 +361,71 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 text-gray-600" />
                     {formData.endDate ? (
-                      format(new Date(formData.endDate), 'dd/MM/yyyy', { locale: vi })
+                      <div className="flex items-center gap-2">
+                        <span>{format(new Date(formData.endDate), 'dd/MM/yyyy', { locale: vi })}</span>
+                        <div className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-0.5 rounded">
+                          <Clock className="w-3 h-3" />
+                          {format(new Date(formData.endDate), 'HH:mm')}
+                        </div>
+                      </div>
                     ) : (
-                      "Chọn ngày kết thúc"
+                      "Chọn ngày và giờ kết thúc"
                     )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 shadow-lg border-gray-200" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.endDate ? new Date(formData.endDate) : undefined}
-                    onSelect={(date) => handleDateSelect('endDate', date)}
-                    disabled={(date) => {
-                      const today = new Date();
-                      const startDate = formData.startDate ? new Date(formData.startDate) : today;
-                      return date < today || date < startDate;
-                    }}
-                    initialFocus
-                    className="rounded-lg"
-                  />
+                  <div className="flex">
+                    <Calendar
+                      mode="single"
+                      selected={formData.endDate ? new Date(formData.endDate) : undefined}
+                      onSelect={(date) => handleDateSelect('endDate', date)}
+                      disabled={(date) => {
+                        const today = new Date();
+                        const startDate = formData.startDate ? new Date(formData.startDate) : today;
+                        return date < today || date < startDate;
+                      }}
+                      initialFocus
+                      className="rounded-l-lg border-r"
+                    />
+                    <div className="p-4 space-y-4 w-32">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium text-gray-700">Giờ</Label>
+                        <Select
+                          value={getTimeValue(formData.endDate, 'hour')}
+                          onValueChange={(value) => handleTimeChange('endDate', 'hour', value)}
+                        >
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="23" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {generateHours().map(hour => (
+                              <SelectItem key={hour.value} value={hour.value}>
+                                {hour.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-medium text-gray-700">Phút</Label>
+                        <Select
+                          value={getTimeValue(formData.endDate, 'minute')}
+                          onValueChange={(value) => handleTimeChange('endDate', 'minute', value)}
+                        >
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="59" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {generateMinutes().map(minute => (
+                              <SelectItem key={minute.value} value={minute.value}>
+                                {minute.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
                 </PopoverContent>
               </Popover>
               <ErrorMessage error={errors.endDate} />
