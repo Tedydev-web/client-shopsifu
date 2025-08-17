@@ -92,27 +92,28 @@ export default function ProfileHeader({
       {/* Avatar + Info Section */}
       <div className="flex flex-1 items-center gap-6 p-6 sm:p-8 w-full relative z-10">
         {/* Avatar with Status Ring */}
-        <div className="relative">
+        {/* Avatar with Status Ring */}
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24">
           {avatar ? (
-            <div className="relative">
-              <img
-                src={avatar}
-                alt="Avatar"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-white shadow-lg"
-              />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#D70018]/20 to-transparent"></div>
-            </div>
+            <img
+              src={avatar}
+              alt="Avatar"
+              className="w-full h-full rounded-full object-cover border-4 border-white shadow-lg"
+            />
           ) : (
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-[#D70018] to-[#FF6B35] flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shadow-lg border-4 border-white">
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-[#D70018] to-[#FF6B35] flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shadow-lg border-4 border-white">
               {name?.[0]?.toUpperCase() || "U"}
             </div>
           )}
 
-          {/* User Level Badge */}
+          {/* User Level Badge – Căn giữa tuyệt đối */}
           <div
-            className={`absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${userLevel.color} shadow-lg flex items-center gap-1 whitespace-nowrap`}
+            className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2
+                px-3 py-1 rounded-full text-xs font-bold text-white
+                bg-gradient-to-r ${userLevel.color}
+                shadow-lg flex items-center gap-1 whitespace-nowrap z-10`}
           >
-            <LevelIcon className="w-3 h-3" />
+            <LevelIcon className="w-3 h-3 shrink-0" />
             <span>{userLevel.level}</span>
           </div>
         </div>
