@@ -10,15 +10,6 @@ import { Review } from "@/types/review.interface";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -26,18 +17,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import useUploadMedia from "@/hooks/useUploadMedia";
 
 const StarRating = ({
   rating,
   size = 4,
-  interactive = false,
-  onSelect,
 }: {
   rating: number;
   size?: number;
-  interactive?: boolean;
-  onSelect?: (rating: number) => void;
 }) => (
   <div className="flex items-center">
     {[...Array(5)].map((_, i) => (
@@ -45,8 +31,7 @@ const StarRating = ({
         key={i}
         className={`h-${size} w-${size} ${
           i < rating ? "text-red-500 fill-red-500" : "text-gray-300"
-        } ${interactive ? "cursor-pointer" : ""}`}
-        onClick={() => interactive && onSelect?.(i + 1)}
+        }`}
       />
     ))}
   </div>
@@ -100,32 +85,13 @@ const ReviewItem = ({ review }: { review: Review }) => {
 
 export const ProductsReviews = ({ productId }: { productId: string }) => {
   const [filter, setFilter] = useState<number | "all" | "media">("all");
-  const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [rating, setRating] = useState(5);
-  const [content, setContent] = useState("");
   const [page, setPage] = useState(1);
   const limit = 5;
 
   const searchParams = useSearchParams();
-  const { reviews, totalItems, loading, error, fetchReviews, createReview } =
+  const { reviews, totalItems, loading, fetchReviews } =
     useProductReview(productId);
-
-  // Upload media hook
-  const {
-    files,
-    uploadedUrls,
-    isUploading,
-    progress,
-    handleAddFiles,
-    handleRemoveFile,
-    handleRemoveAllFiles,
-  } = useUploadMedia();
-
-  useEffect(() => {
-    if (searchParams.get("showReview") === "true") {
-      setIsReviewOpen(true);
-    }
-  }, [searchParams]);
+  useProductReview(productId);
 
   useEffect(() => {
     fetchReviews({
@@ -138,25 +104,6 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
         : {}),
     });
   }, [fetchReviews, page, filter]);
-
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await createReview({
-      productId,
-      orderId: searchParams.get("orderId") || "",
-      rating,
-      content,
-      medias: uploadedUrls.map((url) => ({
-        url,
-        type: "IMAGE" as const,
-      })),
-    });
-    setIsReviewOpen(false);
-    setRating(5);
-    setContent("");
-    handleRemoveAllFiles();
-    setPage(1);
-  };
 
   const totalPages = Math.ceil(totalItems / limit);
 
@@ -250,8 +197,6 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
             <div className="h-4 bg-gray-200 rounded w-5/6"></div>
           </div>
         </div>
-      ) : error ? (
-        <div className="text-red-500 mt-6">{error}</div>
       ) : (
         <>
           <div className="mt-6 divide-y divide-gray-200">
@@ -316,92 +261,6 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
           )}
         </>
       )}
-
-      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Đánh giá sản phẩm</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmitReview} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Đánh giá của bạn</Label>
-              <StarRating
-                rating={rating}
-                size={6}
-                interactive={true}
-                onSelect={setRating}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Nội dung đánh giá</Label>
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Chia sẻ cảm nhận của bạn..."
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Hình ảnh (tùy chọn)</Label>
-              <Input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => {
-                  if (e.target.files) handleAddFiles(e.target.files);
-                }}
-              />
-
-              {/* Preview ảnh */}
-              <div className="flex flex-wrap gap-2 mt-2">
-                {files.map((file) => (
-                  <div
-                    key={file.name}
-                    className="relative w-20 h-20 border rounded overflow-hidden"
-                  >
-                    <Image
-                      src={file.preview!}
-                      alt={file.name}
-                      fill
-                      className="object-cover"
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-0 right-0 bg-black bg-opacity-50 text-white p-1 text-xs"
-                      onClick={() => handleRemoveFile(file.name)}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Tiến trình upload */}
-              {isUploading && (
-                <div className="mt-1 text-sm text-gray-500">
-                  Đang tải lên... {progress}%
-                </div>
-              )}
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsReviewOpen(false)}
-              >
-                Hủy
-              </Button>
-              <Button
-                type="submit"
-                className="bg-red-600 hover:bg-red-700 text-white"
-                disabled={loading || isUploading}
-              >
-                {loading ? "Đang gửi..." : "Gửi đánh giá"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

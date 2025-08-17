@@ -1279,6 +1279,14 @@
       "signout": "Đăng xuất"
     },
 
+    "showToast": {
+      "review": {
+        "createSuccessful": "Gửi đánh giá thành công.",
+        "updateSuccessful": "Cập nhật đánh giá thành công.",
+        "deleteSuccessful": "Xóa đánh giá thành công"
+      }
+    },
+
     "account": {
       "home": "Trang chủ",
       "manageAccount": "Quản lý thông tin tài khoản của bạn",

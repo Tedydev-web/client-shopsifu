@@ -1211,6 +1211,14 @@
       "notifications": "Notifications"
     },
 
+    "showToast": {
+      "review": {
+        "createSuccessful": "Review created successfully.",
+        "updateSuccessful": "Review updated successfully.",
+        "deleteSuccessful": "Review deleted successfully"
+      }
+    },
+
     "account": {
       "profile": {
         "protected": "Your account is protected",
