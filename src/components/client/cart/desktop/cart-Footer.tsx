@@ -14,6 +14,7 @@ interface CartFooterProps {
   allSelected: boolean;
   onToggleAll: () => void;
   onCheckout: () => void;
+  onDeleteSelected: () => void;
 }
 
 export default function CartFooter({
@@ -24,6 +25,7 @@ export default function CartFooter({
   allSelected,
   onToggleAll,
   onCheckout,
+  onDeleteSelected,
 }: CartFooterProps) {
   const t = useTranslations();
 
@@ -43,7 +45,7 @@ export default function CartFooter({
       )} */}
 
       {/* Coin */}
-      {!isEditing && (
+      {/* {!isEditing && (
         <div className="flex items-center justify-between h-12 px-6 border-b">
           <div className="flex items-center gap-2 opacity-50">
             <input type="checkbox" disabled className="w-4 h-4" title="Sử dụng xu" aria-label="Sử dụng xu" />
@@ -52,7 +54,7 @@ export default function CartFooter({
           </div>
           <span className="opacity-50">-₫0</span>
         </div>
-      )}
+      )} */}
 
       {/* Bottom Row */}
       <div className="flex items-center justify-between px-6 h-14 bg-white">
@@ -66,6 +68,16 @@ export default function CartFooter({
           <label htmlFor="select-all" className="text-base">
             Chọn tất cả ({selectedCount})
           </label>
+          {selectedCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onDeleteSelected}
+              className="ml-4 text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+            >
+              Xóa ({selectedCount})
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center gap-3">

@@ -95,7 +95,7 @@ export interface Cart {
  * @description Response API khi thực hiện các thao tác với giỏ hàng
  */
 export interface CartResponse extends BaseResponse {
-    data: {
+    data: CartItem | {
         cartItem?: CartItem;
     };
 }

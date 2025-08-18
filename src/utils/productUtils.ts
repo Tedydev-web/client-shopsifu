@@ -178,15 +178,15 @@ export function findSelectedSkuPrice(
  * @param variantGroups Danh sách nhóm variant của sản phẩm
  * @param quantity Số lượng sản phẩm cần thêm vào giỏ hàng
  * @param addToCartFn Hàm addToCart từ useCart hook
- * @returns Promise với kết quả của việc thêm vào giỏ hàng
+ * @returns Promise với cart item ID hoặc false nếu thất bại
  */
 export async function handleAddToCart(
   selectedVariants: SelectedVariants,
   skus: Sku[],
   variantGroups: VariantGroup[],
   quantity: number,
-  addToCartFn: (data: {skuId: string, quantity: number}, showNotification?: boolean) => Promise<boolean>
-): Promise<boolean> {
+  addToCartFn: (data: {skuId: string, quantity: number}, showNotification?: boolean) => Promise<string | boolean>
+): Promise<string | false> {
   // Tìm SKU phù hợp với các lựa chọn variant
   const selectedSku = findMatchingSku(selectedVariants, skus, variantGroups);
   
@@ -212,7 +212,8 @@ export async function handleAddToCart(
       quantity: safeQuantity
     }, true); // true để hiển thị thông báo
     
-    return result;
+    // Return cart item ID if available, otherwise false
+    return typeof result === 'string' ? result : false;
   } catch (error) {
     console.error("Lỗi khi thêm vào giỏ hàng:", error);
     return false;

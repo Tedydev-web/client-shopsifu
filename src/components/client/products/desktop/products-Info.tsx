@@ -57,6 +57,7 @@ export default function ProductInfo({ product }: { product: Product }) {
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string | null>>({});
   const [currentSku, setCurrentSku] = useState<Sku | null>(null);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
   const router = useRouter();
   // Sử dụng Context để quản lý giỏ hàng toàn cục
   const { addToCart } = useCart();
@@ -165,12 +166,40 @@ export default function ProductInfo({ product }: { product: Product }) {
   };
 
   // Hàm xử lý khi click vào nút "Mua ngay"
-  const handleBuyNowClick = () => {
+  const handleBuyNowClick = async () => {
     if (checkAuth()) {
       if (!isVariantSelected || !currentSku || currentSku.stock === 0) return;
-      // Logic mua ngay sẽ được triển khai ở đây, ví dụ: chuyển hướng đến trang thanh toán
-      console.log("Redirecting to checkout with SKU:", currentSku.id, "and quantity:", quantity);
-      // router.push(`/checkout?skuId=${currentSku.id}&quantity=${quantity}`);
+      
+      setIsBuyingNow(true);
+      try {
+        // 1. Thêm sản phẩm vào giỏ hàng và lấy cart item ID
+        const cartItemId = await handleAddToCart(
+          selectedVariants,
+          product.skus,
+          variantGroups as VariantGroup[],
+          quantity,
+          addToCart
+        );
+
+        if (cartItemId && typeof cartItemId === 'string') {
+          console.log('Added to cart with ID:', cartItemId);
+          // 2. Redirect với cart item ID từ API response  
+          router.push(`/cart?selectItem=${cartItemId}`);
+        } else {
+          console.warn('Không lấy được cart item ID, redirect bình thường');
+          // 3. Fallback: redirect bình thường
+          router.push('/cart');
+        }
+      } catch (error) {
+        console.error('Error in buy now process:', error);
+        // Nếu có lỗi, vẫn redirect đến cart để user có thể thao tác manual
+        router.push('/cart');
+      } finally {
+        setIsBuyingNow(false);
+      }
+    }
+    else{
+      router.push('/sign-in');
     }
   };
 
@@ -429,19 +458,33 @@ export default function ProductInfo({ product }: { product: Product }) {
         {/* Mua ngay */}
         <Button
           className="flex-1 h-12 rounded-xs bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md text-base font-medium flex items-center justify-center gap-2 transition-all duration-200"
-          disabled={!isVariantSelected || !currentSku || currentSku.stock === 0}
+          disabled={!isVariantSelected || !currentSku || currentSku.stock === 0 || isBuyingNow}
           onClick={handleBuyNowClick}
         >
-          Mua Ngay
-          <span>
-            ₫
-            {(currentSku 
-              ? currentSku.price
-              : isFlashSale
-                ? flashSalePrice
-                : product.basePrice
-            ).toLocaleString("vi-VN")}
-          </span>
+          {isBuyingNow ? (
+            <>
+              <span className="animate-spin mr-2">
+                <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+              Đang xử lý...
+            </>
+          ) : (
+            <>
+              Mua Ngay
+              <span>
+                ₫
+                {(currentSku 
+                  ? currentSku.price
+                  : isFlashSale
+                    ? flashSalePrice
+                    : product.basePrice
+                ).toLocaleString("vi-VN")}
+              </span>
+            </>
+          )}
         </Button>
       </div>
 

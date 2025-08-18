@@ -2,7 +2,7 @@
 
 import DesktopCartItem from "./cart-Items";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import DesktopCartHeader from "./cart-ProductTitle";
 import CartFooter from "./cart-Footer";
 import { Loader2 } from "lucide-react";
@@ -13,7 +13,7 @@ import { ProductInfo } from '@/types/order.interface';
 import { PiStorefrontLight } from "react-icons/pi";
 import Image from "next/image";
 import { useDispatch } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { setShopOrders, setCommonInfo, setShopProducts } from "@/store/features/checkout/ordersSilde";
 
@@ -33,6 +33,34 @@ export default function DesktopCartPageMobile() {
   const [selectedShops, setSelectedShops] = useState<Record<string, boolean>>({});
   const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
   const [selectAll, setSelectAll] = useState(false);
+  
+  // Track manual selections để tránh bị override bởi API sync
+  const manualSelectionsRef = useRef<Set<string>>(new Set());
+
+  // Listen for manual item selection events (từ Buy Now flow)
+  useEffect(() => {
+    const handleForceSelectItem = (event: CustomEvent) => {
+      const { itemId, isSelected } = event.detail;
+      
+      // Mark as manual selection
+      manualSelectionsRef.current.add(itemId);
+      
+      setSelectedItems(prev => ({
+        ...prev,
+        [itemId]: isSelected
+      }));
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('forceSelectItem', handleForceSelectItem as EventListener);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('forceSelectItem', handleForceSelectItem as EventListener);
+      }
+    };
+  }, []);
 
   // Đồng bộ trạng thái selected từ API với state local
   useEffect(() => {
@@ -49,15 +77,19 @@ export default function DesktopCartPageMobile() {
         if (!allItemsSelected) allSelected = false;
         
         shopCart.cartItems.forEach((item: CartItem) => {
-          itemSelectedState[item.id] = item.isSelected || false;
+          // Chỉ update từ API nếu không phải manual selection
+          if (!manualSelectionsRef.current.has(item.id)) {
+            itemSelectedState[item.id] = item.isSelected || false;
+          }
         });
       });
       
+      setSelectedItems(prev => ({
+        ...prev,
+        ...itemSelectedState
+      }));
       setSelectedShops(shopSelectedState);
-      setSelectedItems(itemSelectedState);
       setSelectAll(allSelected);
-
-
     }
   }, [shopCarts, lastUpdated]);
 
@@ -86,6 +118,9 @@ export default function DesktopCartPageMobile() {
     shopItems: CartItem[]
   ) => {
     const newIsSelected = !selectedItems[itemId];
+    
+    // Mark as manual selection
+    manualSelectionsRef.current.add(itemId);
     
     // Cập nhật UI ngay lập tức để có phản hồi tốt
     const updatedItems = { ...selectedItems, [itemId]: newIsSelected };
@@ -136,6 +171,32 @@ export default function DesktopCartPageMobile() {
     }
   };
 
+  // Xóa tất cả sản phẩm đã chọn
+  const handleDeleteSelected = async () => {
+    try {
+      // Lấy tất cả các cart item IDs đã được chọn
+      const selectedItemIds = Object.keys(selectedItems).filter(itemId => selectedItems[itemId]);
+      
+      if (selectedItemIds.length === 0) {
+        toast.error("Vui lòng chọn sản phẩm để xóa");
+        return;
+      }
+
+      // Gọi API để xóa tất cả items đã chọn
+      await removeItems(selectedItemIds);
+      
+      // Reset selected state sau khi xóa thành công
+      setSelectedItems({});
+      setSelectedShops({});
+      setSelectAll(false);
+      
+      toast.success(`Đã xóa ${selectedItemIds.length} sản phẩm khỏi giỏ hàng`);
+    } catch (error) {
+      console.error("Error removing selected items from cart:", error);
+      toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+    }
+  };
+
   const handleQuantityChange = async (itemId: string, quantity: number) => {
     if (quantity > 0) {
       // Tìm cart item để lấy skuId hiện tại
@@ -182,6 +243,25 @@ export default function DesktopCartPageMobile() {
 
   const dispatch = useDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Handle URL param để force select item khi redirect từ Buy Now
+  useEffect(() => {
+    const selectItemId = searchParams.get('selectItem');
+    if (selectItemId) {
+      // Mark as manual selection và update state
+      manualSelectionsRef.current.add(selectItemId);
+      setSelectedItems(prev => ({
+        ...prev,
+        [selectItemId]: true
+      }));
+      
+      // Clear URL param
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('selectItem');
+      window.history.replaceState({}, '', newUrl.pathname);
+    }
+  }, [searchParams]);
 
   const handleCheckout = () => {
     // 1. Lọc ra các shop có sản phẩm được chọn
@@ -267,20 +347,24 @@ export default function DesktopCartPageMobile() {
               </div>
 
               {/* Items */}
-               {shopCart.cartItems.map((cartItem: CartItem) => (
-                <DesktopCartItem
-                  key={cartItem.id}
-                  item={cartItem}
-                  checked={!!selectedItems[cartItem.id]}
-                  quantity={cartItem.quantity}
-                  onQuantityChange={handleQuantityChange}
-                  onCheckedChange={() =>
-                    handleToggleItem(shopCart.shop.id, cartItem.id, shopCart.cartItems)
-                  }
-                  onVariationChange={handleVariationChange}
-                  onRemove={() => handleRemoveItem(cartItem.id)}
-                />
-              ))}
+               {shopCart.cartItems.map((cartItem: CartItem) => {
+                 const isChecked = !!selectedItems[cartItem.id];
+                 
+                 return (
+                   <DesktopCartItem
+                     key={cartItem.id}
+                     item={cartItem}
+                     checked={isChecked}
+                     quantity={cartItem.quantity}
+                     onQuantityChange={handleQuantityChange}
+                     onCheckedChange={() =>
+                       handleToggleItem(shopCart.shop.id, cartItem.id, shopCart.cartItems)
+                     }
+                     onVariationChange={handleVariationChange}
+                     onRemove={() => handleRemoveItem(cartItem.id)}
+                   />
+                 );
+               })}
               
               {/* Voucher Button */}
               {/* <div className="p-3 border-t">
@@ -313,6 +397,7 @@ export default function DesktopCartPageMobile() {
           allSelected={selectAll}
           onToggleAll={handleToggleAll}
           onCheckout={handleCheckout} // Truyền hàm checkout xuống footer
+          onDeleteSelected={handleDeleteSelected} // Truyền hàm xóa sản phẩm đã chọn
         />
       )}
     </div>
