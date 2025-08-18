@@ -24,6 +24,32 @@ export function SearchInput() {
   const router = useRouter();
   const { openDropdown, setOpenDropdown } = useDropdown();
 
+  //Lịch sử tìm kiếm
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+
+  // Load lịch sử từ localStorage khi mount
+  useEffect(() => {
+    const stored = localStorage.getItem("searchHistory");
+    if (stored) {
+      setSearchHistory(JSON.parse(stored));
+    }
+  }, []);
+
+  // Hàm lưu lịch sử vào localStorage
+  const saveSearchHistory = useCallback((term: string) => {
+    if (!term.trim()) return;
+
+    setSearchHistory((prev) => {
+      // Bỏ trùng lặp, thêm term mới lên đầu
+      const newHistory = [term, ...prev.filter((t) => t !== term)];
+      // Giới hạn 10 từ khóa gần nhất
+      const limitedHistory = newHistory.slice(0, 10);
+
+      localStorage.setItem("searchHistory", JSON.stringify(limitedHistory));
+      return limitedHistory;
+    });
+  }, []);
+
   // State cho kết quả tìm kiếm
   const [searchSuggestions, setSearchSuggestions] = useState<
     ClientSearchResultItem[]
@@ -99,6 +125,7 @@ export function SearchInput() {
     (term: string) => {
       if (!term.trim()) return;
 
+      saveSearchHistory(term);
       setOpenDropdown("none");
 
       // Kiểm tra xem hiện tại có đang ở trang search không
@@ -126,7 +153,7 @@ export function SearchInput() {
         }
       }
     },
-    [router, setOpenDropdown]
+    [router, setOpenDropdown, saveSearchHistory]
   );
 
   // Cập nhật từ khóa tìm kiếm và giữ focus
@@ -294,15 +321,58 @@ export function SearchInput() {
 
                 {/* Content section with full-width hover backgrounds */}
                 <div className="mb-0">
-                  {" "}
                   {/* Changed mb-5 to mb-0 to remove extra space at bottom */}
                   {!searchTerm ? (
                     <>
-                      {/* Layout khi chưa nhập gì - Chỉ hiển thị danh mục phổ biến từ API */}
+                      {/* Nếu có lịch sử tìm kiếm thì hiển thị */}
+                      {searchHistory.length > 0 && (
+                        <div className="px-5 pt-5">
+                          <h3 className="text-[16px] font-semibold text-gray-800 mb-2">
+                            Lịch sử tìm kiếm
+                          </h3>
+                          {searchHistory.map((term, index) => (
+                            <div
+                              key={index}
+                              className="px-2 py-2.5 cursor-pointer hover:bg-gray-50 flex justify-between items-center rounded"
+                              onClick={() => navigateToSearch(term)}
+                            >
+                              <span className="text-sm text-gray-700">
+                                {term}
+                              </span>
+                              <X
+                                className="h-4 w-4 text-gray-400 hover:text-red-500"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // tránh trigger navigateToSearch
+                                  const newHistory = searchHistory.filter(
+                                    (t) => t !== term
+                                  );
+                                  setSearchHistory(newHistory);
+                                  localStorage.setItem(
+                                    "searchHistory",
+                                    JSON.stringify(newHistory)
+                                  );
+                                }}
+                              />
+                            </div>
+                          ))}
+                          {/* nút xoá toàn bộ lịch sử */}
+                          <div
+                            className="text-xs text-red-500 cursor-pointer text-right mt-2 hover:underline"
+                            onClick={() => {
+                              setSearchHistory([]);
+                              localStorage.removeItem("searchHistory");
+                            }}
+                          >
+                            Xoá tất cả
+                          </div>
+                          <div className="border-t border-gray-100 mt-3"></div>
+                        </div>
+                      )}
+
+                      {/* Layout khi chưa nhập gì - Hiển thị danh mục phổ biến từ API */}
                       <div>
                         {loading
-                          ? // Hiển thị skeleton loading khi đang tải danh mục
-                            Array(5)
+                          ? Array(5)
                               .fill(0)
                               .map((_, index) => (
                                 <div key={index} className="px-5 py-2.5">
@@ -312,8 +382,7 @@ export function SearchInput() {
                                   </div>
                                 </div>
                               ))
-                          : // Hiển thị 5 danh mục từ API
-                            categories.slice(0, 5).map((category) => (
+                          : categories.slice(0, 5).map((category) => (
                               <motion.div
                                 key={category.value}
                                 className="cursor-pointer modal-input"
@@ -357,9 +426,7 @@ export function SearchInput() {
                     <>
                       {/* Layout khi đã nhập - Hiển thị kết quả liên quan */}
                       <div>
-                        {/* Hiển thị kết quả tìm kiếm từ API */}
                         {isLoadingSuggestions ? (
-                          // Hiển thị skeleton loading khi đang tải kết quả
                           Array(3)
                             .fill(0)
                             .map((_, index) => (
@@ -374,7 +441,6 @@ export function SearchInput() {
                               </div>
                             ))
                         ) : searchSuggestions.length > 0 ? (
-                          // Hiển thị kết quả tìm kiếm nếu có
                           searchSuggestions.map((item) => (
                             <motion.div
                               key={item.productId}
@@ -385,7 +451,6 @@ export function SearchInput() {
                             >
                               <div className="px-5 py-2.5 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  {/* Ảnh sản phẩm */}
                                   <div className="w-8 h-8 flex-shrink-0 rounded overflow-hidden">
                                     <Image
                                       src={
@@ -397,22 +462,14 @@ export function SearchInput() {
                                       className="object-cover w-full h-full"
                                     />
                                   </div>
-
-                                  {/* Tên sản phẩm */}
                                   <span className="text-sm font-medium text-gray-800 line-clamp-1">
                                     {item.productName}
                                   </span>
                                 </div>
-
-                                {/* Danh mục (nếu muốn bật lại) */}
-                                {/* <span className="text-xs text-gray-500">
-                                  {item.categoryNames[0] || "Sản phẩm"}
-                                </span> */}
                               </div>
                             </motion.div>
                           ))
                         ) : searchTerm.length > 1 ? (
-                          // Hiển thị thông báo không có kết quả
                           <div className="px-5 py-6 text-center">
                             <p className="text-gray-500">
                               Không tìm thấy kết quả cho "{searchTerm}"

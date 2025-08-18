@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, X } from "lucide-react";
+import { Search, X, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { clientProductsService } from "@/services/clientProductsService";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -15,14 +15,40 @@ interface MobileSearchInputProps {
   categories: { value: string; label: string; icon?: string }[];
 }
 
+const SEARCH_HISTORY_KEY = "search_history";
+const MAX_HISTORY = 10;
+
 export function MobileSearchInput({ categories }: MobileSearchInputProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState<ClientSearchResultItem[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const debouncedSearch = useDebounce(searchTerm, 500);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Load history từ localStorage khi mount
+  useEffect(() => {
+    const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
+    if (stored) {
+      setSearchHistory(JSON.parse(stored));
+    }
+  }, []);
+
+  // Save history
+  const saveHistory = useCallback((term: string) => {
+    if (!term.trim()) return;
+
+    setSearchHistory((prev) => {
+      let newHistory = [term, ...prev.filter((t) => t !== term)];
+      if (newHistory.length > MAX_HISTORY) {
+        newHistory = newHistory.slice(0, MAX_HISTORY);
+      }
+      localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory));
+      return newHistory;
+    });
+  }, []);
 
   // Build URL cho search
   const buildSearchUrl = (term: string, withTimestamp = false) => {
@@ -34,6 +60,7 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
     (term: string) => {
       if (!term.trim()) return;
       setIsFocused(false);
+      saveHistory(term);
 
       const isOnSearchPage = window.location.pathname === "/search";
       const currentTerm = new URLSearchParams(window.location.search).get("q");
@@ -45,7 +72,7 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
 
       router.push(url);
     },
-    [router]
+    [router, saveHistory]
   );
 
   // Fetch gợi ý
@@ -81,7 +108,7 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
     return () => controller.abort();
   }, [debouncedSearch, fetchSearchSuggestions]);
 
-  // Skeleton components
+  // Skeletons
   const SkeletonCategory = () => (
     <div className="px-4 py-2 flex items-center">
       <div className="w-9 h-9 bg-gray-200 rounded-full mr-3 animate-pulse" />
@@ -159,42 +186,30 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
             >
               <div className="px-4 pt-3">
                 <h3 className="text-sm font-semibold text-gray-800 pb-2 border-b border-gray-100">
-                  {!searchTerm ? "Danh mục phổ biến" : "Kết quả liên quan"}
+                  {!searchTerm ? "Tìm kiếm gần đây" : "Kết quả liên quan"}
                 </h3>
               </div>
 
               <div className="pb-3">
                 {!searchTerm ? (
-                  // Category list
-                  categories.length === 0
-                    ? Array(5).fill(0).map((_, i) => <SkeletonCategory key={i} />)
-                    : categories.slice(0, 5).map((category) => (
-                        <Link
-                          key={category.value}
-                          href={createCategorySlug(category.label, [category.value])}
-                          className="px-4 py-2 flex items-center hover:bg-gray-50"
-                          onClick={() => setIsFocused(false)}
-                          role="option"
-                        >
-                          <div className="w-9 h-9 relative overflow-hidden rounded-full border border-gray-100 mr-3">
-                            {category.icon ? (
-                              <Image
-                                src={category.icon}
-                                alt={category.label}
-                                fill
-                                sizes="36px"
-                                className="object-cover"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
-                                {category.label.charAt(0)}
-                              </div>
-                            )}
-                          </div>
-                          <span className="text-sm text-gray-800">{category.label}</span>
-                        </Link>
-                      ))
+                  // Lịch sử tìm kiếm
+                  searchHistory.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-gray-400 text-sm">
+                      Chưa có lịch sử tìm kiếm
+                    </div>
+                  ) : (
+                    searchHistory.map((term, idx) => (
+                      <div
+                        key={idx}
+                        className="px-4 py-2 flex items-center hover:bg-gray-50 cursor-pointer"
+                        onClick={() => navigateToSearch(term)}
+                        role="option"
+                      >
+                        <Clock className="h-4 w-4 text-gray-500 mr-2" />
+                        <span className="text-sm text-gray-800">{term}</span>
+                      </div>
+                    ))
+                  )
                 ) : isLoadingSuggestions ? (
                   Array(3).fill(0).map((_, i) => <SkeletonSuggestion key={i} />)
                 ) : searchSuggestions.length > 0 ? (
