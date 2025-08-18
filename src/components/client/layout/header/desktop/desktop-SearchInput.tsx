@@ -81,18 +81,18 @@ export function SearchInput() {
 
   // Effect để gọi API search khi searchTerm thay đổi
   // Effect gọi API
-useEffect(() => {
-  if (debouncedSearchTerm.length < 2) {
-    setSearchSuggestions([]);
-    return;
-  }
+  useEffect(() => {
+    if (debouncedSearchTerm.length < 2) {
+      setSearchSuggestions([]);
+      return;
+    }
 
-  const controller = new AbortController();
-  fetchSearchSuggestions(debouncedSearchTerm, controller.signal);
+    const controller = new AbortController();
+    fetchSearchSuggestions(debouncedSearchTerm, controller.signal);
 
-  // Cleanup: hủy request cũ khi từ khóa thay đổi
-  return () => controller.abort();
-}, [debouncedSearchTerm, fetchSearchSuggestions]);
+    // Cleanup: hủy request cũ khi từ khóa thay đổi
+    return () => controller.abort();
+  }, [debouncedSearchTerm, fetchSearchSuggestions]);
 
   // Chuyển đến trang tìm kiếm - được tách ra để tái sử dụng
   const navigateToSearch = useCallback(
@@ -384,15 +384,30 @@ useEffect(() => {
                               }
                             >
                               <div className="px-5 py-2.5 flex items-center justify-between">
-                                <div className="flex items-center">
-                                  <Search className="h-4 w-4 text-gray-500 mr-2.5" />
-                                  <span className="text-sm font-medium text-gray-800">
+                                <div className="flex items-center gap-2">
+                                  {/* Ảnh sản phẩm */}
+                                  <div className="w-8 h-8 flex-shrink-0 rounded overflow-hidden">
+                                    <Image
+                                      src={
+                                        item.skuImage || "/static/no-image.png"
+                                      }
+                                      alt={item.productName}
+                                      width={32}
+                                      height={32}
+                                      className="object-cover w-full h-full"
+                                    />
+                                  </div>
+
+                                  {/* Tên sản phẩm */}
+                                  <span className="text-sm font-medium text-gray-800 line-clamp-1">
                                     {item.productName}
                                   </span>
                                 </div>
-                                <span className="text-xs text-gray-500">
+
+                                {/* Danh mục (nếu muốn bật lại) */}
+                                {/* <span className="text-xs text-gray-500">
                                   {item.categoryNames[0] || "Sản phẩm"}
-                                </span>
+                                </span> */}
                               </div>
                             </motion.div>
                           ))

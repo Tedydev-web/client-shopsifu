@@ -16,6 +16,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import useUploadMedia from "@/hooks/useUploadMedia";
 import { useProductReview } from "./hooks/useProductReview";
+import { createProductSlug } from "@/components/client/products/shared/productSlug";
+import router from "next/router";
 
 interface ReviewsModalProps {
   open: boolean;
@@ -188,7 +190,16 @@ export function ReviewsModal({
             Hủy
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={async () => {
+              await handleSubmit(); // gọi hàm gửi đánh giá
+              if (product) {
+                const slug = createProductSlug(
+                  product.productName,
+                  product.productId
+                );
+                router.push(`/products/${slug}`);
+              }
+            }}
             disabled={isUploading || loading}
             className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold"
           >
