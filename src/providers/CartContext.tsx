@@ -76,6 +76,112 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
     return result;
   }, [originalUpdateCartItem, forceRefresh]);
+
+  // Hàm để select specific cart item
+  const selectSpecificItem = useCallback(async (itemId: string, isSelected: boolean = true, showNotification: boolean = false) => {
+    try {
+      // Tìm item hiện tại để lấy skuId và quantity
+      const currentCartData = rest.shopCarts;
+      if (!currentCartData || currentCartData.length === 0) {
+        console.warn('No cart data found for selecting item');
+        return false;
+      }
+
+      let currentItem = null;
+      for (const shopCart of currentCartData) {
+        currentItem = shopCart.cartItems.find(item => item.id === itemId);
+        if (currentItem) break;
+      }
+
+      if (!currentItem) {
+        console.warn(`Item with id ${itemId} not found in current cart`);
+        return false;
+      }
+
+      // Update item với isSelected mới, giữ nguyên skuId và quantity
+      const result = await originalUpdateCartItem(itemId, { 
+        skuId: currentItem.sku.id,
+        quantity: currentItem.quantity,
+        isSelected 
+      }, showNotification);
+      
+      if (result) {
+        // Force refresh để đảm bảo UI được cập nhật
+        await forceRefresh();
+        console.log(`Successfully updated selection for item ${itemId} to ${isSelected}`);
+      }
+      return result;
+    } catch (error) {
+      console.error('Error selecting specific item:', error);
+      throw error;
+    }
+  }, [originalUpdateCartItem, rest.shopCarts, forceRefresh]);
+
+  // Hàm helper để tìm và select item vừa thêm vào cart dựa trên skuId và quantity
+  const findAndSelectNewItem = useCallback(async (skuId: string, quantity: number) => {
+    try {
+      // 1. Refresh cart để có data mới nhất
+      await forceRefresh();
+      
+      // 2. Đợi thêm để đảm bảo state được cập nhật
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // 3. Lấy cart data từ current state
+      const { shopCarts: currentCartData } = rest;
+      
+      if (!currentCartData || currentCartData.length === 0) {
+        console.warn('No cart data found after refresh');
+        return false;
+      }
+
+      // 4. Tìm item có skuId và quantity matching
+      let foundItem = null;
+      for (const shopCart of currentCartData) {
+        for (const item of shopCart.cartItems) {
+          if (item.sku.id === skuId && item.quantity === quantity) {
+            foundItem = item;
+            break;
+          }
+        }
+        if (foundItem) break;
+      }
+
+      if (!foundItem) {
+        console.warn(`Item with skuId ${skuId} and quantity ${quantity} not found in cart`);
+        return false;
+      }
+
+      // 5. Select item đó
+      // 5a. Ngay lập tức update UI để có response tức thì
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('forceSelectItem', { 
+          detail: { itemId: foundItem.id, isSelected: true } 
+        }));
+      }
+      
+      // 5b. Thực hiện API call để sync với backend
+      const selectResult = await selectSpecificItem(foundItem.id, true, false);
+      if (selectResult) {
+        console.log(`Successfully selected item ${foundItem.id} for Buy Now`);
+        return foundItem.id;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error in findAndSelectNewItem:', error);
+      return false;
+    }
+  }, [forceRefresh, rest, selectSpecificItem]);
+  
+  // Hàm mới để manually trigger UI update cho specific item (dùng cho Buy Now flow)
+  const forceSelectItemInUI = useCallback((itemId: string) => {
+    // Emit event để cart component có thể manually update state
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('forceSelectItem', { 
+        detail: { itemId, isSelected: true } 
+      }));
+    }
+  }, []);
   
   return (
     <CartContext.Provider value={{
@@ -87,7 +193,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       selectAllItems,
       lastUpdated,
       forceRefresh,
-      updateCartItemAndRefresh
+      updateCartItemAndRefresh,
+      selectSpecificItem,
+      findAndSelectNewItem,
+      forceSelectItemInUI
     }}>
       {children}
     </CartContext.Provider>

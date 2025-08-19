@@ -133,7 +133,7 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
         toast.dismiss();
         toast.info('Hệ thống đang xử lý thanh toán của bạn. Vui lòng đợi trong giây lát.');
         // Vẫn gọi onPaymentConfirm để xử lý luồng hiện tại
-        onPaymentConfirm();
+        //onPaymentConfirm();
       }
     } catch (error) {
       toast.dismiss();

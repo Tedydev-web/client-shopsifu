@@ -104,7 +104,21 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
         const successMessage = response.message || 'Đã thêm sản phẩm vào giỏ hàng.';
         toast.success(successMessage);
       }
-      return true;
+      
+      // Return the cart item ID from the API response
+      // Handle both possible response structures
+      let cartItemId: string | null = null;
+      if (response.data) {
+        if ('id' in response.data) {
+          // Direct CartItem structure
+          cartItemId = response.data.id;
+        } else if ('cartItem' in response.data && response.data.cartItem) {
+          // Nested structure
+          cartItemId = response.data.cartItem.id;
+        }
+      }
+      
+      return cartItemId || true;
     } catch (error: any) {
       console.error('Error adding item to cart:', error);
       if (showNotification) {
