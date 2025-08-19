@@ -10,13 +10,10 @@ import { clientProductsService } from "@/services/clientProductsService";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ClientSearchResultItem } from "@/types/client.products.interface";
 import { createCategorySlug } from "@/utils/slugify";
-import { set } from "date-fns";
+import { useCbbCategory } from "@/hooks/combobox/useCbbCategory";
+import { createProductSlug } from "@/components/client/products/shared/productSlug";
 
-interface MobileSearchInputProps {
-  categories: { value: string; label: string; icon?: string }[];
-}
-
-export function MobileSearchInput({ categories }: MobileSearchInputProps) {
+export function MobileSearchInput() {
   const [searchTerm, setSearchTerm] = useState("");
   const [totalItems, setTotalItems] = useState<number>(0);
   const [searchSuggestions, setSearchSuggestions] = useState<
@@ -52,11 +49,11 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
     });
   }, []);
 
-  // Build URL cho search
-  const buildSearchUrl = (term: string, withTimestamp = false) => {
-    const ts = withTimestamp ? `&_t=${Date.now()}` : "";
-    return `/search?q=${encodeURIComponent(term)}${ts}`;
-  };
+  //Sử dụng hook để lấy danh mục từ api
+  const { categories, loading } = useCbbCategory(null);
+
+  // Debounce search term để tránh gọi API quá nhiều
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const navigateToSearch = useCallback(
     (term: string) => {
@@ -141,7 +138,7 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
     const match = text.slice(startIndex, endIndex);
     const after = text.slice(endIndex);
 
-    return `${before}<span class="font-bold text-red-600">${match}</span>${after}`;
+    return `${before}<span class="font-bold bg-yellow-200">${match}</span>${after}`;
   };
 
   useEffect(() => {
@@ -230,45 +227,137 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
               transition={{ duration: 0.2 }}
               role="listbox"
             >
-              <div className="px-4 pt-3">
-                <h3 className="text-sm font-semibold text-gray-800 pb-2 border-b border-gray-100">
-                  {!searchTerm ? "Tìm kiếm gần đây" : "Kết quả liên quan"}
-                </h3>
-              </div>
-
               <div className="pb-3">
                 {!searchTerm ? (
-                  // Lịch sử tìm kiếm
-                  searchHistory.length === 0 ? (
-                    <div className="px-4 py-6 text-center text-gray-400 text-sm">
-                      Chưa có lịch sử tìm kiếm
-                    </div>
-                  ) : (
-                    searchHistory.map((term, idx) => (
-                      <div
-                        key={idx}
-                        className="px-4 py-2 flex items-center hover:bg-gray-50 cursor-pointer"
-                        onClick={() => navigateToSearch(term)}
-                        role="option"
-                      >
-                        <Clock className="h-4 w-4 text-gray-500 mr-2" />
-                        <span className="text-sm text-gray-800">{term}</span>
+                  <>
+                    {/* --- Lịch sử tìm kiếm --- */}
+                    {searchHistory.length === 0 ? (
+                      <div className="px-4 py-6 text-center text-gray-400 text-sm">
+                        Chưa có lịch sử tìm kiếm
                       </div>
-                    ))
-                  )
+                    ) : (
+                      <div className="px-4 pt-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="text-sm font-semibold text-gray-800">
+                            Lịch sử tìm kiếm
+                          </h3>
+                          <button
+                            className="text-xs text-red-500 hover:underline"
+                            onClick={() => {
+                              setSearchHistory([]);
+                              localStorage.removeItem("searchHistory");
+                            }}
+                          >
+                            Xoá tất cả
+                          </button>
+                        </div>
+
+                        <div className="space-y-1">
+                          {searchHistory.map((term, idx) => (
+                            <div
+                              key={idx}
+                              className="px-2 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between rounded-md transition-colors"
+                              onClick={() => navigateToSearch(term)}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-gray-500" />
+                                <span className="text-sm text-gray-800">
+                                  {term}
+                                </span>
+                              </div>
+                              <X
+                                className="h-4 w-4 text-gray-400 hover:text-red-500 flex-shrink-0"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const newHistory = searchHistory.filter(
+                                    (t) => t !== term
+                                  );
+                                  setSearchHistory(newHistory);
+                                  localStorage.setItem(
+                                    "searchHistory",
+                                    JSON.stringify(newHistory)
+                                  );
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <div className="border-t border-gray-100 mt-3"></div>
+                      </div>
+                    )}
+
+                    {/* --- Danh mục phổ biến --- */}
+                    <div className="px-4 pt-3">
+                      <h3 className="text-sm font-semibold text-gray-800 mb-2">
+                        Danh mục phổ biến
+                      </h3>
+                      {categories.slice(0, 5).map((category) => (
+                        <motion.div
+                          key={category.value}
+                          className="cursor-pointer modal-input"
+                          onClick={() => setIsFocused(false)}
+                        >
+                          <div className="px-2 py-2.5">
+                            <Link
+                              href={createCategorySlug(category.label, [
+                                category.value,
+                              ])}
+                              className="w-full flex items-center justify-between"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div className="flex items-center">
+                                <div className="w-9 h-9 relative overflow-hidden rounded-full border border-gray-100 mr-3">
+                                  {category.icon ? (
+                                    <Image
+                                      src={category.icon}
+                                      alt={category.label}
+                                      fill
+                                      sizes="36px"
+                                      className="object-cover transition-transform duration-300"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                      {category.label.charAt(0)}
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="text-sm text-gray-800">
+                                  {category.label}
+                                </span>
+                              </div>
+                            </Link>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </>
                 ) : isLoadingSuggestions ? (
-                  Array(3)
+                  Array(5)
                     .fill(0)
                     .map((_, i) => <SkeletonSuggestion key={i} />)
                 ) : searchSuggestions.length > 0 ? (
-                  searchSuggestions.map((item) => (
-                    <div
-                      key={item.productId}
-                      className="px-4 py-2 flex items-center justify-between hover:bg-gray-50 cursor-pointer"
-                      onClick={() => navigateToSearch(item.productName)}
-                      role="option"
-                    >
-                      <div className="px-5 py-2.5 flex items-center justify-between">
+                  <>
+                    {/* --- Kết quả liên quan --- */}
+                    <div className="px-4 pt-3">
+                      <h3 className="text-sm font-semibold text-gray-800 mb-2">
+                        Kết quả liên quan
+                      </h3>
+                    </div>
+
+                    {searchSuggestions.map((item) => (
+                      <div
+                        key={item.productId}
+                        className="px-4 py-2 flex items-center justify-between hover:bg-gray-50 cursor-pointer"
+                        onClick={() => {
+                          navigateToSearch(item.productName);
+                          const slug = createProductSlug(
+                            item.productName,
+                            item.productId
+                          );
+                          router.push(`/products/${slug}`);
+                        }}
+                        role="option"
+                      >
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 flex-shrink-0 rounded overflow-hidden">
                             <Image
@@ -290,8 +379,8 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
                           />
                         </div>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                  </>
                 ) : (
                   <div className="px-4 py-6 text-center text-gray-500">
                     Không tìm thấy kết quả cho "{searchTerm}"
@@ -299,6 +388,7 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
                 )}
               </div>
 
+              {/* Footer CTA */}
               {searchTerm && (
                 <div className="px-5 pb-5">
                   <div className="border-t border-gray-100 pt-4">
