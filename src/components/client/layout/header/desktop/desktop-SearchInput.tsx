@@ -18,6 +18,7 @@ import { ClientSearchResultItem } from "@/types/client.products.interface";
 
 export function SearchInput() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [totalItems, setTotalItems] = useState<number>(0);
   const [hoverEffect, setHoverEffect] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +94,7 @@ export function SearchInput() {
           { signal }
         );
         setSearchSuggestions(response.data);
+        setTotalItems(response.metadata?.totalItems || 0);
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
           console.error("Error fetching search suggestions:", error);
@@ -493,7 +495,16 @@ export function SearchInput() {
                         }}
                       >
                         <Search className="h-4 w-4 mr-2.5" />
-                        <span>Tìm kiếm theo từ khóa "{searchTerm}"</span>
+                        <span>
+                          Xem tất cả{" "}
+                          <span className="font-bold text-red-600">
+                            "{totalItems}"
+                          </span>{" "}
+                          kết quả theo từ khóa{" "}
+                          <span className="font-bold text-red-600">
+                            "{searchTerm}"
+                          </span>
+                        </span>
                       </div>
                     </div>
                   </div>

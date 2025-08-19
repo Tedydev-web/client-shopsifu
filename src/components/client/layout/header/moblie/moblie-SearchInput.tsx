@@ -10,17 +10,18 @@ import { clientProductsService } from "@/services/clientProductsService";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ClientSearchResultItem } from "@/types/client.products.interface";
 import { createCategorySlug } from "@/utils/slugify";
+import { set } from "date-fns";
 
 interface MobileSearchInputProps {
   categories: { value: string; label: string; icon?: string }[];
 }
 
-const SEARCH_HISTORY_KEY = "search_history";
-const MAX_HISTORY = 10;
-
 export function MobileSearchInput({ categories }: MobileSearchInputProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchSuggestions, setSearchSuggestions] = useState<ClientSearchResultItem[]>([]);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [searchSuggestions, setSearchSuggestions] = useState<
+    ClientSearchResultItem[]
+  >([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -28,25 +29,26 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Load history từ localStorage khi mount
+  // Load lịch sử từ localStorage khi mount
   useEffect(() => {
-    const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
+    const stored = localStorage.getItem("searchHistory");
     if (stored) {
       setSearchHistory(JSON.parse(stored));
     }
   }, []);
 
-  // Save history
-  const saveHistory = useCallback((term: string) => {
+  // Hàm lưu lịch sử vào localStorage
+  const saveSearchHistory = useCallback((term: string) => {
     if (!term.trim()) return;
 
     setSearchHistory((prev) => {
-      let newHistory = [term, ...prev.filter((t) => t !== term)];
-      if (newHistory.length > MAX_HISTORY) {
-        newHistory = newHistory.slice(0, MAX_HISTORY);
-      }
-      localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory));
-      return newHistory;
+      // Bỏ trùng lặp, thêm term mới lên đầu
+      const newHistory = [term, ...prev.filter((t) => t !== term)];
+      // Giới hạn 10 từ khóa gần nhất
+      const limitedHistory = newHistory.slice(0, 10);
+
+      localStorage.setItem("searchHistory", JSON.stringify(limitedHistory));
+      return limitedHistory;
     });
   }, []);
 
@@ -59,20 +61,35 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
   const navigateToSearch = useCallback(
     (term: string) => {
       if (!term.trim()) return;
-      setIsFocused(false);
-      saveHistory(term);
 
+      saveSearchHistory(term);
+
+      // Kiểm tra xem hiện tại có đang ở trang search không
       const isOnSearchPage = window.location.pathname === "/search";
-      const currentTerm = new URLSearchParams(window.location.search).get("q");
 
-      const url =
-        isOnSearchPage && currentTerm === term
-          ? buildSearchUrl(term, true)
-          : buildSearchUrl(term, isOnSearchPage);
+      // Lấy thông tin search term hiện tại từ URL để so sánh
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentSearchTerm = urlParams.get("q");
 
-      router.push(url);
+      // Nếu search term không thay đổi và đang ở trang search, thêm/cập nhật timestamp
+      if (isOnSearchPage && currentSearchTerm === term) {
+        // Tạo timestamp mới cho mỗi lần search để đảm bảo không bị cache
+        const timestamp = new Date().getTime();
+        router.push(`/search?q=${encodeURIComponent(term)}&_t=${timestamp}`);
+      }
+      // Nếu search term thay đổi hoặc không ở trang search
+      else {
+        if (isOnSearchPage) {
+          // Nếu đã ở trang search và search term khác, thêm timestamp
+          const timestamp = new Date().getTime();
+          router.push(`/search?q=${encodeURIComponent(term)}&_t=${timestamp}`);
+        } else {
+          // Chuyển hướng đến route gốc /search (không thêm timestamp lần đầu)
+          router.push(`/search?q=${encodeURIComponent(term)}`);
+        }
+      }
     },
-    [router, saveHistory]
+    [router, saveSearchHistory]
   );
 
   // Fetch gợi ý
@@ -84,8 +101,13 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
       }
       setIsLoadingSuggestions(true);
       try {
-        const response = await clientProductsService.getSearchSuggestions(term, 5, { signal });
+        const response = await clientProductsService.getSearchSuggestions(
+          term,
+          5,
+          { signal }
+        );
         setSearchSuggestions(response.data);
+        setTotalItems(response.metadata?.totalItems || 0);
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
           console.error("Error fetching search suggestions:", error);
@@ -211,7 +233,9 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
                     ))
                   )
                 ) : isLoadingSuggestions ? (
-                  Array(3).fill(0).map((_, i) => <SkeletonSuggestion key={i} />)
+                  Array(3)
+                    .fill(0)
+                    .map((_, i) => <SkeletonSuggestion key={i} />)
                 ) : searchSuggestions.length > 0 ? (
                   searchSuggestions.map((item) => (
                     <div
@@ -220,9 +244,21 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
                       onClick={() => navigateToSearch(item.productName)}
                       role="option"
                     >
-                      <div className="flex items-center">
-                        <Search className="h-4 w-4 text-gray-500 mr-2" />
-                        <span className="text-sm font-medium text-gray-800">{item.productName}</span>
+                      <div className="px-5 py-2.5 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 flex-shrink-0 rounded overflow-hidden">
+                            <Image
+                              src={item.skuImage || "/static/no-image.png"}
+                              alt={item.productName}
+                              width={32}
+                              height={32}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-gray-800 line-clamp-1">
+                            {item.productName}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -234,14 +270,27 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
               </div>
 
               {searchTerm && (
-                <div className="px-4 pb-4 pt-2 border-t border-gray-100">
-                  <button
-                    className="flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-2.5 rounded-lg"
-                    onClick={() => navigateToSearch(searchTerm)}
-                  >
-                    <Search className="h-4 w-4 mr-2" />
-                    Tìm kiếm theo từ khóa "{searchTerm}"
-                  </button>
+                <div className="px-5 pb-5">
+                  <div className="border-t border-gray-100 pt-4">
+                    <div
+                      className="flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-3 rounded-lg transition-colors duration-200 cursor-pointer"
+                      onClick={() => {
+                        navigateToSearch(searchTerm);
+                      }}
+                    >
+                      <Search className="h-4 w-4 mr-2.5" />
+                      <span>
+                        Xem tất cả{" "}
+                        <span className="font-bold text-red-600">
+                          "{totalItems}"
+                        </span>{" "}
+                        kết quả theo từ khóa{" "}
+                        <span className="font-bold text-red-600">
+                          "{searchTerm}"
+                        </span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               )}
             </motion.div>
