@@ -107,6 +107,30 @@ export function SearchInput() {
     []
   );
 
+  // Bỏ dấu tiếng Việt
+  const removeDiacritics = (str: string) =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  const highlightMatch = (text: string, keyword: string) => {
+    if (!keyword) return text;
+
+    const normalizedText = removeDiacritics(text).toLowerCase();
+    const normalizedKeyword = removeDiacritics(keyword).toLowerCase();
+
+    // Tìm vị trí match trong chuỗi đã bỏ dấu
+    const startIndex = normalizedText.indexOf(normalizedKeyword);
+    if (startIndex === -1) return text;
+
+    const endIndex = startIndex + normalizedKeyword.length;
+
+    // Cắt highlight dựa trên vị trí match
+    const before = text.slice(0, startIndex);
+    const match = text.slice(startIndex, endIndex);
+    const after = text.slice(endIndex);
+
+    return `${before}<span class="font-bold text-red-600">${match}</span>${after}`;
+  };
+
   // Effect để gọi API search khi searchTerm thay đổi
   // Effect gọi API
   useEffect(() => {
@@ -464,9 +488,15 @@ export function SearchInput() {
                                       className="object-cover w-full h-full"
                                     />
                                   </div>
-                                  <span className="text-sm font-medium text-gray-800 line-clamp-1">
-                                    {item.productName}
-                                  </span>
+                                  <span
+                                    className="text-sm font-medium text-gray-800 line-clamp-1"
+                                    dangerouslySetInnerHTML={{
+                                      __html: highlightMatch(
+                                        item.productName,
+                                        searchTerm
+                                      ),
+                                    }}
+                                  />
                                 </div>
                               </div>
                             </motion.div>
@@ -485,7 +515,7 @@ export function SearchInput() {
 
                 {/* Footer section with padding - added pt-5 to create proper spacing */}
                 {searchTerm && (
-                  <div className="px-5 pb-5 pt-5">
+                  <div className="px-5 pb-5">
                     <div className="border-t border-gray-100 pt-4">
                       <div
                         className="flex items-center justify-center w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium p-3.5 rounded-lg transition-colors duration-200 cursor-pointer"

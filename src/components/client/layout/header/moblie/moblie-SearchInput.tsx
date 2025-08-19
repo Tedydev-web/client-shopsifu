@@ -120,6 +120,30 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
     []
   );
 
+  // Bỏ dấu tiếng Việt
+  const removeDiacritics = (str: string) =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  const highlightMatch = (text: string, keyword: string) => {
+    if (!keyword) return text;
+
+    const normalizedText = removeDiacritics(text).toLowerCase();
+    const normalizedKeyword = removeDiacritics(keyword).toLowerCase();
+
+    // Tìm vị trí match trong chuỗi đã bỏ dấu
+    const startIndex = normalizedText.indexOf(normalizedKeyword);
+    if (startIndex === -1) return text;
+
+    const endIndex = startIndex + normalizedKeyword.length;
+
+    // Cắt highlight dựa trên vị trí match
+    const before = text.slice(0, startIndex);
+    const match = text.slice(startIndex, endIndex);
+    const after = text.slice(endIndex);
+
+    return `${before}<span class="font-bold text-red-600">${match}</span>${after}`;
+  };
+
   useEffect(() => {
     if (debouncedSearch.length < 2) {
       setSearchSuggestions([]);
@@ -255,9 +279,15 @@ export function MobileSearchInput({ categories }: MobileSearchInputProps) {
                               className="object-cover w-full h-full"
                             />
                           </div>
-                          <span className="text-sm font-medium text-gray-800 line-clamp-1">
-                            {item.productName}
-                          </span>
+                          <span
+                            className="text-sm font-medium text-gray-800 line-clamp-1"
+                            dangerouslySetInnerHTML={{
+                              __html: highlightMatch(
+                                item.productName,
+                                searchTerm
+                              ),
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
