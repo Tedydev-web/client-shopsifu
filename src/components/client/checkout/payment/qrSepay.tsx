@@ -18,26 +18,27 @@ import { useShopsifuSocket } from '@/providers/ShopsifuSocketProvider';
 interface QrSepayProps {
   paymentId: string;
   orderId: string; // Add orderId to check status
+  totalAmount?: number; // Optional totalAmount for retry flow
   onPaymentConfirm: () => void;
   onPaymentCancel: () => void;
 }
 
-export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel }: QrSepayProps) {
+export function QrSepay({ paymentId, orderId, totalAmount, onPaymentConfirm, onPaymentCancel }: QrSepayProps) {
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [isExpired, setIsExpired] = useState(false);
   const { payments, connect, disconnect } = useShopsifuSocket();
   const commonInfo = useSelector(selectCommonOrderInfo);
   const router = useRouter();
 
-  // Lấy tổng số tiền cuối cùng từ Redux state
-  const totalAmount = commonInfo.amount;
+  // Lấy tổng số tiền từ props (retry) hoặc Redux state (checkout thường)
+  const finalTotalAmount = totalAmount || commonInfo.amount;
 
   // Environment variables for Sepay
   const SEPAY_ACCOUNT = process.env.NEXT_PUBLIC_SEPAY_ACCOUNT || '565615056666';
   const SEPAY_BANK = process.env.NEXT_PUBLIC_SEPAY_BANK || 'MbBank';
   
   // Generate QR URL according to Sepay docs
-  const qrUrl = `https://qr.sepay.vn/img?acc=${SEPAY_ACCOUNT}&bank=${SEPAY_BANK}&amount=${totalAmount}&des=DH${paymentId}`;
+  const qrUrl = `https://qr.sepay.vn/img?acc=${SEPAY_ACCOUNT}&bank=${SEPAY_BANK}&amount=${finalTotalAmount}&des=DH${paymentId}`;
   
   // Connect and disconnect socket based on component lifecycle
   useEffect(() => {
@@ -72,9 +73,9 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
       toast.success('Thanh toán thành công!');
       console.clear();
       // Redirect to the success page
-      router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
+      router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${finalTotalAmount}`);
     }
-  }, [payments, orderId, router, totalAmount]);
+  }, [payments, orderId, router, finalTotalAmount]);
 
   // Countdown timer
   useEffect(() => {
@@ -128,7 +129,7 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
       if (Order.data.status === OrderStatus.PENDING_PICKUP) {
         toast.dismiss();
         toast.success('Thanh toán thành công!');
-        router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${totalAmount}`);
+        router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${finalTotalAmount}`);
       } else {
         toast.dismiss();
         toast.info('Hệ thống đang xử lý thanh toán của bạn. Vui lòng đợi trong giây lát.');
@@ -241,7 +242,7 @@ export function QrSepay({ paymentId, orderId, onPaymentConfirm, onPaymentCancel 
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-700 font-medium">Số tiền:</span>
-            <span className="font-bold text-red-600 text-base">{formatCurrency(totalAmount)}</span>
+            <span className="font-bold text-red-600 text-base">{formatCurrency(finalTotalAmount)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-700 font-medium">Nội dung:</span>

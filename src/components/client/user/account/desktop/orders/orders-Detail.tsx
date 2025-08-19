@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Phone, ChevronLeft } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Phone, ChevronLeft, AlertTriangle } from "lucide-react";
 import { useOrder } from "./useOrder";
 import { Order, OrderItem } from "@/types/order.interface";
 import Link from "next/link";
@@ -22,6 +30,8 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
 
   const { fetchOrderDetail, cancelOrder, loading } = useOrder();
   const [order, setOrder] = useState<Order | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     const loadOrder = async () => {
@@ -40,6 +50,32 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
     await cancelOrder(orderId);
     const res = await fetchOrderDetail(orderId);
     setOrder(res?.data ?? null);
+  };
+
+  const handleCancelClick = () => {
+    setShowCancelDialog(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!orderId) return;
+    
+    setIsCancelling(true);
+    try {
+      await cancelOrder(orderId);
+      const res = await fetchOrderDetail(orderId);
+      setOrder(res?.data ?? null);
+      setShowCancelDialog(false);
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const handleCancelDialogClose = () => {
+    if (!isCancelling) {
+      setShowCancelDialog(false);
+    }
   };
 
   if (loading || !order) {
@@ -132,28 +168,48 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           <div className="flex flex-col items-end gap-2">
             <span className="text-sm">Số lượng: {totalQuantity}</span>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-[#d70018] text-[#d70018] hover:bg-[#d70018] hover:text-white"
-                onClick={() => {
-                  if (selectedItem) {
-                    const slug = createProductSlug(
-                      selectedItem.productName,
-                      selectedItem.productId
-                    );
-                    router.push(`/products/${slug}`);
-                  }
-                }}
-              >
-                Mua lại
-              </Button>
+              {/* Nút Mua lại - chỉ hiển thị cho trạng thái DELIVERED, RETURNED, CANCELLED */}
+              {(order.status === "DELIVERED" || order.status === "RETURNED" || order.status === "CANCELLED") && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#d70018] text-[#d70018] hover:bg-[#d70018] hover:text-white min-w-[100px]"
+                  onClick={() => {
+                    if (selectedItem) {
+                      const slug = createProductSlug(
+                        selectedItem.productName,
+                        selectedItem.productId
+                      );
+                      router.push(`/products/${slug}`);
+                    }
+                  }}
+                >
+                  Mua lại
+                </Button>
+              )}
 
+              {/* Nút Thanh toán lại - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
               {order.status === "PENDING_PAYMENT" && (
                 <Button
                   variant="outline"
-                  className="text-red-500 border-red-500 hover:bg-red-50"
-                  onClick={handleCancel}
+                  size="sm"
+                  className="border-[#0066cc] text-[#0066cc] hover:bg-[#0066cc] hover:text-white min-w-[120px]"
+                  onClick={() => {
+                    // Chuyển hướng đến trang retry payment
+                    router.push(`/checkout/retry/${order.id}`);
+                  }}
+                >
+                  Tiếp tục thanh toán
+                </Button>
+              )}
+
+              {/* Nút Hủy đơn hàng - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
+              {order.status === "PENDING_PAYMENT" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-red-500 border-red-500 hover:bg-red-50 min-w-[110px]"
+                  onClick={handleCancelClick}
                 >
                   Hủy đơn hàng
                 </Button>
@@ -278,6 +334,41 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           </div>
         </section>
       </div>
+
+      {/* Modal xác nhận hủy đơn hàng */}
+      <Dialog open={showCancelDialog} onOpenChange={handleCancelDialogClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <DialogTitle>Xác nhận hủy đơn hàng</DialogTitle>
+            </div>
+            <DialogDescription className="text-left">
+              Bạn có chắc chắn muốn hủy đơn hàng <span className="font-semibold">#{order?.paymentId}</span> không?
+              <br />
+              <span className="text-red-600 text-sm mt-2 block">
+                Lưu ý: Hành động này không thể hoàn tác.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCancelDialogClose}
+              disabled={isCancelling}
+            >
+              Không, giữ lại
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmCancel}
+              disabled={isCancelling}
+            >
+              {isCancelling ? "Đang hủy..." : "Có, hủy đơn hàng"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

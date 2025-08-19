@@ -148,7 +148,7 @@ const SuccessView = ({ orderId, totalAmount }: { orderId: string; totalAmount: n
           </Link>
         </Button>
         <Button asChild className="w-full">
-          <Link href="/user/purchase">
+          <Link href="/user/orders">
             <ShoppingBag className="mr-2 h-4 w-4" />
             Xem lịch sử mua hàng
           </Link>

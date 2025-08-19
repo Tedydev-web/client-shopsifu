@@ -24,7 +24,7 @@ export const sidebarItems = [
   },
   {
     labelKey: 'user.account.myPurchase.myPurchase',
-    href: '/user/purchase',
+    href: '/user/orders',
     icon: <NotepadText className="w-5 h-5 mr-2 text-gray-900" />,
   },
 ]
