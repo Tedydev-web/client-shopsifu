@@ -11,7 +11,7 @@ import { showToast } from '@/components/ui/toastify'
 import { Brand, BrandCreateRequest, BrandUpdateRequest } from '@/types/admin/brands.interface'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Upload, X, Camera, Image as ImageIcon } from "lucide-react"
-import { useUploadMedia } from '@/hooks/useUploadMedia'
+import { useUploadMediaPresign } from '@/hooks/useUploadMediaPresign'
 import { Progress } from '@/components/ui/progress'
 
 interface BrandModalUpsertProps {
@@ -37,19 +37,24 @@ export default function BrandModalUpsert({
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   
-  // Upload media hook
+  // Upload media hook with presigned URL
   const { 
     files, 
     uploadedUrls, 
+    presignedData,
     isUploading,
+    isProcessing,
     progress,
     error: uploadError,
+    currentStep,
+    progressMessage,
     handleAddFiles,
     handleRemoveFile,
     handleRemoveAllFiles,
     uploadFiles,
+    uploadToS3Multiple,
     reset: resetUpload
-  } = useUploadMedia()
+  } = useUploadMediaPresign()
 
   // Reset form when modal opens or mode/brand changes
   useEffect(() => {
@@ -82,21 +87,28 @@ export default function BrandModalUpsert({
       // Clear existing files first
       handleRemoveAllFiles();
       
-      // Add the new file (which will be compressed automatically)
+      // Add the new file (will be compressed and prepared for upload)
       handleAddFiles(e.target.files);
     }
   };
   
-  // Handle logo upload
+  // Handle logo upload - Manual trigger after file preparation
   const handleUploadLogo = async () => {
-    if (files.length === 0) return;
+    if (presignedData.length === 0) return;
     
-    const urls = await uploadFiles();
+    const urls = await uploadToS3Multiple();
     if (urls.length > 0) {
       // Use the first uploaded image URL as logo
       setLogo(urls[0]);
     }
   };
+
+  // Auto-set logo URL when upload completes
+  useEffect(() => {
+    if (uploadedUrls.length > 0 && !isUploading) {
+      setLogo(uploadedUrls[uploadedUrls.length - 1]); // Use the latest uploaded URL
+    }
+  }, [uploadedUrls, isUploading]);
 
   // Create validation schema
   const brandSchema = z.object({
@@ -210,28 +222,60 @@ export default function BrandModalUpsert({
                     </button>
                   </div>
                   
-                  {/* Logo URL - Read Only */}
-                  <div className="flex-1 space-y-1">
-                    <Input 
-                      value={logo} 
-                      onChange={e => setLogo(e.target.value)}
-                      placeholder={t('modal.logoPlaceholder') || 'URL sẽ được tạo sau khi tải lên'} 
-                      className="bg-muted"
-                    />
-                    
-                    {/* Upload button only shown when a file is selected */}
-                    {files.length > 0 && (
-                      <Button 
-                        type="button"
-                        size="sm"
-                        onClick={handleUploadLogo}
-                        disabled={isUploading}
-                        className="w-full"
-                      >
-                        {isUploading ? t('modal.uploading') || 'Đang tải lên...' : t('modal.uploadImage') || 'Tải lên'}
-                      </Button>
-                    )}
-                  </div>
+                    {/* Logo URL - Auto-populated from upload */}
+                    <div className="flex-1 space-y-1">
+                      <Input 
+                        value={logo} 
+                        onChange={e => setLogo(e.target.value)}
+                        placeholder={t('modal.logoPlaceholder') || 'URL sẽ được tạo sau khi tải lên'} 
+                        className="bg-muted"
+                        readOnly={isUploading}
+                      />
+                      
+                      {/* Processing progress (compress + get URLs) */}
+                      {isProcessing && (
+                        <div className="space-y-1">
+                          <Progress value={progress} className="h-1" />
+                          <p className="text-xs text-muted-foreground">
+                            {progressMessage} - {progress}% {t('modal.completed') || 'đã hoàn thành'}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Upload progress (S3 upload) */}
+                      {isUploading && (
+                        <div className="space-y-1">
+                          <Progress value={progress} className="h-1" />
+                          <p className="text-xs text-muted-foreground">
+                            {progressMessage} - {progress}% {t('modal.completed') || 'đã hoàn thành'}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Ready to upload */}
+                      {presignedData.length > 0 && !isUploading && !isProcessing && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-green-600">
+                            ✓ Sẵn sàng tải lên
+                          </p>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={handleUploadLogo}
+                            className="w-full"
+                          >
+                            Tải lên
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {/* Success message
+                      {uploadedUrls.length > 0 && !isUploading && !isProcessing && (
+                        <p className="text-xs text-green-600">
+                          ✓ Tải lên thành công
+                        </p>
+                      )} */}
+                    </div>
                 </div>
                 
                 <input
@@ -249,7 +293,7 @@ export default function BrandModalUpsert({
                   <div className="space-y-1">
                     <Progress value={progress} className="h-1" />
                     <p className="text-xs text-muted-foreground">
-                      {progress}% {t('modal.completed') || 'đã hoàn thành'}
+                      {progressMessage} - {progress}% {t('modal.completed') || 'đã hoàn thành'}
                     </p>
                   </div>
                 )}

@@ -44,6 +44,7 @@ export const API_ENDPOINTS = {
   },
   BASE:{
     UPLOAD_MEDIA: `${API_BASE}/media/images/upload`,
+    GET_PRESIGN_URL: `${API_BASE}/media/images/upload/presigned-urls`
   },
   // QUẢN LÝ NGƯỜI DÙNG - USERS
   USERS:{

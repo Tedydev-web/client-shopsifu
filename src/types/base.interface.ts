@@ -64,3 +64,39 @@ export interface MediaUploadResponse {
       url: string;
   }[];
 }
+
+/**
+ * @interface PresignedFileRequest
+ * @description Interface cho request để lấy presigned URL
+ */
+export interface PresignedFileRequest {
+  filename: string;
+  filesize: number;
+}
+
+/**
+ * @interface PresignedUrlData
+ * @description Interface cho dữ liệu presigned URL response
+ */
+export interface PresignedUrlData {
+  originalFilename: string;
+  filename: string;
+  presignedUrl: string;
+  url: string;
+}
+
+/**
+ * @interface PresignedUrlsRequest
+ * @description Interface cho request body để lấy nhiều presigned URLs
+ */
+export interface PresignedUrlsRequest {
+  files: PresignedFileRequest[];
+}
+
+/**
+ * @interface PresignedUrlsResponse
+ * @description Interface cho response của presigned URLs API
+ */
+export interface PresignedUrlsResponse extends BaseResponse {
+  data: PresignedUrlData[];
+}
