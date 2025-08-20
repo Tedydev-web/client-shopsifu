@@ -31,7 +31,9 @@ export interface GetAbilityResponse extends BaseResponse {
 
 
 export interface oAuthLoginResponse {
-  url: string
+  data:{
+    url: string
+  }
 }
 // ĐĂNG XUẤT TÀI KHOẢN - LOGOUT
 export interface LogoutRequest {

@@ -19,8 +19,7 @@ import Link from "next/link";
 import { createProductSlug } from "@/components/client/products/shared/productSlug"; // Đường dẫn đến hàm tạo slug
 
 interface OrderDetailProps {
-  orderId: string;
-  status?: string; // Thêm prop status nếu cần
+  readonly orderId: string;
 }
 
 export default function OrderDetail({ orderId }: OrderDetailProps) {
@@ -121,10 +120,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
         <ChevronLeft className="w-5 h-5" />
         <span className="text-[#121214] text-sm">
           Lịch sử mua hàng
-          <span className="font-medium text-[#CFCFD3]">
-            {" "}
-            / Chi tiết đơn hàng
-          </span>
+          <span className="font-medium text-[#CFCFD3]"> / Chi tiết đơn hàng</span>
         </span>
       </Link>
 
