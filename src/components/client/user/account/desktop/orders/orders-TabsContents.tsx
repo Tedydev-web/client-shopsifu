@@ -11,13 +11,42 @@ import { ChevronDown } from "lucide-react";
 import { createProductSlug } from "@/components/client/products/shared/productSlug";
 import { ReviewsModal } from "@/components/client/products/products-ReviewsModal";
 
-const statusLabel: Record<OrderStatus, string> = {
-  PENDING_PAYMENT: "Chờ thanh toán",
-  PENDING_PICKUP: "Chờ lấy hàng",
-  PENDING_DELIVERY: "Đang giao hàng",
-  DELIVERED: "Đã giao hàng",
-  RETURNED: "Đã trả hàng",
-  CANCELLED: "Đã huỷ",
+interface StatusInfo {
+  label: string;
+  className: string;
+}
+
+const statusLabel: Record<OrderStatus, StatusInfo> = {
+  PENDING_PAYMENT: {
+    label: "Chờ thanh toán",
+    className:
+      "bg-gradient-to-r from-amber-50 to-yellow-100 text-amber-700 border border-amber-200",
+  },
+  PENDING_PICKUP: {
+    label: "Chờ lấy hàng",
+    className:
+      "bg-gradient-to-r from-sky-50 to-blue-100 text-sky-700 border border-sky-200",
+  },
+  PENDING_DELIVERY: {
+    label: "Đang giao hàng",
+    className:
+      "bg-gradient-to-r from-violet-50 to-purple-100 text-violet-700 border border-violet-200",
+  },
+  DELIVERED: {
+    label: "Đã giao hàng",
+    className:
+      "bg-gradient-to-r from-emerald-50 to-green-100 text-emerald-700 border border-emerald-200",
+  },
+  RETURNED: {
+    label: "Đã trả hàng",
+    className:
+      "bg-gradient-to-r from-slate-50 to-gray-100 text-slate-700 border border-slate-200",
+  },
+  CANCELLED: {
+    label: "Đã hủy",
+    className:
+      "bg-gradient-to-r from-red-50 to-rose-100 text-red-700 border border-red-200",
+  },
 };
 
 interface Props {
@@ -127,7 +156,14 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                       {/* Right: Status + Price + Actions */}
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
                         <div className="text-gray-400 text-xs sm:text-sm">
-                          {statusLabel[order.status]}
+                          <span
+                            className={`text-xs font-semibold px-3 py-2 rounded-full ${
+                              statusLabel[order.status]?.className ||
+                              "bg-gray-100 text-gray-600 border border-gray-200"
+                            }`}
+                          >
+                            {statusLabel[order.status]?.label || order.status}
+                          </span>
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-gray-500 mb-1">

@@ -52,7 +52,7 @@ export function MobileHeader() {
 
           {/* Row 2 */}
           <div className="w-full px-1">
-            <MobileSearchInput categories={[]} />
+            <MobileSearchInput/>
           </div>
         </div>
       </header>
