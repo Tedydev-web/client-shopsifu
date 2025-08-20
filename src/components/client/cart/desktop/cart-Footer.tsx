@@ -2,7 +2,6 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Ticket, Coins } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-
 export const OrderEmpty = () => {
   return (
     <div className="flex flex-col items-center justify-center text-muted-foreground gap-2 py-12">

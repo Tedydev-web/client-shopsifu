@@ -10,15 +10,6 @@ export default function OrderHistory() {
   const [currentTab, setCurrentTab] = useState("all");
 
   return (
-    // <Tabs
-    //   value={currentTab}
-    //   onValueChange={setCurrentTab}
-    //   className="
-    //     w-full bg-white
-    //     md:rounded-xl md:shadow-sm md:min-h-[85vh]
-    //     sm:min-h-[70vh] sm:rounded-none sm:shadow-none
-    //   "
-    // >
     <Tabs
       value={currentTab}
       onValueChange={setCurrentTab}

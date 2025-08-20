@@ -50,10 +50,7 @@ export function MobileSearchInput() {
   }, []);
 
   //Sử dụng hook để lấy danh mục từ api
-  const { categories, loading } = useCbbCategory(null);
-
-  // Debounce search term để tránh gọi API quá nhiều
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const { categories } = useCbbCategory(null);
 
   const navigateToSearch = useCallback(
     (term: string) => {
@@ -150,14 +147,6 @@ export function MobileSearchInput() {
     fetchSearchSuggestions(debouncedSearch, controller.signal);
     return () => controller.abort();
   }, [debouncedSearch, fetchSearchSuggestions]);
-
-  // Skeletons
-  const SkeletonCategory = () => (
-    <div className="px-4 py-2 flex items-center">
-      <div className="w-9 h-9 bg-gray-200 rounded-full mr-3 animate-pulse" />
-      <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" />
-    </div>
-  );
 
   const SkeletonSuggestion = () => (
     <div className="px-4 py-2 flex items-center">
