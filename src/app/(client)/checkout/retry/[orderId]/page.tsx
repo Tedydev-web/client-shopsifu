@@ -1,11 +1,12 @@
 import RetryPaymentPage from './RetryPaymentPage';
 
-interface PageProps {
-  params: {
+interface RetryPageProps {
+  params: Promise<{
     orderId: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: PageProps) {
-  return <RetryPaymentPage orderId={params.orderId} />;
+export default async function Page({ params }: RetryPageProps) {
+  const { orderId } = await params;
+  return <RetryPaymentPage orderId={orderId} />;
 }

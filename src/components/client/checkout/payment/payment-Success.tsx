@@ -51,12 +51,6 @@ export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMeth
 
   // Theo dõi trạng thái thanh toán nếu là pending
   useEffect(() => {
-    // Nếu là VNPay, không cần kiểm tra vì đã được xác thực trực tiếp từ API
-    if (paymentMethod === 'vnpay') {
-      console.log('[VNPay] Using verified status from API:', status);
-      return;
-    }
-    
     // Không gọi API trong các trường hợp sau:
     // 1. Status đã xác định (success/failed)
     // 2. OrderId không hợp lệ (N/A hoặc không định dạng đúng)
@@ -85,15 +79,33 @@ export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMeth
         console.error('Error checking payment status:', error);
       }
     };
-    
-    // Check ngay lập tức một lần
-    checkPaymentStatus();
-    
-    // Sau đó check định kỳ
-    const intervalId = setInterval(checkPaymentStatus, 3000); // Mỗi 3 giây
-    
-    return () => clearInterval(intervalId);
-  }, [orderId, status]);
+
+    // Nếu là VNPay, đợi socket check trước 8 giây, sau đó mới fallback về API
+    if (paymentMethod === 'vnpay') {
+      console.log('[VNPay] Waiting for socket confirmation for 8 seconds before API fallback');
+      
+      const fallbackTimer = setTimeout(() => {
+        console.log('[VNPay] Socket timeout, falling back to API check');
+        checkPaymentStatus();
+        
+        // Sau đó check định kỳ bằng API
+        const intervalId = setInterval(checkPaymentStatus, 3000);
+        
+        // Cleanup function sẽ clear interval này
+        return () => clearInterval(intervalId);
+      }, 8000); // Đợi 8 giây
+      
+      return () => clearTimeout(fallbackTimer);
+    } else {
+      // Với các phương thức khác, check ngay bằng API
+      checkPaymentStatus();
+      
+      // Sau đó check định kỳ
+      const intervalId = setInterval(checkPaymentStatus, 3000);
+      
+      return () => clearInterval(intervalId);
+    }
+  }, [orderId, status, paymentMethod]);
 
   // Log trước khi render để debug
   console.log(`[PaymentStatus] Rendering view for status: ${status} (initialStatus: ${initialStatus}, paymentMethod: ${paymentMethod})`);
@@ -195,30 +207,27 @@ const PendingView = ({
   }, [orderId, paymentMethod]);
 
   useEffect(() => {
-    // Không kết nối socket nếu:
-    // 1. Là callback từ VNPay (đã xác thực qua verifyVNPayReturn)
-    // 2. PaymentId không hợp lệ
+    // Kết nối socket cho tất cả các phương thức thanh toán khi có paymentId hợp lệ
     if (
-      paymentMethod === 'vnpay' || 
       !paymentId || 
       paymentId === 'N/A' || 
       !paymentId.match(/^[a-zA-Z0-9]+$/) // Kiểm tra paymentId có hợp lệ không
     ) {
-      console.log(`[Socket] Not connecting for ${paymentMethod} payment. Using verified status instead.`);
+      console.log('[Socket] Invalid paymentId, not connecting');
       return;
     }
     
-    // Kết nối socket với paymentId thay vì orderId (chỉ cho các phương thức không phải VNPay)
-    console.log(`[Socket] Connecting with paymentId: ${paymentId}`);
+    // Kết nối socket với paymentId
+    console.log(`[Socket] Connecting with paymentId: ${paymentId} for ${paymentMethod} payment`);
     connect(paymentId);
     return () => disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentId, paymentMethod]);
 
   useEffect(() => {
-    // Không theo dõi sự kiện storage nếu là VNPay callback
-    if (paymentMethod === 'vnpay' || !paymentId || paymentId === 'N/A') {
-      console.log('[Storage Events] Not listening for', paymentMethod);
+    // Theo dõi sự kiện storage cho tất cả các phương thức thanh toán
+    if (!paymentId || paymentId === 'N/A') {
+      console.log('[Storage Events] No valid paymentId for storage listening');
       return;
     }
     
