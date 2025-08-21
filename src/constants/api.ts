@@ -175,5 +175,14 @@ export const API_ENDPOINTS = {
     GET_BY_ID: `${API_BASE}/manage-discount/discounts/:discountId`,
     GUEST_GET_DISCOUNT_LIST: `${API_BASE}/discounts/available`,
     VALIDATE_DISCOUNT: `${API_BASE}/discounts/validate-code`
+  },
+  // QUẢN LÝ VẬN CHUYỂN - SHIPPING - ADDRESS
+  ADDRESS:{
+    GET_PROVINCES: `${API_BASE}/shipping/address/provinces`,
+    GET_DISTRICTS: `${API_BASE}/shipping/address/districts`,
+    GET_WARDS: `${API_BASE}/shipping/address/wards`
+  },
+  SHIPPING:{
+    CALCULATE_FEE: `${API_BASE}/shipping/calculate-fee`,
   }
 }
