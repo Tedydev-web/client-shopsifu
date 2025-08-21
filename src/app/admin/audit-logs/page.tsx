@@ -1,6 +1,8 @@
-"use client";
-// import AuditLogsTableWrapper from "@/components/admin/audit-logs/auditLogs-Wrapper";
 import { useTranslations } from 'next-intl';
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/audit-log']
 
 export default function AuditLogsPage() {
   const t = useTranslations();

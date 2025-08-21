@@ -1,6 +1,9 @@
-'use client'
 import ProductsTableWrapper from "@/components/admin/products/products-Wrapper";
 import { useTranslations } from "next-intl";
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/products']
 
 export default function ProductsPage() {
   const t = useTranslations('admin.ModuleProduct')

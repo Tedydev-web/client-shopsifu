@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTES } from '@/constants/route';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import { Spinner } from '@/components/ui/spinner';
+import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTES } from "@/constants/route";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { Spinner } from "@/components/ui/spinner";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -12,13 +12,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthGuard();
 
   // Kiểm tra xem route hiện tại có cần bảo vệ không
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => 
-    pathname === route || pathname.startsWith(route)
+  const isProtectedRoute = PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route)
   );
 
   // Kiểm tra xem có phải route public không
-  const isPublicRoute = PUBLIC_ROUTES.some(route => 
-    pathname === route || pathname.startsWith(route)
+  const isPublicRoute = PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route)
   );
 
   useEffect(() => {
@@ -27,9 +27,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       if (!isAuthenticated && isProtectedRoute) {
         router.push(ROUTES.BUYER.SIGNIN);
       }
-      
+
       // Nếu đã đăng nhập và đang ở signin/signup page
-      if (isAuthenticated && pathname === ROUTES.BUYER.SIGNIN) {
+
+      if (
+        isAuthenticated &&
+        (pathname === ROUTES.BUYER.SIGNIN || pathname === ROUTES.BUYER.SIGNUP)
+      ) {
         router.push(ROUTES.HOME);
       }
     }
@@ -50,4 +54,4 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
-} 
+}

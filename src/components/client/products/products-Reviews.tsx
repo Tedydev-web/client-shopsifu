@@ -37,6 +37,26 @@ const StarRating = ({
   </div>
 );
 
+const { reviews, totalItems, loading, fetchReviews, summary, fetchSummary } =
+  useProductReview(productId);
+
+useEffect(() => {
+  fetchSummary(); // chỉ gọi 1 lần để lấy tổng quan
+}, [fetchSummary]);
+
+useEffect(() => {
+  fetchReviews({
+    page,
+    limit,
+    ...(filter !== "all"
+      ? filter === "media"
+        ? { hasMedia: true }
+        : { rating: filter }
+      : {}),
+  });
+}, [fetchReviews, page, filter]);
+
+
 const ReviewItem = ({ review }: { review: Review }) => {
   const userName = review.user?.name || "Người dùng ẩn danh";
   const userAvatar = review.user?.avatar || "/assets/demo/shop-avatar.png";

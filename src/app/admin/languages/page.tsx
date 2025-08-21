@@ -1,6 +1,9 @@
-'use client'
 import LanguagesTableWrapper from "@/components/admin/languages/languages-Wrapper";
 import { useTranslations } from "next-intl";
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/languages']
 
 export default function LanguagesPage() {
   const t = useTranslations()

@@ -1,7 +1,9 @@
-'use client'
-
 import BrandTableWrapper from "@/components/admin/brand/brand-Wrapper";
 import { useTranslations } from "next-intl";
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/brand']
 
 export default function BrandPage() {
   const t = useTranslations()

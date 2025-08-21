@@ -1,7 +1,10 @@
-'use client'
 import RolesTableWrapper from "@/components/admin/roles/roles-Wrapper"
 import { useTranslations } from "next-intl";
-import RolesTable from "@/components/admin/roles/roles-Table";
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/roles']
+
 export default function RolesPage() {
   const t = useTranslations()
   return (

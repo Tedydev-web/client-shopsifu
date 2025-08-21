@@ -1,6 +1,9 @@
-'use client'
 import OrdersDynamic from "@/components/admin/orders/orders-Wrapper";
 import { useTranslations } from "next-intl";
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/order']
 
 export default function OrdersPage() {
   const t = useTranslations()

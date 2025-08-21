@@ -1,6 +1,9 @@
-'use client'
 import PermissionsTableWrapper from "@/components/admin/permissions/permissions-Wrapper";
 import { useTranslations } from "next-intl";
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/permissions']
 
 export default function PermissionsPage() {
   const t = useTranslations()

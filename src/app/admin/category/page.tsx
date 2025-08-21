@@ -1,7 +1,9 @@
-'use client';
-
 import CategoryTableWrapper from '@/components/admin/category/category-Wrapper';
 import { useTranslations } from 'next-intl';
+
+import { metadataConfig } from '@/lib/metadata'
+import type { Metadata } from 'next'
+export const metadata: Metadata = metadataConfig['/admin/category']
 
 export default function CategoryPage() {
   const t  = useTranslations("admin.ModuleCategory");
