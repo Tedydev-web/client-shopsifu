@@ -31,11 +31,11 @@ export function useVerify() {
       
       // Chỉ cần kiểm tra action từ URL để quyết định chuyển hướng
       if (action === 'forgot') {
-        router.replace(ROUTES.BUYER.RESET_PASSWORD)
+        router.replace(ROUTES.AUTH.RESET_PASSWORD)
       } else if (action === 'signup') {
-        router.replace(ROUTES.BUYER.SIGNUP)
+        router.replace(ROUTES.AUTH.SIGNUP)
       } else {
-        router.replace(ROUTES.BUYER.SIGNIN)
+        router.replace(ROUTES.AUTH.SIGNIN)
       }
     } catch (error) {
       showToast(parseApiError(error), 'error')

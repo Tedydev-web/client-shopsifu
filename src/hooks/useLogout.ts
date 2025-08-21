@@ -33,7 +33,7 @@ export function useLogout() {
 
       // 5. Điều hướng về trang đăng nhập bằng cách tải lại trang
       // Điều này đảm bảo dọn dẹp triệt để mọi trạng thái còn sót lại trong bộ nhớ
-      window.location.href = ROUTES.BUYER.SIGNIN;
+      window.location.href = ROUTES.AUTH.SIGNIN;
     }
   };
 

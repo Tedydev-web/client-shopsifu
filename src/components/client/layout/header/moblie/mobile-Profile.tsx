@@ -45,12 +45,12 @@ export function ProfileDropdown() {
     {
       icon: User,
       label: 'Tài khoản của tôi',
-      onClick: () => router.push(ROUTES.BUYER.MY_ACCOUNT)
+      onClick: () => router.push(ROUTES.CLIENT.USER.BASE)
     },
     {
       icon: ShoppingCart,
       label: 'Đơn hàng mua',
-      onClick: () => router.push(ROUTES.BUYER.MY_ORDERS),
+      onClick: () => router.push(ROUTES.CLIENT.USER.ORDERS),
       requireDivider: true
     },
     {
@@ -63,7 +63,7 @@ export function ProfileDropdown() {
   if (!user) {
     return (
       <button
-        onClick={() => router.push(ROUTES.BUYER.SIGNIN)}
+        onClick={() => router.push(ROUTES.AUTH.SIGNIN)}
         className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-transparent text-white"
       >
         <User className="w-6 h-6" strokeWidth={1}/>

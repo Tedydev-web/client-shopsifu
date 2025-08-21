@@ -126,12 +126,12 @@ export const usePasswordSecuritySession = () => {
     try {
       const response = await sessionService.revokeAll({ excludeCurrentSession: excludeCurrent })
       if (response.verificationType === 'OTP') {
-        router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP&revokeAll=true`)
+        router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=OTP&revokeAll=true`)
         // showToast(response.message, 'info')
         return
       }
       if (response.verificationType === '2FA') {
-        router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP&revokeAll=true`)
+        router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=TOTP&revokeAll=true`)
         // showToast(response.message, 'info')
         return
       }

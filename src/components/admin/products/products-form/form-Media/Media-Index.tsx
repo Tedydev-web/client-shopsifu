@@ -49,6 +49,7 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
         handleSelectAll,
         handleRemoveSelected,
         handleDragEnd: onDragEnd,
+        handleDragStart: onDragStart,
         isUploading,
     } = useMediaForm({ initialImageUrls: images });
     
@@ -87,6 +88,12 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
 
     const handleDragStart = (event: DragStartEvent) => {
         setActiveId(event.active.id as string);
+        onDragStart(); // Call hook's drag start
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        onDragEnd(event);
+        setActiveId(null);
     };
 
 
@@ -162,10 +169,7 @@ export const MediaForm = ({ images, setImages }: MediaFormProps) => {
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragStart={handleDragStart}
-                    onDragEnd={(event) => {
-                        onDragEnd(event);
-                        setActiveId(null);
-                    }}
+                    onDragEnd={handleDragEnd}
                 >
                     <div className="relative"
                         onDragEnter={handleDragEnter}

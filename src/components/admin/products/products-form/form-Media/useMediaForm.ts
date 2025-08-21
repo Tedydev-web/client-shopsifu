@@ -1,14 +1,15 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { useUploadMedia } from '@/hooks/useUploadMedia';
+import { useUploadMediaPresign } from '@/hooks/useUploadMediaPresign';
 import { toast } from 'sonner';
 
 interface ImageObject {
   id: string; 
   url: string; 
   file?: File; 
-  progress: number; 
+  progress: number;
+  originalIndex?: number; // Track original position for reordering
 }
 
 interface UseMediaFormProps {
@@ -21,6 +22,7 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
   );
   
   const prevUrlsRef = useRef<string[]>([]);
+  const lastProcessedLengthRef = useRef<number>(0); // Track last processed uploadedUrls length
   
   // Thay thế useEffect đồng bộ với initialImageUrls
   useEffect(() => {
@@ -40,17 +42,47 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
                   .filter(url => !uploadingUrls.has(url))
                   .map(url => ({ id: url, url, progress: 100 }));
               
-              return [...uploadingObjects, ...newObjectsFromUrls];
+              return [...newObjectsFromUrls, ...uploadingObjects];
           });
       }
   }, [initialImageUrls]);
   
-  const { uploadedUrls, isUploading, progress: overallProgress, handleAddFiles, uploadFiles, handleRemoveFile } = useUploadMedia();
+  const presignHook = useUploadMediaPresign();
+  
+  // Wrapper to maintain compatibility with old interface
+  const uploadedUrls = presignHook.uploadedUrls;
+  const isUploading = presignHook.isProcessing || presignHook.isUploading;
+  const overallProgress = presignHook.progress;
+  
+  // Enhanced handleAddFiles that automatically uploads after processing
+  const handleAddFiles = useCallback(async (files: File[]) => {
+    try {
+      // Step 1: Process files (compress + get presigned URLs)
+      const result = await presignHook.handleAddFiles(files);
+      
+      // Step 2: Auto upload to S3 if processing was successful
+      if (result && result.presignedData && result.presignedData.length > 0) {
+        console.log('Uploading with files:', result.processedFiles.length, 'presigned data:', result.presignedData.length);
+        
+        // Call with explicit data to avoid state timing issues
+        await presignHook.uploadToS3Multiple(result.processedFiles, result.presignedData);
+      }
+    } catch (error) {
+      console.error('Error in handleAddFiles:', error);
+    }
+  }, [presignHook]);
+  
+  // Keep uploadFiles for compatibility
+  const uploadFiles = handleAddFiles;
+  
+  // Keep handleRemoveFile for compatibility
+  const handleRemoveFile = presignHook.handleRemoveFile;
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hoveredImageIndex, setHoveredImageIndex] = useState<number | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedImageIds, setSelectedImageIds] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false); // Track drag state
 
   useEffect(() => {
     setImageObjects(currentObjects => 
@@ -62,55 +94,62 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
 
   // Xử lý khi có URLs mới được upload
   useEffect(() => {
-    if (uploadedUrls.length > 0) {
-      // Map từ các file đã tải lên đến các đối tượng imageObjects
+    // Don't update IDs while dragging to avoid confusion
+    if (isDragging) return;
+    
+    if (uploadedUrls.length > lastProcessedLengthRef.current) {
+      // Get only new URLs since last processing
+      const newUrls = uploadedUrls.slice(lastProcessedLengthRef.current);
+      
+      console.log('Processing new uploaded URLs:', newUrls);
+      // Map từ các file đang tải lên đến URLs mới
       setImageObjects(currentObjects => {
-        // Tạo map để lưu trữ thông tin về file names đang tải lên
-        const fileNameMap = new Map();
-        currentObjects.forEach(obj => {
+        console.log('Current objects before update:', currentObjects.map((o: ImageObject) => ({ id: o.id, url: o.url.substring(0, 50), hasFile: !!o.file })));
+        
+        // Tìm các objects đang upload (có file property)
+        const uploadingObjects = currentObjects.filter(obj => obj.file);
+        
+        // Create updated objects for new URLs
+        
+        // Create a new array by updating existing uploading objects with new URLs
+        const updatedObjects = currentObjects.map(obj => {
+          // If it's an uploading object, try to match it with a new URL
           if (obj.file) {
-            fileNameMap.set(obj.file.name, obj);
+            const uploadingIndex = uploadingObjects.indexOf(obj);
+            if (uploadingIndex !== -1 && uploadingIndex < newUrls.length) {
+              // Update this uploading object with the final URL and CHANGE ID to final URL
+              console.log(`Updating object: ${obj.id} with URL: ${newUrls[uploadingIndex]}`);
+              return {
+                id: newUrls[uploadingIndex], // Change ID to final URL (like original system)
+                url: newUrls[uploadingIndex], // Final URL
+                progress: 100,
+                file: undefined // Remove file reference
+              };
+            }
           }
+          // Keep non-uploading objects as-is
+          return obj;
         });
         
-        // Tạo một mảng mới với các đối tượng không thay đổi
-        const unmodifiedObjects = currentObjects.filter(obj => !obj.file);
-        
-        // Tạo một mảng mới chứa các đối tượng đã được cập nhật từ uploadedUrls
-        const updatedObjects: ImageObject[] = [];
-        
-        // Đối chiếu uploadedUrls với fileNameMap
-        // Đây chỉ là một mảng các chuỗi URL
-        console.log('Received uploadedUrls:', uploadedUrls);
-        
-        // Lặp qua từng URL và tạo đối tượng imageObject mới
-        uploadedUrls.forEach((url, index) => {
-          // Chúng ta không có cách nào để ánh xạ URL với file gốc
-          // nên gán cho URL đầu tiên với đối tượng đầu tiên và tiếp tục
-          const files = Array.from(fileNameMap.values());
-          if (index < files.length) {
-            const originalObj = files[index];
-            updatedObjects.push({
-              id: url, // Dùng URL làm ID
-              url: url, // URL được trả về từ API
-              progress: 100,
-              file: undefined // Không cần file nữa vì đã tải lên thành công
-            });
-          } else {
-            // Nếu có nhiều URL hơn file, thêm các URL đó vào
-            updatedObjects.push({
-              id: url,
-              url: url,
-              progress: 100
-            });
-          }
+        // Add any remaining new URLs that couldn't be matched (fallback)
+        const unmatchedUrls = newUrls.slice(uploadingObjects.length);
+        unmatchedUrls.forEach(url => {
+          updatedObjects.push({
+            id: url, // Use URL as ID like original
+            url: url,
+            progress: 100
+          });
         });
         
-        // Kết hợp các đối tượng chưa được cập nhật với các đối tượng đã được cập nhật
-        return [...unmodifiedObjects, ...updatedObjects];
+        // Update last processed length
+        lastProcessedLengthRef.current = uploadedUrls.length;
+        
+        console.log('Updated objects after processing:', updatedObjects.map((o: ImageObject) => ({ id: o.id, url: o.url.substring(0, 50), hasFile: !!o.file })));
+        
+        return updatedObjects;
       });
     }
-  }, [uploadedUrls]);
+  }, [uploadedUrls, isDragging]);
 
   const handleFileSelected = useCallback(async (files: File[]) => {
     const availableSlots = 12 - imageObjects.length;
@@ -123,7 +162,7 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
     if (filesToProcess.length === 0) return;
 
     const newImageObjects: ImageObject[] = filesToProcess.map(file => ({
-      id: `uploading-${file.name}-${Date.now()}`,
+      id: `uploading-${file.name}-${Date.now()}`, // Simple ID like original
       url: URL.createObjectURL(file),
       file: file,
       progress: 0,
@@ -160,6 +199,7 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
       .filter(img => selectedImageIds.includes(img.id) && img.file)
       .map(img => img.file!);
     
+    // Remove from presign hook state
     uploadingFilesToRemove.forEach(file => handleRemoveFile(file.name));
 
     setImageObjects(prev => prev.filter(img => !selectedImageIds.includes(img.id)));
@@ -206,6 +246,8 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
+      setIsDragging(false); // End drag state
+      
       if (over && active.id !== over.id) {
         setImageObjects((items) => {
           const oldIndex = items.findIndex((item) => item.id === active.id);
@@ -214,12 +256,16 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
         });
       }
     },
-    [setImageObjects]
+    []
   );
 
   const handleDragEnter = useCallback(() => setIsDragOver(true), []);
   const handleDragLeave = useCallback(() => setIsDragOver(false), []);
   const handleDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); }, []);
+  
+  const handleDragStart = useCallback(() => {
+    setIsDragging(true);
+  }, []);
 
   const imagesForDisplay = useMemo(() => imageObjects.map(img => img.url), [imageObjects]);
 
@@ -241,6 +287,7 @@ export function useMediaForm({ initialImageUrls }: UseMediaFormProps) {
     handleSelectAll,
     handleRemoveSelected,
     handleDragEnd,
+    handleDragStart,
     isUploading,
 
   };
