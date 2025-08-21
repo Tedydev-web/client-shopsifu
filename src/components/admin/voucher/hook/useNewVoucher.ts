@@ -172,6 +172,13 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
           newFormData.discountApplyType = DiscountApplyType.ALL; // Default to all
           newFormData.selectedProducts = [];
           break;
+
+        case VoucherUseCase.PRIVATE_ADMIN:
+          newFormData.displayType = 'PRIVATE';
+          newFormData.isPrivate = true;
+          newFormData.discountApplyType = DiscountApplyType.ALL; // Default to all
+          newFormData.selectedProducts = [];
+          break;
       }
       return newFormData;
     });
@@ -316,6 +323,14 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
       return false;
     }
 
+    // Validation cho voucher PRIVATE_ADMIN khi chọn sản phẩm cụ thể
+    if (useCase === VoucherUseCase.PRIVATE_ADMIN && 
+        formData.discountApplyType === DiscountApplyType.SPECIFIC && 
+        (formData.selectedProducts ?? []).length === 0) {
+      toast.error('Vui lòng chọn ít nhất một sản phẩm để áp dụng voucher');
+      return false;
+    }
+
     // Validation cho maxDiscountValue khi discountType là PERCENTAGE
     if (formData.discountType === 'PERCENTAGE' && 
         formData.maxDiscountValue !== null && 
@@ -342,10 +357,10 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
 
     // Xác định owner thực tế dựa trên role của user và useCase
     // Chỉ case PLATFORM (4) mới có isPlatform = true
-    // Các case khác (5-8) đều có isPlatform = false nhưng shopId = null
+    // Các case khác (5-8-9) đều có isPlatform = false nhưng shopId = null
     const isAdminCase = userData?.role?.name === 'ADMIN' && 
                        [VoucherUseCase.PLATFORM, VoucherUseCase.CATEGORIES, VoucherUseCase.BRAND, 
-                        VoucherUseCase.SHOP_ADMIN, VoucherUseCase.PRODUCT_ADMIN].includes(useCase);
+                        VoucherUseCase.SHOP_ADMIN, VoucherUseCase.PRODUCT_ADMIN, VoucherUseCase.PRIVATE_ADMIN].includes(useCase);
     
     const isPlatformVoucher = (useCase === VoucherUseCase.PLATFORM); // Chỉ case PLATFORM mới true
     const actualOwner = isPlatformVoucher ? 'PLATFORM' : 'SHOP';
@@ -440,6 +455,15 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
             ? DiscountApplyType.SPECIFIC 
             : DiscountApplyType.ALL;
           break;
+          
+        case VoucherUseCase.PRIVATE_ADMIN:
+          // Case 9: Voucher riêng tư được tạo bởi Admin (giống SELLER PRIVATE nhưng ở cấp platform)
+          payload.voucherType = VoucherType.SHOP; // Bản chất vẫn là SHOP voucher
+          payload.isPlatform = false;
+          payload.shopId = null; // Admin tạo voucher riêng tư cấp platform
+          payload.displayType = DisplayType.PRIVATE; // Force private
+          payload.discountApplyType = formData.discountApplyType; // Có thể ALL hoặc SPECIFIC
+          break;
         
         default:
           // Các case SELLER (1-3) - cần shopId từ userData
@@ -462,7 +486,7 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
       }
 
       // Xử lý displayType dựa trên useCase
-      if (useCase === VoucherUseCase.PRIVATE) {
+      if (useCase === VoucherUseCase.PRIVATE || useCase === VoucherUseCase.PRIVATE_ADMIN) {
         payload.displayType = DisplayType.PRIVATE;
       } else {
         payload.displayType = formData.displayType === 'PRIVATE' ? DisplayType.PRIVATE : DisplayType.PUBLIC;
@@ -477,6 +501,11 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
       if (useCase === VoucherUseCase.PRODUCT_ADMIN && formData.selectedProducts && formData.selectedProducts.length > 0) {
         (payload as any).products = formData.selectedProducts.map(p => p.id);
         payload.discountApplyType = DiscountApplyType.SPECIFIC;
+      }
+
+      // Xử lý products cho PRIVATE_ADMIN khi chọn sản phẩm cụ thể
+      if (useCase === VoucherUseCase.PRIVATE_ADMIN && formData.discountApplyType === DiscountApplyType.SPECIFIC) {
+        (payload as any).products = formData.selectedProducts?.map(p => p.id) || [];
       }
 
       console.log('User role and owner logic:', {
@@ -555,6 +584,42 @@ export function useNewVoucher({ useCase, owner, userData, onCreateSuccess }: Use
             voucherType: 'SHOP',
             shopId: 'user_id_selected',
             discountApplyType: 'ALL'
+          }
+        });
+      }
+
+      if (useCase === VoucherUseCase.PRODUCT_ADMIN) {
+        console.log('🔥 PRODUCT_ADMIN VOUCHER DEBUG:', {
+          useCase: 'PRODUCT_ADMIN (8)',
+          isPlatform: payload.isPlatform,
+          voucherType: payload.voucherType,
+          shopId: payload.shopId,
+          products: (payload as any).products,
+          discountApplyType: payload.discountApplyType,
+          expectedFormat: {
+            isPlatform: false,
+            voucherType: 'PRODUCT',
+            shopId: null,
+            discountApplyType: 'ALL or SPECIFIC'
+          }
+        });
+      }
+
+      if (useCase === VoucherUseCase.PRIVATE_ADMIN) {
+        console.log('🔥 PRIVATE_ADMIN VOUCHER DEBUG:', {
+          useCase: 'PRIVATE_ADMIN (9)',
+          isPlatform: payload.isPlatform,
+          voucherType: payload.voucherType,
+          shopId: payload.shopId,
+          displayType: payload.displayType,
+          products: (payload as any).products,
+          discountApplyType: payload.discountApplyType,
+          expectedFormat: {
+            isPlatform: false,
+            voucherType: 'SHOP',
+            shopId: null,
+            displayType: 'PRIVATE',
+            discountApplyType: 'ALL or SPECIFIC'
           }
         });
       }

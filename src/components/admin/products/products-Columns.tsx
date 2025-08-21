@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
 import { DataTableRowActions, ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2, QrCode } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -25,6 +25,7 @@ const getProductActions = (
   onDelete: (product: ProductColumn) => void,
   onEdit: (product: ProductColumn) => void,
   onView: (product: ProductColumn) => void,
+  onViewBarcode: (product: ProductColumn) => void,
   t: (key: string) => string
 ): ActionItem<ProductColumn>[] => [
   {
@@ -38,6 +39,12 @@ const getProductActions = (
     label: t("DataTable.edit"),
     icon: <Edit />,
     onClick: () => onEdit(product),
+  },
+  {
+    type: "command",
+    label: "Xem mã vạch",
+    icon: <QrCode />,
+    onClick: () => onViewBarcode(product),
   },
   { type: "separator" },
   {
@@ -53,10 +60,12 @@ export const productsColumns = ({
   onDelete,
   onEdit,
   onView,
+  onViewBarcode,
 }: {
   onDelete: (product: ProductColumn) => void;
   onEdit: (product: ProductColumn) => void;
   onView: (product: ProductColumn) => void;
+  onViewBarcode: (product: ProductColumn) => void;
 }): ColumnDef<ProductColumn>[] => {
   const t = useTranslations('admin.ModuleProduct');
 
@@ -90,12 +99,11 @@ export const productsColumns = ({
         header: () => t("DataTable.image"),
         cell: ({ row }) => {
             const imageUrl = row.original.image || '/images/image-placeholder.jpg';
-            const productUrl = getProductUrl(row.original.name, row.original.id);
             return (
                 <div 
                     className="cursor-pointer" 
-                    onClick={() => window.open(productUrl, '_blank')}
-                    title={`Xem sản phẩm: ${row.original.name}`}
+                    onClick={() => onEdit(row.original)}
+                    title={`Chỉnh sửa sản phẩm: ${row.original.name}`}
                 >
                     <Image
                         src={imageUrl}
@@ -114,12 +122,11 @@ export const productsColumns = ({
         accessorKey: "name",
         header: () => t("DataTable.name"),
         cell: ({ row }) => {
-            const productUrl = getProductUrl(row.original.name, row.original.id);
             return (
                 <span 
                     className="font-medium line-clamp-3 w-40 whitespace-normal cursor-pointer hover:underline"
-                    title={`Click để mở trang: ${productUrl}`}
-                    onClick={() => window.open(productUrl, '_blank')}
+                    title={`Chỉnh sửa sản phẩm: ${row.original.name}`}
+                    onClick={() => onEdit(row.original)}
                 >
                     {row.original.name}
                 </span>
@@ -208,7 +215,7 @@ export const productsColumns = ({
       cell: ({ row }) => (
         <DataTableRowActions
           row={row}
-          actions={getProductActions(row.original, onDelete, onEdit, onView, t)}
+          actions={getProductActions(row.original, onDelete, onEdit, onView, onViewBarcode, t)}
         />
       ),
     },

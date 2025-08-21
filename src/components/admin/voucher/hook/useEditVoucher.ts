@@ -47,6 +47,11 @@ const determineUseCaseFromVoucher = (voucher: Discount, userRole: string): Vouch
     return VoucherUseCase.PRODUCT_ADMIN;
   }
 
+  // Case 9: PRIVATE_ADMIN voucher (ADMIN only) - private voucher created by admin
+  if (userRole === 'ADMIN' && voucher.displayType === 'PRIVATE' && !shopId) {
+    return VoucherUseCase.PRIVATE_ADMIN;
+  }
+
   // Case 2: PRODUCT voucher (SELLER)
   if (voucherType === 'PRODUCT' && productIds && productIds.length > 0) {
     return VoucherUseCase.PRODUCT;

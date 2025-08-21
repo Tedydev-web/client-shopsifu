@@ -40,6 +40,8 @@ export default function NewVoucherPage() {
         return VoucherUseCase.SHOP_ADMIN;
       case '8':
         return VoucherUseCase.PRODUCT_ADMIN;
+      case '9':
+        return VoucherUseCase.PRIVATE_ADMIN;
       default:
         return VoucherUseCase.SHOP;
     }
@@ -63,6 +65,8 @@ export default function NewVoucherPage() {
         return 'Tạo Voucher Shop (Admin)';
       case VoucherUseCase.PRODUCT_ADMIN:
         return 'Tạo Voucher Sản Phẩm (Admin)';
+      case VoucherUseCase.PRIVATE_ADMIN:
+        return 'Tạo Voucher Riêng Tư (Admin)';
       default:
         return t('title_shop');
     }

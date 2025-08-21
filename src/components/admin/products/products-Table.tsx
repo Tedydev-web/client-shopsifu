@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useProducts, ProductColumn } from './useProducts';
 import { productsColumns } from './products-Columns';
 import { useTranslations } from 'next-intl';
@@ -15,12 +15,18 @@ import SearchInput from '@/components/ui/data-table-component/search-input';
 import DataTableViewOption from '@/components/ui/data-table-component/data-table-view-option';
 import { ProductsFilter } from './products-Filter';
 import { ProductsExportData } from './products-ExportData';
+import ProductModalBarcode from './product-ModalBarcode';
 import type { Table as TanstackTable } from '@tanstack/react-table';
 import { useDataTable } from '@/hooks/useDataTable';
 
 export function ProductsTable() {
   const t = useTranslations('admin.ModuleProduct');
   const router = useRouter();
+  
+  // State cho modal barcode
+  const [barcodeModalOpen, setBarcodeModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductColumn | null>(null);
+  
   const {
     data,
     loading,
@@ -50,7 +56,17 @@ export function ProductsTable() {
     window.open(productUrl, '_blank');
   };
 
-  const columns = productsColumns({ onEdit, onDelete: handleOpenDelete, onView });
+  const onViewBarcode = (product: ProductColumn) => {
+    setSelectedProduct(product);
+    setBarcodeModalOpen(true);
+  };
+
+  const handleCloseBarcodeModal = () => {
+    setBarcodeModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const columns = productsColumns({ onEdit, onDelete: handleOpenDelete, onView, onViewBarcode });
   const table = useDataTable({ data, columns });
 
   // Tạo component riêng cho Search và Filter để tránh re-render
@@ -115,6 +131,12 @@ export function ProductsTable() {
         loading={deleteLoading}
         title={t('DeleteModal.title')}
         description={t('DeleteModal.description')}
+      />
+
+      <ProductModalBarcode
+        product={selectedProduct}
+        isOpen={barcodeModalOpen}
+        onClose={handleCloseBarcodeModal}
       />
     </div>
   );

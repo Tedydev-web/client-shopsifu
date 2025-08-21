@@ -250,17 +250,25 @@ export default function VoucherShowSettings({ formData, updateFormData, useCase,
       VoucherUseCase.PRODUCT_ADMIN
     ].includes(useCase);
 
-    if (useCase === VoucherUseCase.PRIVATE) {
-      // For PRIVATE case, show a disabled 'Không công khai' option.
+    if (useCase === VoucherUseCase.PRIVATE || useCase === VoucherUseCase.PRIVATE_ADMIN) {
+      // For PRIVATE and PRIVATE_ADMIN cases, show a disabled 'Không công khai' option.
+      const isAdminPrivate = useCase === VoucherUseCase.PRIVATE_ADMIN;
       return (
         <div className="flex items-start space-x-6">
           <RequiredLabel htmlFor="display-type" className="mt-3 whitespace-nowrap">Cài đặt hiển thị</RequiredLabel>
           <RadioGroup value="PRIVATE" className="w-full">
-            <div className="flex items-center space-x-2 p-3 rounded-lg bg-gray-100 border border-gray-200">
+            <div className={`flex items-center space-x-2 p-3 rounded-lg border ${isAdminPrivate ? 'bg-red-50 border-red-200' : 'bg-gray-100 border-gray-200'}`}>
               <RadioGroupItem value="PRIVATE" id="display-private" checked={true} disabled />
               <Label htmlFor="display-private" className="font-normal text-gray-900">
-                Không công khai
-                <p className="text-xs text-gray-600 mt-1">Voucher sẽ không được hiển thị ở bất cứ đâu trên Shop.</p>
+                <div className="flex items-center gap-2">
+                  <span>Không công khai {isAdminPrivate ? '(Admin)' : ''}</span>
+                  {isAdminPrivate && (
+                    <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Platform</span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-600 mt-1">
+                  Voucher sẽ không được hiển thị ở bất cứ đâu trên {isAdminPrivate ? 'nền tảng' : 'Shop'}.
+                </p>
               </Label>
             </div>
           </RadioGroup>
@@ -451,6 +459,45 @@ export default function VoucherShowSettings({ formData, updateFormData, useCase,
                 </p>
               </div>
               {renderProductSelector()}
+            </div>
+          </div>
+        );
+      case VoucherUseCase.PRIVATE_ADMIN:
+        // For PRIVATE_ADMIN case, show product selector with admin privileges and private styling.
+        return (
+          <div className="flex items-start space-x-6">
+            <RequiredLabel htmlFor="apply-type" className="mt-3 whitespace-nowrap">Sản phẩm được áp dụng</RequiredLabel>
+            <div className="w-full space-y-3">
+              <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm text-red-800 font-medium">🔒 Voucher riêng tư (Admin)</span>
+                  <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">Platform Private</span>
+                </div>
+                <p className="text-xs text-red-600">
+                  Voucher riêng tư cấp Admin - có thể áp dụng cho tất cả sản phẩm hoặc sản phẩm cụ thể trên toàn nền tảng.
+                </p>
+              </div>
+              <RadioGroup
+                value={formData.discountApplyType || 'ALL'}
+                onValueChange={(value) => updateFormData('discountApplyType', value)}
+                className="w-full space-y-3"
+              >
+                <div className="flex items-center space-x-2 p-3 rounded-lg border border-red-200 hover:bg-red-50 transition-colors">
+                  <RadioGroupItem value="ALL" id="apply-all-admin" />
+                  <Label htmlFor="apply-all-admin" className="font-normal cursor-pointer text-gray-900">
+                    Tất cả sản phẩm trên nền tảng
+                  </Label>
+                </div>
+                <div className="p-3 rounded-lg border border-red-200 hover:bg-red-50 transition-colors">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <RadioGroupItem value="SPECIFIC" id="apply-specific-admin" />
+                    <Label htmlFor="apply-specific-admin" className="font-normal cursor-pointer text-gray-900">
+                      Sản phẩm cụ thể
+                    </Label>
+                  </div>
+                  {formData.discountApplyType === 'SPECIFIC' && renderProductSelector()}
+                </div>
+              </RadioGroup>
             </div>
           </div>
         );

@@ -309,6 +309,8 @@
       "shopAdminVoucherDesc": "Mã giảm giá được quản lý và phát hành bởi quản trị viên cửa hàng.",
       "productAdminVoucher": "Mã giảm giá sản phẩm",
       "productAdminVoucherDesc": "Chỉ áp dụng cho các sản phẩm được chỉ định bởi quản trị viên.",
+      "privateAdminVoucher": "Mã giảm giá riêng tư (Admin)",
+      "privateAdminVoucherDesc": "Mã giảm giá riêng tư cấp nền tảng - chỉ những người có mã mới sử dụng được.",
       "create": "Tạo",
       "Table":{
         "voucherInfo": "Thông tin voucher",
