@@ -6,5 +6,6 @@ export enum VoucherUseCase {
   CATEGORIES = '5',
   BRAND = '6',
   SHOP_ADMIN = '7',
-  PRODUCT_ADMIN = '8'
+  PRODUCT_ADMIN = '8',
+  PRIVATE_ADMIN = '9'
 }

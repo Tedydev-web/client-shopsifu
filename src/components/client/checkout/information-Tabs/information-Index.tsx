@@ -84,8 +84,8 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
 
     setFormData(prev => ({ ...prev, [name]: val }));
     
-    // Reset selected address if user starts typing in address fields
-    if (['receiverName', 'receiverPhone', 'province', 'district', 'ward', 'address'].includes(name)) {
+    // Only reset selected address if user manually changes address fields (not programmatic changes)
+    if (['province', 'district', 'ward', 'address'].includes(name) && selectedAddress?.id) {
       setSelectedAddress(null);
     }
   };
@@ -96,7 +96,10 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
 
   const handleSelectExistingAddress = (address: Address) => {
     // Prevent unnecessary updates
-    if (JSON.stringify(address) === JSON.stringify(selectedAddress)) {
+    const currentAddressString = JSON.stringify(selectedAddress);
+    const newAddressString = JSON.stringify(address);
+    
+    if (currentAddressString === newAddressString) {
       return;
     }
     
@@ -119,20 +122,19 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       });
     }
 
-    // Cập nhật formData với thông tin từ địa chỉ đã chọn - CHỈ CẬP NHẬT PHẦN ĐỊA CHỈ
-    const updatedFormData = {
-      ...formData,
-      province: isExistingAddress ? safeProvince : '', // Nếu là địa chỉ mới, xóa các thông tin địa chỉ
+    // Update selectedAddress first
+    setSelectedAddress(isExistingAddress ? address : null);
+
+    // Then batch the form data update
+    setFormData(prev => ({
+      ...prev,
+      receiverName: address.receiverName || prev.receiverName,
+      receiverPhone: address.receiverPhone || prev.receiverPhone,
+      province: isExistingAddress ? safeProvince : '',
       district: isExistingAddress ? safeDistrict : '',
       ward: isExistingAddress ? safeWard : '',
       address: isExistingAddress ? safeAddressDetail : ''
-    };
-    
-    // First update formData
-    setFormData(updatedFormData);
-    
-    // Then update selectedAddress - this order matters to avoid extra render cycles
-    setSelectedAddress(isExistingAddress ? address : null);
+    }));
   };
 
   const handleSubmit = () => {

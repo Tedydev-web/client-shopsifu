@@ -31,7 +31,7 @@ export function useReset() {
 
       
       showToast(response.message, 'success')
-      router.replace(ROUTES.BUYER.SIGNIN)
+      router.replace(ROUTES.AUTH.SIGNIN)
     } catch (error) {
       showToast(parseApiError(error), 'error')
     } finally {

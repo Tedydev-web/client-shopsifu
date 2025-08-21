@@ -1,8 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
-import { ROUTES } from '@/constants/route';
+import { 
+  ROUTES, 
+  PROTECTED_ROUTES, 
+  PUBLIC_ROUTES, 
+  ADMIN_ONLY_ROUTES, 
+  SELLER_ALLOWED_ROUTES 
+} from '@/constants/route';
 import { showToast } from '@/components/ui/toastify';
-import { useUserData } from './useGetData-UserLogin'; // Import hook lấy data từ Redux
+import { useUserData } from './useGetData-UserLogin';
 
 interface UseAuthGuardOptions {
   redirectTo?: string;
@@ -12,7 +18,7 @@ interface UseAuthGuardOptions {
 
 export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
   const {
-    redirectTo = ROUTES.BUYER.SIGNIN,
+    redirectTo = ROUTES.AUTH.SIGNIN,
     showToastMessage = true,
     silentCheck = false
   } = options;
@@ -20,15 +26,15 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // 1. Gọi hook useUserData ở cấp cao nhất
+  // Gọi hook useUserData ở cấp cao nhất
   const userData = useUserData();
 
-  // 2. Định nghĩa lại hàm checkAuth để sử dụng cả cookie và data từ Redux
+  // Logic kiểm tra authentication
   const checkAuth = useCallback(() => {
     try {
       const accessToken = Cookies.get('access_token');
       const hasToken = !!accessToken;
-      const hasReduxData = !!userData; // userData sẽ là null nếu không có dữ liệu
+      const hasReduxData = !!userData;
 
       // Điều kiện: có token HOẶC có dữ liệu trong Redux
       const isAuthed = hasToken || hasReduxData;
@@ -42,7 +48,59 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
       setIsLoading(false);
       return false;
     }
-  }, [userData]); // Phụ thuộc vào userData, sẽ chạy lại khi user đăng nhập/đăng xuất
+  }, [userData]);
+
+  // Logic kiểm tra route permissions
+  const checkRouteAccess = useCallback((pathname: string) => {
+    // Kiểm tra route types
+    const isProtectedRoute = PROTECTED_ROUTES.some(route => 
+      pathname === route || pathname.startsWith(route)
+    );
+    
+    const isPublicRoute = PUBLIC_ROUTES.some(route => 
+      pathname === route || pathname.startsWith(route.replace(':slug', '').replace(':id', ''))
+    );
+    
+    const isAdminRoute = pathname.startsWith('/admin');
+
+    // Kiểm tra quyền truy cập admin routes
+    const canAccessAdminRoute = (userRole: string) => {
+      if (!isAdminRoute) return true; // Không phải admin route thì OK
+      
+      // ADMIN có thể truy cập tất cả
+      if (userRole === 'ADMIN') return true;
+      
+      // SELLER chỉ được truy cập routes được phép
+      if (userRole === 'SELLER') {
+        return SELLER_ALLOWED_ROUTES.some(route => 
+          pathname === route || pathname.startsWith(route)
+        );
+      }
+      
+      // CLIENT không được truy cập admin routes
+      return false;
+    };
+
+    return {
+      isProtectedRoute,
+      isPublicRoute,
+      isAdminRoute,
+      canAccessAdminRoute
+    };
+  }, []);
+
+  // Lấy redirect URL dựa trên role
+  const getHomeRedirectByRole = useCallback((userRole: string) => {
+    switch (userRole?.toUpperCase()) {
+      case 'ADMIN':
+      case 'SELLER':
+        return '/admin';
+      case 'CLIENT':
+      case 'CUSTOMER':
+      default:
+        return '/';
+    }
+  }, []);
 
   useEffect(() => {
     checkAuth();
@@ -85,10 +143,18 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
     const isAuthed = checkAuth();
     if (!isAuthed && showToastMessage) {
       showToast('Vui lòng đăng nhập để tiếp tục', 'error');
-      // Có thể thêm logic redirect ở đây nếu cần
     }
     return isAuthed;
   };
 
-  return { isAuthenticated, isLoading, withAuth, requireAuth, checkAuth };
+  return { 
+    isAuthenticated, 
+    isLoading, 
+    userData,
+    withAuth, 
+    requireAuth, 
+    checkAuth,
+    checkRouteAccess,
+    getHomeRedirectByRole
+  };
 };

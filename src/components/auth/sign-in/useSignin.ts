@@ -35,12 +35,12 @@ export function useSignin() {
       // if (response.status === 200) {
       //   // Handle 2FA/OTP redirection first
       //   if (response.verificationType === 'OTP') {
-      //     router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
+      //     router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=OTP`);
       //     showToast(response.message || t('auth.device.verification.required'), 'info');
       //     return;
       //   }	
       //   if (response.verificationType === '2FA') {
-      //     router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
+      //     router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=TOTP`);
       //     showToast(response.message || t('auth.device.verification.required'), 'info');
       //     return;
       //   }

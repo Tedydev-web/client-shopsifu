@@ -56,7 +56,7 @@ export default function VoucherFormCreate() {
     }
   ];
 
-  // Danh sách voucher cho ADMIN (5 loại platform)
+  // Danh sách voucher cho ADMIN (6 loại platform)
   const adminVoucherTypes: VoucherType[] = [
     {
       id: 'platform',
@@ -97,13 +97,21 @@ export default function VoucherFormCreate() {
       icon: Star,
       redirect: `/admin/voucher/new?usecase=8&owner=PLATFORM`,
       requiredRole: 'ADMIN'
+    },
+    {
+      id: 'private-admin',
+      nameKey: 'privateAdminVoucher',
+      descKey: 'privateAdminVoucherDesc',
+      icon: Users,
+      redirect: `/admin/voucher/new?usecase=9&owner=PLATFORM`,
+      requiredRole: 'ADMIN'
     }
   ];
 
   // Xác định danh sách voucher hiển thị dựa trên role
   const getVoucherTypes = () => {
     if (isAdmin) {
-      return adminVoucherTypes; // ADMIN chỉ thấy 5 loại platform vouchers
+      return adminVoucherTypes; // ADMIN thấy 6 loại platform vouchers (bao gồm cả private admin)
     } else if (isSeller) {
       return sellerVoucherTypes; // SELLER chỉ thấy 3 loại cơ bản
     }

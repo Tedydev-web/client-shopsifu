@@ -27,12 +27,12 @@ export const usePasswordChangePassword = () => {
       showToast(response.message, "success");
 
       if (response.verificationType === "OTP") {
-        router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP`);
+        router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=OTP`);
         return { success: false, timestamp: null };
       }
 
       if (response.verificationType === "2FA") {
-        router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP`);
+        router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=TOTP`);
         return { success: false, timestamp: null };
       }
 
