@@ -184,5 +184,7 @@ export const API_ENDPOINTS = {
   },
   SHIPPING:{
     CALCULATE_FEE: `${API_BASE}/shipping/calculate-fee`,
+    SERVICE: `${API_BASE}/shipping/services`,
+    DELIVERY_TIME: `${API_BASE}/shipping/delivery-time`
   }
 }

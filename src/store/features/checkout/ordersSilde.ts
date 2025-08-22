@@ -13,6 +13,14 @@ interface CommonOrderInfo {
   } | null;
   paymentGateway: string | null;
   amount: number;
+  shipping: {
+    provinceId: string;
+    districtId: string;
+    wardCode: string;
+    provinceName?: string;
+    districtName?: string;
+    wardName?: string;
+  } | null;
 }
 
 // Thông tin riêng cho từng shop
@@ -41,6 +49,7 @@ const initialState: CheckoutState = {
     receiver: null,
     paymentGateway: null,
     amount: 0,
+    shipping: null,
   },
   shopOrders: [],
   shopProducts: {},
@@ -59,6 +68,17 @@ const checkoutSlice = createSlice({
     // Cập nhật thông tin chung (người nhận, cổng thanh toán)
     setCommonInfo(state, action: PayloadAction<Partial<CommonOrderInfo>>) {
       state.commonInfo = { ...state.commonInfo, ...action.payload };
+    },
+    // Cập nhật thông tin shipping
+    setShippingInfo(state, action: PayloadAction<{
+      provinceId: string;
+      districtId: string;
+      wardCode: string;
+      provinceName?: string;
+      districtName?: string;
+      wardName?: string;
+    }>) {
+      state.commonInfo.shipping = action.payload;
     },
     // Thiết lập danh sách các đơn hàng theo shop
     // Thiết lập thông tin sản phẩm chi tiết cho các shop
@@ -106,6 +126,7 @@ const checkoutSlice = createSlice({
 // --- Actions ---
 export const {
   setCommonInfo,
+  setShippingInfo,
   setShopProducts,
   setShopOrders,
   updateDiscountForShop,
@@ -132,6 +153,12 @@ export const selectAppliedPlatformVoucher = createSelector(
 export const selectCommonOrderInfo = createSelector(
   [selectCheckoutState],
   (checkout) => checkout.commonInfo
+);
+
+// Selector để lấy thông tin shipping
+export const selectShippingInfo = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.commonInfo.shipping
 );
 
 // Selector để lấy thông tin các đơn hàng theo shop

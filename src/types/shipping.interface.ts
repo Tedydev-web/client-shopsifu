@@ -49,15 +49,28 @@ export interface GetWardsResponse extends BaseShippingResponse<Ward[]> {}
 export interface CalculateShippingFeeRequest {
   from_district_id: number;
   to_district_id: number;
+  from_ward_code: string;
   to_ward_code: string;
+  service_id?: number;
   weight: number;
   length?: number;
   width?: number;
   height?: number;
-  service_id?: number;
-  service_type_id?: number;
 }
 
+export interface DeliveryTimeRequest{
+  service_id: number;
+  to_district_id: number;
+  to_ward_code: string;
+  from_district_id: number;
+  from_ward_code: string
+}
+export interface DeliveryTimeResponse {
+  data:{
+    leadtime: number;
+    expected_delivery_time: string;
+  }
+}
 export interface ShippingFee {
   total: number;
   service_fee: number;
@@ -74,4 +87,15 @@ export interface ShippingFee {
   cod_failed_fee: number;
 }
 
+export interface ShippingServiceResponse{
+  data:{
+    service_id: number
+    short_name: string
+    service_type_id: number;
+    config_fee_id: string
+    extra_cost_id: string
+    standard_config_fee_id: string
+    standard_extra_cost_id: string
+  }
+}
 export interface CalculateShippingFeeResponse extends BaseShippingResponse<ShippingFee> {}
