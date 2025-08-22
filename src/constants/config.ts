@@ -4,4 +4,5 @@ export const CONFIG = {
   DEFAULT_LANGUAGE: 'vi',
   ITEMS_PER_PAGE: 10,
   // ... các config khác
+  
 }
