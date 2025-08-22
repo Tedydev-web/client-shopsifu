@@ -87,15 +87,17 @@ export interface ShippingFee {
   cod_failed_fee: number;
 }
 
-export interface ShippingServiceResponse{
-  data:{
-    service_id: number
-    short_name: string
-    service_type_id: number;
-    config_fee_id: string
-    extra_cost_id: string
-    standard_config_fee_id: string
-    standard_extra_cost_id: string
-  }
+export interface ShippingService {
+  service_id: number;
+  short_name: string;
+  service_type_id: number;
+  config_fee_id: string;
+  extra_cost_id: string;
+  standard_config_fee_id: string;
+  standard_extra_cost_id: string;
+}
+
+export interface ShippingServiceResponse {
+  data: ShippingService | ShippingService[];
 }
 export interface CalculateShippingFeeResponse extends BaseShippingResponse<ShippingFee> {}

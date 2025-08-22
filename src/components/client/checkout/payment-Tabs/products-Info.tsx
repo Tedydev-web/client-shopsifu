@@ -14,7 +14,7 @@ import Image from 'next/image';
 import { PiStorefrontLight } from "react-icons/pi";
 import { VoucherButton } from "@/components/client/checkout/shared/cart-ModalVoucher";
 import { ShippingModal } from "@/components/client/checkout/shared/cart-ModalShipping";
-import { Truck, Clock, MapPin } from 'lucide-react';
+import { Truck, Clock } from 'lucide-react';
 
 // Header component for the product list - desktop only
 function ProductHeader() {
@@ -125,7 +125,7 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
       </div>
 
       {/* Footer: Voucher, Shipping & Total */}
-      <div className="px-4 lg:px-6 py-4 bg-gray-50/50 border-t">
+      <div className="py-4 bg-gray-50/50 border-t">
         <div className="flex flex-col gap-4">
           {/* Voucher Section */}
           <div className="">
@@ -138,29 +138,24 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
           </div>
           
           {/* Shipping Method Section */}
-          <div className="border rounded-lg p-3 bg-white">
+          <div className="border-t border-dashed border-gray-300 pt-3 bg-[#FAFDFF] px-6">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <Truck className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">Phương thức vận chuyển:</span>
-                  <span className="text-sm font-semibold text-blue-600">{selectedShippingMethod.name}</span>
+                  <span className="text-sm text-black">Phương thức vận chuyển:</span>
+                  <span className="text-sm text-black">{selectedShippingMethod.name}</span>
                 </div>
                 
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-xs text-gray-600">
-                    <Clock className="h-3 w-3" />
-                    <span>{selectedShippingMethod.estimatedTime}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-600">
-                    <MapPin className="h-3 w-3" />
-                    <span>Nhận Voucher trị giá ₫15.000 nếu đơn hàng được giao đến bạn sau ngày 26 Tháng 8 2025</span>
+                  <div className="flex items-center gap-2 text-xs text-[rgb(38,170,153)]">
+                    <Truck className="h-4 w-4" />
+                    <span>Đảm bảo nhận hàng từ {selectedShippingMethod.estimatedTime}</span>
                   </div>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-blue-600">
+                <span className="text-gray-700 font-medium text-sm">
                   ₫{selectedShippingMethod.price.toLocaleString()}
                 </span>
                 <button
@@ -192,7 +187,7 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
           </div> */}
 
           {/* Total */}
-          <div className="flex items-center justify-end gap-3 pt-2 border-t">
+          <div className="flex items-center justify-end gap-3 pt-2 px-6 border-t border-dashed">
             <span className="text-sm text-gray-600">Tổng tiền:</span>
             <span className="text-xl font-bold text-primary">
               ₫{finalTotal.toLocaleString()}

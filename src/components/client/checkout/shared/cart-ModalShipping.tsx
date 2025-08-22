@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Truck, Clock, MapPin, Package, Shield } from 'lucide-react';
+import { Truck, Clock, MapPin, Package, Shield, Loader2 } from 'lucide-react';
+import { useShipping } from '../hooks/useShipping';
 
 interface ShippingMethod {
   id: string;
@@ -14,8 +15,14 @@ interface ShippingMethod {
   price: number;
   estimatedTime: string;
   description: string;
-  features?: string[];
+  features: string[];
   icon: 'truck' | 'package' | 'shield';
+  service_id: number;
+  service_type_id: number;
+  config_fee_id: string;
+  extra_cost_id: string;
+  standard_config_fee_id: string;
+  standard_extra_cost_id: string;
 }
 
 interface ShippingModalProps {
@@ -25,36 +32,6 @@ interface ShippingModalProps {
   currentMethod?: ShippingMethod;
   onSelectMethod: (method: ShippingMethod) => void;
 }
-
-const mockShippingMethods: ShippingMethod[] = [
-  {
-    id: 'standard',
-    name: 'Nhanh',
-    price: 37700,
-    estimatedTime: '24 Tháng 8 - 26 Tháng 8',
-    description: 'Đảm bảo nhận hàng từ 24 Tháng 8 - 26 Tháng 8',
-    features: ['Nhận Voucher trị giá ₫15.000 nếu đơn hàng được giao đến bạn sau ngày 26 Tháng 8 2025'],
-    icon: 'truck'
-  },
-  {
-    id: 'express',
-    name: 'Hỏa Tốc',
-    price: 45000,
-    estimatedTime: '23 Tháng 8 - 24 Tháng 8',
-    description: 'Giao hàng siêu nhanh trong 1-2 ngày',
-    features: ['Ưu tiên xử lý đơn hàng', 'Giao hàng trong ngày làm việc'],
-    icon: 'package'
-  },
-  {
-    id: 'safe',
-    name: 'Tiết Kiệm',
-    price: 25000,
-    estimatedTime: '26 Tháng 8 - 28 Tháng 8',
-    description: 'Phương thức giao hàng tiết kiệm',
-    features: ['Thời gian giao hàng linh hoạt', 'Chi phí thấp nhất'],
-    icon: 'shield'
-  }
-];
 
 const getIcon = (iconType: 'truck' | 'package' | 'shield') => {
   switch (iconType) {
@@ -70,10 +47,35 @@ const getIcon = (iconType: 'truck' | 'package' | 'shield') => {
 };
 
 export function ShippingModal({ isOpen, onClose, shopName, currentMethod, onSelectMethod }: ShippingModalProps) {
-  const [selectedMethod, setSelectedMethod] = useState<string>(currentMethod?.id || 'standard');
+  const [selectedMethod, setSelectedMethod] = useState<string>(currentMethod?.id || '');
+  const { shippingMethods, loading, error } = useShipping();
+
+  // Use API data only - no fallback to mock data
+  const availableMethods = shippingMethods.map(service => ({
+    id: service.id,
+    name: service.name,
+    price: service.price,
+    estimatedTime: service.estimatedTime,
+    description: service.description,
+    features: service.features,
+    icon: service.icon,
+    service_id: service.service_id,
+    service_type_id: service.service_type_id,
+    config_fee_id: service.config_fee_id,
+    extra_cost_id: service.extra_cost_id,
+    standard_config_fee_id: service.standard_config_fee_id,
+    standard_extra_cost_id: service.standard_extra_cost_id,
+  }));
+
+  // Set default selected method when methods are loaded
+  useEffect(() => {
+    if (availableMethods.length > 0 && !selectedMethod) {
+      setSelectedMethod(availableMethods[0].id);
+    }
+  }, [availableMethods, selectedMethod]);
 
   const handleConfirm = () => {
-    const method = mockShippingMethods.find(m => m.id === selectedMethod);
+    const method = availableMethods.find((m: ShippingMethod) => m.id === selectedMethod);
     if (method) {
       onSelectMethod(method);
     }
@@ -94,59 +96,78 @@ export function ShippingModal({ isOpen, onClose, shopName, currentMethod, onSele
         </DialogHeader>
 
         <div className="space-y-4">
-          <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
-            {mockShippingMethods.map((method) => (
-              <div
-                key={method.id}
-                className={`border rounded-lg p-4 transition-all cursor-pointer ${
-                  selectedMethod === method.id 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => setSelectedMethod(method.id)}
-              >
-                <div className="flex items-start space-x-3">
-                  <RadioGroupItem value={method.id} id={method.id} className="mt-1" />
-                  <div className="flex-1">
-                    <Label htmlFor={method.id} className="cursor-pointer">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {getIcon(method.icon)}
-                          <span className="font-medium text-base">{method.name}</span>
-                          <span className="text-lg font-semibold text-blue-600">
-                            ₫{method.price.toLocaleString()}
-                          </span>
-                        </div>
-                        <Badge variant="secondary" className="bg-green-100 text-green-700">
-                          {selectedMethod === method.id ? 'Đã chọn' : 'Chọn'}
-                        </Badge>
-                      </div>
-                      
-                      <div className="mt-2 space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Clock className="h-4 w-4" />
-                          <span>{method.estimatedTime}</span>
-                        </div>
-                        
-                        <p className="text-sm text-gray-700">{method.description}</p>
-                        
-                        {method.features && method.features.length > 0 && (
-                          <div className="space-y-1">
-                            {method.features.map((feature, index) => (
-                              <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
-                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
-                                <span>{feature}</span>
-                              </div>
-                            ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin mr-2" />
+              <span>Đang tải phương thức vận chuyển...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                Thử lại
+              </Button>
+            </div>
+          ) : availableMethods.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">Chưa có phương thức vận chuyển khả dụng</p>
+              <p className="text-sm text-gray-500">Vui lòng kiểm tra lại địa chỉ giao hàng</p>
+            </div>
+          ) : (
+            <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
+              {availableMethods.map((method: ShippingMethod) => (
+                <div
+                  key={method.id}
+                  className={`border rounded-lg p-4 transition-all cursor-pointer ${
+                    selectedMethod === method.id 
+                      ? 'border-red-500 bg-red-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setSelectedMethod(method.id)}
+                >
+                  <div className="flex items-start space-x-3">
+                    <RadioGroupItem value={method.id} id={method.id} className="mt-1" />
+                    <div className="flex-1">
+                      <Label htmlFor={method.id} className="cursor-pointer">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {getIcon(method.icon || 'truck')}
+                            <span className="font-medium text-base">{method.name}</span>
+                            <span className="text-lg font-semibold text-red-600">
+                              ₫{(method.price || 0).toLocaleString()}
+                            </span>
                           </div>
-                        )}
-                      </div>
-                    </Label>
+                          <Badge variant="secondary" className="bg-red-100 text-red-700">
+                            {selectedMethod === method.id ? 'Đã chọn' : 'Chọn'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="mt-2 space-y-2">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Clock className="h-4 w-4" />
+                            <span>{method.estimatedTime || 'Đang cập nhật'}</span>
+                          </div>
+                          
+                          <p className="text-sm text-gray-700">{method.description || 'Phương thức vận chuyển'}</p>
+                          
+                          {method.features && method.features.length > 0 && (
+                            <div className="space-y-1">
+                              {method.features.map((feature: string, index: number) => (
+                                <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
+                                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 flex-shrink-0" />
+                                  <span>{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </Label>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </RadioGroup>
+              ))}
+            </RadioGroup>
+          )}
 
           <div className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
@@ -165,7 +186,7 @@ export function ShippingModal({ isOpen, onClose, shopName, currentMethod, onSele
           <Button variant="outline" onClick={onClose} className="flex-1">
             Trở Lại
           </Button>
-          <Button onClick={handleConfirm} className="flex-1 bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleConfirm} className="flex-1 bg-red-600 hover:bg-red-700">
             Xác Nhận
           </Button>
         </div>
