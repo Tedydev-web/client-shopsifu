@@ -10,6 +10,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { CartProvider } from '@/providers/CartContext';
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import ChunkErrorHandler from "@/components/client/landing-page/ChunkgErrorHandler";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
   title: "Shopsifu",
   description: "Mua sắm dễ dàng cùng Shopsifu",
 };
+
 
 export default async function RootLayout({
   children,
@@ -42,6 +44,8 @@ export default async function RootLayout({
                   </CartProvider>
                 </AuthGuard>
                 <Toaster position="bottom-right" />
+                <ChunkErrorHandler />
+              {/* </ClientLayout> */}
             </StoreProvider>
           </ReactQueryProvider>
         </NextIntlClientProvider>
