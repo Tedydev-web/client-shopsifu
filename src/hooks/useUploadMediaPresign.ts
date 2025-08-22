@@ -137,7 +137,7 @@ export function useUploadMediaPresign() {
       }));
 
       toast.success(`Đã sẵn sàng tải lên ${processedFiles.length} tệp`);
-      return presignedData;
+      return { processedFiles, presignedData };
 
     } catch (error: any) {
       console.error('Processing error:', error);
@@ -154,13 +154,16 @@ export function useUploadMediaPresign() {
         description: error.message || 'Vui lòng thử lại sau',
       });
       
-      return [];
+      return { processedFiles: [], presignedData: [] };
     }
   }, [compressImage, getPresignedUrls]);
 
   // Upload files to S3 (separate function)
-  const uploadToS3Multiple = useCallback(async () => {
-    if (state.files.length === 0 || state.presignedData.length === 0) {
+  const uploadToS3Multiple = useCallback(async (files?: FileWithPreview[], presignedData?: PresignedUrlData[]) => {
+    const filesToUpload = files || state.files;
+    const presignedDataToUse = presignedData || state.presignedData;
+    
+    if (filesToUpload.length === 0 || presignedDataToUse.length === 0) {
       toast.error('Không có tệp để tải lên');
       return [];
     }
@@ -174,8 +177,8 @@ export function useUploadMediaPresign() {
     }));
     
     try {
-      const uploadPromises = state.files.map(async (file, index) => {
-        const presignedInfo = state.presignedData[index];
+      const uploadPromises = filesToUpload.map(async (file, index) => {
+        const presignedInfo = presignedDataToUse[index];
         if (!presignedInfo) {
           throw new Error(`No presigned URL for file: ${file.name}`);
         }
@@ -183,7 +186,7 @@ export function useUploadMediaPresign() {
         await uploadToS3(file, presignedInfo.presignedUrl);
         
         // Update progress during upload
-        const uploadProgress = (index + 1) / state.files.length * 100;
+        const uploadProgress = (index + 1) / filesToUpload.length * 100;
         setState(prev => ({ ...prev, progress: uploadProgress }));
         
         return presignedInfo.url; // Return final URL
@@ -270,7 +273,7 @@ export function useUploadMediaPresign() {
     const filesToProcess = filesToUpload || state.files;
     
     if (filesToProcess.length === 0) {
-      return [];
+      return { processedFiles: [], presignedData: [] };
     }
 
     return handleAddFiles(filesToProcess);

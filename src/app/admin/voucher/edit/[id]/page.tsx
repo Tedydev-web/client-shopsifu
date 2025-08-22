@@ -1,15 +1,12 @@
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { discountService } from '@/services/discountService';
 import { Discount } from '@/types/discount.interface';
 import VoucherEditWrapper from '@/components/admin/voucher/edit/edit-Wrapper';
 import { useUserData } from '@/hooks/useGetData-UserLogin';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-
-import { metadataConfig } from '@/lib/metadata'
-import type { Metadata } from 'next'
-export const metadata: Metadata = metadataConfig['/admin/roles']
 
 function EditVoucherContent() {
   const params = useParams();
@@ -89,7 +86,7 @@ function EditVoucherContent() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">

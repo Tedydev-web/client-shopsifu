@@ -34,6 +34,8 @@ function getUseCase(param: string | null): VoucherUseCase {
       return VoucherUseCase.SHOP_ADMIN;
     case '8':
       return VoucherUseCase.PRODUCT_ADMIN;
+    case '9':
+      return VoucherUseCase.PRIVATE_ADMIN;
     default:
       return VoucherUseCase.SHOP;
   }

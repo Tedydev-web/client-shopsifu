@@ -171,7 +171,7 @@ export function CartDropdown() {
             <ShoppingCart size={48} className="text-gray-300 mb-4" />
             <p className="text-gray-500 mb-4">Vui lòng đăng nhập để xem giỏ hàng</p>
             <Button asChild className="bg-red-600 hover:bg-red-700">
-              <Link href={ROUTES.BUYER.SIGNIN}>
+              <Link href={ROUTES.AUTH.SIGNIN}>
                 Đăng nhập
               </Link>
             </Button>

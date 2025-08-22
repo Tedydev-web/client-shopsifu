@@ -25,14 +25,14 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!isLoading) {
       // Nếu chưa đăng nhập và đang ở protected route
       if (!isAuthenticated && isProtectedRoute) {
-        router.push(ROUTES.BUYER.SIGNIN);
+        router.push(ROUTES.AUTH.SIGNIN);
       }
 
       // Nếu đã đăng nhập và đang ở signin/signup page
 
       if (
         isAuthenticated &&
-        (pathname === ROUTES.BUYER.SIGNIN || pathname === ROUTES.BUYER.SIGNUP)
+        (pathname === ROUTES.AUTH.SIGNIN || pathname === ROUTES.AUTH.SIGNUP)
       ) {
         router.push(ROUTES.HOME);
       }

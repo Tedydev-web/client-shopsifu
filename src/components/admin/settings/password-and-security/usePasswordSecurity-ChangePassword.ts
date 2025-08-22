@@ -15,12 +15,12 @@ export const usePasswordSecurityChangePassword = () => {
     try {
       const response = await profileService.changePasswordProfile(data);
       if (response.verificationType === 'OTP') {
-      router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=OTP&changePassword=true`);
+      router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=OTP&changePassword=true`);
       showToast(response.message, 'info');
       return;
     }
     if (response.verificationType === '2FA') {
-      router.push(`${ROUTES.BUYER.VERIFY_2FA}?type=TOTP&changePassword=true`);
+      router.push(`${ROUTES.AUTH.VERIFY_2FA}?type=TOTP&changePassword=true`);
       showToast(response.message, 'info');
       return;
     }

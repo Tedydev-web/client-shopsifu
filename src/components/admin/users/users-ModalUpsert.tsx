@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown, Upload, X, Image as ImageIcon, Camera } from 'lucide-react'
 import { User, UserCreateRequest, UserRole, UserUpdateRequest } from '@/types/admin/user.interface'
-import { useUploadMedia } from '@/hooks/useUploadMedia'
+import { useUploadMediaPresign } from '@/hooks/useUploadMediaPresign'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
 import { userCreateSchema, userUpdateSchema } from '@/utils/schema'
@@ -51,15 +51,18 @@ export default function UsersModalUpsert({
   const { 
     files, 
     uploadedUrls, 
+    presignedData,
+    isProcessing,
     isUploading,
     progress,
+    progressMessage,
     error: uploadError,
     handleAddFiles,
     handleRemoveFile,
     handleRemoveAllFiles,
-    uploadFiles,
+    uploadToS3Multiple,
     reset: resetUpload
-  } = useUploadMedia()
+  } = useUploadMediaPresign()
 
   // Status options
   const STATUS_OPTIONS = [
@@ -112,7 +115,7 @@ export default function UsersModalUpsert({
       // Clear existing files first
       handleRemoveAllFiles();
       
-      // Add the new file (which will be compressed automatically)
+      // Add the new file and process it (compress + get presigned URLs)
       handleAddFiles(e.target.files);
     }
   };
@@ -121,7 +124,19 @@ export default function UsersModalUpsert({
   const handleUploadAvatar = async () => {
     if (files.length === 0) return;
     
-    const urls = await uploadFiles();
+    // Nếu đã có presignedData thì upload luôn, nếu không thì process files trước
+    let urls: string[] = [];
+    
+    if (presignedData.length > 0) {
+      // Đã có presigned URLs, upload trực tiếp
+      urls = await uploadToS3Multiple();
+    } else {
+      // Chưa có presigned URLs, cần process files trước
+      await handleAddFiles(files);
+      // Sau khi process xong, upload
+      urls = await uploadToS3Multiple();
+    }
+    
     if (urls.length > 0) {
       // Use the first uploaded image URL as avatar
       setAvatar(urls[0]);
@@ -291,7 +306,7 @@ export default function UsersModalUpsert({
                     <button 
                       type="button"
                       onClick={() => document.getElementById('avatar-upload')?.click()}
-                      disabled={isUploading}
+                      disabled={isUploading || isProcessing}
                       aria-label={t('admin.users.modal.selectImage') || 'Chọn ảnh đại diện'}
                       title={t('admin.users.modal.selectImage') || 'Chọn ảnh đại diện'}
                       className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 rounded-full transition-opacity"
@@ -309,16 +324,28 @@ export default function UsersModalUpsert({
                       className="bg-muted"
                     />
                     
-                    {/* Upload button only shown when a file is selected */}
-                    {files.length > 0 && (
+                    {/* Upload button - hiển thị khi có files và đã có presigned URLs */}
+                    {files.length > 0 && presignedData.length > 0 && !isUploading && (
                       <Button 
                         type="button"
                         size="sm"
                         onClick={handleUploadAvatar}
-                        disabled={isUploading}
+                        disabled={isUploading || isProcessing}
                         className="w-full"
                       >
                         {isUploading ? t('admin.users.modal.uploading') || 'Đang tải lên...' : t('admin.users.modal.uploadImage') || 'Tải lên'}
+                      </Button>
+                    )}
+                    
+                    {/* Processing button - hiển thị khi đang xử lý files */}
+                    {isProcessing && (
+                      <Button 
+                        type="button"
+                        size="sm"
+                        disabled
+                        className="w-full"
+                      >
+                        {progressMessage || 'Đang xử lý...'}
                       </Button>
                     )}
                   </div>
@@ -329,25 +356,26 @@ export default function UsersModalUpsert({
                   type="file"
                   className="hidden"
                   onChange={handleFileChange}
-                  disabled={isUploading}
+                  disabled={isUploading || isProcessing}
                   accept="image/*"
                   aria-label={t('admin.users.modal.selectImage') || 'Chọn ảnh đại diện'}
                 />
                 
                 {/* Upload progress */}
-                {isUploading && (
+                {(isUploading || isProcessing) && (
                   <div className="space-y-1">
                     <Progress value={progress} className="h-1" />
                     <p className="text-xs text-muted-foreground">
-                      {progress}% {t('admin.users.modal.completed') || 'đã hoàn thành'}
+                      {progress}% {t('admin.users.modal.completed') || 'đã hoàn thành'} - {progressMessage}
                     </p>
                   </div>
                 )}
                 
                 {/* File preview */}
-                {files.length > 0 && !isUploading && (
+                {files.length > 0 && !isUploading && !isProcessing && (
                   <div className="text-xs text-muted-foreground">
                     {files[0].name} ({Math.round(files[0].size / 1024)} KB)
+                    {presignedData.length > 0 && <span className="text-green-600 ml-2">✓ Sẵn sàng tải lên</span>}
                   </div>
                 )}
                 

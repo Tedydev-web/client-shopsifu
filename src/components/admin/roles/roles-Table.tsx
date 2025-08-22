@@ -116,7 +116,7 @@ export default function RolesTable() {
           table={table}
           columns={columns}
           loading={loading}
-          notFoundMessage={t('notFound')}
+          notFoundMessage={t('noData')}
           pagination={{
             metadata: pagination,
             onPageChange: handlePageChange,

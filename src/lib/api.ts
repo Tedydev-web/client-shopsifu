@@ -194,7 +194,7 @@ const handleLogout = async () => {
   // 4. Redirect
   showToast('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại', 'info');
   setTimeout(() => {
-    window.location.href = ROUTES.BUYER.SIGNIN;
+    window.location.href = ROUTES.AUTH.SIGNIN;
   }, 100);
 };
 
@@ -272,7 +272,7 @@ privateAxios.interceptors.response.use(
 
 //       // 4. Redirect to sign-in page after a short delay to allow state changes to process
 //       setTimeout(() => {
-//         window.location.href = ROUTES.BUYER.SIGNIN;
+//         window.location.href = ROUTES.AUTH.SIGNIN;
 //       }, 100);
 //     }
 //     return Promise.reject(error);
@@ -293,8 +293,8 @@ privateAxios.interceptors.response.use(
 //     } catch (error) {
 //       console.error('❌ Không thể làm mới token. Đăng xuất người dùng.', error);
 //       await clearClientState();
-//       if (window.location.pathname !== ROUTES.BUYER.SIGNIN) {
-//         window.location.href = ROUTES.BUYER.SIGNIN;
+//       if (window.location.pathname !== ROUTES.AUTH.SIGNIN) {
+//         window.location.href = ROUTES.AUTH.SIGNIN;
 //       }
 //     }
 //     return;
@@ -325,7 +325,7 @@ privateAxios.interceptors.response.use(
 //       } catch (error) {
 //         console.error('❌ Không thể làm mới token đã hết hạn. Đăng xuất...', error);
 //         await clearClientState();
-//         window.location.href = ROUTES.BUYER.SIGNIN;
+//         window.location.href = ROUTES.AUTH.SIGNIN;
 //       }
 //       return;
 //     }
@@ -345,7 +345,7 @@ privateAxios.interceptors.response.use(
 //   } catch (error) {
 //     console.error('Lỗi khi giải mã hoặc kiểm tra token. Token có thể bị lỗi:', error);
 //     await clearClientState();
-//     window.location.href = ROUTES.BUYER.SIGNIN;
+//     window.location.href = ROUTES.AUTH.SIGNIN;
 //   }
 // }
 // // Interval management

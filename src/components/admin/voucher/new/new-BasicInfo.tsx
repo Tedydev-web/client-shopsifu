@@ -41,6 +41,8 @@ const getVoucherTypeName = (useCase: VoucherUseCase) => {
       return 'Voucher shop (Admin)';
     case VoucherUseCase.PRODUCT_ADMIN:
       return 'Voucher sản phẩm (Admin)';
+    case VoucherUseCase.PRIVATE_ADMIN:
+      return 'Voucher riêng tư (Admin)';
     default:
       return 'Voucher';
   }
@@ -132,7 +134,8 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
       VoucherUseCase.CATEGORIES, 
       VoucherUseCase.BRAND, 
       VoucherUseCase.SHOP_ADMIN, 
-      VoucherUseCase.PRODUCT_ADMIN
+      VoucherUseCase.PRODUCT_ADMIN,
+      VoucherUseCase.PRIVATE_ADMIN
     ].includes(useCase);
 
     if (isAdminCase) {
@@ -187,7 +190,7 @@ export default function VoucherBasicInfo({ formData, updateFormData, errors, use
             <span className={cn("text-xs font-medium", badgeStyle.text)}>{getVoucherTypeName(useCase)}</span>
           </div>
           {/* Thêm badge admin nếu là case admin */}
-          {[VoucherUseCase.PLATFORM, VoucherUseCase.CATEGORIES, VoucherUseCase.BRAND, VoucherUseCase.SHOP_ADMIN, VoucherUseCase.PRODUCT_ADMIN].includes(useCase) && (
+          {[VoucherUseCase.PLATFORM, VoucherUseCase.CATEGORIES, VoucherUseCase.BRAND, VoucherUseCase.SHOP_ADMIN, VoucherUseCase.PRODUCT_ADMIN, VoucherUseCase.PRIVATE_ADMIN].includes(useCase) && (
             <div className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium">
               Admin Only
             </div>
