@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import {
@@ -51,7 +53,7 @@ export const SimpleAddressSelect: React.FC<SimpleAddressSelectProps> = ({
     setSelectedProvinceId(value);
     setSelectedDistrictId('');
     setSelectedWardCode('');
-    
+
     if (onAddressChange) {
       onAddressChange(value, '', '');
     }
@@ -60,7 +62,7 @@ export const SimpleAddressSelect: React.FC<SimpleAddressSelectProps> = ({
   const handleDistrictChange = (value: string) => {
     setSelectedDistrictId(value);
     setSelectedWardCode('');
-    
+
     if (onAddressChange) {
       onAddressChange(selectedProvinceId, value, '');
     }
@@ -68,7 +70,7 @@ export const SimpleAddressSelect: React.FC<SimpleAddressSelectProps> = ({
 
   const handleWardChange = (value: string) => {
     setSelectedWardCode(value);
-    
+
     if (onAddressChange) {
       onAddressChange(selectedProvinceId, selectedDistrictId, value);
     }
