@@ -12,7 +12,7 @@ export const SHIPPING_CONFIG = {
   DEFAULT_FROM: {
     districtId: process.env.NEXT_PUBLIC_FROM_DISTRICT_ID 
       ? parseInt(process.env.NEXT_PUBLIC_FROM_DISTRICT_ID) 
-      : 1052,
+      : 1536,
     wardCode: process.env.NEXT_PUBLIC_FROM_WARD_CODE || "1A0101",
   },
   

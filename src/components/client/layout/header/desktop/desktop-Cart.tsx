@@ -202,8 +202,10 @@ export function CartDropdown() {
               <div className="divide-y divide-gray-200">
                 {allCartItems.map((item: ApiCartItem & { shopName: string }) => {
                   const product = item.sku.product;
-                  const productImage = product.images && product.images.length > 0
-                    ? product.images[0]
+                  // const productImage = product.images && product.images.length > 0
+                  const productImage = item.sku.image
+
+                    ? item.sku.image
                     : '/images/image-placeholder.jpg';
                   
                   return (

@@ -46,6 +46,12 @@ export const useShipping = () => {
     setError(null);
     
     try {
+      console.log('Starting shipping services fetch...');
+      console.log('Request params:', {
+        fromDistrictId: SHIPPING_CONFIG.DEFAULT_FROM.districtId,
+        toDistrictId: parseInt(shippingInfo.districtId!)
+      });
+      
       // Step 1: Get available shipping services
       const servicesResponse: ShippingServiceResponse = await shippingService.getServices({
         fromDistrictId: SHIPPING_CONFIG.DEFAULT_FROM.districtId,

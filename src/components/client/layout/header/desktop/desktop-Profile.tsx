@@ -33,7 +33,7 @@ export function ProfileDropdown() {
   const isOpen = openDropdown === "profile";
 
   // Kiểm tra role từ user data
-  const isAdmin = user?.role?.name === 'ADMIN' || user?.role?.name === 'Super Admin';
+  const isAdmin = user?.role?.name === 'ADMIN' || user?.role?.name === 'Super Admin' || user?.role?.name === 'SELLER';
 
   const menuItems: MenuItemProps[] = [
     {

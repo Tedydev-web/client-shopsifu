@@ -178,13 +178,13 @@ export const API_ENDPOINTS = {
   },
   // QUẢN LÝ VẬN CHUYỂN - SHIPPING - ADDRESS
   ADDRESS:{
-    GET_PROVINCES: `${API_BASE}/shipping/address/provinces`,
-    GET_DISTRICTS: `${API_BASE}/shipping/address/districts`,
-    GET_WARDS: `${API_BASE}/shipping/address/wards`
+    GET_PROVINCES: `${API_BASE}/shipping/ghn/address/provinces`,
+    GET_DISTRICTS: `${API_BASE}/shipping/ghn/address/districts`,
+    GET_WARDS: `${API_BASE}/shipping/ghn/address/wards`
   },
   SHIPPING:{
-    CALCULATE_FEE: `${API_BASE}/shipping/calculate-fee`,
-    SERVICE: `${API_BASE}/shipping/services`,
-    DELIVERY_TIME: `${API_BASE}/shipping/delivery-time`
+    CALCULATE_FEE: `${API_BASE}/shipping/ghn/calculate-fee`,
+    SERVICE: `${API_BASE}/shipping/ghn/services`,
+    DELIVERY_TIME: `${API_BASE}/shipping/ghn/delivery-time`
   }
 }

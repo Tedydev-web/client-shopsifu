@@ -1,20 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { 
   selectShopProducts, 
   applyVoucher, 
   selectAppliedVouchers, 
-  
+  selectShippingInfo
 } from '@/store/features/checkout/ordersSilde';
 import { ProductInfo, AppliedVoucherInfo } from '@/types/order.interface';
 import Image from 'next/image';
 import { PiStorefrontLight } from "react-icons/pi";
 import { VoucherButton } from "@/components/client/checkout/shared/cart-ModalVoucher";
 import { ShippingModal } from "@/components/client/checkout/shared/cart-ModalShipping";
+import { useShipping } from "@/components/client/checkout/hooks/useShipping";
 import { Truck, Clock } from 'lucide-react';
+
+// Define ShippingMethod interface to match the useShipping hook
+interface ShippingMethod {
+  id: string;
+  name: string;
+  price: number;
+  estimatedTime: string;
+  description: string;
+  features: string[];
+  icon: 'truck' | 'package' | 'shield';
+  service_id: number;
+  service_type_id: number;
+  config_fee_id: string;
+  extra_cost_id: string;
+  standard_config_fee_id: string;
+  standard_extra_cost_id: string;
+}
 
 // Header component for the product list - desktop only
 function ProductHeader() {
@@ -84,27 +102,32 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
   const dispatch = useDispatch();
   const appliedVouchers = useSelector<RootState, Record<string, AppliedVoucherInfo>>(selectAppliedVouchers);
   const appliedVoucher = appliedVouchers[shopId];
+  const shippingInfo = useSelector(selectShippingInfo);
   const [isShippingModalOpen, setIsShippingModalOpen] = useState(false);
-  const [selectedShippingMethod, setSelectedShippingMethod] = useState({
-    id: 'standard',
-    name: 'Nhanh',
-    price: 37700,
-    estimatedTime: '24 Tháng 8 - 26 Tháng 8',
-    description: 'Đảm bảo nhận hàng từ 24 Tháng 8 - 26 Tháng 8',
-    features: ['Nhận Voucher trị giá ₫15.000 nếu đơn hàng được giao đến bạn sau ngày 26 Tháng 8 2025'],
-    icon: 'truck' as const
-  });
+  
+  // Use shipping hook to get real shipping data
+  const { shippingMethods, loading: shippingLoading, error: shippingError } = useShipping();
+  
+  // State for selected shipping method - with proper interface
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
 
   const shopName = products.length > 0 ? products[0].shopName : 'Shop';
   const shopTotal = products.reduce((sum, item) => sum + item.subtotal, 0);
-  const finalTotal = shopTotal - (appliedVoucher?.discountAmount || 0) + selectedShippingMethod.price;
+  const finalTotal = shopTotal - (appliedVoucher?.discountAmount || 0) + (selectedShippingMethod?.price || 0);
   const cartItemIds = products.map(p => p.id);
+
+  // Set default shipping method when methods are loaded
+  useEffect(() => {
+    if (shippingMethods.length > 0 && !selectedShippingMethod) {
+      setSelectedShippingMethod(shippingMethods[0]);
+    }
+  }, [shippingMethods, selectedShippingMethod]);
 
   const handleApplyVoucher = (shopId: string, voucherInfo: AppliedVoucherInfo) => {
     dispatch(applyVoucher({ shopId, voucherInfo }));
   };
 
-  const handleSelectShippingMethod = (method: any) => {
+  const handleSelectShippingMethod = (method: ShippingMethod) => {
     setSelectedShippingMethod(method);
   };
 
@@ -139,33 +162,55 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
           
           {/* Shipping Method Section */}
           <div className="border-t border-dashed border-gray-300 pt-3 bg-[#FAFDFF] px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm text-black">Phương thức vận chuyển:</span>
-                  <span className="text-sm text-black">{selectedShippingMethod.name}</span>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-xs text-[rgb(38,170,153)]">
-                    <Truck className="h-4 w-4" />
-                    <span>Đảm bảo nhận hàng từ {selectedShippingMethod.estimatedTime}</span>
+            {shippingLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-sm text-gray-600">Đang tải phương thức vận chuyển...</span>
+              </div>
+            ) : shippingError ? (
+              <div className="text-center py-4">
+                <p className="text-red-600 text-sm mb-2">{shippingError}</p>
+                <p className="text-xs text-gray-500">Vui lòng kiểm tra lại địa chỉ giao hàng</p>
+              </div>
+            ) : !selectedShippingMethod ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600 text-sm mb-2">Chưa có phương thức vận chuyển khả dụng</p>
+                <p className="text-xs text-gray-500">
+                  {!shippingInfo?.districtId || !shippingInfo?.wardCode 
+                    ? 'Vui lòng chọn địa chỉ giao hàng' 
+                    : 'Vui lòng kiểm tra lại địa chỉ giao hàng'
+                  }
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm text-black">Phương thức vận chuyển:</span>
+                    <span className="text-sm text-black">{selectedShippingMethod.name}</span>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-xs text-[rgb(38,170,153)]">
+                      <Truck className="h-4 w-4" />
+                      <span>Đảm bảo nhận hàng từ {selectedShippingMethod.estimatedTime}</span>
+                    </div>
                   </div>
                 </div>
+                
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-700 font-medium text-sm">
+                    ₫{selectedShippingMethod.price.toLocaleString()}
+                  </span>
+                  <button
+                    onClick={() => setIsShippingModalOpen(true)}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
+                  >
+                    Thay Đổi
+                  </button>
+                </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <span className="text-gray-700 font-medium text-sm">
-                  ₫{selectedShippingMethod.price.toLocaleString()}
-                </span>
-                <button
-                  onClick={() => setIsShippingModalOpen(true)}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
-                >
-                  Thay Đổi
-                </button>
-              </div>
-            </div>
+            )}
           </div>
           
           {/* Applied Voucher */}
@@ -201,7 +246,7 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
         isOpen={isShippingModalOpen}
         onClose={() => setIsShippingModalOpen(false)}
         shopName={shopName}
-        currentMethod={selectedShippingMethod}
+        currentMethod={selectedShippingMethod || undefined}
         onSelectMethod={handleSelectShippingMethod}
       />
     </div>
