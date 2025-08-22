@@ -1,6 +1,5 @@
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { discountService } from '@/services/discountService';
 import { Discount } from '@/types/discount.interface';
 import VoucherEditWrapper from '@/components/admin/voucher/edit/edit-Wrapper';
