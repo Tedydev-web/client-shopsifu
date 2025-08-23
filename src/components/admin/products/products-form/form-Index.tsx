@@ -28,40 +28,41 @@ function ProductForm({ initialData, onCreateSuccess }: ProductFormProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
-  {/* === CỘT CHÍNH BÊN TRÁI === */}
-  <div className="grid auto-rows-max items-start gap-4 md:gap-8">
-    <ProductBasicInfoForm 
-      productData={productData}
-      handleInputChange={handleInputChange}
-    />
+      {/* === CỘT CHÍNH BÊN TRÁI === */}
+      <div className="grid auto-rows-max items-start gap-4 md:gap-8">
+        <ProductBasicInfoForm
+          productData={productData}
+          handleInputChange={handleInputChange}
+        />
 
-    <VariantSettingsIndex 
-      variants={productData.variants}
-      skus={productData.skus}
-      setVariants={setVariants}
-      updateSingleSku={updateSingleSku}
-    />
-    
-    <ProductSpecificationsForm 
-      specifications={productData.specifications || []}
-      handleSpecificationsChange={(specs) => handleInputChange('specifications', specs)}
-    />
-  </div>
+        <VariantSettingsIndex
+          variants={productData.variants}
+          skus={productData.skus}
+          setVariants={setVariants}
+          updateSingleSku={updateSingleSku}
+        />
 
-  {/* === CỘT PHỤ BÊN PHẢI === */}
-  <div className="grid auto-rows-max items-start gap-4 md:gap-8">
-    <ProductAsideForm 
-      brandId={productData.brandId}
-      categories={productData.categories}
-      handleInputChange={handleInputChange}
-      handleSubmit={handleSubmit}
-      handleSaveAndAddNew={handleSaveAndAddNew}
-      isSubmitting={isSubmitting}
-      isEditMode={isEditMode}
-    />
-  </div>
-</div>
+        <ProductSpecificationsForm
+          specifications={productData.specifications || []}
+          handleSpecificationsChange={(specs) =>
+            handleInputChange("specifications", specs)
+          }
+        />
+      </div>
 
+      {/* === CỘT PHỤ BÊN PHẢI === */}
+      <div className="grid auto-rows-max items-start gap-4 md:gap-8">
+        <ProductAsideForm
+          brandId={productData.brandId}
+          categories={productData.categories}
+          handleInputChange={handleInputChange}
+          handleSubmit={handleSubmit}
+          handleSaveAndAddNew={handleSaveAndAddNew}
+          isSubmitting={isSubmitting}
+          isEditMode={isEditMode}
+        />
+      </div>
+    </div>
   );
 }
 
