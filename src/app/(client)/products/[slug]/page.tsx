@@ -74,13 +74,12 @@ export default async function Page({ params }: PageProps) {
     // Fetch data cơ bản từ server sử dụng ID đã trích xuất
     const productData = await clientProductsService.getProductDetail(productId);
     console.log(`✅ [Server] Fetched product: ${productData.name} (ID: ${productData.id})`);
-    console.log('✅ [Server] Fetched product data:', JSON.stringify(productData, null, 2));
     
     // Truyền data đã fetch xuống client component thông qua wrapper
     return <ProductPageWrapper slug={slug} initialData={productData} />;
   } catch (error) {
     console.error('❌ [Server] Error fetching product:', error);
-    // Handle error state hoặc redirect
-    return <ProductPageWrapper slug={slug} error={error} />;
+    // Throw error để Next.js error boundary xử lý
+    throw error;
   }
 }
