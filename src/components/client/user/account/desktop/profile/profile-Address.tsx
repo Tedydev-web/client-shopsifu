@@ -276,7 +276,7 @@ export default function AddressBook() {
                     {options.map((o) => (
                       <CommandItem
                         key={String(o.code)}
-                        value={o.name}
+                        value={o.name} // <-- Quan trọng: value chính là text để filter
                         onSelect={() => {
                           field.onChange(o.name);
                           if (onSelect) onSelect(o);
@@ -288,7 +288,8 @@ export default function AddressBook() {
                             field.value === o.name ? "opacity-100" : "opacity-0"
                           )}
                         />
-                        {o.name}
+                        <span>{o.name}</span>{" "}
+                        {/* <-- text hiển thị, đồng bộ với value */}
                       </CommandItem>
                     ))}
                   </CommandGroup>

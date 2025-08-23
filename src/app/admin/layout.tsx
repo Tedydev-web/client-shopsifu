@@ -44,7 +44,5 @@ export default function AdminLayout({
         </main>
       </div>
     </div>
-
-    
   )
 }
