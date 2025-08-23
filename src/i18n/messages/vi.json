@@ -520,7 +520,7 @@
     "sidebar": {
       "dashboard": "Bảng điều khiển",
       "voucher": {
-        "voucher": "Mã giảm giá của Shop",
+        "voucher": "Mã giảm giá",
         "listVoucher": "Danh sách mã giảm giá",
         "newVoucher": "Thêm mới"
       },

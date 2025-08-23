@@ -26,7 +26,7 @@ export default function AdminLayout({
   return (
     <div className="relative min-h-screen bg-background">
       <Header onToggleSidebar={handleToggleSidebar} />
-      <Sidebar isOpen={sidebarOpen} onOpenChange={setSidebarOpen} onCollapse={handleSidebarCollapse} />
+      <Sidebar isOpen={sidebarOpen} onOpenChange={setSidebarOpen} onCollapse={handleSidebarCollapse}/>
       <div
         className={cn(
           "min-h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out",

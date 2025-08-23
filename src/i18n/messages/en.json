@@ -520,7 +520,7 @@
     "sidebar": {
       "dashboard": "Dashboard",
       "voucher": {
-        "voucher": "Shop's discount code",
+        "voucher": "Discount code",
         "listVoucher": "List of discount codes",
         "newVoucher": "Add new"
       },

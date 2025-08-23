@@ -261,7 +261,7 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "bg-white border-r h-[calc(100vh-4rem)] fixed top-16 flex flex-col transition-all duration-300",
+          "bg-white border-r h-[calc(100vh-4rem)] fixed top-16 flex flex-col transition-all duration-300 z-50",
           {
             "inset-y-0 left-0 z-50 h-screen transition-transform duration-300":
               isMobile,
