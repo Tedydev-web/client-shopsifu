@@ -1,22 +1,10 @@
-import VoucherDynamic from "@/components/admin/voucher/voucher-Wrapper";
-import { useTranslations } from "next-intl";
+// src/app/admin/voucher/page.tsx
+import { metadataConfig } from "@/lib/metadata";
+import type { Metadata } from "next";
+import VoucherPageClient from "./VoucherPageClient";
 
-import { metadataConfig } from '@/lib/metadata'
-import type { Metadata } from 'next'
-export const metadata: Metadata = metadataConfig['/admin/voucher']
+export const metadata: Metadata = metadataConfig["/admin/voucher"];
 
 export default function VoucherPage() {
-  const t = useTranslations()
-
-  return(
-    <div className="space-y-6 p-6 bg-white h-full">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">{t("admin.ModuleVouchers.title")}</h2>
-        <p className="text-muted-foreground">
-          {t("admin.ModuleVouchers.subtitle")}
-        </p>
-      </div>
-      <VoucherDynamic />  
-    </div>
-  )
+  return <VoucherPageClient />;
 }

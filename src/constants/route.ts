@@ -7,9 +7,6 @@ export const ROUTES = {
     RESET_PASSWORD: '/reset-password',
     VERIFY_2FA: '/verify-2fa',
     VERIFY_EMAIL: '/verify-email',
-    // MY_ACCOUNT: '/user/dashboard',
-    // MY_ORDERS: '/user/orders',
-    // CART: '/cart'
   },
   CLIENT:{
     SEARCH: '/:slug',

@@ -44,13 +44,6 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
     loadOrder();
   }, [orderId, fetchOrderDetail]);
 
-  const handleCancel = async () => {
-    if (!orderId) return;
-    await cancelOrder(orderId);
-    const res = await fetchOrderDetail(orderId);
-    setOrder(res?.data ?? null);
-  };
-
   const handleCancelClick = () => {
     setShowCancelDialog(true);
   };
