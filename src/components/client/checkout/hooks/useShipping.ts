@@ -44,122 +44,79 @@ export const useShipping = (shopId?: string) => {
   const effectiveShopId = shopId || (shopOrders.length > 0 ? shopOrders[0].shopId : '');
   
   const fetchShippingServices = async () => {
-    // Check if we have required info from Redux and shop address
-    if (!shippingInfo?.districtId || !shippingInfo?.wardCode) {
-      console.log('Missing shipping info:', { districtId: shippingInfo?.districtId, wardCode: shippingInfo?.wardCode });
+    if (!shippingInfo?.districtId || !shippingInfo?.wardCode || !shopAddress) {
       return;
     }
-    
-    if (!shopAddress || addressLoading) {
-      console.log('Shop address not ready:', { shopAddress, addressLoading });
-      return;
-    }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
-      console.log('Starting shipping services fetch...');
-      console.log('Request params:', {
+      const servicesResponse = await shippingService.getServices({
         fromDistrictId: shopAddress.districtId,
-        toDistrictId: parseInt(shippingInfo.districtId!)
+        toDistrictId: parseInt(shippingInfo.districtId),
       });
-      console.log('Shop address being used:', shopAddress);
-      
-      // Step 1: Get available shipping services
-      const servicesResponse: ShippingServiceResponse = await shippingService.getServices({
-        fromDistrictId: shopAddress.districtId,
-        toDistrictId: parseInt(shippingInfo.districtId)
-      });
-      
-      console.log('Services response:', servicesResponse);
-      
-      if (!servicesResponse.data) {
-        throw new Error('No shipping services available');
-      }
-      
-      // Handle both array and single service response
-      const services = Array.isArray(servicesResponse.data) 
-        ? servicesResponse.data 
-        : [servicesResponse.data];
-      
-      // Step 2: For each service, calculate shipping fee and delivery time
-      const enrichedMethods: ShippingMethod[] = await Promise.all(
-        services.map(async (service) => {
+
+      if (servicesResponse.data && Array.isArray(servicesResponse.data) && servicesResponse.data.length > 0) {
+        const shopOrder = shopOrders.find(o => o.shopId === effectiveShopId);
+        const totalWeight = shopOrder?.cartItemIds.length || 1; // Giả định trọng lượng
+
+        const methodsPromises = servicesResponse.data.map(async (service) => {
           try {
-            // Calculate shipping fee
-            const feeRequest: CalculateShippingFeeRequest = {
-              to_district_id: parseInt(shippingInfo.districtId!),
-              to_ward_code: shippingInfo.wardCode!,
-              height: SHIPPING_CONFIG.DEFAULT_PACKAGE.height,
-              weight: SHIPPING_CONFIG.DEFAULT_PACKAGE.weight,
-              length: SHIPPING_CONFIG.DEFAULT_PACKAGE.length,
-              width: SHIPPING_CONFIG.DEFAULT_PACKAGE.width,
-              service_id: service.service_id,
-              from_district_id: shopAddress.districtId,
-              from_ward_code: shopAddress.wardCode,
-            };
-            
             const [feeResponse, timeResponse] = await Promise.all([
-              shippingService.calculateShippingFee(feeRequest),
-              shippingService.calculateDeliveryTime({
-                service_id: service.service_id,
-                to_district_id: parseInt(shippingInfo.districtId!),
-                to_ward_code: shippingInfo.wardCode!,
+              shippingService.calculateShippingFee({
                 from_district_id: shopAddress.districtId,
                 from_ward_code: shopAddress.wardCode,
-              })
+                to_district_id: parseInt(shippingInfo.districtId),
+                to_ward_code: shippingInfo.wardCode,
+                service_id: service.service_id,
+                //insurance_value: 500000, // Cần thay bằng giá trị thực tế
+                weight: totalWeight * 200, // Cần thay bằng trọng lượng thực tế
+                length: 20,
+                width: 20,
+                height: 10,
+              }),
+              shippingService.calculateDeliveryTime({
+                from_district_id: shopAddress.districtId,
+                from_ward_code: shopAddress.wardCode,
+                to_district_id: parseInt(shippingInfo.districtId),
+                to_ward_code: shippingInfo.wardCode,
+                service_id: service.service_id,
+              }),
             ]);
-            
-            console.log(`Service ${service.service_id} - Fee:`, feeResponse, 'Time:', timeResponse);
-            
+
+            const expectedDeliveryDate = new Date(timeResponse.data.expected_delivery_time);
+            const formattedDate = expectedDeliveryDate.toLocaleDateString('vi-VN', {
+              weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric',
+              timeZone: 'Asia/Ho_Chi_Minh',
+            });
+
             return {
-              id: service.service_id.toString(),
+              ...service,
+              id: String(service.service_id),
               name: service.short_name,
-              price: feeResponse.data?.total || 0,
-              estimatedTime: typeof timeResponse.data?.leadtime === 'number' 
-                ? `${timeResponse.data.leadtime} ngày`
-                : timeResponse.data?.leadtime || 'Đang cập nhật',
-              description: `Phương thức vận chuyển ${service.short_name}`,
-              features: [
-                `Service ID: ${service.service_id}`,
-                `Phí vận chuyển: ₫${(feeResponse.data?.total || 0).toLocaleString()}`,
-              ],
-              icon: 'truck' as const,
-              service_id: service.service_id,
-              service_type_id: service.service_type_id,
-              config_fee_id: service.config_fee_id,
-              extra_cost_id: service.extra_cost_id,
-              standard_config_fee_id: service.standard_config_fee_id,
-              standard_extra_cost_id: service.standard_extra_cost_id,
-            };
-          } catch (serviceError) {
-            console.error(`Error processing service ${service.service_id}:`, serviceError);
-            // Return service with default values if API calls fail
-            return {
-              id: service.service_id.toString(),
-              name: service.short_name,
-              price: 0,
-              estimatedTime: 'Không thể tính toán',
-              description: `Phương thức vận chuyển ${service.short_name}`,
-              features: [`Service ID: ${service.service_id}`, 'Lỗi tính phí vận chuyển'],
-              icon: 'truck' as const,
-              service_id: service.service_id,
-              service_type_id: service.service_type_id,
-              config_fee_id: service.config_fee_id,
-              extra_cost_id: service.extra_cost_id,
-              standard_config_fee_id: service.standard_config_fee_id,
-              standard_extra_cost_id: service.standard_extra_cost_id,
-            };
+              price: feeResponse.data.total,
+              estimatedTime: `Nhận hàng dự kiến ${formattedDate}`,
+              description: 'Giao hàng tiêu chuẩn',
+              features: ['Giao giờ hành chính'],
+              icon: service.service_type_id === 5 ? 'package' : 'truck',
+            } as ShippingMethod;
+          } catch (error) {
+            console.error(`Failed to process service ${service.service_id}:`, error);
+            return null;
           }
-        })
-      );
-      
-      setShippingMethods(enrichedMethods);
-      console.log('Final shipping methods:', enrichedMethods);
-    } catch (err) {
-      console.error('Error fetching shipping data:', err);
-      setError('Không thể tải thông tin vận chuyển');
+        });
+
+        const settledMethods = await Promise.all(methodsPromises);
+        const validMethods = settledMethods.filter((method): method is ShippingMethod => method !== null);
+        
+        setShippingMethods(validMethods);
+      } else {
+        setShippingMethods([]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching shipping services:', err);
+      setError('Không thể tải danh sách dịch vụ vận chuyển.');
     } finally {
       setLoading(false);
     }

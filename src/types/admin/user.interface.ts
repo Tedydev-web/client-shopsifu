@@ -77,7 +77,7 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   role: UserRole;
-  addresses: UserAddress;
+  addresses: UserAddress[];
 }
 
 // LẤY TẤT CẢ DANH SÁCH NGƯỜI DÙNG - GET ALL USER

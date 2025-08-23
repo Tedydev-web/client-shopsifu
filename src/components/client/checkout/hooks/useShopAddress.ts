@@ -4,6 +4,10 @@ import { userService } from '@/services/admin/userService';
 import { updateShopAddress } from '@/store/features/checkout/ordersSilde';
 import { UserAddress } from '@/types/admin/user.interface';
 
+interface UserDetailResponse {
+  addresses: UserAddress[];
+}
+
 interface UseShopAddressReturn {
   loading: boolean;
   error: string | null;
@@ -32,26 +36,33 @@ export const useShopAddress = (shopId: string): UseShopAddressReturn => {
       
       console.log('User detail response:', response);
       
-      if (response.data?.addresses) {
-        const address = response.data.addresses;
-        setShopAddress(address);
-        
-        // Lưu vào Redux state
-        dispatch(updateShopAddress({
-          shopId,
-          address: {
-            provinceId: address.provinceId,
-            districtId: address.districtId,
-            wardCode: address.wardCode,
-            province: address.province,
-            district: address.district,
-            ward: address.ward,
-            street: address.street,
-            name: address.name,
-          }
-        }));
-        
-        console.log('Shop address saved to Redux:', address);
+      if (response.data?.addresses && response.data.addresses.length > 0) {
+        const addresses = response.data.addresses;
+        // Ưu tiên tìm địa chỉ mặc định, nếu không có thì lấy địa chỉ đầu tiên
+        const addressToUse = addresses.find(addr => addr.isDefault) || addresses[0];
+
+        if (addressToUse) {
+          setShopAddress(addressToUse);
+          
+          // Lưu vào Redux state
+          dispatch(updateShopAddress({
+            shopId,
+            address: {
+              provinceId: addressToUse.provinceId,
+              districtId: addressToUse.districtId,
+              wardCode: addressToUse.wardCode,
+              province: addressToUse.province,
+              district: addressToUse.district,
+              ward: addressToUse.ward,
+              street: addressToUse.street,
+              name: addressToUse.name,
+            }
+          }));
+          
+          console.log('Shop address saved to Redux:', addressToUse);
+        } else {
+          setError('No valid address found for this shop');
+        }
       } else {
         setError('No address found for this shop');
       }

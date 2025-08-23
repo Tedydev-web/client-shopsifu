@@ -125,7 +125,16 @@ const checkoutSlice = createSlice({
       const { shopId, address } = action.payload;
       const shopIndex = state.shopOrders.findIndex(order => order.shopId === shopId);
       if (shopIndex !== -1) {
+        // Nếu shop đã tồn tại, cập nhật địa chỉ
         state.shopOrders[shopIndex].shopAddress = address;
+      } else {
+        // Nếu shop chưa tồn tại, tạo một bản ghi mới
+        state.shopOrders.push({
+          shopId,
+          cartItemIds: [], // Khởi tạo rỗng, sẽ được cập nhật sau
+          discountCodes: [], // Khởi tạo rỗng
+          shopAddress: address,
+        });
       }
     },
 

@@ -193,7 +193,7 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-xs text-[rgb(38,170,153)]">
                       <Truck className="h-4 w-4" />
-                      <span>Đảm bảo nhận hàng từ {selectedShippingMethod.estimatedTime}</span>
+                      <span>{selectedShippingMethod.estimatedTime}</span>
                     </div>
                   </div>
                 </div>
