@@ -128,14 +128,19 @@
     },
     "resetPassword": {
       "title": "Đặt lại mật khẩu",
-      "subtitle": "Nhập mật khẩu mới bên dưới.",
+      "subtitle": "Nhập mật khẩu mới của bạn vào bên dưới.",
+      "currentPassword": "Mật khẩu hiện tại",
+      "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại của bạn",
+      "newPasswordPlaceholder": "Nhập mật khẩu mới của bạn",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới của bạn",
       "new password": "Mật khẩu mới",
       "confirmnewPassword": "Xác nhận mật khẩu mới",
-      "Remember password": "Nhớ mật khẩu?",
+      "Remember password": "Bạn đã nhớ mật khẩu chưa?",
+      "changePassword": "Đổi mật khẩu",
       "login": "Đăng nhập",
-      "Processing": "Đang xử lý",
-      "success": "Liên kết đặt lại mật khẩu đã được gửi đến email của bạn",
-      "send": "Gửi liên kết"
+      "Processing": "Đang xử lý...",
+      "success": "Đường dẫn đặt lại mật khẩu đã được gửi đến email của bạn",
+      "send": "Gửi đường dẫn"
     },
     "verifyOtp": {
       "title": "Nhập mã xác minh",
@@ -279,8 +284,8 @@
         }
       }
     },
-    "ModuleVouchers":{
-      "breadcrumb":{
+    "ModuleVouchers": {
+      "breadcrumb": {
         "title": "Quản lý mã giảm giá",
         "subtitle": "Quản lý tất cả mã giảm giá tại đây",
         "vouchers": "Danh sách mã giảm giá",
@@ -312,7 +317,7 @@
       "privateAdminVoucher": "Mã giảm giá riêng tư (Admin)",
       "privateAdminVoucherDesc": "Mã giảm giá riêng tư cấp nền tảng - chỉ những người có mã mới sử dụng được.",
       "create": "Tạo",
-      "Table":{
+      "Table": {
         "voucherInfo": "Thông tin voucher",
         "discountType": "Loại giảm giá",
         "voucherType": "Loại voucher",
@@ -333,7 +338,7 @@
         },
         "searchPlaceholder": "Tìm kiếm theo tên voucher",
         "notFound": "Không tìm thấy voucher",
-        "deleteConfirm":{
+        "deleteConfirm": {
           "title": "Xác nhận xóa voucher",
           "description": "Bạn có chắc chắn muốn xóa voucher này không? Hành động này không thể hoàn tác.",
           "deleteAction": "Xóa ngay",
@@ -429,7 +434,7 @@
         "activeFilter": "Bộ lọc đang áp dụng",
         "searchCategory": "Tìm kiếm danh mục",
         "noResults": "Không có kết quả",
-        "loading":"Đang tải dữ liệu...",
+        "loading": "Đang tải dữ liệu...",
         "clearFilters": "Xóa tất cả bộ lọc"
       },
       "AddNew": {
@@ -514,7 +519,7 @@
     },
     "sidebar": {
       "dashboard": "Bảng điều khiển",
-      "voucher":{
+      "voucher": {
         "voucher": "Mã giảm giá của Shop",
         "listVoucher": "Danh sách mã giảm giá",
         "newVoucher": "Thêm mới"
@@ -566,11 +571,9 @@
           "cancel": "Hủy"
         }
       },
-
       "categories": {
         "categories": "Danh mục"
       },
-
       "system": {
         "system": "Hệ thống",
         "permissionManager": "Quản lý quyền",
@@ -579,11 +582,9 @@
         "systemLog": "Nhật ký hệ thống",
         "deviceManager": "Quản lý thiết bị"
       },
-
       "language": {
         "languageManager": "Quản lý ngôn ngữ"
       },
-
       "settings": {
         "settings": "Cài đặt",
         "systemSettings": "Cài đặt hệ thống",
@@ -592,7 +593,6 @@
         "passwordAndSecurity": "Mật khẩu & Bảo mật"
       }
     },
-
     "profileDropdown": {
       "shopProfile": "Hồ sơ cửa hàng",
       "shopSettings": "Cài đặt cửa hàng",
@@ -854,7 +854,6 @@
       "confirm": "Lưu thay đổi",
       "cancel": "Hủy"
     },
-
     "auditLogs": {
       "title": "Nhật ký hệ thống",
       "subtitle": "Quản lý tất cả nhật ký hệ thống của bạn",
@@ -1251,6 +1250,56 @@
           "nameRequired": "Tên không được để trống",
           "websiteInvalid": "URL website không hợp lệ"
         }
+      }
+    },
+    "category": {
+      "title": "Quản lý danh mục",
+      "subtitle": "Quản lý tất cả danh mục sản phẩm của bạn",
+      "searchPlaceholder": "Tìm kiếm theo tên, slug hoặc mô tả",
+      "notFound": "Không tìm thấy danh mục nào.",
+      "stats": {
+        "total": "Tổng số danh mục",
+        "active": "Danh mục đang hoạt động",
+        "inactive": "Danh mục không hoạt động",
+        "root": "Danh mục gốc"
+      },
+      "column": {
+        "name": "Tên danh mục",
+        "slug": "Đường dẫn",
+        "parent": "Danh mục cha",
+        "status": "Trạng thái",
+        "sortOrder": "Thứ tự sắp xếp",
+        "productsCount": "Số lượng sản phẩm",
+        "createdAt": "Ngày tạo",
+        "actions": "Hành động"
+      },
+      "status": {
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động"
+      },
+      "actions": {
+        "view": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "create": "Tạo danh mục mới"
+      },
+      "modal": {
+        "detailTitle": "Chi tiết danh mục - {{name}}",
+        "detailDesc": "Xem thông tin chi tiết danh mục",
+        "name": "Tên danh mục",
+        "slug": "Đường dẫn",
+        "status": "Trạng thái",
+        "parent": "Danh mục cha",
+        "sortOrder": "Thứ tự sắp xếp",
+        "productsCount": "Số lượng sản phẩm",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "description": "Mô tả",
+        "metaTitle": "Tiêu đề Meta",
+        "metaDescription": "Mô tả Meta",
+        "image": "Hình ảnh",
+        "more": "Hiển thị thêm",
+        "close": "Đóng"
       }
     }
   },

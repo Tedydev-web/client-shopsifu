@@ -188,6 +188,13 @@
       "resendOtp": "Resend OTP"
     }
   },
+  "system": {
+    "toasts": {
+      "createSuccess": "Successfully added!",
+      "editSuccess": "Successfully updated",
+      "deleteSuccess": "Successfully deleted"
+    }
+  },
   "admin": {
     "pages": {
       "category": {
@@ -277,35 +284,98 @@
         }
       }
     },
+    "ModuleVouchers": {
+      "breadcrumb": {
+        "title": "Voucher Management",
+        "subtitle": "Manage all vouchers here",
+        "vouchers": "Voucher list",
+        "newPage": "Create voucher"
+      },
+      "title_shop": "Shop-wide voucher",
+      "title_product": "Product voucher",
+      "title_private": "Private voucher",
+      "title": "Voucher Management",
+      "subtitle": "Manage all vouchers here",
+      "createVoucher": "Create Voucher",
+      "createVoucherDesc": "Create a shop-wide or product voucher now to attract buyers.",
+      "shopVoucher": "Shop-wide voucher",
+      "productVoucher": "Product voucher",
+      "privateVoucher": "Private voucher",
+      "shopVoucherDesc": "Vouchers applicable to all of your shops",
+      "productVoucherDesc": "Vouchers applicable to certain products selected by the shop",
+      "privateVoucherDesc": "Vouchers applicable to private users",
+      "platformVoucher": "Platform-wide voucher",
+      "platformVoucherDesc": "Applicable to all products across the entire e-commerce platform.",
+      "categoriesVoucher": "Category voucher",
+      "categoriesVoucherDesc": "Only applicable to products within specific categories.",
+      "brandVoucher": "Brand voucher",
+      "brandVoucherDesc": "Only applicable to products of a specific brand.",
+      "shopAdminVoucher": "Store voucher",
+      "shopAdminVoucherDesc": "Vouchers managed and issued by the store administrator.",
+      "productAdminVoucher": "Product voucher",
+      "productAdminVoucherDesc": "Only applicable to products specified by the administrator.",
+      "privateAdminVoucher": "Private voucher (Admin)",
+      "privateAdminVoucherDesc": "Platform-level private vouchers - only users with the code can use them.",
+      "create": "Create",
+      "Table": {
+        "voucherInfo": "Voucher info",
+        "discountType": "Discount type",
+        "voucherType": "Voucher type",
+        "displayType": "Display type",
+        "discountValue": "Discount value",
+        "validFrom": "Valid from",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "validTo": "Valid to",
+        "name": "Voucher name",
+        "code": "Voucher code",
+        "discount": "Discount",
+        "type": "Voucher type",
+        "status": "Status",
+        "actions": {
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "searchPlaceholder": "Search by voucher name",
+        "notFound": "No voucher found",
+        "deleteConfirm": {
+          "title": "Confirm voucher deletion",
+          "description": "Are you sure you want to delete this voucher? This action cannot be undone.",
+          "deleteAction": "Delete now",
+          "cancel": "Cancel"
+        }
+      }
+    },
     "ModuleUsers": {
       "Table": {
         "role": "Role",
-        "name": "User Name",
+        "name": "User name",
         "Email": "Email",
         "status": "Status",
-        "createdAt": "Created At",
-        "updatedAt": "Updated At",
-        "notFound": "No users found",
-        "addAction": "Add User",
-        "searchPlaceholder": "Search by name or role description...",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "notFound": "No user found",
+        "addAction": "Add user",
+        "searchPlaceholder": "Search by role name or description...",
         "deleteConfirm": {
-          "title": "Confirm User Deletion",
+          "title": "Confirm user deletion",
           "description": "Are you sure you want to delete this user? This action cannot be undone.",
-          "deleteAction": "Delete Now",
+          "deleteAction": "Delete now",
           "cancel": "Cancel"
         },
         "actions": {
-          "edit": "Edit User",
-          "delete": "Delete User"
+          "edit": "Edit user",
+          "delete": "Delete user"
         }
       }
     },
     "ModuleProduct": {
       "title": "Product Management",
-      "subtitle": "Manage all your products here",
+      "subtitle": "Manage all products here",
       "DataTable": {
-        "name": "Product Name",
-        "price": "Price",
+        "name": "Product name",
+        "price": "Selling price",
+        "virtualPrice": "Original price",
         "category": "Category",
         "stock": "Stock",
         "status": "Status",
@@ -313,11 +383,11 @@
         "image": "Image",
         "description": "Description",
         "slug": "Slug",
-        "createdAt": "Created At",
-        "updatedAt": "Updated At",
-        "edit": "Edit Info",
-        "delete": "Delete Product",
-        "view": "View Product",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "edit": "Edit information",
+        "delete": "Delete product",
+        "view": "View product",
         "notFound": "No products found"
       },
       "Status": {
@@ -327,20 +397,20 @@
       },
       "searchPlaceholder": "Search by product name",
       "DeleteModal": {
-        "title": "Confirm Deletion",
+        "title": "Confirm deletion",
         "description": "Are you sure you want to delete this product?",
         "confirmText": "Delete",
         "cancelText": "Cancel"
       },
       "ExportData": {
-        "title": "Export Data",
+        "title": "Export data",
         "description": "Export product data",
         "confirmText": "Export",
         "cancelText": "Cancel",
-        "pickDate": "Pick Date",
-        "selectFormat": "Select Format",
-        "fileFormat": "File Format",
-        "dateRange": "Date Range"
+        "pickDate": "Select date",
+        "selectFormat": "Select format",
+        "fileFormat": "File format",
+        "dateRange": "Date range"
       },
       "Filter": {
         "category": "Category",
@@ -351,26 +421,35 @@
         "image": "Image",
         "description": "Description",
         "slug": "Slug",
-        "createdAt": "Created At",
-        "updatedAt": "Updated At",
-        "edit": "Edit Info",
-        "delete": "Delete Product",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "edit": "Edit information",
+        "delete": "Delete product",
         "notFound": "No products found",
-        "priceRange": "Price Range"
+        "priceRange": "Price range",
+        "clear": "Clear filter",
+        "applyFilter": "Apply filter",
+        "apply": "Apply",
+        "clearFilter": "Clear filter",
+        "activeFilter": "Active filters",
+        "searchCategory": "Search category",
+        "noResults": "No results",
+        "loading": "Loading data...",
+        "clearFilters": "Clear all filters"
       },
       "AddNew": {
         "page": {
           "breadcrumb": {
             "products": "Products",
-            "newPage": "Add New Product"
+            "newPage": "Add new product"
           },
-          "title": "Add Product",
+          "title": "Add product",
           "formPlaceholder": ""
         }
       },
       "mainDetails": {
-        "title": "Product Details",
-        "productTitle": "Product Title",
+        "title": "Product details",
+        "productTitle": "Product name",
         "productTitlePlaceholder": "Enter product name",
         "content": "Content",
         "contentPlaceholder": "Enter content"
@@ -384,7 +463,7 @@
         "createdAt": "Created at",
         "updatedAt": "Updated at",
         "addAction": "Add brand",
-        "notFound": "No brands found",
+        "notFound": "No brand found",
         "deleteConfirm": {
           "title": "Confirm brand deletion",
           "description": "Are you sure you want to delete the brand {name}?",
@@ -405,18 +484,19 @@
         "name": "Brand name",
         "namePlaceholder": "Enter brand name",
         "logo": "Logo",
-        "logoPlaceholder": "Enter logo",
+        "logoPlaceholder": "Enter Logo",
         "cancel": "Cancel",
         "adding": "Adding...",
         "saving": "Saving...",
-        "add": "Add",
+        "add": "Add new",
         "save": "Save changes",
         "uploadImage": "Upload image",
-        "uploading": "",
-        "selectImage": "Select image"
+        "uploading": "Uploading...",
+        "selectImage": "Select image to upload"
       }
     },
-    "orders" : {
+    "orders": {
+      "products": "Products",
       "title": "List Orders",
       "subtitle": "Manage all orders",
       "searchPlaceholder": "Search orders",
@@ -439,12 +519,17 @@
     },
     "sidebar": {
       "dashboard": "Dashboard",
+      "voucher": {
+        "voucher": "Shop's discount code",
+        "listVoucher": "List of discount codes",
+        "newVoucher": "Add new"
+      },
       "orders": {
         "orders": "Orders",
         "allOrders": "All orders",
         "newOrders": "New orders",
         "processedOrders": "Processed orders",
-        "listOrders": "List Orders"
+        "listOrders": "Order list"
       },
       "permission": {
         "permissionManager": "Permission management"
@@ -470,9 +555,9 @@
       "products": {
         "products": "Products",
         "productsList": "Product list",
-        "addProducts": "Add product",
-        "title": "Product management",
-        "subtitle": "Manage all your products here",
+        "addProducts": "Add products",
+        "title": "Product Management",
+        "subtitle": "Manage all products here",
         "form": {
           "name": "Product name",
           "slug": "Slug",
@@ -508,7 +593,6 @@
         "passwordAndSecurity": "Password & Security"
       }
     },
-
     "profileDropdown": {
       "shopProfile": "Shop Profile",
       "shopSettings": "Shop Settings",
@@ -533,7 +617,7 @@
       "total": "Total"
     },
     "dataTable": {
-      "noData": "No data available",
+      "noData": "No data",
       "image": "Image",
       "productName": "Product name",
       "category": "Category",
@@ -541,7 +625,11 @@
       "stock": "Stock",
       "status": "Status",
       "view": "View",
-      "toggle_columns": "Toggle columns"
+      "toggle_columns": "Toggle columns",
+      "edit": "Edit content",
+      "delete": "Delete content",
+      "Active": "Active",
+      "Inactive": "Inactive"
     },
     "dataTableExport": {
       "export": "Export file",
@@ -626,7 +714,6 @@
         "sentOtp": "OTP code has been sent to your email.",
         "sentNewOtp": "A new OTP code has been resent.",
         "sentCode": "Verification code has been sent to your email.",
-
         "emailNotFound": "Email not found. Please try again.",
         "sessionExpireds": "Authentication session has expired. Please try again.",
         "loginSessionNotFound": "Login session not found. Please try again.",
@@ -752,17 +839,13 @@
       "or": "or",
       "googleAuth": "Google Authenticator",
       "device": "for phone or tablet.",
-
       "name": "Name",
       "lang": "Language",
       "accountInfo": "Account information",
       "manageAccount": "Manage your account information",
-
       "edit": "Edit",
-
       "2faVerify": "Two-factor authentication"
     },
-
     "profileUpdate": {
       "title": "Edit account information",
       "subtitle": "Update the information fields below and click save to complete.",
@@ -771,7 +854,6 @@
       "confirm": "Save changes",
       "cancel": "Cancel"
     },
-
     "auditLogs": {
       "title": "Audit Logs",
       "subtitle": "Manage all your audit logs",
@@ -821,133 +903,153 @@
     "roles": {
       "title": "Roles",
       "subtitle": "Manage all your roles",
-      "add": "Add New Role",
-      "edit": "Edit Role",
-      "delete": "Delete Role",
-      "confirmDeleteTitle": "Confirm Role Deletion",
+      "add": "Add new role",
+      "edit": "Edit role",
+      "delete": "Delete role",
+      "confirmDeleteTitle": "Confirm role deletion",
       "confirmDeleteDesc": "Are you sure you want to delete the role {{name}}? This action cannot be undone.",
       "confirm": "Confirm",
       "cancel": "Cancel",
       "search": "Search",
       "searchPlaceholder": "Search by role name or description",
-      "name": "Role Name",
-      "createdAt": "Created At",
-      "updatedAt": "Updated At",
+      "name": "Role name",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
       "actions": "Actions",
-      "noData": "No data available.",
-      "addTitle": "Add Role",
-      "editTitle": "Edit Role",
+      "noData": "No data.",
+      "addTitle": "Add role",
+      "editTitle": "Edit role",
       "form": {
-        "name": "Role Name",
+        "id": "ID",
+        "name": "Role name",
         "subtitle": "Manage all your roles",
-        "description": "Role Description",
-        "path": "Role Path",
-        "method": "Role Method",
-        "namePlaceholder": "Enter role name"
+        "description": "Role description",
+        "path": "Role path",
+        "method": "Role method",
+        "namePlaceholder": "Enter role name",
+        "module": "Module",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at"
       },
       "toast": {
-        "addSuccess": "Role created successfully",
+        "addSuccess": "Role added successfully",
         "editSuccess": "Role updated successfully",
         "deleteSuccess": "Role deleted successfully"
       },
-      "editAction": "Edit Information",
-      "deleteAction": "Delete Role",
-      "addAction": "Add Role",
+      "editAction": "Edit information",
+      "deleteAction": "Delete role",
+      "addAction": "Add role",
       "modal": {
-        "title": "Add New Role",
-        "subtitle": "Enter role details to add to the system",
-        "description": "Role Description",
-        "name": "Role Name",
-        "path": "Role Path",
-        "method": "Role Method",
+        "title": "Add new role",
+        "subtitle": "Enter role information to add to the system",
+        "description": "Role description",
+        "name": "Role name",
+        "path": "Role path",
+        "method": "Role method",
         "namePlaceholder": "Enter role name",
         "searchPlaceholder": "Search by code or name...",
         "descriptionPlaceholder": "Enter role description",
         "pathPlaceholder": "Enter role path",
         "methodPlaceholder": "Enter role method",
-        "save": "Save Information",
+        "save": "Save information",
         "cancel": "Cancel",
         "delete": "Delete",
         "processing": "Processing...",
         "success": "Role added successfully",
         "error": "An error occurred",
-        "isActive": "Active?",
+        "isActive": "Is active?",
         "permissions": "Permissions"
       },
       "modalEdit": {
-        "title": "Edit Role",
-        "subtitle": "Enter role details to edit",
-        "save": "Save Information",
+        "title": "Edit role",
+        "subtitle": "Enter role information to edit",
+        "save": "Save information",
         "cancel": "Cancel",
         "processing": "Processing...",
         "success": "Role updated successfully",
         "error": "An error occurred",
-        "edit": "Edit Role"
+        "edit": "Edit role"
       }
     },
     "permissions": {
+      "notFound": "No permissions found",
       "title": "Permissions",
       "subtitle": "Manage all your permissions",
-      "add": "Add New Permission",
-      "edit": "Edit Permission",
-      "delete": "Delete Permission",
-      "confirmDeleteTitle": "Confirm Permission Deletion",
+      "add": "Add new permission",
+      "edit": "Edit permission",
+      "delete": "Delete permission",
+      "confirmDeleteTitle": "Confirm permission deletion",
       "confirmDeleteDesc": "Are you sure you want to delete the permission {{name}}? This action cannot be undone.",
       "confirm": "Confirm",
       "cancel": "Cancel",
       "search": "Search",
       "searchPlaceholder": "Search by user, action, or date",
-      "name": "Permission Name",
-      "createdAt": "Created At",
-      "updatedAt": "Updated At",
+      "name": "Permission name",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
       "actions": "Actions",
-      "noData": "No data available.",
-      "addTitle": "Add Permission",
-      "editTitle": "Edit Permission",
+      "noData": "No data.",
+      "addTitle": "Add permission",
+      "editTitle": "Edit permission",
       "form": {
-        "name": "Permission Name",
+        "name": "Permission path",
         "subtitle": "Manage all your permissions",
-        "description": "Permission Description",
-        "path": "Permission Path",
-        "method": "Permission Method",
-        "namePlaceholder": "Enter permission name"
+        "description": "Permission description",
+        "path": "Permission path",
+        "method": "Permission method",
+        "namePlaceholder": "Enter permission name",
+        "module": "Module",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "ID": "ID",
+        "editAction": "Edit permission",
+        "deleteAction": "Delete permission",
+        "Name": "Permission name"
+      },
+      "deleteModal": {
+        "deleteTitle": "Confirm delete permission",
+        "deleteDescription": "Are you sure you want to delete this permission?"
       },
       "toast": {
-        "addSuccess": "Permission created successfully",
+        "addSuccess": "Permission added successfully",
         "editSuccess": "Permission updated successfully",
         "deleteSuccess": "Permission deleted successfully"
       },
-      "editAction": "Edit Information",
-      "deleteAction": "Delete Permission",
-      "addAction": "Add Permission",
+      "editAction": "Edit information",
+      "deleteAction": "Delete permission",
+      "addAction": "Add permission",
       "modal": {
-        "title": "Add New Permission",
-        "subtitle": "Enter permission details to add to the system",
-        "description": "Permission Description",
-        "name": "Permission Name",
-        "path": "Permission Path",
-        "method": "Permission Method",
+        "addTitle": "Add new permission",
+        "addSubtitle": "Enter permission information to add to the system",
+        "editTitle": "Edit permission",
+        "editSubtitle": "Enter permission information to edit the system",
+        "description": "Permission description",
+        "name": "Permission name",
+        "path": "Permission path",
+        "method": "Permission method",
         "namePlaceholder": "Enter permission name",
         "searchPlaceholder": "Search by code or name...",
         "descriptionPlaceholder": "Enter permission description",
         "pathPlaceholder": "Enter permission path",
         "methodPlaceholder": "Enter permission method",
-        "save": "Save Information",
+        "save": "Save information",
         "cancel": "Cancel",
         "delete": "Delete",
         "processing": "Processing...",
         "success": "Permission added successfully",
-        "error": "An error occurred"
+        "error": "An error occurred",
+        "module": "Module",
+        "modulePlaceholder": "Enter feature module..."
       },
       "modalEdit": {
-        "title": "Edit Permission",
-        "subtitle": "Enter permission details to edit",
-        "save": "Save Information",
+        "title": "Edit permission",
+        "subtitle": "Enter permission information to edit",
+        "save": "Save information",
         "cancel": "Cancel",
         "processing": "Processing...",
         "success": "Permission updated successfully",
         "error": "An error occurred",
-        "edit": "Edit Permission"
+        "edit": "Edit permission"
       },
       "methods": {
         "GET": "GET",
@@ -964,11 +1066,11 @@
       "searchPlaceholder": "Search by name, action, or date",
       "add": "Add new user",
       "table": {
-        "name": "Name",
+        "name": "User name",
         "email": "Email",
         "role": "Role",
         "status": "Status",
-        "createdAt": "Created At",
+        "createdAt": "Created at",
         "actions": "Actions"
       },
       "status": {
@@ -978,7 +1080,7 @@
       },
       "role": {
         "user": "User",
-        "admin": "Administrator",
+        "admin": "Admin",
         "editor": "Editor"
       },
       "actions": {
@@ -997,14 +1099,32 @@
         "role": "Role",
         "status": "Status",
         "cancel": "Cancel",
-        "confirmAdd": "Add",
+        "confirmAdd": "Add new",
         "confirmEdit": "Update",
         "loadingAdd": "Adding...",
-        "loadingEdit": "Updating..."
+        "loadingEdit": "Updating...",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "username": "Username",
+        "phoneNumber": "Phone number",
+        "bio": "Bio",
+        "countryCode": "Country code",
+        "roleId": "Role",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "avatar": "Avatar",
+        "passwordStepDescription": "Password must contain at least 6 characters, including uppercase, lowercase, numbers, and special characters",
+        "confirmPasswordStepDescription": "Confirm password must match the password",
+        "statusActive": "Active",
+        "statusInactive": "Inactive",
+        "avatarUrl": "Your avatar URL...",
+        "add": "Add new",
+        "uploadImage": "Upload image",
+        "selectImage": "Select image to upload"
       },
       "deleteConfirm": {
         "title": "Confirm user deletion",
-        "description": "Are you sure you want to delete user {{name}}? This action cannot be undone.",
+        "description": "Are you sure you want to delete the user {{name}}? This action cannot be undone.",
         "confirmText": "Delete",
         "cancelText": "Cancel"
       },
@@ -1017,107 +1137,113 @@
       "whereYouLogIn": "Where you log in"
     },
     "languages": {
-      "title": "Languages",
-      "subtitle": "Manage all your languages here",
-      "add": "Add New Language",
-      "edit": "Edit Language",
-      "delete": "Delete Language",
-      "confirmDeleteTitle": "Confirm Language Deletion",
+      "notFound": "No languages found",
+      "title": "Language Management",
+      "subtitle": "Manage all languages here",
+      "add": "Add new language",
+      "edit": "Edit language",
+      "delete": "Delete language",
+      "confirmDeleteTitle": "Confirm language deletion",
       "confirmDeleteDesc": "Are you sure you want to delete the language {{name}}? This action cannot be undone.",
       "confirm": "Confirm",
       "cancel": "Cancel",
       "search": "Search",
-      "searchPlaceholder": "Search for languages...",
-      "code": "Language Code",
-      "name": "Language Name",
-      "createdAt": "Created At",
-      "updatedAt": "Updated At",
+      "searchPlaceholder": "Search languages...",
+      "code": "Language code",
+      "name": "Language name",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
       "actions": "Actions",
-      "noData": "No data available.",
-      "addTitle": "Add Language",
-      "editTitle": "Edit Language",
+      "noData": "No data.",
+      "addTitle": "Add language",
+      "editTitle": "Edit language",
       "form": {
-        "code": "Language Code",
-        "name": "Language Name",
+        "code": "Language code",
+        "name": "Language name",
         "codePlaceholder": "Enter language code",
         "namePlaceholder": "Enter language name"
       },
       "toast": {
-        "addSuccess": "Language created successfully",
+        "addSuccess": "Language added successfully",
         "editSuccess": "Language updated successfully",
         "deleteSuccess": "Language deleted successfully"
       },
-      "editAction": "Edit Information",
-      "deleteAction": "Delete Language",
-      "addAction": "Add Language",
+      "editAction": "Edit information",
+      "deleteAction": "Delete language",
+      "addAction": "Add language",
       "modal": {
-        "title": "Add New Language",
-        "subtitle": "Enter language details to add to the system",
-        "code": "Language Code",
-        "name": "Language Name",
+        "title": "Add new language",
+        "subtitle": "Enter language information to add to the system",
+        "code": "Language code",
+        "name": "Language name",
         "codePlaceholder": "Enter language code",
         "namePlaceholder": "Enter language name",
         "searchPlaceholder": "Search by code or name...",
-        "save": "Save Information",
+        "save": "Save information",
         "cancel": "Cancel",
         "processing": "Processing...",
         "success": "Language added successfully",
         "error": "An error occurred"
       },
       "modalEdit": {
-        "title": "Edit Language",
-        "subtitle": "Enter language details to edit",
-        "save": "Save Information",
+        "title": "Edit language",
+        "subtitle": "Enter language information to edit",
+        "save": "Save information",
         "cancel": "Cancel",
         "processing": "Processing...",
         "success": "Language updated successfully",
         "error": "An error occurred",
-        "edit": "Edit Language"
+        "edit": "Edit language"
+      },
+      "modalDelete": {
+        "deleteConfirmTitle": "Delete language",
+        "deleteConfirmMessage": "Are you sure you want to delete the language",
+        "cancelAction": "Cancel"
       }
     },
     "settings": {
       "profile": {
-        "title": "Profile Settings",
+        "title": "Profile settings",
         "subtitle": "Manage your personal information and account security"
       }
     },
     "notifications": {
       "title": "Notifications",
       "emptyTitle": "No notifications",
-      "emptyDesc": "You don't have any notifications at the moment, but once you do they will live here.",
+      "emptyDesc": "You don't have any notifications at the moment, but they will show up here when you do.",
       "esc": "esc",
       "close": "Close"
     },
     "brand": {
       "title": "Brand Management",
       "subtitle": "Manage the list of brands in the system.",
-      "searchPlaceholder": "Search brands...",
-      "addAction": "Add Brand",
-      "editAction": "Edit Brand",
-      "deleteAction": "Delete Brand",
-      "code": "Brand Code",
-      "name": "Brand Name",
+      "searchPlaceholder": "Search for brands...",
+      "addAction": "Add brand",
+      "editAction": "Edit brand",
+      "deleteAction": "Delete brand",
+      "code": "Brand code",
+      "name": "Brand name",
       "actions": "Actions",
-      "confirmDelete": "Are you sure you want to delete brand",
+      "confirmDelete": "Are you sure you want to delete the brand",
       "addSuccess": "Brand added successfully",
       "editSuccess": "Brand updated successfully",
       "deleteSuccess": "Brand deleted successfully",
       "modal": {
-        "addTitle": "Add New Brand",
-        "editTitle": "Edit Brand",
-        "codePlaceholder": "E.g: APPLE",
-        "namePlaceholder": "E.g: Apple Inc.",
-        "descriptionPlaceholder": "Enter detailed description about the brand...",
+        "addTitle": "Add new brand",
+        "editTitle": "Edit brand",
+        "codePlaceholder": "e.g., APPLE",
+        "namePlaceholder": "e.g., Apple Inc.",
+        "descriptionPlaceholder": "Enter a detailed description of the brand...",
         "websitePlaceholder": "https://example.com",
-        "countryPlaceholder": "E.g: Vietnam",
-        "uploadLabel": "Choose or drag and drop logo here",
-        "uploadDescription": "PNG, JPG, GIF max 5MB",
-        "statusPlaceholder": "Select status",
+        "countryPlaceholder": "e.g., Vietnam",
+        "uploadLabel": "Select or drag and drop logo here",
+        "uploadDescription": "PNG, JPG, GIF up to 5MB",
+        "statusPlaceholder": "Select active status",
         "statusActive": "Active",
         "statusInactive": "Inactive",
         "website": "Website",
         "cancel": "Cancel",
-        "add": "Add New",
+        "add": "Add new",
         "update": "Update",
         "validation": {
           "codeRequired": "Code cannot be empty",
