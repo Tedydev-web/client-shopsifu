@@ -204,7 +204,7 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
     
     // Tạo địa chỉ đầy đủ cho người nhận
     const fullAddress = selectedAddress 
-      ? `${selectedAddress.addressDetail}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.province}`
+      ? `${selectedAddress.addressDetail}, ${parseLocationValue(selectedAddress.ward)}, ${parseLocationValue(selectedAddress.district)}, ${parseLocationValue(selectedAddress.province)}`
       : [
           formData.address,
           parseLocationValue(formData.ward),

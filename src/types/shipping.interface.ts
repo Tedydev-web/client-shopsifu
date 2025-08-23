@@ -45,25 +45,19 @@ export interface GetWardsParams {
 
 export interface GetWardsResponse extends BaseShippingResponse<Ward[]> {}
 
-// Shipping Fee Calculation Interfaces (for future use)
+// Shipping Fee Calculation Interfaces (updated)
 export interface CalculateShippingFeeRequest {
-  from_district_id: number;
-  to_district_id: number;
-  from_ward_code: string;
-  to_ward_code: string;
-  service_id?: number;
+  height: number;
   weight: number;
-  length?: number;
-  width?: number;
-  height?: number;
+  length: number;
+  width: number;
+  service_id: number;
+  cartItemId: string;
 }
 
-export interface DeliveryTimeRequest{
+export interface DeliveryTimeRequest {
   service_id: number;
-  to_district_id: number;
-  to_ward_code: string;
-  from_district_id: number;
-  from_ward_code: string
+  cartItemId: string;
 }
 export interface DeliveryTimeResponse {
   data:{

@@ -58,15 +58,16 @@ export function FooterSection({
   // Sử dụng hook tự động tính toán để tránh vòng lặp vô hạn
   const { calculationResult: autoCalculationResult, loading: calculationLoading, error: calculationError } = useAutoCalculateOrder();
 
-  // Cập nhật platformDiscountCodes khi có voucher platform
-  useEffect(() => {
-    const platformCodes = appliedPlatformVoucher ? [appliedPlatformVoucher.code] : [];
-    dispatch(setPlatformDiscountCodes(platformCodes));
-  }, [appliedPlatformVoucher, dispatch]);
+  // Không cần useEffect này nữa vì đã được xử lý trong Redux action
+  // useEffect(() => {
+  //   const platformCodes = appliedPlatformVoucher ? [appliedPlatformVoucher.code] : [];
+  //   dispatch(setPlatformDiscountCodes(platformCodes));
+  // }, [appliedPlatformVoucher, dispatch]);
 
-  // Sử dụng dữ liệu từ hook tự động tính toán, fallback về Redux state, cuối cùng là tính toán thủ công
+  // Ưu tiên sử dụng kết quả từ API calculation, fallback về tính toán thủ công
   const finalCalculationResult = autoCalculationResult || calculationResult;
   
+  // Nếu có kết quả từ API, sử dụng trực tiếp
   const subtotal = finalCalculationResult?.totalItemCost || Object.values(shopProducts).reduce((total, shopProducts) => {
     return total + shopProducts.reduce((shopTotal, product) => {
       return shopTotal + (product.price * product.quantity);

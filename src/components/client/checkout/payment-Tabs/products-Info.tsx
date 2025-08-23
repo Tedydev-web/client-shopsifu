@@ -184,7 +184,6 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
                     <span className="text-sm text-black">Phương thức vận chuyển:</span>
                     <span className="text-sm text-black">{selectedShippingMethod.name}</span>
                   </div>
-                  
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-xs text-[rgb(38,170,153)]">
                       <Truck className="h-4 w-4" />

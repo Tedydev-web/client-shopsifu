@@ -158,21 +158,35 @@ const checkoutSlice = createSlice({
     applyVoucher(state, action: PayloadAction<{ shopId: string; voucherInfo: AppliedVoucherInfo }>) {
       const { shopId, voucherInfo } = action.payload;
       state.appliedVouchers[shopId] = voucherInfo;
+      // Cập nhật discountCodes trong shopOrders để trigger recalculation
+      const shopIndex = state.shopOrders.findIndex(order => order.shopId === shopId);
+      if (shopIndex !== -1) {
+        state.shopOrders[shopIndex].discountCodes = [voucherInfo.code];
+      }
     },
 
     // Xóa voucher cho một shop cụ thể
     removeVoucher(state, action: PayloadAction<{ shopId: string }>) {
       delete state.appliedVouchers[action.payload.shopId];
+      // Cập nhật discountCodes trong shopOrders để trigger recalculation
+      const shopIndex = state.shopOrders.findIndex(order => order.shopId === action.payload.shopId);
+      if (shopIndex !== -1) {
+        state.shopOrders[shopIndex].discountCodes = [];
+      }
     },
 
     // Áp dụng voucher cho toàn sàn
     applyPlatformVoucher(state, action: PayloadAction<AppliedVoucherInfo | null>) {
       state.appliedPlatformVoucher = action.payload;
+      // Cập nhật platformDiscountCodes để trigger API calculateOrder
+      state.platformDiscountCodes = action.payload ? [action.payload.code] : [];
     },
 
     // Xóa voucher của sàn
     removePlatformVoucher(state) {
       state.appliedPlatformVoucher = null;
+      // Reset platformDiscountCodes để trigger recalculation
+      state.platformDiscountCodes = [];
     },
 
     // Cập nhật phương thức vận chuyển cho một shop
