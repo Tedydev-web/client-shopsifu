@@ -106,7 +106,7 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
   const [isShippingModalOpen, setIsShippingModalOpen] = useState(false);
   
   // Use shipping hook to get real shipping data
-  const { shippingMethods, loading: shippingLoading, error: shippingError } = useShipping();
+  const { shippingMethods, loading: shippingLoading, error: shippingError } = useShipping(shopId);
   
   // State for selected shipping method - with proper interface
   const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
@@ -261,10 +261,12 @@ export function ProductsInfo() {
   }
 
   return (
-    <div className="space-y-4">
-      {Object.entries(shopProducts).map(([shopId, products]) => (
-        <ShopSection key={shopId} shopId={shopId} products={products} />
-      ))}
-    </div>
+    <>
+      <div className="space-y-4">
+        {Object.entries(shopProducts).map(([shopId, products]) => (
+          <ShopSection key={shopId} shopId={shopId} products={products} />
+        ))}
+      </div>
+    </>
   );
 }

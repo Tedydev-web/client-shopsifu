@@ -46,12 +46,12 @@ export const shippingService = {
     return response.data;
   },
 
-  // 4. Calculate Shipping Fee - Test with publicAxios to fix CORS
+  // 4. Calculate Shipping Fee (for future use)
   calculateShippingFee: async (
     data: CalculateShippingFeeRequest,
     signal?: AbortSignal
   ): Promise<CalculateShippingFeeResponse> => {
-    const response = await publicAxios.post(
+    const response = await privateAxios.post(
       API_ENDPOINTS.SHIPPING.CALCULATE_FEE,
       data,
       { signal }
@@ -59,12 +59,12 @@ export const shippingService = {
     return response.data;
   },
 
-  // 5. Calculate Delivery Time - Test with publicAxios to fix CORS
+  // 5. Calculate Delivery Time
   calculateDeliveryTime: async (
     data: DeliveryTimeRequest,
     signal?: AbortSignal
   ): Promise<DeliveryTimeResponse> => {
-    const response = await publicAxios.post(
+    const response = await privateAxios.post(
       API_ENDPOINTS.SHIPPING.DELIVERY_TIME,
       data,
       { signal }
@@ -72,12 +72,12 @@ export const shippingService = {
     return response.data;
   },
 
-  // 6. Get Shipping Services - Test with publicAxios to fix CORS
+  // 6. Get Shipping Services
   getServices: async (
     params: { fromDistrictId: number; toDistrictId: number },
     signal?: AbortSignal
   ): Promise<ShippingServiceResponse> => {
-    const response = await publicAxios.get(API_ENDPOINTS.SHIPPING.SERVICE, {
+    const response = await privateAxios.get(API_ENDPOINTS.SHIPPING.SERVICE, {
       params,
       signal,
     });

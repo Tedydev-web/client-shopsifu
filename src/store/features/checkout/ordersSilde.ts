@@ -29,6 +29,16 @@ interface ShopOrderInfo {
   shopId: string;
   cartItemIds: string[];
   discountCodes: string[];
+  shopAddress?: {
+    provinceId: number;
+    districtId: number;
+    wardCode: string;
+    province: string;
+    district: string;
+    ward: string;
+    street: string;
+    name: string;
+  } | null;
 }
 
 // Cấu trúc state tổng thể cho slice này
@@ -97,6 +107,28 @@ const checkoutSlice = createSlice({
         state.shopOrders[shopIndex].discountCodes = discountCodes;
       }
     },
+
+    // Cập nhật địa chỉ cho một shop cụ thể
+    updateShopAddress(state, action: PayloadAction<{ 
+      shopId: string; 
+      address: {
+        provinceId: number;
+        districtId: number;
+        wardCode: string;
+        province: string;
+        district: string;
+        ward: string;
+        street: string;
+        name: string;
+      }
+    }>) {
+      const { shopId, address } = action.payload;
+      const shopIndex = state.shopOrders.findIndex(order => order.shopId === shopId);
+      if (shopIndex !== -1) {
+        state.shopOrders[shopIndex].shopAddress = address;
+      }
+    },
+
     // Reset state về ban đầu (sau khi thanh toán thành công hoặc hủy bỏ)
     clearCheckoutState: () => initialState,
 
@@ -130,6 +162,7 @@ export const {
   setShopProducts,
   setShopOrders,
   updateDiscountForShop,
+  updateShopAddress,
   clearCheckoutState,
   applyVoucher,
   removeVoucher,
@@ -172,6 +205,15 @@ export const selectShopProducts = createSelector(
 export const selectShopOrders = createSelector(
   [selectCheckoutState],
   (checkout) => checkout.shopOrders
+);
+
+// Selector để lấy địa chỉ của một shop cụ thể
+export const selectShopAddress = (shopId: string) => createSelector(
+  [selectCheckoutState],
+  (checkout) => {
+    const shopOrder = checkout.shopOrders.find(order => order.shopId === shopId);
+    return shopOrder?.shopAddress || null;
+  }
 );
 
 // ** Selector quan trọng: Tự động tạo request body cho API từ state **

@@ -1,15 +1,15 @@
-'use client';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { shippingService } from '@/services/shippingService';
-import { selectShippingInfo } from '@/store/features/checkout/ordersSilde';
+import { selectShippingInfo, selectShopOrders } from '@/store/features/checkout/ordersSilde';
 import { SHIPPING_CONFIG } from '@/constants/shipping';
-import {
-  ShippingServiceResponse,
+import { useShopAddress } from './useShopAddress';
+import { 
+  ShippingServiceResponse, 
   CalculateShippingFeeRequest,
   CalculateShippingFeeResponse,
   DeliveryTimeRequest,
-  DeliveryTimeResponse
+  DeliveryTimeResponse 
 } from '@/types/shipping.interface';
 
 interface ShippingMethod {
@@ -28,48 +28,61 @@ interface ShippingMethod {
   standard_extra_cost_id: string;
 }
 
-export const useShipping = () => {
+export const useShipping = (shopId?: string) => {
   const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  
   // Get shipping info from Redux
   const shippingInfo = useSelector(selectShippingInfo);
-
+  const shopOrders = useSelector(selectShopOrders);
+  
+  // Get shop address using the new hook
+  const { shopAddress, loading: addressLoading, error: addressError } = useShopAddress(shopId || '');
+  
+  // Get first shop ID if not provided
+  const effectiveShopId = shopId || (shopOrders.length > 0 ? shopOrders[0].shopId : '');
+  
   const fetchShippingServices = async () => {
-    // Check if we have required info from Redux
+    // Check if we have required info from Redux and shop address
     if (!shippingInfo?.districtId || !shippingInfo?.wardCode) {
       console.log('Missing shipping info:', { districtId: shippingInfo?.districtId, wardCode: shippingInfo?.wardCode });
       return;
     }
-
+    
+    if (!shopAddress || addressLoading) {
+      console.log('Shop address not ready:', { shopAddress, addressLoading });
+      return;
+    }
+    
     setLoading(true);
     setError(null);
-
+    
     try {
       console.log('Starting shipping services fetch...');
       console.log('Request params:', {
-        fromDistrictId: SHIPPING_CONFIG.DEFAULT_FROM.districtId,
+        fromDistrictId: shopAddress.districtId,
         toDistrictId: parseInt(shippingInfo.districtId!)
       });
-
+      console.log('Shop address being used:', shopAddress);
+      
       // Step 1: Get available shipping services
       const servicesResponse: ShippingServiceResponse = await shippingService.getServices({
-        fromDistrictId: SHIPPING_CONFIG.DEFAULT_FROM.districtId,
+        fromDistrictId: shopAddress.districtId,
         toDistrictId: parseInt(shippingInfo.districtId)
       });
-
+      
       console.log('Services response:', servicesResponse);
-
+      
       if (!servicesResponse.data) {
         throw new Error('No shipping services available');
       }
-
+      
       // Handle both array and single service response
-      const services = Array.isArray(servicesResponse.data)
-        ? servicesResponse.data
+      const services = Array.isArray(servicesResponse.data) 
+        ? servicesResponse.data 
         : [servicesResponse.data];
-
+      
       // Step 2: For each service, calculate shipping fee and delivery time
       const enrichedMethods: ShippingMethod[] = await Promise.all(
         services.map(async (service) => {
@@ -83,28 +96,28 @@ export const useShipping = () => {
               length: SHIPPING_CONFIG.DEFAULT_PACKAGE.length,
               width: SHIPPING_CONFIG.DEFAULT_PACKAGE.width,
               service_id: service.service_id,
-              from_district_id: SHIPPING_CONFIG.DEFAULT_FROM.districtId,
-              from_ward_code: SHIPPING_CONFIG.DEFAULT_FROM.wardCode,
+              from_district_id: shopAddress.districtId,
+              from_ward_code: shopAddress.wardCode,
             };
-
+            
             const [feeResponse, timeResponse] = await Promise.all([
               shippingService.calculateShippingFee(feeRequest),
               shippingService.calculateDeliveryTime({
                 service_id: service.service_id,
                 to_district_id: parseInt(shippingInfo.districtId!),
                 to_ward_code: shippingInfo.wardCode!,
-                from_district_id: SHIPPING_CONFIG.DEFAULT_FROM.districtId,
-                from_ward_code: SHIPPING_CONFIG.DEFAULT_FROM.wardCode,
+                from_district_id: shopAddress.districtId,
+                from_ward_code: shopAddress.wardCode,
               })
             ]);
-
+            
             console.log(`Service ${service.service_id} - Fee:`, feeResponse, 'Time:', timeResponse);
-
+            
             return {
               id: service.service_id.toString(),
               name: service.short_name,
               price: feeResponse.data?.total || 0,
-              estimatedTime: typeof timeResponse.data?.leadtime === 'number'
+              estimatedTime: typeof timeResponse.data?.leadtime === 'number' 
                 ? `${timeResponse.data.leadtime} ngày`
                 : timeResponse.data?.leadtime || 'Đang cập nhật',
               description: `Phương thức vận chuyển ${service.short_name}`,
@@ -141,7 +154,7 @@ export const useShipping = () => {
           }
         })
       );
-
+      
       setShippingMethods(enrichedMethods);
       console.log('Final shipping methods:', enrichedMethods);
     } catch (err) {
@@ -151,18 +164,18 @@ export const useShipping = () => {
       setLoading(false);
     }
   };
-
-  // Auto fetch when shipping info changes
+  
+  // Auto fetch when shipping info or shop address changes
   useEffect(() => {
-    if (shippingInfo?.districtId && shippingInfo?.wardCode) {
+    if (shippingInfo?.districtId && shippingInfo?.wardCode && shopAddress && !addressLoading) {
       fetchShippingServices();
     }
-  }, [shippingInfo?.districtId, shippingInfo?.wardCode]);
-
+  }, [shippingInfo?.districtId, shippingInfo?.wardCode, shopAddress, addressLoading]);
+  
   return {
     shippingMethods,
-    loading,
-    error,
+    loading: loading || addressLoading,
+    error: error || addressError,
     refetch: fetchShippingServices,
   };
 };

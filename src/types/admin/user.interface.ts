@@ -41,6 +41,27 @@ export interface UserRole {
   name: string;
 }
 
+export interface UserAddress {
+    id: string
+    name: string,
+    recipient: string,
+    phoneNumber: string,
+    province: string,
+    district: string,
+    ward: string,
+    provinceId: number,
+    districtId: number,
+    wardCode: string,
+    street: string,
+    addressType: string,
+    createdById: string,
+    updatedById: null,
+    deletedById: null,
+    deletedAt: null,
+    createdAt: string,
+    updatedAt: string,
+    isDefault: false
+}
 export interface User {
   id: string;
   email: string;
@@ -56,6 +77,7 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   role: UserRole;
+  addresses: UserAddress;
 }
 
 // LẤY TẤT CẢ DANH SÁCH NGƯỜI DÙNG - GET ALL USER
