@@ -9,24 +9,10 @@ import {
   CalculateShippingFeeRequest,
   CalculateShippingFeeResponse,
   DeliveryTimeRequest,
-  DeliveryTimeResponse 
+  DeliveryTimeResponse,
+  ShippingMethod
 } from '@/types/shipping.interface';
 
-interface ShippingMethod {
-  id: string;
-  name: string;
-  price: number;
-  estimatedTime: string;
-  description: string;
-  features: string[];
-  icon: 'truck' | 'package' | 'shield';
-  service_id: number;
-  service_type_id: number;
-  config_fee_id: string;
-  extra_cost_id: string;
-  standard_config_fee_id: string;
-  standard_extra_cost_id: string;
-}
 
 export const useShipping = (shopId?: string) => {
   const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([]);

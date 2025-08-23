@@ -101,3 +101,20 @@ export interface ShippingServiceResponse {
   data: ShippingService | ShippingService[];
 }
 export interface CalculateShippingFeeResponse extends BaseShippingResponse<ShippingFee> {}
+
+// Định nghĩa chuẩn cho một phương thức vận chuyển đã được xử lý
+export interface ShippingMethod {
+  id: string;
+  name: string;
+  price: number;
+  estimatedTime: string;
+  service_id: number;
+  service_type_id: number;
+  description?: string;
+  features?: string[];
+  icon?: 'truck' | 'package' | 'shield';
+  config_fee_id: string | null;
+  extra_cost_id: string | null;
+  standard_config_fee_id: string | null;
+  standard_extra_cost_id: string | null;
+}

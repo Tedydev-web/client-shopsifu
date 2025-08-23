@@ -8,22 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Truck, Clock, MapPin, Package, Shield, Loader2 } from 'lucide-react';
 import { useShipping } from '../hooks/useShipping';
+import { ShippingMethod } from '@/types/shipping.interface';
 
-interface ShippingMethod {
-  id: string;
-  name: string;
-  price: number;
-  estimatedTime: string;
-  description: string;
-  features: string[];
-  icon: 'truck' | 'package' | 'shield';
-  service_id: number;
-  service_type_id: number;
-  config_fee_id: string;
-  extra_cost_id: string;
-  standard_config_fee_id: string;
-  standard_extra_cost_id: string;
-}
 
 interface ShippingModalProps {
   isOpen: boolean;
@@ -31,6 +17,9 @@ interface ShippingModalProps {
   shopName: string;
   currentMethod?: ShippingMethod;
   onSelectMethod: (method: ShippingMethod) => void;
+  shippingMethods: ShippingMethod[];
+  loading: boolean;
+  error: string | null;
 }
 
 const getIcon = (iconType: 'truck' | 'package' | 'shield') => {
@@ -46,36 +35,26 @@ const getIcon = (iconType: 'truck' | 'package' | 'shield') => {
   }
 };
 
-export function ShippingModal({ isOpen, onClose, shopName, currentMethod, onSelectMethod }: ShippingModalProps) {
-  const [selectedMethod, setSelectedMethod] = useState<string>(currentMethod?.id || '');
-  const { shippingMethods, loading, error } = useShipping();
+export function ShippingModal({
+  isOpen,
+  onClose,
+  shopName,
+  currentMethod,
+  onSelectMethod,
+  shippingMethods,
+  loading,
+  error
+}: ShippingModalProps) {
+  const [selectedMethodId, setSelectedMethodId] = useState<string | undefined>(currentMethod?.id);
 
-  // Use API data only - no fallback to mock data
-  const availableMethods = shippingMethods.map(service => ({
-    id: service.id,
-    name: service.name,
-    price: service.price,
-    estimatedTime: service.estimatedTime,
-    description: service.description,
-    features: service.features,
-    icon: service.icon,
-    service_id: service.service_id,
-    service_type_id: service.service_type_id,
-    config_fee_id: service.config_fee_id,
-    extra_cost_id: service.extra_cost_id,
-    standard_config_fee_id: service.standard_config_fee_id,
-    standard_extra_cost_id: service.standard_extra_cost_id,
-  }));
-
-  // Set default selected method when methods are loaded
   useEffect(() => {
-    if (availableMethods.length > 0 && !selectedMethod) {
-      setSelectedMethod(availableMethods[0].id);
+    if (isOpen) {
+      setSelectedMethodId(currentMethod?.id);
     }
-  }, [availableMethods, selectedMethod]);
+  }, [isOpen, currentMethod]);
 
   const handleConfirm = () => {
-    const method = availableMethods.find((m: ShippingMethod) => m.id === selectedMethod);
+    const method = shippingMethods.find((m) => m.id === selectedMethodId);
     if (method) {
       onSelectMethod(method);
     }
@@ -108,22 +87,21 @@ export function ShippingModal({ isOpen, onClose, shopName, currentMethod, onSele
                 Thử lại
               </Button>
             </div>
-          ) : availableMethods.length === 0 ? (
+          ) : shippingMethods.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600 mb-4">Chưa có phương thức vận chuyển khả dụng</p>
               <p className="text-sm text-gray-500">Vui lòng kiểm tra lại địa chỉ giao hàng</p>
             </div>
           ) : (
-            <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
-              {availableMethods.map((method: ShippingMethod) => (
+            <RadioGroup value={selectedMethodId} onValueChange={setSelectedMethodId}>
+              {shippingMethods.map((method: ShippingMethod) => (
                 <div
                   key={method.id}
-                  className={`border rounded-lg p-4 transition-all cursor-pointer ${
-                    selectedMethod === method.id 
+                  className={`border rounded-lg p-4 transition-all cursor-pointer ${selectedMethodId === method.id 
                       ? 'border-red-500 bg-red-50' 
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
-                  onClick={() => setSelectedMethod(method.id)}
+                  onClick={() => setSelectedMethodId(method.id)}
                 >
                   <div className="flex items-start space-x-3">
                     <RadioGroupItem value={method.id} id={method.id} className="mt-1" />
@@ -138,7 +116,7 @@ export function ShippingModal({ isOpen, onClose, shopName, currentMethod, onSele
                             </span>
                           </div>
                           <Badge variant="secondary" className="bg-red-100 text-red-700">
-                            {selectedMethod === method.id ? 'Đã chọn' : 'Chọn'}
+                            {selectedMethodId === method.id ? 'Đã chọn' : 'Chọn'}
                           </Badge>
                         </div>
                         

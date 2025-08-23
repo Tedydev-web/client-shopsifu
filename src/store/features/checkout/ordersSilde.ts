@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { OrderCreateRequest, ProductInfo, AppliedVoucherInfo } from '@/types/order.interface';
+import { OrderCreateRequest, ProductInfo, AppliedVoucherInfo, CalculateOrderRequest } from '@/types/order.interface';
+import { ShippingMethod } from '@/types/shipping.interface';
 
 // --- Interfaces cho State ---
 
@@ -10,6 +11,9 @@ interface CommonOrderInfo {
     name: string;
     phone: string;
     address: string;
+    provinceId: number;
+    districtId: number;
+    wardCode: string;
   } | null;
   paymentGateway: string | null;
   amount: number;
@@ -25,10 +29,12 @@ interface CommonOrderInfo {
 
 // Thông tin riêng cho từng shop
 // Thông tin riêng cho từng shop
+
 interface ShopOrderInfo {
   shopId: string;
   cartItemIds: string[];
   discountCodes: string[];
+  shippingFee: number; // Thêm phí vận chuyển cho từng shop
   shopAddress?: {
     provinceId: number;
     districtId: number;
@@ -39,6 +45,7 @@ interface ShopOrderInfo {
     street: string;
     name: string;
   } | null;
+  selectedShippingMethod: ShippingMethod | null;
 }
 
 // Cấu trúc state tổng thể cho slice này
@@ -48,6 +55,8 @@ interface CheckoutState {
   shopProducts: Record<string, ProductInfo[]>; // Key là shopId
   appliedVouchers: Record<string, AppliedVoucherInfo>; // Key là shopId
   appliedPlatformVoucher: AppliedVoucherInfo | null; // For platform-wide voucher
+  platformDiscountCodes: string[]; // Mã giảm giá toàn sàn
+  calculationResult: any | null; // Kết quả tính toán từ API calculateOrder
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -65,6 +74,8 @@ const initialState: CheckoutState = {
   shopProducts: {},
   appliedVouchers: {},
   appliedPlatformVoucher: null,
+  platformDiscountCodes: [],
+  calculationResult: null,
   status: 'idle',
   error: null,
 };
@@ -133,7 +144,9 @@ const checkoutSlice = createSlice({
           shopId,
           cartItemIds: [], // Khởi tạo rỗng, sẽ được cập nhật sau
           discountCodes: [], // Khởi tạo rỗng
+          shippingFee: 0, // Khởi tạo phí vận chuyển là 0
           shopAddress: address,
+          selectedShippingMethod: null, // Khởi tạo là null
         });
       }
     },
@@ -161,6 +174,34 @@ const checkoutSlice = createSlice({
     removePlatformVoucher(state) {
       state.appliedPlatformVoucher = null;
     },
+
+    // Cập nhật phương thức vận chuyển cho một shop
+    updateShippingForShop(state, action: PayloadAction<{ shopId: string; shippingMethod: ShippingMethod | null }>) {
+      const { shopId, shippingMethod } = action.payload;
+      const shopIndex = state.shopOrders.findIndex(order => order.shopId === shopId);
+      if (shopIndex !== -1) {
+        state.shopOrders[shopIndex].selectedShippingMethod = shippingMethod;
+      }
+    },
+
+    // Cập nhật phí vận chuyển cho một shop
+    updateShippingFeeForShop(state, action: PayloadAction<{ shopId: string; shippingFee: number }>) {
+      const { shopId, shippingFee } = action.payload;
+      const shopIndex = state.shopOrders.findIndex(order => order.shopId === shopId);
+      if (shopIndex !== -1) {
+        state.shopOrders[shopIndex].shippingFee = shippingFee;
+      }
+    },
+
+    // Cập nhật mã giảm giá toàn sàn
+    setPlatformDiscountCodes(state, action: PayloadAction<string[]>) {
+      state.platformDiscountCodes = action.payload;
+    },
+
+    // Lưu kết quả tính toán từ API calculateOrder
+    setCalculationResult(state, action: PayloadAction<any>) {
+      state.calculationResult = action.payload;
+    },
   },
 });
 
@@ -177,6 +218,10 @@ export const {
   removeVoucher,
   applyPlatformVoucher,
   removePlatformVoucher,
+  updateShippingForShop,
+  updateShippingFeeForShop,
+  setPlatformDiscountCodes,
+  setCalculationResult,
 } = checkoutSlice.actions;
 
 // --- Selectors ---
@@ -227,20 +272,32 @@ export const selectShopAddress = (shopId: string) => createSelector(
 
 // ** Selector quan trọng: Tự động tạo request body cho API từ state **
 export const selectOrderCreateRequest = createSelector(
-  [selectCommonOrderInfo, selectShopOrders],
-  (commonInfo, shopOrders): OrderCreateRequest | null => {
+  [selectCommonOrderInfo, selectShopOrders, selectCheckoutState],
+  (commonInfo, shopOrders, checkout): OrderCreateRequest | null => {
     // Chỉ tạo request khi có đủ thông tin cần thiết
     if (!commonInfo.receiver || !commonInfo.paymentGateway || shopOrders.length === 0) {
       return null;
     }
 
-    return shopOrders.map((shopOrder: ShopOrderInfo) => ({
-      shopId: shopOrder.shopId,
-      cartItemIds: shopOrder.cartItemIds,
-      receiver: commonInfo.receiver!,
-      discountCodes: shopOrder.discountCodes,
-      paymentGateway: commonInfo.paymentGateway!,
-    }));
+    return {
+      shops: shopOrders.map((shopOrder: ShopOrderInfo) => ({
+        shopId: shopOrder.shopId,
+        receiver: commonInfo.receiver!,
+        cartItemIds: shopOrder.cartItemIds,
+        discountCodes: shopOrder.discountCodes,
+        shippingInfo: {
+          length: 30, // Giá trị mặc định, có thể cập nhật sau
+          weight: 2000,
+          width: 20,
+          height: 15,
+          service_id: shopOrder.selectedShippingMethod?.service_id || 53321,
+          service_type_id: shopOrder.selectedShippingMethod?.service_type_id || 2,
+          shippingFee: shopOrder.shippingFee,
+        },
+        isCod: commonInfo.paymentGateway === 'COD',
+      })),
+      platformDiscountCodes: checkout.platformDiscountCodes,
+    };
   }
 );
 
@@ -271,6 +328,38 @@ export const selectTotalDiscountAmount = createSelector(
 
     return totalDiscount;
   }
+);
+
+// Selector để tạo request body cho API calculateOrder
+export const selectCalculateOrderRequest = createSelector(
+  [selectShopOrders, selectCheckoutState],
+  (shopOrders, checkout): CalculateOrderRequest | null => {
+    if (shopOrders.length === 0) {
+      return null;
+    }
+
+    return {
+      shops: shopOrders.map((shopOrder: ShopOrderInfo) => ({
+        shopId: shopOrder.shopId,
+        cartItemIds: shopOrder.cartItemIds,
+        shippingFee: shopOrder.shippingFee,
+        discountCodes: shopOrder.discountCodes,
+      })),
+      platformDiscountCodes: checkout.platformDiscountCodes,
+    };
+  }
+);
+
+// Selector để lấy kết quả tính toán
+export const selectCalculationResult = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.calculationResult
+);
+
+// Selector để lấy mã giảm giá toàn sàn
+export const selectPlatformDiscountCodes = createSelector(
+  [selectCheckoutState],
+  (checkout) => checkout.platformDiscountCodes
 );
 
 // --- Reducer ---

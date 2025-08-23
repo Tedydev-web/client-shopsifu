@@ -5,6 +5,7 @@ import { CheckoutContext } from '@/providers/CheckoutContext';
 import { orderService } from '@/services/orderService';
 import { useSelector } from 'react-redux';
 import { selectShopOrders, selectShopProducts, selectAppliedVouchers, selectAppliedPlatformVoucher, selectCommonOrderInfo } from '@/store/features/checkout/ordersSilde';
+import { SHIPPING_CONFIG } from '@/constants/shipping';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { OrderCreateRequest, OrderHandlerResult } from '@/types/order.interface';
@@ -51,8 +52,8 @@ export const useCheckout = () => {
 const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResult | undefined> => {
   if (isSubmitting) return;
 
-  // Validate receiver info
-  if (!context.state.receiverInfo.name || !context.state.receiverInfo.phone || !context.state.receiverInfo.address) {
+  // Validate receiver info from commonInfo
+  if (!commonInfo.receiver?.name || !commonInfo.receiver?.phone || !commonInfo.receiver?.address) {
     toast.error('Vui lòng điền đầy đủ thông tin người nhận.');
     return;
   }
@@ -71,8 +72,7 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
     const getPaymentGatewayId = (paymentMethod: string): string => {
       // Map payment method IDs to the correct gateway format
       const paymentGatewayMap: { [key: string]: string } = {
-        // 'cod': 'COD',
-        // 'momo': 'momo',
+        'cod': 'COD',
         'sepay': 'sepay',
         'vnpay': 'vnpay'
       };
@@ -80,44 +80,60 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
     };
 
     const selectedPaymentGateway = getPaymentGatewayId(context.state.paymentMethod);
+    const isCodPayment = context.state.paymentMethod === 'cod';
 
     setIsSubmitting(true);
     try {
-      // Create order payload array for multiple shops
-      const orderPayload: OrderCreateRequest = shopOrders.map(order => {
-        const codesForThisShop: string[] = [];
+      // Create order payload with new structure
+      const shopDiscountCodes: string[] = [];
+      const platformDiscountCodes: string[] = [];
 
-        // Add shop-specific voucher code
+      // Collect shop-specific voucher codes
+      shopOrders.forEach(order => {
         const shopVoucher = appliedVouchers[order.shopId];
-        if (shopVoucher && shopVoucher.code) {
-          codesForThisShop.push(shopVoucher.code);
+        if (shopVoucher && shopVoucher.code && !shopDiscountCodes.includes(shopVoucher.code)) {
+          shopDiscountCodes.push(shopVoucher.code);
         }
-
-        // Add platform voucher code to each shop order
-        if (appliedPlatformVoucher && appliedPlatformVoucher.code) {
-          if (!codesForThisShop.includes(appliedPlatformVoucher.code)) {
-            codesForThisShop.push(appliedPlatformVoucher.code);
-          }
-        }
-
-        return {
-          shopId: order.shopId,
-          cartItemIds: order.cartItemIds,
-          receiver: {
-            name: context.state.receiverInfo.name,
-            phone: context.state.receiverInfo.phone,
-            address: context.state.receiverInfo.address,
-          },
-          paymentGateway: selectedPaymentGateway,
-          discountCodes: codesForThisShop,
-        };
       });
+
+      // Collect platform voucher codes
+      if (appliedPlatformVoucher && appliedPlatformVoucher.code) {
+        platformDiscountCodes.push(appliedPlatformVoucher.code);
+      }
+
+      const orderPayload = {
+        shops: shopOrders.map(order => ({
+          shopId: order.shopId,
+          receiver: {
+            name: commonInfo.receiver!.name,
+            phone: commonInfo.receiver!.phone,
+            address: commonInfo.receiver!.address,
+            provinceId: commonInfo.receiver!.provinceId,
+            districtId: commonInfo.receiver!.districtId,
+            wardCode: commonInfo.receiver!.wardCode
+          },
+          cartItemIds: order.cartItemIds,
+          discountCodes: shopDiscountCodes,
+          shippingInfo: {
+            length: SHIPPING_CONFIG.DEFAULT_PACKAGE.length,
+            weight: SHIPPING_CONFIG.DEFAULT_PACKAGE.weight,
+            width: SHIPPING_CONFIG.DEFAULT_PACKAGE.width,
+            height: SHIPPING_CONFIG.DEFAULT_PACKAGE.height,
+            service_id: order.selectedShippingMethod?.service_id || 53321,
+            service_type_id: order.selectedShippingMethod?.service_type_id || 2,
+            shippingFee: order.shippingFee || 0
+          },
+          isCod: isCodPayment
+        })),
+        platformDiscountCodes: platformDiscountCodes
+      };
 
       // Console log để kiểm tra data trước khi gọi API
       console.log('📦 Order Payload Data:', {
         paymentMethod: context.state.paymentMethod,
         paymentGateway: selectedPaymentGateway,
-        receiverInfo: context.state.receiverInfo,
+        isCod: isCodPayment,
+        receiverInfo: commonInfo.receiver,
         shopOrders: shopOrders,
         finalPayload: orderPayload
       });
@@ -182,8 +198,25 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
             error: vnPayError.message
           };
         }
+      } else if (selectedPaymentGateway === 'COD' || isCodPayment) {
+        // Thanh toán khi nhận hàng (COD)
+        toast.success('Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng.');
+        const orderId = orderData.orders && orderData.orders.length > 0 
+          ? orderData.orders[0].id 
+          : undefined;
+          
+        const result = {
+          success: true,
+          paymentMethod: 'COD',
+          orderData: orderData,
+          orderId: orderId,
+          paymentId: orderData.paymentId
+        };
+        
+        console.log('✅ COD Payment Result:', result);
+        return result;
       } else {
-        // Các phương thức thanh toán khác (COD, ...)
+        // Các phương thức thanh toán khác
         toast.success('Đặt hàng thành công!');
         router.push(`/checkout/success?orderId=${orderData.orders[0].id}`); // Navigate to success page with the first order's ID if available
         const orderId = orderData.orders && orderData.orders.length > 0 

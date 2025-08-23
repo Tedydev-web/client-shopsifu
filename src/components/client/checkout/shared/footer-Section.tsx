@@ -12,11 +12,14 @@ import {
   selectAppliedPlatformVoucher,
   removePlatformVoucher,
   setCommonInfo,
+  selectCalculationResult,
+  setPlatformDiscountCodes,
 } from '@/store/features/checkout/ordersSilde';
 import { formatCurrency } from '@/utils/formatter';
 import { useEffect, useState } from 'react';
 import { PlatformVoucherModal } from './cart-PlatformVoucher';
 import { AppliedVoucherInfo } from '@/types/order.interface';
+import { useAutoCalculateOrder } from '@/components/client/checkout/hooks/useAutoCalculateOrder';
 
 interface FooterSectionProps {
   variant?: 'default' | 'mobile';
@@ -49,20 +52,30 @@ export function FooterSection({
   const shopProducts = useSelector(selectShopProducts);
   const totalDiscount = useSelector(selectTotalDiscountAmount);
   const appliedPlatformVoucher = useSelector(selectAppliedPlatformVoucher);
+  const calculationResult = useSelector(selectCalculationResult);
   const [isPlatformModalOpen, setPlatformModalOpen] = useState(false);
+  
+  // Sử dụng hook tự động tính toán để tránh vòng lặp vô hạn
+  const { calculationResult: autoCalculationResult, loading: calculationLoading, error: calculationError } = useAutoCalculateOrder();
 
-  // Calculate subtotal from all products in all shops
-  const subtotal = Object.values(shopProducts).reduce((total, shopProducts) => {
+  // Cập nhật platformDiscountCodes khi có voucher platform
+  useEffect(() => {
+    const platformCodes = appliedPlatformVoucher ? [appliedPlatformVoucher.code] : [];
+    dispatch(setPlatformDiscountCodes(platformCodes));
+  }, [appliedPlatformVoucher, dispatch]);
+
+  // Sử dụng dữ liệu từ hook tự động tính toán, fallback về Redux state, cuối cùng là tính toán thủ công
+  const finalCalculationResult = autoCalculationResult || calculationResult;
+  
+  const subtotal = finalCalculationResult?.totalItemCost || Object.values(shopProducts).reduce((total, shopProducts) => {
     return total + shopProducts.reduce((shopTotal, product) => {
       return shopTotal + (product.price * product.quantity);
     }, 0);
   }, 0);
 
-  // For now, shipping is not implemented
-  const shippingFee = 0;
-
-  // Calculate the final total
-  const totalPayment = subtotal + shippingFee - totalDiscount;
+  const shippingFee = finalCalculationResult?.totalShippingFee || 0;
+  const voucherDiscount = finalCalculationResult?.totalVoucherDiscount || totalDiscount;
+  const totalPayment = finalCalculationResult?.totalPayment || (subtotal + shippingFee - totalDiscount);
 
   const handleApplyPlatformVoucher = (voucher: AppliedVoucherInfo) => {
     // The actual application logic is likely in the modal, this is for closing
@@ -158,15 +171,37 @@ export function FooterSection({
 
       <h2 className="text-lg font-semibold">Tóm tắt đơn hàng</h2>
       <div className="space-y-2">
+        {calculationLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-sm text-gray-600">Đang tính toán...</span>
+          </div>
+        ) : calculationError ? (
+          <div className="text-center py-4">
+            <p className="text-red-600 text-sm mb-2">{calculationError}</p>
+            <p className="text-xs text-gray-500">Sử dụng tính toán tạm thời</p>
+          </div>
+        ) : null}
+        
         <div className="space-y-3">
           <PriceLine label="Tổng tiền hàng" value={formatCurrency(subtotal)} />
-          <PriceLine label="Tổng giảm giá" value={`-${formatCurrency(totalDiscount)}`} />
+          <PriceLine label="Tổng giảm giá" value={`-${formatCurrency(Math.abs(voucherDiscount))}`} />
         </div>
 
         <PriceLine label="Phí vận chuyển" value={formatCurrency(shippingFee)} />
 
         <Separator className="my-3" />
-        <PriceLine label="Tổng thanh toán" value={formatCurrency(totalPayment)} isBold={true} />
+        <PriceLine 
+          label="Tổng thanh toán" 
+          value={formatCurrency(totalPayment)} 
+          isBold={true} 
+        />
+        
+        {finalCalculationResult && (
+          <div className="text-xs text-gray-500 text-center mt-2">
+            {finalCalculationResult.shops?.length > 0 && `Tính toán từ ${finalCalculationResult.shops.length} shop`}
+          </div>
+        )}
       </div>
 
       {isPlatformModalOpen && (

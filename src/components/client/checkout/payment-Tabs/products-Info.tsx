@@ -7,32 +7,22 @@ import {
   selectShopProducts, 
   applyVoucher, 
   selectAppliedVouchers, 
-  selectShippingInfo
+  selectShippingInfo,
+  selectShopOrders,
+  updateShippingForShop,
+  updateShippingFeeForShop,
+  selectCalculationResult
 } from '@/store/features/checkout/ordersSilde';
 import { ProductInfo, AppliedVoucherInfo } from '@/types/order.interface';
+import { ShippingMethod } from '@/types/shipping.interface';
 import Image from 'next/image';
 import { PiStorefrontLight } from "react-icons/pi";
 import { VoucherButton } from "@/components/client/checkout/shared/cart-ModalVoucher";
 import { ShippingModal } from "@/components/client/checkout/shared/cart-ModalShipping";
 import { useShipping } from "@/components/client/checkout/hooks/useShipping";
+import { useCalculateOrder } from "@/components/client/checkout/hooks/useCalculateOrder";
 import { Truck, Clock } from 'lucide-react';
 
-// Define ShippingMethod interface to match the useShipping hook
-interface ShippingMethod {
-  id: string;
-  name: string;
-  price: number;
-  estimatedTime: string;
-  description: string;
-  features: string[];
-  icon: 'truck' | 'package' | 'shield';
-  service_id: number;
-  service_type_id: number;
-  config_fee_id: string;
-  extra_cost_id: string;
-  standard_config_fee_id: string;
-  standard_extra_cost_id: string;
-}
 
 // Header component for the product list - desktop only
 function ProductHeader() {
@@ -100,35 +90,40 @@ function ProductItem({ item }: { item: ProductInfo }) {
 // Component to display a shop and its products
 function ShopSection({ shopId, products }: { shopId: string; products: ProductInfo[] }) {
   const dispatch = useDispatch();
-  const appliedVouchers = useSelector<RootState, Record<string, AppliedVoucherInfo>>(selectAppliedVouchers);
+  const appliedVouchers = useSelector(selectAppliedVouchers);
   const appliedVoucher = appliedVouchers[shopId];
   const shippingInfo = useSelector(selectShippingInfo);
+  const shopOrders = useSelector(selectShopOrders);
+
+  const currentShopOrder = shopOrders.find(order => order.shopId === shopId);
+  const selectedShippingMethod = currentShopOrder?.selectedShippingMethod;
+
   const [isShippingModalOpen, setIsShippingModalOpen] = useState(false);
   
-  // Use shipping hook to get real shipping data
   const { shippingMethods, loading: shippingLoading, error: shippingError } = useShipping(shopId);
-  
-  // State for selected shipping method - with proper interface
-  const [selectedShippingMethod, setSelectedShippingMethod] = useState<ShippingMethod | null>(null);
 
   const shopName = products.length > 0 ? products[0].shopName : 'Shop';
   const shopTotal = products.reduce((sum, item) => sum + item.subtotal, 0);
   const finalTotal = shopTotal - (appliedVoucher?.discountAmount || 0) + (selectedShippingMethod?.price || 0);
   const cartItemIds = products.map(p => p.id);
 
-  // Set default shipping method when methods are loaded
   useEffect(() => {
     if (shippingMethods.length > 0 && !selectedShippingMethod) {
-      setSelectedShippingMethod(shippingMethods[0]);
+      const defaultMethod = shippingMethods[0];
+      dispatch(updateShippingForShop({ shopId, shippingMethod: defaultMethod }));
+      // Cập nhật phí vận chuyển vào Redux state
+      dispatch(updateShippingFeeForShop({ shopId, shippingFee: defaultMethod.price }));
     }
-  }, [shippingMethods, selectedShippingMethod]);
+  }, [dispatch, shopId, shippingMethods, selectedShippingMethod]);
 
   const handleApplyVoucher = (shopId: string, voucherInfo: AppliedVoucherInfo) => {
     dispatch(applyVoucher({ shopId, voucherInfo }));
   };
 
   const handleSelectShippingMethod = (method: ShippingMethod) => {
-    setSelectedShippingMethod(method);
+    dispatch(updateShippingForShop({ shopId, shippingMethod: method }));
+    // Cập nhật phí vận chuyển khi thay đổi phương thức
+    dispatch(updateShippingFeeForShop({ shopId, shippingFee: method.price }));
   };
 
   return (
@@ -248,6 +243,9 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
         shopName={shopName}
         currentMethod={selectedShippingMethod || undefined}
         onSelectMethod={handleSelectShippingMethod}
+        shippingMethods={shippingMethods}
+        loading={shippingLoading}
+        error={shippingError}
       />
     </div>
   );
