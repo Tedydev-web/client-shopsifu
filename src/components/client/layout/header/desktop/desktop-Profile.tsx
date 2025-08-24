@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { useDropdown } from "../dropdown-context";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
 import Image from "next/image";
+import { useGetProfile } from "@/hooks/useGetProfile";
 
 interface MenuItemProps {
   icon: LucideIcon;
@@ -31,6 +32,7 @@ export function ProfileDropdown() {
   const { openDropdown, setOpenDropdown } = useDropdown();
   const user = useUserData();
   const isOpen = openDropdown === "profile";
+  const fetchProfile = useGetProfile(); // Hàm để fetch lại dữ liệu người dùng
 
   // Kiểm tra role từ user data
   const isAdmin = user?.role?.name === 'ADMIN' || user?.role?.name === 'Super Admin' || user?.role?.name === 'SELLER';
@@ -39,7 +41,11 @@ export function ProfileDropdown() {
     {
       icon: User,
       label: "Tài khoản của tôi",
-      onClick: () => router.push(ROUTES.CLIENT.USER.BASE),
+      onClick: async () => {
+        // Fetch profile data before navigation
+        await fetchProfile.fetchProfile();
+        router.push(ROUTES.CLIENT.USER.BASE);
+      },
     },
     {
       icon: ShoppingCart,

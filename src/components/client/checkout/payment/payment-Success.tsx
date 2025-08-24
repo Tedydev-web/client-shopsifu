@@ -66,7 +66,7 @@ export function PaymentStatus({ orderId, totalAmount, initialStatus, paymentMeth
         const orderData = await orderService.getById(orderId);
         
         // Nếu đơn hàng đã được thanh toán
-        if (orderData.data.status === OrderStatus.PENDING_PICKUP || 
+        if (orderData.data.status === OrderStatus.PICKUPED || 
             orderData.data.status === OrderStatus.PENDING_DELIVERY || 
             orderData.data.status === OrderStatus.DELIVERED) {
           setStatus('success');

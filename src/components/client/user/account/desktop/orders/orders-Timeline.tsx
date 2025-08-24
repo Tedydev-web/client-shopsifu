@@ -16,7 +16,11 @@ interface OrderTimelineProps {
   finalAmount?: number;
 }
 
-export function OrderTimeline({ status, finalAmount, createdAt }: OrderTimelineProps) {
+export function OrderTimeline({
+  status,
+  finalAmount,
+  createdAt,
+}: OrderTimelineProps) {
   // Hủy đơn -> không hiển thị timeline
   if (status === OrderStatus.CANCELLED) {
     return (
@@ -35,14 +39,14 @@ export function OrderTimeline({ status, finalAmount, createdAt }: OrderTimelineP
     status === (OrderStatus as any).PICKUPED;
 
   // ===== Labels =====
-let step2Label = "Đã Xác Nhận Thông Tin Thanh Toán";  // Simplified step 2
-let step3Label = "Đang Chuẩn Bị Hàng";
+  let step2Label = "Đã Xác Nhận Thông Tin Thanh Toán"; // Simplified step 2
+  let step3Label = "Đang Chuẩn Bị Hàng";
 
-if (status === OrderStatus.PENDING_PACKAGING) {
-  step3Label = "Người Bán Đang Chuẩn Bị Hàng";
-} else if (isPickuped) {
-  step3Label = "ĐVVC Đã Lấy Hàng Thành Công";
-}
+  if (status === OrderStatus.PENDING_PACKAGING) {
+    step3Label = "Người Bán Đang Chuẩn Bị Hàng";
+  } else if (isPickuped) {
+    step3Label = "ĐVVC Đã Lấy Hàng Thành Công";
+  }
 
   let step4Label = "Đang Vận Chuyển";
   if (status === OrderStatus.PENDING_DELIVERY)
