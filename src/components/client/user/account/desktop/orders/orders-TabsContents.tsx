@@ -22,6 +22,11 @@ const statusLabel: Record<OrderStatus, StatusInfo> = {
     className:
       "bg-gradient-to-r from-amber-50 to-yellow-100 text-amber-700 border border-amber-200",
   },
+  PENDING_PACKAGING: {
+    label: "Đang đóng gói",
+    className:
+      "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 border border-orange-200",
+  },
   PENDING_PICKUP: {
     label: "Chờ lấy hàng",
     className:

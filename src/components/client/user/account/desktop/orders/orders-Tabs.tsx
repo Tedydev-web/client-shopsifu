@@ -35,6 +35,7 @@ export const OrderTabs = () => {
   const tabValues = [
     { value: "all", label: "Tất cả" },
     { value: OrderStatus.PENDING_PAYMENT, label: "Chờ thanh toán" },
+    { value: OrderStatus.PENDING_PACKAGING, label: "Đang đóng gói" },
     { value: OrderStatus.PENDING_PICKUP, label: "Chờ lấy hàng" },
     { value: OrderStatus.PENDING_DELIVERY, label: "Đang giao hàng" },
     { value: OrderStatus.DELIVERED, label: "Đã giao" },

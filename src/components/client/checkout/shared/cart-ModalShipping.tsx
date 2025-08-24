@@ -110,7 +110,11 @@ export function ShippingModal({
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {getIcon(method.icon || 'truck')}
-                            <span className="font-medium text-base">{method.name}</span>
+                            <span className="font-medium text-base">
+                              {method.name === 'Hàng nhẹ' ? 'Tiêu chuẩn' : 
+                               method.name === 'Hàng nặng' ? 'Siêu tốc' : 
+                               method.name}
+                            </span>
                             <span className="text-lg font-semibold text-red-600">
                               ₫{(method.price || 0).toLocaleString()}
                             </span>

@@ -9,6 +9,7 @@ export interface OrderGetAllParams extends PaginationRequest {
 
 export enum OrderStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
+  PENDING_PACKAGING = "PENDING_PACKAGING",
   PENDING_PICKUP = "PENDING_PICKUP",
   PENDING_DELIVERY = "PENDING_DELIVERY",
   DELIVERED = "DELIVERED",
@@ -198,10 +199,100 @@ export interface OrderHandlerResult {
   error?: string;
 }
 
+// ==================================================
+// MANAGE ORDER INTERFACES
+// ==================================================
 
+/**
+ * @interface ManageOrderUser
+ * @description Thông tin user trong manage order
+ */
+export interface ManageOrderUser {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+}
 
+/**
+ * @interface ManageOrderProductTranslation
+ * @description Thông tin dịch thuật sản phẩm
+ */
+export interface ManageOrderProductTranslation {
+  id: string;
+  name: string;
+  languageId: string;
+}
 
+/**
+ * @interface ManageOrderItem
+ * @description Chi tiết item trong đơn hàng manage
+ */
+export interface ManageOrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productTranslations: ManageOrderProductTranslation[];
+  skuPrice: number;
+  image: string;
+  skuValue: string;
+  skuId: string;
+  orderId: string;
+  quantity: number;
+  createdAt: string;
+}
 
+/**
+ * @interface ManageOrder
+ * @description Đơn hàng trong hệ thống quản lý
+ */
+export interface ManageOrder {
+  id: string;
+  userId: string;
+  status: OrderStatus;
+  shopId: string;
+  paymentId: number;
+  createdAt: string;
+  updatedAt: string;
+  items: ManageOrderItem[];
+  user: ManageOrderUser;
+}
+
+/**
+ * @interface ManageOrderGetAllParams
+ * @description Parameters cho API get all manage orders
+ */
+export interface ManageOrderGetAllParams extends PaginationRequest {
+  status?: OrderStatus;
+  shopId?: string;
+  userId?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+/**
+ * @interface ManageOrderGetAllResponse
+ * @description Response cho API get all manage orders
+ */
+export interface ManageOrderGetAllResponse {
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: ManageOrder[];
+  metadata: PaginationMetadata;
+}
+
+/**
+ * @interface ManageOrderGetByIdResponse
+ * @description Response cho API get manage order by ID
+ */
+export interface ManageOrderGetByIdResponse {
+  statusCode: number;
+  message: string;
+  timestamp: string;
+  data: ManageOrder;
+}
 
 /**
  * @interface Calculate Order

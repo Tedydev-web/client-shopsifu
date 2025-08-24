@@ -186,10 +186,16 @@ export function FooterSection({
         
         <div className="space-y-3">
           <PriceLine label="Tổng tiền hàng" value={formatCurrency(subtotal)} />
-          <PriceLine label="Tổng giảm giá" value={`-${formatCurrency(Math.abs(voucherDiscount))}`} />
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-600">Tổng giảm giá</span>
+            <span className="text-green-600 font-medium">-{formatCurrency(Math.abs(voucherDiscount))}</span>
+          </div>
         </div>
 
-        <PriceLine label="Phí vận chuyển" value={formatCurrency(shippingFee)} />
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-600">Phí vận chuyển</span>
+          <span className="text-red-600 font-medium">{formatCurrency(shippingFee)}</span>
+        </div>
 
         <Separator className="my-3" />
         <PriceLine 

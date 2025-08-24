@@ -70,7 +70,12 @@ export default function ProductInfo({ product }: { product: Product }) {
   useEffect(() => {
     const initialVariants: SelectedVariants = {};
     variantGroups.forEach(group => {
-      initialVariants[group.value] = null;
+      // Auto-select nếu variant là "Default"
+      if (group.value === "Default" && group.options.includes("Default")) {
+        initialVariants[group.value] = "Default";
+      } else {
+        initialVariants[group.value] = null;
+      }
     });
     setSelectedVariants(initialVariants);
   }, [variantGroups]);

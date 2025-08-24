@@ -86,6 +86,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
     { label: string; variant?: "default" | "destructive" }
   > = {
     PENDING_PAYMENT: { label: "Chờ thanh toán" },
+    PENDING_PACKAGING: { label: "Đang đóng gói" },
     PENDING_PICKUP: { label: "Chờ lấy hàng" },
     PENDING_DELIVERY: { label: "Đang giao hàng" },
     DELIVERED: { label: "Đã giao hàng" },

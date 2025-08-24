@@ -83,7 +83,7 @@ export function FlashSaleSection({ className }: FlashSaleSectionProps) {
     initialLoading,
     error
   } = useClientSuggestedProducts({
-    initialLimit: 200,
+    initialLimit: 24,
     sortBy: 'createdAt',
     sortOrder: 'asc' // Sắp xếp tăng dần cho flashsale
   });
