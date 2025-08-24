@@ -9,6 +9,7 @@ import { FooterSection } from './shared/footer-Section';
 import { useCheckout } from './hooks/useCheckout';
 import { CheckoutStep } from './checkout-Steps';
 import { QrSepay } from './payment/qrSepay';
+import { PaymentCod } from './payment/payment-cod';
 import { useRouter } from 'next/navigation';
 import { useShopsifuSocket } from '@/providers/ShopsifuSocketProvider';
 import { orderService } from '@/services/orderService';
@@ -41,8 +42,9 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
     isValid: cartItemIds.length > 0
   });
   
-  // 2. State để quản lý việc hiển thị QR Sepay và loading states
+  // 2. State để quản lý việc hiển thị QR Sepay, COD và loading states
   const [showQrSepay, setShowQrSepay] = useState(false);
+  const [showCodPayment, setShowCodPayment] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [redirectingTo, setRedirectingTo] = useState<string | null>(null);
   const [totalAmount, setTotalAmount] = useState<number>(0);
@@ -111,8 +113,11 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
             // Chuyển hướng đến trang thanh toán VNPay
             window.location.href = result.paymentUrl as string;
           }, 1500);
+        } else if (result.paymentMethod === 'COD' && result.orderId) {
+          // Thanh toán COD - hiển thị component COD
+          setShowCodPayment(true);
         } else if (result.orderId) {
-          // Các phương thức khác (COD, ...)
+          // Các phương thức khác
           router.push(`/checkout/payment-success?orderId=${result.orderId}&status=success&totalAmount=${totalAmount}`);
         }
       } else {
@@ -217,6 +222,18 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
     return step === 'cart' ? 'information' : step;
   };
 
+  // Nếu đang hiển thị COD Payment, render component COD
+  if (showCodPayment && orderResult && orderResult.orderId) {
+    return (
+      <PaymentCod
+        orderId={orderResult.orderId}
+        totalAmount={totalAmount}
+        paymentId={orderResult.paymentId}
+        orderData={orderResult.orderData}
+      />
+    );
+  }
+  
   // Nếu đang hiển thị QR Sepay, render component QR
   if (showQrSepay && orderResult && orderResult.paymentId && orderResult.orderId) {
     return (

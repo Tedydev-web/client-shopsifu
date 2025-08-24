@@ -260,7 +260,7 @@ export function VoucherButton({ shopName, onApplyVoucher, shopId, cartItemIds }:
   return (
     <>
       <div className="flex items-center justify-between px-4 py-3 text-base">
-        <div className="flex items-center gap-4 text-gray-500">
+        <div className="flex items-center gap-4 text-gray-500 text-sm">
           <Ticket className="w-5 h-5 text-red-500" />
           <span className="text-black">Mã giảm giá của {shopName}</span>
         </div>

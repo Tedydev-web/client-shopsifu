@@ -1,18 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { CustomerInfo } from './customer-Info';
 import { ShippingAddress } from './shipping-Address';
 import { useCheckout } from '../hooks/useCheckout';
 import { CustomerFormData, Address, ShippingAddress as ShippingAddressType } from '@/types/checkout.interface';
 import { toast } from 'sonner';
+import { setCommonInfo } from '@/store/features/checkout/ordersSilde';
 
 interface InformationTabsProps {
   onNext: () => void;
 }
 
 export function InformationTabs({ onNext }: InformationTabsProps) {
+  const dispatch = useDispatch();
   const { updateReceiverInfo, updateShippingAddress, updateShippingMethod } = useCheckout();
 
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
@@ -191,6 +194,13 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       const parts = value.split('|');
       return parts[1] || parts[0]; // Ưu tiên name, fallback về code
     };
+
+    // Helper function để lấy ID từ format "code|name"
+    const parseLocationId = (value: string) => {
+      if (!value) return null;
+      const parts = value.split('|');
+      return parseInt(parts[0]) || null;
+    };
     
     // Tạo địa chỉ đầy đủ cho người nhận
     const fullAddress = selectedAddress 
@@ -202,6 +212,28 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
           parseLocationValue(formData.province)
         ].filter(Boolean).join(', ');
     
+    // Lấy thông tin địa chỉ chi tiết với ID
+    let provinceId: number | null = null;
+    let districtId: number | null = null;
+    let wardCode: string = '';
+
+    if (selectedAddress) {
+      // Nếu chọn địa chỉ có sẵn, lấy từ selectedAddress
+      // Cần parse từ selectedAddress nếu có thông tin ID
+      const addressParts = selectedAddress.province?.split('|') || [];
+      const districtParts = selectedAddress.district?.split('|') || [];
+      const wardParts = selectedAddress.ward?.split('|') || [];
+      
+      provinceId = addressParts.length > 0 ? parseInt(addressParts[0]) || null : null;
+      districtId = districtParts.length > 0 ? parseInt(districtParts[0]) || null : null;
+      wardCode = wardParts.length > 0 ? wardParts[0] : '';
+    } else {
+      // Nếu nhập địa chỉ mới, parse từ formData
+      provinceId = parseLocationId(formData.province);
+      districtId = parseLocationId(formData.district);
+      wardCode = formData.ward ? formData.ward.split('|')[0] : '';
+    }
+    
     // Cập nhật thông tin người nhận vào context (đây là thông tin quan trọng cho API)
     const receiverInfo = {
       name: receiverName.trim(),
@@ -209,6 +241,41 @@ export function InformationTabs({ onNext }: InformationTabsProps) {
       address: fullAddress,
     };
     updateReceiverInfo(receiverInfo);
+
+    // Cập nhật thông tin receiver vào Redux commonInfo với đầy đủ thông tin
+    // Chỉ lưu khi có đầy đủ thông tin địa chỉ
+    if (provinceId && districtId && wardCode) {
+      const receiverData = {
+        name: receiverName.trim(),
+        phone: receiverPhone.trim(),
+        address: fullAddress,
+        provinceId: provinceId,
+        districtId: districtId,
+        wardCode: wardCode
+      };
+      
+      dispatch(setCommonInfo({
+        receiver: receiverData
+      }));
+      
+      console.log('🏠 Updated receiver info to Redux:', receiverData);
+    } else {
+      // Nếu chưa có đầy đủ thông tin địa chỉ, chỉ lưu thông tin cơ bản
+      const basicReceiverData = {
+        name: receiverName.trim(),
+        phone: receiverPhone.trim(),
+        address: fullAddress,
+        provinceId: 204, // Default fallback
+        districtId: 1536, // Default fallback  
+        wardCode: wardCode || '480121' // Default fallback
+      };
+      
+      dispatch(setCommonInfo({
+        receiver: basicReceiverData
+      }));
+      
+      console.log('🏠 Updated basic receiver info to Redux (using defaults):', basicReceiverData);
+    }
     
     // Cập nhật địa chỉ giao hàng (thông tin chi tiết)
     const shippingAddress = {

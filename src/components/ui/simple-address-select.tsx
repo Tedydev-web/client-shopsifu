@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -27,6 +27,15 @@ export const SimpleAddressSelect: React.FC<SimpleAddressSelectProps> = ({
   const [selectedProvinceId, setSelectedProvinceId] = useState(initialValues?.provinceId || '');
   const [selectedDistrictId, setSelectedDistrictId] = useState(initialValues?.districtId || '');
   const [selectedWardCode, setSelectedWardCode] = useState(initialValues?.wardCode || '');
+
+  // Update state khi initialValues thay đổi (cho edit mode)
+  useEffect(() => {
+    if (initialValues) {
+      setSelectedProvinceId(initialValues.provinceId || '');
+      setSelectedDistrictId(initialValues.districtId || '');
+      setSelectedWardCode(initialValues.wardCode || '');
+    }
+  }, [initialValues?.provinceId, initialValues?.districtId, initialValues?.wardCode]);
 
   const { data: provinces, isLoading: provincesLoading } = useProvinces();
   const { data: districts, isLoading: districtsLoading } = useDistricts(
@@ -129,7 +138,7 @@ export const SimpleAddressSelect: React.FC<SimpleAddressSelectProps> = ({
       </div>
 
       {/* Ward Select - Full width on next row */}
-      <div className="space-y-1 md:col-span-1">
+      <div className="space-y-1 md:col-span-2">
         <div>
           <Label className="text-xs font-medium">Phường/Xã</Label>
           <Select

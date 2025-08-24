@@ -21,17 +21,48 @@ interface ReceiverInfo {
   name: string;
   phone: string;
   address: string;
+  provinceId: number;
+  districtId: number;
+  wardCode: string;
 }
 
-interface OrderCreationInfo {
+// --- Interfaces cho Tạo Đơn hàng (Create Order) ---
+
+/**
+ * @interface ShippingInfo
+ * @description Thông tin chi tiết về gói hàng và dịch vụ vận chuyển được chọn.
+ */
+interface ShippingInfo {
+  length: number;
+  weight: number;
+  width: number;
+  height: number;
+  service_id: number;
+  service_type_id: number;
+  shippingFee: number;
+}
+
+/**
+ * @interface ShopOrderCreationInfo
+ * @description Thông tin tạo đơn hàng cho một shop cụ thể.
+ */
+interface ShopOrderCreationInfo {
   shopId: string;
-  cartItemIds: string[];
   receiver: ReceiverInfo;
+  cartItemIds: string[];
   discountCodes: string[];
-  paymentGateway: string;
+  shippingInfo: ShippingInfo;
+  isCod: boolean;
 }
 
-export type OrderCreateRequest = OrderCreationInfo[];
+/**
+ * @interface OrderCreateRequest
+ * @description Cấu trúc request body để tạo một hoặc nhiều đơn hàng.
+ */
+export interface OrderCreateRequest {
+  shops: ShopOrderCreationInfo[];
+  platformDiscountCodes: string[];
+}
 
 export interface OrderCreateResponse {
   statusCode: number;
@@ -115,10 +146,10 @@ export interface ProductInfo {
   shopName: string;
   name: string;
   image: string;
-  variation: string;
   quantity: number;
   subtotal: number;
   price: number;
+  variation?: string; // Thêm thuộc tính variation
 }
 
 export interface OrderGetAllResponse {
@@ -176,20 +207,44 @@ export interface OrderHandlerResult {
  * @interface Calculate Order
  * @description API Tính toán giá trị đơn hàng kèm mã giảm giá
  */
-export interface CalculateOrderRequest{
+/**
+ * @interface ShopCalculationInfo
+ * @description Thông tin để tính toán giá trị đơn hàng cho một shop.
+ */
+interface ShopCalculationInfo {
+  shopId: string;
   cartItemIds: string[];
+  shippingFee: number;
   discountCodes: string[];
+}
+
+/**
+ * @interface CalculateOrderRequest
+ * @description Cấu trúc request body để tính toán giá trị cuối cùng của đơn hàng.
+ */
+export interface CalculateOrderRequest {
+  shops: ShopCalculationInfo[];
+  platformDiscountCodes: string[];
 }
 export interface CalculateOrderResponse{
   statusCode: number;
-    message: string;
-    timestamp: string;
-    data: {
-        totalItemCost: number;
-        totalShippingFee: number;
-        totalVoucherDiscount: number;
-        totalPayment: number;
-    }
+  message: string;
+  timestamp: string;
+  data: {
+    totalItemCost: number;
+    totalShippingFee: number;
+    totalVoucherDiscount: number;
+    totalPayment: number;
+    shops: {
+      shopId: string;
+      itemCost: number;
+      shippingFee: number;
+      voucherDiscount: number;
+      platformVoucherDiscount: number;
+      itemCount: number;
+      payment: number;
+    }[];
+  };
 }
 
 export interface AppliedVoucherInfo {

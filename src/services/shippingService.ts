@@ -8,6 +8,9 @@ import {
   GetWardsResponse,
   CalculateShippingFeeRequest,
   CalculateShippingFeeResponse,
+  DeliveryTimeRequest,
+  DeliveryTimeResponse,
+  ShippingServiceResponse,
 } from "@/types/shipping.interface";
 
 export const shippingService = {
@@ -53,6 +56,31 @@ export const shippingService = {
       data,
       { signal }
     );
+    return response.data;
+  },
+
+  // 5. Calculate Delivery Time
+  calculateDeliveryTime: async (
+    data: DeliveryTimeRequest,
+    signal?: AbortSignal
+  ): Promise<DeliveryTimeResponse> => {
+    const response = await privateAxios.post(
+      API_ENDPOINTS.SHIPPING.DELIVERY_TIME,
+      data,
+      { signal }
+    );
+    return response.data;
+  },
+
+  // 6. Get Shipping Services
+  getServices: async (
+    params: { fromDistrictId: number; toDistrictId: number },
+    signal?: AbortSignal
+  ): Promise<ShippingServiceResponse> => {
+    const response = await privateAxios.get(API_ENDPOINTS.SHIPPING.SERVICE, {
+      params,
+      signal,
+    });
     return response.data;
   },
 };

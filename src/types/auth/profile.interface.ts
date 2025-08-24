@@ -15,6 +15,9 @@ export interface Address {
   street: string;
   addressType: "HOME" | "OFFICE";
   isDefault: boolean;
+  provinceId: number;
+  districtId: number;
+  wardCode: string;
   createdById: string;
   updatedById: string | null;
   deletedById: string | null;
@@ -34,6 +37,10 @@ export interface AddAddressRequest {
   phoneNumber?: string;
   recipient?: string;
   isDefault: boolean;
+  // Thêm các trường mới
+  provinceId: number;
+  districtId: number;
+  wardCode: string;
 }
 
 export interface AddAddressResponse {
@@ -52,6 +59,10 @@ export interface UpdateAddressRequest {
   phoneNumber?: string;
   recipient?: string;
   isDefault?: boolean;
+  // Thêm các trường mới
+  provinceId?: number;
+  districtId?: number;
+  wardCode?: string;
 }
 
 export interface UpdateAddressResponse {

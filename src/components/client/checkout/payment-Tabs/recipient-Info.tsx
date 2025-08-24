@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUserData } from '@/hooks/useGetData-UserLogin';
+import { useSelector } from 'react-redux';
+import { selectShippingInfo } from '@/store/features/checkout/ordersSilde';
 import { useEffect } from 'react';
 
 interface RecipientInfoProps {
@@ -22,11 +24,13 @@ interface RecipientInfoProps {
 export function RecipientInfo({ shippingAddress, onEdit }: RecipientInfoProps) {
   // Lấy thông tin khách hàng trực tiếp từ Redux
   const userData = useUserData();
+  const shippingInfo = useSelector(selectShippingInfo);
   
-  // Debug: Log shipping address
+  // Debug: Log shipping address và shipping info
   useEffect(() => {
     console.log('[RecipientInfo] Received shippingAddress:', shippingAddress);
-  }, [shippingAddress]);
+    console.log('[RecipientInfo] Redux shippingInfo:', shippingInfo);
+  }, [shippingAddress, shippingInfo]);
   
   // Khởi tạo thông tin khách hàng từ userData
   const customerInfo = {
@@ -50,10 +54,27 @@ export function RecipientInfo({ shippingAddress, onEdit }: RecipientInfoProps) {
       address: shippingAddress.address,
       ward: shippingAddress.ward,
       district: shippingAddress.district,
-      province: shippingAddress.province
+      province: shippingAddress.province,
+      shippingInfo
     });
     
-    // First try using addressDetail + location details
+    // Ưu tiên sử dụng tên từ Redux shipping info nếu có
+    if (shippingInfo && shippingAddress.addressDetail) {
+      const parts = [
+        shippingAddress.addressDetail,
+        shippingInfo.wardName || parseLocationName(shippingAddress.ward),
+        shippingInfo.districtName || parseLocationName(shippingAddress.district),
+        shippingInfo.provinceName || parseLocationName(shippingAddress.province)
+      ].filter(Boolean);
+      
+      console.log('[RecipientInfo] Address parts from Redux:', parts);
+      
+      if (parts.length > 0) {
+        return parts.join(', ');
+      }
+    }
+    
+    // Fallback: try using addressDetail + location details
     if (shippingAddress.addressDetail) {
       const parts = [
         shippingAddress.addressDetail,
@@ -62,7 +83,7 @@ export function RecipientInfo({ shippingAddress, onEdit }: RecipientInfoProps) {
         parseLocationName(shippingAddress.province)
       ].filter(Boolean);
       
-      console.log('[RecipientInfo] Address parts:', parts);
+      console.log('[RecipientInfo] Address parts fallback:', parts);
       
       if (parts.length > 0) {
         return parts.join(', ');

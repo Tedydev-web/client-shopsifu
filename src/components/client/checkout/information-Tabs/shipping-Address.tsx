@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,8 @@ import { CustomerFormData, Address } from '@/types/checkout.interface';
 import { addressService } from '@/services/addressService';
 import { Address as ProfileAddress } from '@/types/auth/profile.interface';
 import { SimpleAddressSelect } from '@/components/ui/simple-address-select';
+import { useProvinces, useDistricts, useWards } from '@/hooks/useShipping';
+import { setShippingInfo } from '@/store/features/checkout/ordersSilde';
 
 interface ShippingAddressProps {
   formData: CustomerFormData;
@@ -26,10 +29,22 @@ export function ShippingAddress({
   addresses,
   onSelectExistingAddress
 }: ShippingAddressProps) {
+  const dispatch = useDispatch();
   const [isSelectingAddress, setIsSelectingAddress] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
   const [savedAddresses, setSavedAddresses] = useState<ProfileAddress[]>([]);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+
+  // Hooks để lấy data cho việc mapping names
+  const { data: provincesData } = useProvinces();
+  const { data: districtsData } = useDistricts(
+    { provinceId: parseInt(formData.province?.split('|')[0] || '0') },
+    !!formData.province?.split('|')[0]
+  );
+  const { data: wardsData } = useWards(
+    { districtId: parseInt(formData.district?.split('|')[0] || '0') },
+    !!formData.district?.split('|')[0]
+  );
 
   // Handle address selection changes (much simpler now)
   const handleAddressFormChange = useCallback((provinceId: string, districtId: string, wardCode: string) => {
@@ -44,8 +59,22 @@ export function ShippingAddress({
       if (wardCode) {
         handleChange('ward', wardCode);
       }
+
+      // Lưu thông tin vào Redux với tên tương ứng
+      const provinceName = provincesData?.data?.find(p => p.ProvinceID.toString() === provinceId)?.ProvinceName || '';
+      const districtName = districtsData?.data?.find(d => d.DistrictID.toString() === districtId)?.DistrictName || '';
+      const wardName = wardsData?.data?.find(w => w.WardCode === wardCode)?.WardName || '';
+
+      dispatch(setShippingInfo({
+        provinceId,
+        districtId,
+        wardCode,
+        provinceName,
+        districtName,
+        wardName
+      }));
     }
-  }, [isSelectingAddress, handleChange]);
+  }, [isSelectingAddress, handleChange, dispatch, provincesData, districtsData, wardsData]);
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -87,6 +116,16 @@ export function ShippingAddress({
         province: `${selected.province}|${selected.province}`,
         type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
       };
+
+      // Lưu thông tin shipping vào Redux từ địa chỉ có sẵn
+      dispatch(setShippingInfo({
+        provinceId: selected.provinceId?.toString() || '',
+        districtId: selected.districtId?.toString() || '',
+        wardCode: selected.wardCode || '',
+        provinceName: selected.province,
+        districtName: selected.district,
+        wardName: selected.ward
+      }));
       
       setTimeout(() => {
         onSelectExistingAddress(addressToUpdate);
