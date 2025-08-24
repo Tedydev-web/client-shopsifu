@@ -201,7 +201,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               )}
 
               {/* Nút Hủy đơn hàng - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
-              {order.status === "PENDING_PAYMENT" && (
+              {(order.status === "PENDING_PAYMENT"|| order.status === "PENDING_PACKAGING") && (
                 <Button
                   variant="outline"
                   size="sm"
