@@ -17,6 +17,7 @@ import { useOrder } from "./useOrder";
 import { Order, OrderItem } from "@/types/order.interface";
 import Link from "next/link";
 import { createProductSlug } from "@/components/client/products/shared/productSlug"; // Đường dẫn đến hàm tạo slug
+import { OrderTimeline } from "./orders-Timeline";
 
 interface OrderDetailProps {
   readonly orderId: string;
@@ -50,7 +51,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
 
   const handleConfirmCancel = async () => {
     if (!orderId) return;
-    
+
     setIsCancelling(true);
     try {
       await cancelOrder(orderId);
@@ -58,7 +59,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
       setOrder(res?.data ?? null);
       setShowCancelDialog(false);
     } catch (error) {
-      console.error('Error cancelling order:', error);
+      console.error("Error cancelling order:", error);
     } finally {
       setIsCancelling(false);
     }
@@ -105,7 +106,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
   const finalAmount = order.totalPayment;
 
   return (
-    <div className="mx-auto bg-[#f5f5f5] space-y-4 text-sm rounded-md">
+    <div className="mx-auto bg-[#f5f5f5] space-y-3 text-sm rounded-md">
       <Link
         href="/user/orders"
         className="flex items-center gap-1 text-muted-foreground text-sm bg-white rounded-lg p-4 border cursor-pointer"
@@ -113,9 +114,17 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
         <ChevronLeft className="w-5 h-5" />
         <span className="text-[#121214] text-sm">
           Lịch sử mua hàng
-          <span className="font-medium text-[#CFCFD3]"> / Chi tiết đơn hàng</span>
+          <span className="font-medium text-[#CFCFD3]">
+            {" "}
+            / Chi tiết đơn hàng
+          </span>
         </span>
       </Link>
+
+      <section className="bg-white rounded-lg border p-4 space-y-3">
+        <h2 className="text-lg font-semibold">Tiến trình đơn hàng</h2>
+        <OrderTimeline/>
+      </section>
 
       {/* Tổng quan */}
       <section className="bg-white rounded-lg border p-4 space-y-3">
@@ -135,7 +144,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           </Badge>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
           <div className="flex items-center gap-4">
             <img
               src={selectedItem?.image}
@@ -143,7 +152,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               className="w-20 h-20 object-cover rounded"
             />
             <div>
-              <p className="font-medium">{selectedItem?.productName}</p>
+              <p className="font-medium line-clamp-2">{selectedItem?.productName}</p>
               <div className="flex items-center gap-2">
                 <span className="text-[#d70018] font-semibold">
                   {(selectedItem?.skuPrice ?? 0).toLocaleString()}đ
@@ -154,11 +163,13 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               </span>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-2 min-w-[100px]">
             <span className="text-sm">Số lượng: {totalQuantity}</span>
             <div className="flex gap-2">
               {/* Nút Mua lại - chỉ hiển thị cho trạng thái DELIVERED, RETURNED, CANCELLED */}
-              {(order.status === "DELIVERED" || order.status === "RETURNED" || order.status === "CANCELLED") && (
+              {(order.status === "DELIVERED" ||
+                order.status === "RETURNED" ||
+                order.status === "CANCELLED") && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -178,7 +189,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               )}
 
               {/* Nút Thanh toán lại - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
-              {order.status === "PENDING_PAYMENT" && (
+              {(order.status === "PENDING_PAYMENT" || order.status === "PENDING_PACKAGING") && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -209,24 +220,24 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
       </section>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-10 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-3">
         {/* Cột trái */}
-        <div className="md:col-span-5 flex flex-col space-y-4">
+        <div className="md:col-span-5 flex flex-col space-y-3">
           {/* Thông tin khách hàng */}
           <section className="bg-white rounded-lg border p-4 space-y-3">
-            <h2 className="text-lg font-semibold">Thông tin khách hàng</h2>
+            <h2 className="text-lg">Thông tin khách hàng</h2>
             <div className="px-2 space-y-2 text-base">
               <div className="flex justify-between border-b pb-2">
                 <span className="text-muted-foreground">Họ và tên:</span>
-                <span className="font-medium">{order.receiver?.name}</span>
+                <span className="font-sm">{order.receiver?.name}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="text-muted-foreground">Số điện thoại:</span>
-                <span className="font-medium">{order.receiver?.phone}</span>
+                <span className="font-sm">{order.receiver?.phone}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span className="text-muted-foreground">Địa chỉ:</span>
-                <span className="font-semibold text-right max-w-[70%]">
+                <span className="font-sm text-right max-w-[70%]">
                   {order.receiver?.address}
                 </span>
               </div>
@@ -258,7 +269,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           {/* Trung tâm bảo hành */}
           <section className="bg-white rounded-lg border p-4 space-y-3 flex-1">
             <h2 className="text-lg font-semibold">Trung tâm bảo hành</h2>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b">
               <span>Danh sách trung tâm bảo hành</span>
               <Button variant="link" className="text-primary px-0">
                 Truy cập
@@ -318,7 +329,14 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
             </p>
             <div className="flex px-2 justify-between text-red-600">
               <span>Tổng số tiền đã thanh toán</span>
-              <span>{order.status === "PENDING_PICKUP" || order.status === "PENDING_DELIVERY" || order.status === "DELIVERED" ? order.totalPayment.toLocaleString() : "0"}đ</span>
+              <span>
+                {order.status === "PENDING_PICKUP" ||
+                order.status === "PENDING_DELIVERY" ||
+                order.status === "DELIVERED"
+                  ? order.totalPayment.toLocaleString()
+                  : "0"}
+                đ
+              </span>
             </div>
           </div>
         </section>
@@ -333,7 +351,8 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               <DialogTitle>Xác nhận hủy đơn hàng</DialogTitle>
             </div>
             <DialogDescription className="text-left">
-              Bạn có chắc chắn muốn hủy đơn hàng <span className="font-semibold">#{order?.paymentId}</span> không?
+              Bạn có chắc chắn muốn hủy đơn hàng{" "}
+              <span className="font-semibold">#{order?.paymentId}</span> không?
               <br />
               <span className="text-red-600 text-sm mt-2 block">
                 Lưu ý: Hành động này không thể hoàn tác.

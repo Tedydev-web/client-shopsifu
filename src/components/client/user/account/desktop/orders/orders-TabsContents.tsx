@@ -221,7 +221,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                 <div className="flex justify-center mt-4">
                   <Button
                     variant="ghost"
-                    onClick={() => setVisibleCount((prev) => prev + 5)}
+                    onClick={() => setVisibleCount(orders.length)}
                     className="text-xs sm:text-sm md:text-base text-[#3B82F6]"
                   >
                     Xem thêm

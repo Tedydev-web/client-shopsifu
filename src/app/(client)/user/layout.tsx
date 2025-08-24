@@ -59,8 +59,8 @@ export default function AccountLayout({
               </div>
 
               {/* Sidebar + children */}
-              <div className="flex flex-1 gap-4 px-6 pb-6">
-                <aside className="w-[340px] min-w-[280px] pt-4">
+              <div className="flex flex-1 gap-3 px-6 pb-6">
+                <aside className="w-[320px] min-w-[280px] pt-4">
                   <Sidebar />
                 </aside>
                 <main className="flex-1 overflow-hidden pt-4">

@@ -15,7 +15,7 @@ export default function DesktopSidebar() {
   const { handleLogout, loading: logoutLoading } = useLogout();
 
   return (
-    <aside className="bg-gradient-to-br from-white via-gray-50/30 to-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full md:w-[340px] h-full flex flex-col border border-gray-100 relative overflow-hidden">
+    <aside className="bg-gradient-to-br from-white via-gray-50/30 to-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 w-full md:w-[320px] h-full flex flex-col border border-gray-100 relative overflow-hidden">
       
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-3">
