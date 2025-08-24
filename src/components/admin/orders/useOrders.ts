@@ -172,6 +172,84 @@ export function useOrder() {
     }
   }, []);
 
+  // 🔹 In hóa đơn GHN
+  const handlePrintInvoice = useCallback(async (orderId: string, orderCode?: string) => {
+    try {
+      console.log('Printing invoice for orderId:', orderId);
+      console.log('Provided orderCode:', orderCode);
+      
+      // Nếu đã có orderCode từ tham số, dùng luôn
+      if (orderCode) {
+        console.log('Using provided orderCode:', orderCode);
+      } else {
+        // Nếu không có orderCode, tìm từ orderDetail hoặc orders
+        const order = orderDetail?.id === orderId ? orderDetail : orders.find(o => o.id === orderId);
+        console.log('Found order from state:', order);
+        
+        if (!order) {
+          console.error('Order not found for ID:', orderId);
+          alert('Không tìm thấy thông tin đơn hàng. Vui lòng thử lại.');
+          return;
+        }
+        
+        if (!order.orderCode) {
+          console.error('Order found but missing orderCode:', order);
+          alert('Đơn hàng chưa có mã vận đơn. Không thể in hóa đơn.');
+          return;
+        }
+        
+        orderCode = order.orderCode;
+        console.log('Using orderCode from state:', orderCode);
+      }
+
+      if (!orderCode) {
+        alert('Không có mã vận đơn để in hóa đơn.');
+        return;
+      }
+
+      console.log('Final orderCode to use:', orderCode);
+
+      // Bước 1: Gọi API gen-token
+      const tokenResponse = await fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/a5/gen-token', {
+        method: 'POST',
+        headers: {
+          'Token': process.env.NEXT_PUBLIC_GHN_TOKEN || '',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          order_codes: [orderCode]
+        })
+      });
+
+      console.log('Token response status:', tokenResponse.status);
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error('Token API error:', errorText);
+        throw new Error(`Failed to generate token: ${tokenResponse.status}`);
+      }
+
+      const tokenData = await tokenResponse.json();
+      console.log('Token data:', tokenData);
+      
+      const printToken = tokenData.data?.token;
+
+      if (!printToken) {
+        console.error('No token in response:', tokenData);
+        throw new Error('No token received from GHN');
+      }
+
+      // Bước 2: Mở link printA5 trực tiếp với token
+      const printUrl = `https://dev-online-gateway.ghn.vn/a5/public-api/printA5?token=${printToken}`;
+      console.log('Opening print URL:', printUrl);
+      window.open(printUrl, '_blank');
+      
+    } catch (error) {
+      console.error('Error printing invoice:', error);
+      alert(`Lỗi in hóa đơn: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }, [orderDetail, orders]);
+
   return {
     orders,
     orderDetail,
@@ -187,5 +265,6 @@ export function useOrder() {
     createOrder,
     cancelOrder,
     updateOrderStatus,
+    handlePrintInvoice,
   };
 }

@@ -269,6 +269,7 @@ export interface ManageOrder {
   totalVoucherDiscount: number;
   totalPayment: number;
   user?: ManageOrderUser;
+  orderCode: string;
 }
 
 /**

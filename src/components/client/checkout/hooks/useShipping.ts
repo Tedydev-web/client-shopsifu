@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { shippingService } from '@/services/shippingService';
 import { selectShippingInfo, selectShopOrders } from '@/store/features/checkout/ordersSilde';
 import { SHIPPING_CONFIG } from '@/constants/shipping';
-import { useShopAddress } from './useShopAddress';
 import { 
   ShippingServiceResponse, 
   CalculateShippingFeeRequest,
@@ -23,8 +22,6 @@ export const useShipping = (shopId?: string) => {
   const shippingInfo = useSelector(selectShippingInfo);
   const shopOrders = useSelector(selectShopOrders);
   
-  // Get shop address using the new hook
-  const { shopAddress, loading: addressLoading, error: addressError } = useShopAddress(shopId || '');
   
   // Get first shop ID if not provided
   const effectiveShopId = shopId || (shopOrders.length > 0 ? shopOrders[0].shopId : '');
@@ -148,15 +145,15 @@ export const useShipping = (shopId?: string) => {
   
   // Auto fetch when shipping info changes
   useEffect(() => {
-    if (shippingInfo?.districtId && shippingInfo?.wardCode && !addressLoading) {
+    if (shippingInfo?.districtId && shippingInfo?.wardCode) {
       fetchShippingServices();
     }
-  }, [shippingInfo?.districtId, shippingInfo?.wardCode, effectiveShopId, shopOrders, addressLoading]);
+  }, [shippingInfo?.districtId, shippingInfo?.wardCode, effectiveShopId, shopOrders]);
   
   return {
     shippingMethods,
-    loading: loading || addressLoading,
-    error: error || addressError,
+    loading,
+    error,
     refetch: fetchShippingServices,
   };
 };

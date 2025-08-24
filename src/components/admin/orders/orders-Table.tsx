@@ -14,6 +14,7 @@ import { useDataTable } from "@/hooks/useDataTable";
 import { useServerDataTable } from "@/hooks/useServerDataTable";
 import { manageOrderService } from "@/services/orderService";
 import type { ManageOrder, ManageOrderGetAllResponse } from "@/types/order.interface";
+import { useOrder } from "./useOrders";
 
 export function OrdersTable() {
   const t = useTranslations("admin.orders");
@@ -35,7 +36,10 @@ export function OrdersTable() {
       ...params,
       sortOrder: params.sortOrder as "asc" | "desc" | undefined,
     }),
-    getResponseData: (response: ManageOrderGetAllResponse) => response.data || [],
+    getResponseData: (response: ManageOrderGetAllResponse) => {
+      console.log('Orders data received:', response.data);
+      return response.data || [];
+    },
     getResponseMetadata: (response: ManageOrderGetAllResponse) => response.metadata,
     defaultLimit: 10,
     requestConfig: {
@@ -50,9 +54,21 @@ export function OrdersTable() {
     router.push(`/admin/order/${orderId}`);
   };
 
-  const handlePrintInvoice = (orderId: string) => {
-    // TODO: Implement print invoice logic
-    console.log('Print invoice for order:', orderId);
+  // Sử dụng handlePrintInvoice từ useOrder hook
+  const { handlePrintInvoice } = useOrder();
+
+  const handlePrintOrder = (order: ManageOrder) => {
+    console.log('handlePrintOrder called with order:', order);
+    console.log('Order ID:', order.id);
+    console.log('Order Code:', order.orderCode);
+    
+    if (!order.orderCode) {
+      alert('Đơn hàng chưa có mã vận đơn. Không thể in hóa đơn.');
+      return;
+    }
+    
+    // Truyền cả orderId và orderCode để đảm bảo function có đủ thông tin
+    handlePrintInvoice(order.id, order.orderCode);
   };
 
   const handleUpdateStatus = (orderId: string) => {
@@ -63,7 +79,7 @@ export function OrdersTable() {
   const columns = OrdersColumns({ 
     t,
     onViewDetail: handleViewDetail,
-    onPrintInvoice: handlePrintInvoice,
+    onPrintInvoice: handlePrintOrder,
     onUpdateStatus: handleUpdateStatus,
     expandedRows,
     setExpandedRows,

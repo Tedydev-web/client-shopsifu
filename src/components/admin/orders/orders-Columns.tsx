@@ -22,7 +22,7 @@ import type { ManageOrder } from "@/types/order.interface";
 const getOrderActions = (
   order: ManageOrder,
   onViewDetail: ((orderId: string) => void) | undefined,
-  onPrintInvoice: ((orderId: string) => void) | undefined,
+  onPrintInvoice: ((order: ManageOrder) => void) | undefined,
   onUpdateStatus: ((orderId: string) => void) | undefined,
   t: (key: string) => string
 ): ActionItem<ManageOrder>[] => {
@@ -42,7 +42,7 @@ const getOrderActions = (
       type: "command",
       label: t("printInvoice"),
       icon: <Printer className="w-4 h-4" />,
-      onClick: (order) => onPrintInvoice(order.id),
+      onClick: (order) => onPrintInvoice(order),
     });
   }
 
@@ -71,7 +71,7 @@ export const OrdersColumns = ({
 }: {
   t: (key: string) => string;
   onViewDetail?: (orderId: string) => void;
-  onPrintInvoice?: (orderId: string) => void;
+  onPrintInvoice?: (order: ManageOrder) => void;
   onUpdateStatus?: (orderId: string) => void;
   expandedRows?: Set<string>;
   setExpandedRows?: (rows: Set<string>) => void;
@@ -149,22 +149,53 @@ export const OrdersColumns = ({
   },
   {
     accessorFn: (row) => row.id,
-    id: "orderCode",
+    id: "orderId",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("orderCode")}
+        title="Mã đơn hàng"
         className="justify-center text-center px-2"
       />
     ),
     cell: ({ getValue }) => (
       <div
-        className="w-[160px] truncate text-center font-medium text-blue-600 py-3"
+        className="w-[140px] truncate text-center font-medium text-slate-600 py-3"
         title={getValue<string>()}
       >
         #{getValue<string>().slice(-8).toUpperCase()}
       </div>
     ),
+  },
+  {
+    accessorFn: (row) => row.orderCode,
+    id: "orderCode",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Mã vận đơn"
+        className="justify-center text-center px-2"
+      />
+    ),
+    cell: ({ row }) => {
+      const orderCode = row.original.orderCode;
+      
+      return (
+        <div className="w-[120px] text-center py-3">
+          {orderCode ? (
+            <div
+              className="font-medium text-blue-600 text-sm"
+              title={`Mã vận đơn: ${orderCode}`}
+            >
+              {orderCode}
+            </div>
+          ) : (
+            <div className="text-gray-400 text-xs italic">
+              Chưa có
+            </div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorFn: (row) => row.createdAt,
@@ -276,39 +307,6 @@ export const OrdersColumns = ({
       );
     },
   },
-  // {
-  //   accessorFn: (row) => row.paymentId,
-  //   id: "paymentMethod",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader
-  //       column={column}
-  //       title={t("paymentMethod")}
-  //       className="justify-center text-center px-2"
-  //     />
-  //   ),
-  //   cell: ({ getValue }) => {
-  //     const paymentId = getValue<number>();
-  //     const paymentMethods: Record<number, { label: string; color: string }> = {
-  //       1: { label: 'COD', color: 'text-green-600 bg-green-50' },
-  //       2: { label: 'VNPay', color: 'text-blue-600 bg-blue-50' },
-  //       3: { label: 'MoMo', color: 'text-pink-600 bg-pink-50' },
-  //       4: { label: 'Bank Transfer', color: 'text-purple-600 bg-purple-50' },
-  //     };
-      
-  //     const payment = paymentMethods[paymentId] || { 
-  //       label: `Payment ${paymentId}`, 
-  //       color: 'text-gray-600 bg-gray-50' 
-  //     };
-      
-  //     return (
-  //       <div className="w-[120px] text-center py-3">
-  //         <div className={`px-2 py-1 rounded-lg text-xs font-medium ${payment.color}`}>
-  //           {payment.label}
-  //         </div>
-  //       </div>
-  //     );
-  //   },
-  // },
   {
     accessorFn: (row) => row.items.reduce((total, item) => total + (item.skuPrice * item.quantity), 0),
     id: "totalAmount",

@@ -6,6 +6,7 @@ import { RootState } from '@/store/store';
 import { 
   selectShopProducts, 
   applyVoucher, 
+  removeVoucher,
   selectAppliedVouchers, 
   selectShippingInfo,
   selectShopOrders,
@@ -21,7 +22,7 @@ import { VoucherButton } from "@/components/client/checkout/shared/cart-ModalVou
 import { ShippingModal } from "@/components/client/checkout/shared/cart-ModalShipping";
 import { useShipping } from "@/components/client/checkout/hooks/useShipping";
 import { useCalculateOrder } from "@/components/client/checkout/hooks/useCalculateOrder";
-import { Truck, Clock } from 'lucide-react';
+import { Truck, Clock, X } from 'lucide-react';
 
 
 // Header component for the product list - desktop only
@@ -126,6 +127,10 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
     dispatch(updateShippingFeeForShop({ shopId, shippingFee: method.price }));
   };
 
+  const handleRemoveVoucher = (shopId: string) => {
+    dispatch(removeVoucher({ shopId }));
+  };
+
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       {/* Shop header */}
@@ -213,11 +218,25 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
           
           {/* Applied Voucher */}
           {appliedVoucher && (
-            <div className="flex items-center justify-end gap-3 px-6">
-              <span className="text-sm text-gray-600">Giảm giá voucher:</span>
-              <span className="text-lg font-semibold text-green-600">
-                -₫{appliedVoucher.discountAmount.toLocaleString()}
-              </span>
+            <div className="flex items-center justify-between px-6">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Voucher áp dụng:</span>
+                <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                  {appliedVoucher.code}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-lg font-semibold text-green-600">
+                  -₫{appliedVoucher.discountAmount.toLocaleString()}
+                </span>
+                <button
+                  onClick={() => handleRemoveVoucher(shopId)}
+                  className="p-1 hover:bg-red-50 rounded-full transition-colors group"
+                  title="Bỏ voucher"
+                >
+                  <X className="h-4 w-4 text-gray-400 group-hover:text-red-500" />
+                </button>
+              </div>
             </div>
           )}
           {/* Total */}

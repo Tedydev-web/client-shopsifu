@@ -17,12 +17,13 @@ import {
   CreditCard,
   DollarSign,
   ShoppingBag,
-  Loader2
+  Loader2,
+  Printer
 } from "lucide-react";
 
-export default function OrderDetail({ onBack }: { onBack?: () => void }) {
+export default function OrderDetail() {
   const { id } = useParams<{ id: string }>();
-  const { orderDetail, loading, fetchOrderDetail, cancelOrder } = useOrder();
+  const { orderDetail, loading, fetchOrderDetail, cancelOrder, handlePrintInvoice } = useOrder();
 
   useEffect(() => {
     if (id) fetchOrderDetail(id);
@@ -104,114 +105,118 @@ export default function OrderDetail({ onBack }: { onBack?: () => void }) {
   const showCancelButton = orderDetail.status === "PENDING_PAYMENT";
 
   return (
-    <div className="min-h-screen bg-slate-50/30">
-      <div className="max-w-6xl mx-auto p-4 lg:p-6 space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              onClick={onBack}
-              className="flex items-center gap-2 text-slate-600 border-slate-300 hover:bg-slate-50 h-9 px-4 text-sm"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Quay lại</span>
-            </Button>
-            <div>
-              <h1 className="text-lg font-semibold text-slate-800">
-                Đơn hàng #{orderDetail.id}
-              </h1>
-              <p className="text-slate-500 text-xs mt-1">
-                Tạo lúc {format(new Date(orderDetail.createdAt), "dd/MM/yyyy 'lúc' HH:mm")}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <Badge
-              className={`${status.bgColor} ${status.color} border px-3 py-1.5 rounded-full text-xs font-medium`}
-            >
-              {status.label}
-            </Badge>
-            {showCancelButton && id && (
-              <Button
-                variant="outline"
-                onClick={() => cancelOrder(id)}
-                className="text-red-600 border-red-300 hover:bg-red-50 h-9 px-4 text-sm"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                    Đang hủy...
-                  </>
-                ) : (
-                  "Hủy đơn hàng"
-                )}
-              </Button>
-            )}
+    <div className="space-y-6">
+      {/* Status Badge and Cancel Button */}
+      <div className="flex items-center justify-between bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
+        <div className="flex items-center gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-800">
+              Đơn hàng #{orderDetail.id}
+            </h2>
+            <p className="text-slate-500 text-sm mt-1">
+              Tạo lúc {format(new Date(orderDetail.createdAt), "dd/MM/yyyy 'lúc' HH:mm")}
+            </p>
           </div>
         </div>
+        
+        <div className="flex items-center gap-3">
+          <Badge
+            className={`${status.bgColor} ${status.color} border px-3 py-1.5 rounded-full text-xs font-medium`}
+          >
+            {status.label}
+          </Badge>
+          
+          {/* Print Invoice Button */}
+          {id && (
+            <Button
+              variant="outline"
+              onClick={() => handlePrintInvoice(id)}
+              className="text-blue-600 border-blue-300 hover:bg-blue-50 h-9 px-4 text-sm"
+            >
+              <Printer className="w-3 h-3 mr-2" />
+              In hóa đơn
+            </Button>
+          )}
+          
+          {showCancelButton && id && (
+            <Button
+              variant="outline"
+              onClick={() => cancelOrder(id)}
+              className="text-red-600 border-red-300 hover:bg-red-50 h-9 px-4 text-sm"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                  Đang hủy...
+                </>
+              ) : (
+                "Hủy đơn hàng"
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
 
-        {/* Content Grid - Balanced Layout */}
-        <div className="grid lg:grid-cols-12 gap-6">
-          {/* Left Column - Order Details */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Receiver Information */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Package className="w-4 h-4 text-blue-600" />
+      {/* Content Grid - Balanced Layout */}
+      <div className="grid lg:grid-cols-12 gap-6">
+        {/* Left Column - Order Details */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* Receiver Information */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Package className="w-4 h-4 text-blue-600" />
+              </div>
+              <h2 className="text-base font-medium text-slate-700">Thông tin người nhận</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="flex items-center gap-3">
+                <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-slate-500">Họ và tên</p>
+                  <p className="text-sm font-medium text-slate-800 truncate">{orderDetail.receiver.name}</p>
                 </div>
-                <h2 className="text-base font-medium text-slate-700">Thông tin người nhận</h2>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex items-center gap-3">
-                  <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-slate-500">Họ và tên</p>
-                    <p className="text-sm font-medium text-slate-800 truncate">{orderDetail.receiver.name}</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-slate-500">Số điện thoại</p>
+                  <p className="text-sm font-medium text-slate-800">{orderDetail.receiver.phone}</p>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-slate-500">Số điện thoại</p>
-                    <p className="text-sm font-medium text-slate-800">{orderDetail.receiver.phone}</p>
-                  </div>
-                </div>
-                
-                <div className="sm:col-span-2 flex items-start gap-3">
-                  <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-slate-500">Địa chỉ giao hàng</p>
-                    <p className="text-sm font-medium text-slate-800 leading-relaxed">
-                      {orderDetail.receiver.address}
-                    </p>
-                  </div>
+              </div>
+              
+              <div className="sm:col-span-2 flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-slate-500">Địa chỉ giao hàng</p>
+                  <p className="text-sm font-medium text-slate-800 leading-relaxed">
+                    {orderDetail.receiver.address}
+                  </p>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Product List */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <ShoppingBag className="w-4 h-4 text-emerald-600" />
-                </div>
-                <h2 className="text-base font-medium text-slate-700">
-                  Sản phẩm ({orderDetail.items.length} mặt hàng)
-                </h2>
+          {/* Product List */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200/60">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <ShoppingBag className="w-4 h-4 text-emerald-600" />
               </div>
-              
-              <div className="space-y-4">
-                {orderDetail.items.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="flex gap-4 p-4 rounded-lg border border-slate-200 bg-slate-50/30"
-                  >
+              <h2 className="text-base font-medium text-slate-700">
+                Sản phẩm ({orderDetail.items.length} mặt hàng)
+              </h2>
+            </div>
+            
+            <div className="space-y-4">
+              {orderDetail.items.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="flex gap-4 p-4 rounded-lg border border-slate-200 bg-slate-50/30"
+                >
                     <div className="flex-shrink-0">
                       <Image
                         src={item.image}
@@ -316,6 +321,5 @@ export default function OrderDetail({ onBack }: { onBack?: () => void }) {
           </div>
         </div>
       </div>
-    </div>
   );
 }
