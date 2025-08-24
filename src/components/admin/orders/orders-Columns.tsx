@@ -1,35 +1,201 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
-import { format } from "date-fns";
-import { Order } from "@/types/order.interface";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Package } from "lucide-react";
+import { DataTableColumnHeader } from "@/components/ui/data-table-component/data-table-column-header";
+import { DataTableRowActions } from "@/components/ui/data-table-component/data-table-row-actions";
+import type { ActionItem } from "@/components/ui/data-table-component/data-table-row-actions";
+import type { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { 
+  ChevronDown, 
+  ChevronRight, 
+  Eye, 
+  Package, 
+  Printer, 
+  RefreshCw 
+} from "lucide-react";
+import type { ManageOrder } from "@/types/order.interface";
+
+// Hàm tạo danh sách actions cho Order
+const getOrderActions = (
+  order: ManageOrder,
+  onViewDetail: ((orderId: string) => void) | undefined,
+  onPrintInvoice: ((order: ManageOrder) => void) | undefined,
+  onUpdateStatus: ((orderId: string) => void) | undefined,
+  t: (key: string) => string
+): ActionItem<ManageOrder>[] => {
+  const actions: ActionItem<ManageOrder>[] = [];
+
+  if (onViewDetail) {
+    actions.push({
+      type: "command",
+      label: t("viewDetail"),
+      icon: <Eye className="w-4 h-4" />,
+      onClick: (order) => onViewDetail(order.id),
+    });
+  }
+
+  if (onPrintInvoice) {
+    actions.push({
+      type: "command",
+      label: t("printInvoice"),
+      icon: <Printer className="w-4 h-4" />,
+      onClick: (order) => onPrintInvoice(order),
+    });
+  }
+
+  // if (onUpdateStatus) {
+  //   if (actions.length > 0) {
+  //     actions.push({ type: "separator" });
+  //   }
+  //   actions.push({
+  //     type: "command",
+  //     label: t("updateStatus"),
+  //     icon: <Package className="w-4 h-4" />,
+  //     onClick: (order) => onUpdateStatus(order.id),
+  //   });
+  // }
+
+  return actions;
+};
 
 export const OrdersColumns = ({
   t,
+  onViewDetail,
+  onPrintInvoice,
+  onUpdateStatus,
+  expandedRows,
+  setExpandedRows,
 }: {
   t: (key: string) => string;
-}): ColumnDef<Order, any>[] => [
+  onViewDetail?: (orderId: string) => void;
+  onPrintInvoice?: (order: ManageOrder) => void;
+  onUpdateStatus?: (orderId: string) => void;
+  expandedRows?: Set<string>;
+  setExpandedRows?: (rows: Set<string>) => void;
+}): ColumnDef<ManageOrder, any>[] => [
+  // Expand button column
   {
-    accessorFn: (row) => row.id,
-    id: "orderCode",
+    id: "expand",
+    header: "",
+    cell: ({ row }) => {
+      const orderId = row.original.id;
+      const isExpanded = expandedRows?.has(orderId) || false;
+      const items = row.original.items;
+      const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+      
+      const toggleExpanded = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Ngăn trigger onRowClick
+        if (setExpandedRows && expandedRows) {
+          const newExpanded = new Set(expandedRows);
+          if (isExpanded) {
+            newExpanded.delete(orderId);
+          } else {
+            newExpanded.add(orderId);
+          }
+          setExpandedRows(newExpanded);
+        }
+      };
+      
+      return (
+        <div className="w-[50px] flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleExpanded}
+            className="h-8 w-8 p-0"
+          >
+            {isExpanded ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      );
+    },
+    enableSorting: false,
+    enableHiding: false,
+  },
+  // Products summary column
+  {
+    accessorFn: (row) => row.items,
+    id: "products",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("orderCode")}
+        title={t("products")}
+        className="justify-center text-center px-2"
+      />
+    ),
+    cell: ({ row }) => {
+      const items = row.original.items;
+      const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+      
+      return (
+        <div className="w-[120px] text-center py-3">
+          <div className="flex items-center justify-center gap-2">
+            <Package className="h-4 w-4 text-gray-500" />
+            <span className="text-sm">
+              {totalItems} sản phẩm
+            </span>
+          </div>
+        </div>
+      );
+    },
+    enableSorting: false,
+  },
+  {
+    accessorFn: (row) => row.id,
+    id: "orderId",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Mã đơn hàng"
         className="justify-center text-center px-2"
       />
     ),
     cell: ({ getValue }) => (
       <div
-        className="w-[160px] truncate text-center font-medium text-blue-600 py-3"
+        className="w-[140px] truncate text-center font-medium text-slate-600 py-3"
         title={getValue<string>()}
       >
         #{getValue<string>().slice(-8).toUpperCase()}
       </div>
     ),
+  },
+  {
+    accessorFn: (row) => row.orderCode,
+    id: "orderCode",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Mã vận đơn"
+        className="justify-center text-center px-2"
+      />
+    ),
+    cell: ({ row }) => {
+      const orderCode = row.original.orderCode;
+      
+      return (
+        <div className="w-[120px] text-center py-3">
+          {orderCode ? (
+            <div
+              className="font-medium text-blue-600 text-sm"
+              title={`Mã vận đơn: ${orderCode}`}
+            >
+              {orderCode}
+            </div>
+          ) : (
+            <div className="text-gray-400 text-xs italic">
+              Chưa có
+            </div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorFn: (row) => row.createdAt,
@@ -73,49 +239,6 @@ export const OrdersColumns = ({
     },
   },
   {
-    accessorFn: (row) => row.items,
-    id: "products",
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={t("products")}
-        className="justify-center text-center px-2"
-      />
-    ),
-    cell: ({ getValue }) => {
-      const items = getValue<Order['items']>();
-      const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-      const firstItem = items[0];
-      
-      return (
-        <div className="w-[180px] text-center py-3">
-          <div className="flex items-center gap-2 mb-1">
-            {firstItem?.image ? (
-              <img 
-                src={firstItem.image} 
-                alt={firstItem.productName}
-                className="w-12 h-12 object-cover rounded border flex-shrink-0"
-              />
-            ) : (
-              <div className="w-6 h-6 bg-gray-100 rounded border flex items-center justify-center flex-shrink-0">
-                <Package className="w-3 h-3 text-gray-400" />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-medium truncate" title={firstItem?.productName}>
-                {firstItem?.productName}
-              </div>
-              <div className="text-xs text-gray-500">
-                {totalItems} sản phẩm
-                {items.length > 1 && ` (+${items.length - 1})`}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    },
-  },
-  {
     accessorFn: (row) => row.status,
     id: "status",
     header: ({ column }) => (
@@ -132,6 +255,11 @@ export const OrdersColumns = ({
           color: "bg-yellow-50 text-yellow-700 border-yellow-200",
           label: t("statuses.pendingPayment"),
           dotColor: "bg-yellow-500"
+        },
+        PENDING_PACKAGING:{
+          color: "bg-blue-50 text-blue-700 border-blue-200",
+          label: t("statuses.pendingPackaging"),
+          dotColor: "bg-blue-500"
         },
         PENDING_PICKUP: {
           color: "bg-blue-50 text-blue-700 border-blue-200",
@@ -180,39 +308,6 @@ export const OrdersColumns = ({
     },
   },
   {
-    accessorFn: (row) => row.paymentId,
-    id: "paymentMethod",
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={t("paymentMethod")}
-        className="justify-center text-center px-2"
-      />
-    ),
-    cell: ({ getValue }) => {
-      const paymentId = getValue<number>();
-      const paymentMethods: Record<number, { label: string; color: string }> = {
-        1: { label: 'COD', color: 'text-green-600 bg-green-50' },
-        2: { label: 'VNPay', color: 'text-blue-600 bg-blue-50' },
-        3: { label: 'MoMo', color: 'text-pink-600 bg-pink-50' },
-        4: { label: 'Bank Transfer', color: 'text-purple-600 bg-purple-50' },
-      };
-      
-      const payment = paymentMethods[paymentId] || { 
-        label: `Payment ${paymentId}`, 
-        color: 'text-gray-600 bg-gray-50' 
-      };
-      
-      return (
-        <div className="w-[120px] text-center py-3">
-          <div className={`px-2 py-1 rounded-lg text-xs font-medium ${payment.color}`}>
-            {payment.label}
-          </div>
-        </div>
-      );
-    },
-  },
-  {
     accessorFn: (row) => row.items.reduce((total, item) => total + (item.skuPrice * item.quantity), 0),
     id: "totalAmount",
     header: ({ column }) => (
@@ -242,5 +337,16 @@ export const OrdersColumns = ({
       );
     },
   },
-  // Bỏ column deliveryAddress vì không có trong response
+  // Actions column
+  {
+    id: "actions",
+    cell: ({ row }) => (
+      <DataTableRowActions
+        row={row}
+        actions={getOrderActions(row.original, onViewDetail, onPrintInvoice, onUpdateStatus, t)}
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
 ];

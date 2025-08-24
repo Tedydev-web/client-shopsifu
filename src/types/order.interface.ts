@@ -251,12 +251,26 @@ export interface ManageOrder {
   id: string;
   userId: string;
   status: OrderStatus;
+  receiver: {
+    name: string;
+    phone: string;
+    address: string;
+  };
   shopId: string;
   paymentId: number;
+  createdById: string;
+  updatedById: string | null;
+  deletedById: string | null;
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
   items: ManageOrderItem[];
-  user: ManageOrderUser;
+  totalItemCost: number;
+  totalShippingFee: number;
+  totalVoucherDiscount: number;
+  totalPayment: number;
+  user?: ManageOrderUser;
+  orderCode: string;
 }
 
 /**
@@ -295,6 +309,10 @@ export interface ManageOrderGetByIdResponse {
   data: ManageOrder;
 }
 
+export interface UpdateStatusRequest{
+  status: OrderStatus
+  note: string;
+}
 /**
  * @interface Calculate Order
  * @description API Tính toán giá trị đơn hàng kèm mã giảm giá

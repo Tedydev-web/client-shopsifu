@@ -496,6 +496,9 @@
       }
     },
     "orders": {
+      "viewDetail": "Xem chi tiết",
+      "printInvoice": "In hóa đơn",
+      "updateStatus": "Cập nhật trạng thái",
       "products": "Sản phẩm",
       "title": "Danh sách đơn hàng",
       "subtitle": "Quản lý tất cả đơn hàng",
@@ -509,6 +512,7 @@
       "totalAmount": "Tổng tiền",
       "notFound": "Không có đơn hàng",
       "statuses": {
+        "pendingPackaging": "Chờ đóng gói",
         "pendingPayment": "Chờ thanh toán",
         "pendingPickup": "Chờ lấy hàng",
         "pendingDelivery": "Đang giao",

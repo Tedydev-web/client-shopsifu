@@ -14,7 +14,8 @@ import {
   CalculateOrderResponse,
   ManageOrderGetAllParams,
   ManageOrderGetAllResponse,
-  ManageOrderGetByIdResponse
+  ManageOrderGetByIdResponse,
+  UpdateStatusRequest
 } from "@/types/order.interface";
 
 export const orderService = {
@@ -174,6 +175,19 @@ export const manageOrderService = {
     try {
       const url = API_ENDPOINTS.MANAGE_ORDER.GET_BY_ID.replace(":orderId", orderId);
       const response = await privateAxios.get(url, { signal });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  updateStatus: async (
+    orderId: string,
+    data: UpdateStatusRequest,
+    signal?: AbortSignal
+  ): Promise<ManageOrderGetByIdResponse> => {
+    try {
+      const url = API_ENDPOINTS.MANAGE_ORDER.UPDATE_STATUS.replace(":orderId", orderId);
+      const response = await privateAxios.put(url, data, { signal });
       return response.data;
     } catch (error) {
       throw error;

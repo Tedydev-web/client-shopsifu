@@ -6,7 +6,7 @@ interface CheckoutMainWrapperProps {
   cartItemIds?: string[];
 }
 
-const CheckoutWrapper = dynamic(() => import("./checkout-Main").then(mod => mod.CheckoutMain), {
+const CheckoutWrapper = dynamic(() => import("./checkout-Main").then(mod => mod.CheckoutMainWithCleanup), {
     loading: () => <Skeleton className="w-full h-full" />,
     ssr: false,
 });
