@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { orderService } from "@/services/orderService";
+import { orderService, manageOrderService } from "@/services/orderService";
 import {
   OrderGetAllResponse,
   OrderGetByIdResponse,
@@ -10,6 +10,10 @@ import {
   OrderCreateResponse,
   OrderCancelResponse,
   Order,
+  ManageOrderGetAllResponse,
+  ManageOrderGetByIdResponse,
+  ManageOrder,
+  UpdateStatusRequest,
 } from "@/types/order.interface";
 
 interface Pagination {
@@ -20,8 +24,8 @@ interface Pagination {
 }
 
 export function useOrder() {
-  const [orders, setOrders] = useState<OrderGetAllResponse["data"]>([]);
-  const [orderDetail, setOrderDetail] = useState<Order | null>(null);
+  const [orders, setOrders] = useState<ManageOrder[]>([]);
+  const [orderDetail, setOrderDetail] = useState<ManageOrder | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<Pagination>({
@@ -31,13 +35,13 @@ export function useOrder() {
     search: "",
   });
 
-  // 🔹 Lấy tất cả đơn hàng
+  // 🔹 Lấy tất cả đơn hàng (Manage Orders)
   const fetchAllOrders = useCallback(
     async (page = 1, limit = 10, search = "") => {
       setLoading(true);
       setError(null);
       try {
-        const res = await orderService.getAll({ page, limit, search });
+        const res = await manageOrderService.getAll({ page, limit, search });
         setOrders(res.data);
         setPagination((prev) => ({
           ...prev,
@@ -57,13 +61,17 @@ export function useOrder() {
     []
   );
 
-  // 🔹 Lọc theo trạng thái
+  // 🔹 Lọc theo trạng thái - sử dụng manageOrderService
   const fetchOrdersByStatus = useCallback(
     async (status: OrderStatus, page = 1, limit = 10) => {
       setLoading(true);
       setError(null);
       try {
-        const res = await orderService.getByStatus(status, { page, limit });
+        const res = await manageOrderService.getAll({ 
+          page, 
+          limit, 
+          status 
+        });
         setOrders(res.data);
         setPagination((prev) => ({
           ...prev,
@@ -103,12 +111,12 @@ export function useOrder() {
     fetchAllOrders(page, limit, search);
   };
 
-  // 🔹 Lấy chi tiết đơn hàng
+  // 🔹 Lấy chi tiết đơn hàng (Manage Order)
   const fetchOrderDetail = useCallback(async (orderId: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await orderService.getById(orderId);
+      const res = await manageOrderService.getById(orderId);
       setOrderDetail(res.data ?? null);
       return res;
     } catch (err: any) {
@@ -128,6 +136,21 @@ export function useOrder() {
       return res;
     } catch (err: any) {
       setError(err.message || "Lỗi khi tạo đơn hàng");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 🔹 Cập nhật trạng thái đơn hàng
+  const updateOrderStatus = useCallback(async (orderId: string, data: UpdateStatusRequest) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await manageOrderService.updateStatus(orderId, data);
+      return res;
+    } catch (err: any) {
+      setError(err.message || "Lỗi khi cập nhật trạng thái đơn hàng");
       throw err;
     } finally {
       setLoading(false);
@@ -163,5 +186,6 @@ export function useOrder() {
     fetchOrderDetail,
     createOrder,
     cancelOrder,
+    updateOrderStatus,
   };
 }

@@ -162,6 +162,7 @@ export const API_ENDPOINTS = {
   MANAGE_ORDER:{
     GETALL: `${API_BASE}/manage-order/orders`,
     GET_BY_ID: `${API_BASE}/manage-order/orders/:orderId`,
+    UPDATE_STATUS: `${API_BASE}/manage-order/orders/:orderId/status`
   },
   // ĐÁNH GIÁ SẢN PHẨM - REVIEWS
   REVIEW:{
