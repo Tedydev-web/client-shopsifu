@@ -11,8 +11,9 @@ import {
   CarouselNext, 
   CarouselPrevious 
 } from '@/components/ui/carousel';
-import { mockProducts } from './landing-Mockdata';
+import { useClientSuggestedProducts } from '@/hooks/client-products/useClientSuggestedProducts';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { getProductUrl } from '@/components/client/products/shared/routes';
 
 interface FlashSaleSectionProps {
   className?: string;
@@ -75,6 +76,34 @@ const CountdownTimer = ({ isMobile }: { isMobile: boolean }) => {
 
 export function FlashSaleSection({ className }: FlashSaleSectionProps) {
   const isMobile = useIsMobile();
+  
+  // Sử dụng hook để lấy sản phẩm từ API với sortOrder: asc và limit: 200, sau đó random chọn 24
+  const {
+    products: allProducts,
+    initialLoading,
+    error
+  } = useClientSuggestedProducts({
+    initialLimit: 24,
+    sortBy: 'createdAt',
+    sortOrder: 'asc' // Sắp xếp tăng dần cho flashsale
+  });
+
+  // Random chọn 24 sản phẩm từ danh sách
+  const products = React.useMemo(() => {
+    if (!allProducts || allProducts.length === 0) return [];
+    
+    // Tạo bản copy của mảng để không ảnh hưởng đến dữ liệu gốc
+    const shuffled = [...allProducts];
+    
+    // Fisher-Yates shuffle algorithm
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    
+    // Lấy 24 sản phẩm đầu tiên sau khi shuffle
+    return shuffled.slice(0, 24);
+  }, [allProducts]);
 
   return (
     <section className={cn("w-full bg-white mt-4 py-4 rounded-sm", className)}>
@@ -96,6 +125,13 @@ export function FlashSaleSection({ className }: FlashSaleSectionProps) {
           </a>
         </div>
 
+        {/* Error State */}
+        {error && (
+          <div className="text-center p-4 text-red-500">
+            Không thể tải sản phẩm Flash Sale. Vui lòng thử lại sau.
+          </div>
+        )}
+
         {/* Products Carousel */}
         <Carousel
           opts={{
@@ -106,38 +142,54 @@ export function FlashSaleSection({ className }: FlashSaleSectionProps) {
           className="relative"
         >
           <CarouselContent className="-ml-2.5">
-            {mockProducts.map((product) => (
-              <CarouselItem key={product.id} className={cn(
-                "pl-2.5",
-                isMobile ? "basis-1/2" : "basis-1/6"
-              )}>
-                <a href="#" className="block border border-transparent rounded-xs overflow-hidden transition-all duration-300 group">
-                  <div className="relative w-full bg-gray-100 pt-[100%]">
-                    <Image 
-                      src={product.image} 
-                      alt={`Product ${product.id}`} 
-                      fill
-                      sizes="(max-width: 640px) 50vw, 16.6vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-2 text-center">
-                    <p className="text-lg font-semibold text-red-500">
-                      đ {product.price}
-                    </p>
-                    <div className="mt-2 w-full bg-red-100 rounded-full h-4 overflow-hidden relative">
-                        <div 
-                            className="bg-gradient-to-r from-red-500 to-red-600 h-full rounded-full"
-                            style={{ width: `${(product.sold / product.total) * 100}%` }}
-                        ></div>
-                        <span className='absolute inset-0 text-white text-xs font-semibold flex items-center justify-center uppercase tracking-tighter'>
-                            {product.label}
-                        </span>
+            {initialLoading
+              ? Array.from({ length: 12 }).map((_, index) => (
+                  <CarouselItem key={index} className={cn(
+                    "pl-2.5",
+                    isMobile ? "basis-1/2" : "basis-1/6"
+                  )}>
+                    <div className="border border-transparent rounded-xs overflow-hidden">
+                      <div className="relative w-full bg-gray-100 pt-[100%] animate-pulse"></div>
+                      <div className="p-2 text-center">
+                        <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
+                        <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                      </div>
                     </div>
-                  </div>
-                </a>
-              </CarouselItem>
-            ))}
+                  </CarouselItem>
+                ))
+              : products.map((product) => (
+                  <CarouselItem key={product.id} className={cn(
+                    "pl-2.5",
+                    isMobile ? "basis-1/2" : "basis-1/6"
+                  )}>
+                    <a href={getProductUrl(product.name, product.id)} className="block border border-transparent rounded-xs overflow-hidden transition-all duration-300 group">
+                      <div className="relative w-full bg-gray-100 pt-[100%]">
+                        <Image 
+                          src={product.images?.[0] || '/images/placeholder-product.png'} 
+                          alt={product.name} 
+                          fill
+                          sizes="(max-width: 640px) 50vw, 16.6vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-2 text-center">
+                        <p className="text-lg font-semibold text-red-500">
+                          ₫ {product.basePrice?.toLocaleString() || '0'}
+                        </p>
+                        <div className="mt-2 w-full bg-red-100 rounded-full h-4 overflow-hidden relative">
+                          <div 
+                            className="bg-gradient-to-r from-red-500 to-red-600 h-full rounded-full"
+                            style={{ width: `${Math.floor(Math.random() * 80) + 20}%` }}
+                          ></div>
+                          <span className='absolute inset-0 text-white text-xs font-semibold flex items-center justify-center uppercase tracking-tighter'>
+                            Đã bán {Math.floor(Math.random() * 50) + 10}
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </CarouselItem>
+                ))
+            }
           </CarouselContent>
           <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-md border border-gray-200 hidden md:flex" />
           <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-md border border-gray-200 hidden md:flex" />

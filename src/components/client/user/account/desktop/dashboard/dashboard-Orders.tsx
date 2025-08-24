@@ -29,6 +29,10 @@ export default function DashboardOrders() {
       label: "Chờ thanh toán",
       className: "bg-gradient-to-r from-amber-50 to-yellow-100 text-amber-700 border border-amber-200",
     },
+    PENDING_PACKAGING: {
+      label: "Đang đóng gói",
+      className: "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 border border-orange-200",
+    },
     PENDING_PICKUP: {
       label: "Chờ lấy hàng",
       className: "bg-gradient-to-r from-sky-50 to-blue-100 text-sky-700 border border-sky-200",

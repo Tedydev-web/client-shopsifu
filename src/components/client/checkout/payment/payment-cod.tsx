@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/utils/formatter';
-import { CheckCircle2, Home, ShoppingBag, Package, Clock, MapPin, Phone, User } from 'lucide-react';
+import { CheckCircle2, Home, ShoppingBag, Package, AlertCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -16,9 +16,11 @@ interface PaymentCodProps {
   totalAmount: number;
   paymentId?: number;
   orderData?: any;
+  isError?: boolean;
+  errorMessage?: string;
 }
 
-export function PaymentCod({ orderId, totalAmount, paymentId, orderData }: PaymentCodProps) {
+export function PaymentCod({ orderId, totalAmount, paymentId, orderData, isError = false, errorMessage }: PaymentCodProps) {
   const dispatch = useDispatch();
   const router = useRouter();
   const [orderDetails, setOrderDetails] = useState<any>(null);
@@ -55,16 +57,8 @@ export function PaymentCod({ orderId, totalAmount, paymentId, orderData }: Payme
     dispatch(clearCheckoutState());
   }, [dispatch]);
 
-  // Calculate estimated delivery time
-  const getEstimatedDelivery = () => {
-    const now = new Date();
-    const deliveryDate = new Date(now.getTime() + (3 * 24 * 60 * 60 * 1000)); // 3 days from now
-    return deliveryDate.toLocaleDateString('vi-VN', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const handleRetry = () => {
+    router.push('/checkout');
   };
 
   if (isLoading) {
@@ -83,6 +77,65 @@ export function PaymentCod({ orderId, totalAmount, paymentId, orderData }: Payme
     );
   }
 
+  // Error State
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <Card className="w-full max-w-lg mx-auto shadow-lg">
+          <CardHeader className="bg-red-50 rounded-t-lg text-center">
+            <div className="mx-auto bg-red-100 rounded-full p-4 w-fit">
+              <AlertCircle className="h-16 w-16 text-red-600" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-red-800 mt-4">
+              Đặt hàng thất bại!
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              {errorMessage || 'Đã xảy ra lỗi trong quá trình đặt hàng. Vui lòng thử lại.'}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4 pt-6">
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <h3 className="font-semibold text-lg mb-3 text-red-800">Có thể do các nguyên nhân sau:</h3>
+              <ul className="space-y-2 text-sm text-red-700">
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">•</span>
+                  Kết nối mạng không ổn định
+                </li>
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">•</span>
+                  Thông tin đơn hàng không hợp lệ
+                </li>
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">•</span>
+                  Sản phẩm đã hết hàng hoặc không còn khả dụng
+                </li>
+                <li className="flex items-start">
+                  <span className="font-bold mr-2">•</span>
+                  Lỗi hệ thống tạm thời
+                </li>
+              </ul>
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex flex-col sm:flex-row gap-4 pt-4">
+            <Button onClick={handleRetry} className="w-full">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Thử lại đặt hàng
+            </Button>
+            <Button asChild className="w-full" variant="outline">
+              <Link href="/">
+                <Home className="mr-2 h-4 w-4" />
+                Quay về trang chủ
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
+  // Success State
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-2xl mx-auto shadow-lg">
@@ -108,10 +161,6 @@ export function PaymentCod({ orderId, totalAmount, paymentId, orderData }: Payme
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Mã đơn hàng:</span>
-                  <span className="font-mono font-semibold text-gray-800">{orderId}</span>
-                </div>
                 {paymentId && (
                   <div className="flex justify-between">
                     <span className="text-gray-500">Mã thanh toán:</span>
@@ -132,45 +181,6 @@ export function PaymentCod({ orderId, totalAmount, paymentId, orderData }: Payme
                   <span className="text-gray-500">Trạng thái:</span>
                   <span className="font-semibold text-blue-600">Đang xử lý</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Delivery Information */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h3 className="font-semibold text-lg mb-4 flex items-center text-blue-800">
-              <Clock className="h-5 w-5 mr-2" />
-              Thông tin giao hàng
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-gray-800">Địa chỉ giao hàng:</p>
-                  <p className="text-gray-600">{commonInfo.receiver?.address || 'Đang cập nhật...'}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <User className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                <div>
-                  <span className="font-medium text-gray-800">Người nhận: </span>
-                  <span className="text-gray-600">{commonInfo.receiver?.name || 'Đang cập nhật...'}</span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                <div>
-                  <span className="font-medium text-gray-800">Số điện thoại: </span>
-                  <span className="text-gray-600">{commonInfo.receiver?.phone || 'Đang cập nhật...'}</span>
-                </div>
-              </div>
-              <div className="bg-white p-3 rounded border border-blue-200">
-                <p className="text-sm text-blue-800">
-                  <strong>Dự kiến giao hàng:</strong> {getEstimatedDelivery()}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Shipper sẽ liên hệ với bạn trước khi giao hàng
-                </p>
               </div>
             </div>
           </div>

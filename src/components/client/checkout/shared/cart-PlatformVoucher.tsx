@@ -43,6 +43,17 @@ const VoucherCard = ({ voucher, onSelect, isSelected }: VoucherCardProps) => {
         {voucher.description && (
           <p className="text-xs text-gray-600">{voucher.description}</p>
         )}
+        
+        {/* Discount Value Display */}
+        <div className="mb-2">
+          <span className="inline-block px-2 py-1 bg-red-100 text-red-600 text-xs font-semibold rounded">
+            {voucher.discountType === 'PERCENTAGE' 
+              ? `Giảm ${voucher.value}%${voucher.maxDiscountValue ? ` (tối đa ${voucher.maxDiscountValue.toLocaleString('vi-VN')}₫)` : ''}` 
+              : `Giảm ${voucher.value.toLocaleString('vi-VN')}₫`
+            }
+          </span>
+        </div>
+
         <div className="flex flex-wrap items-center gap-2 text-xs mt-1">
           <span className="text-gray-500">
             HSD:{" "}

@@ -34,9 +34,9 @@ export const useCalculateOrder = () => {
     lastRequestRef.current = requestHash;
 
     try {
-      console.log('[Calculate Order] Request:', calculateOrderRequest);
+      console.log('[Calculate Order] Request:', JSON.stringify(calculateOrderRequest, null, 2));
       const response: CalculateOrderResponse = await orderService.calculateOrder(calculateOrderRequest);
-      console.log('[Calculate Order] Response:', response);
+      console.log('[Calculate Order] Response:', JSON.stringify(response, null, 2));
       
       // Lưu kết quả vào Redux state
       dispatch(setCalculationResult(response.data));

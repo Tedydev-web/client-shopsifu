@@ -159,6 +159,10 @@ export const API_ENDPOINTS = {
     CALCULATE_ORDER: `${API_BASE}/orders/calculate`,
     CREATE_PAYMENT_VNPAY_URL: `${API_BASE}/payment/vnpay/create-payment`
   },
+  MANAGE_ORDER:{
+    GETALL: `${API_BASE}/manage-order/orders`,
+    GET_BY_ID: `${API_BASE}/manage-order/orders/:orderId`,
+  },
   // ĐÁNH GIÁ SẢN PHẨM - REVIEWS
   REVIEW:{
     GET_BY_ID: `${API_BASE}/reviews/products/:productId`,

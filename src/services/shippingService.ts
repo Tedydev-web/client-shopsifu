@@ -74,7 +74,7 @@ export const shippingService = {
 
   // 6. Get Shipping Services
   getServices: async (
-    params: { fromDistrictId: number; toDistrictId: number },
+    params: { cartItemId: string },
     signal?: AbortSignal
   ): Promise<ShippingServiceResponse> => {
     const response = await privateAxios.get(API_ENDPOINTS.SHIPPING.SERVICE, {

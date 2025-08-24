@@ -50,21 +50,23 @@ export function ShippingAddress({
   const handleAddressFormChange = useCallback((provinceId: string, districtId: string, wardCode: string) => {
     // Only update if not selecting existing address to prevent conflicts
     if (!isSelectingAddress) {
-      if (provinceId) {
-        handleChange('province', provinceId);
-      }
-      if (districtId) {
-        handleChange('district', districtId);
-      }
-      if (wardCode) {
-        handleChange('ward', wardCode);
-      }
-
-      // Lưu thông tin vào Redux với tên tương ứng
+      // Lấy tên tương ứng với ID
       const provinceName = provincesData?.data?.find(p => p.ProvinceID.toString() === provinceId)?.ProvinceName || '';
       const districtName = districtsData?.data?.find(d => d.DistrictID.toString() === districtId)?.DistrictName || '';
       const wardName = wardsData?.data?.find(w => w.WardCode === wardCode)?.WardName || '';
 
+      // Cập nhật formData với format "ID|Name" để information-Index có thể parse đúng
+      if (provinceId && provinceName) {
+        handleChange('province', `${provinceId}|${provinceName}`);
+      }
+      if (districtId && districtName) {
+        handleChange('district', `${districtId}|${districtName}`);
+      }
+      if (wardCode && wardName) {
+        handleChange('ward', `${wardCode}|${wardName}`);
+      }
+
+      // Lưu thông tin vào Redux với tên tương ứng
       dispatch(setShippingInfo({
         provinceId,
         districtId,
@@ -111,9 +113,9 @@ export function ShippingAddress({
         receiverName: selected.recipient || selected.name || '',
         receiverPhone: selected.phoneNumber || '',
         addressDetail: selected.street,
-        ward: `${selected.ward}|${selected.ward}`,
-        district: `${selected.district}|${selected.district}`,
-        province: `${selected.province}|${selected.province}`,
+        ward: `${selected.wardCode}|${selected.ward}`,
+        district: `${selected.districtId}|${selected.district}`,
+        province: `${selected.provinceId}|${selected.province}`,
         type: selected.addressType === 'HOME' ? 'NHÀ RIÊNG' : 'VĂN PHÒNG',
       };
 

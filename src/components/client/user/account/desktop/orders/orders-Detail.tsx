@@ -80,6 +80,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
     { label: string; variant?: "default" | "destructive" }
   > = {
     PENDING_PAYMENT: { label: "Chờ thanh toán" },
+    PENDING_PACKAGING: { label: "Đang đóng gói" },
     PENDING_PICKUP: { label: "Chờ lấy hàng" },
     PENDING_DELIVERY: { label: "Đang giao hàng" },
     DELIVERED: { label: "Đã giao hàng" },
@@ -204,7 +205,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               )}
 
               {/* Nút Hủy đơn hàng - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
-              {order.status === "PENDING_PAYMENT" && (
+              {(order.status === "PENDING_PAYMENT"|| order.status === "PENDING_PACKAGING") && (
                 <Button
                   variant="outline"
                   size="sm"

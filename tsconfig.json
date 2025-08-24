@@ -22,7 +22,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/error", "src/middleware"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/error", "src/middleware", "next-sitemap.config.js"],
   // "src/middleware.ts"
   "exclude": ["node_modules"]
 }

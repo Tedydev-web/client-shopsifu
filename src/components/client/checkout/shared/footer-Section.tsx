@@ -58,15 +58,16 @@ export function FooterSection({
   // Sử dụng hook tự động tính toán để tránh vòng lặp vô hạn
   const { calculationResult: autoCalculationResult, loading: calculationLoading, error: calculationError } = useAutoCalculateOrder();
 
-  // Cập nhật platformDiscountCodes khi có voucher platform
-  useEffect(() => {
-    const platformCodes = appliedPlatformVoucher ? [appliedPlatformVoucher.code] : [];
-    dispatch(setPlatformDiscountCodes(platformCodes));
-  }, [appliedPlatformVoucher, dispatch]);
+  // Không cần useEffect này nữa vì đã được xử lý trong Redux action
+  // useEffect(() => {
+  //   const platformCodes = appliedPlatformVoucher ? [appliedPlatformVoucher.code] : [];
+  //   dispatch(setPlatformDiscountCodes(platformCodes));
+  // }, [appliedPlatformVoucher, dispatch]);
 
-  // Sử dụng dữ liệu từ hook tự động tính toán, fallback về Redux state, cuối cùng là tính toán thủ công
+  // Ưu tiên sử dụng kết quả từ API calculation, fallback về tính toán thủ công
   const finalCalculationResult = autoCalculationResult || calculationResult;
   
+  // Nếu có kết quả từ API, sử dụng trực tiếp
   const subtotal = finalCalculationResult?.totalItemCost || Object.values(shopProducts).reduce((total, shopProducts) => {
     return total + shopProducts.reduce((shopTotal, product) => {
       return shopTotal + (product.price * product.quantity);
@@ -185,10 +186,16 @@ export function FooterSection({
         
         <div className="space-y-3">
           <PriceLine label="Tổng tiền hàng" value={formatCurrency(subtotal)} />
-          <PriceLine label="Tổng giảm giá" value={`-${formatCurrency(Math.abs(voucherDiscount))}`} />
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-600">Tổng giảm giá</span>
+            <span className="text-green-600 font-medium">-{formatCurrency(Math.abs(voucherDiscount))}</span>
+          </div>
         </div>
 
-        <PriceLine label="Phí vận chuyển" value={formatCurrency(shippingFee)} />
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-600">Phí vận chuyển</span>
+          <span className="text-red-600 font-medium">{formatCurrency(shippingFee)}</span>
+        </div>
 
         <Separator className="my-3" />
         <PriceLine 

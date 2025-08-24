@@ -30,7 +30,7 @@ export const useShipping = (shopId?: string) => {
   const effectiveShopId = shopId || (shopOrders.length > 0 ? shopOrders[0].shopId : '');
   
   const fetchShippingServices = async () => {
-    if (!shippingInfo?.districtId || !shippingInfo?.wardCode || !shopAddress) {
+    if (!shippingInfo?.districtId || !shippingInfo?.wardCode) {
       return;
     }
 
@@ -38,68 +38,106 @@ export const useShipping = (shopId?: string) => {
     setError(null);
 
     try {
-      const servicesResponse = await shippingService.getServices({
-        fromDistrictId: shopAddress.districtId,
-        toDistrictId: parseInt(shippingInfo.districtId),
-      });
-
-      if (servicesResponse.data && Array.isArray(servicesResponse.data) && servicesResponse.data.length > 0) {
-        const shopOrder = shopOrders.find(o => o.shopId === effectiveShopId);
-        const totalWeight = shopOrder?.cartItemIds.length || 1; // Giả định trọng lượng
-
-        const methodsPromises = servicesResponse.data.map(async (service) => {
-          try {
-            const [feeResponse, timeResponse] = await Promise.all([
-              shippingService.calculateShippingFee({
-                from_district_id: shopAddress.districtId,
-                from_ward_code: shopAddress.wardCode,
-                to_district_id: parseInt(shippingInfo.districtId),
-                to_ward_code: shippingInfo.wardCode,
-                service_id: service.service_id,
-                //insurance_value: 500000, // Cần thay bằng giá trị thực tế
-                weight: totalWeight * 200, // Cần thay bằng trọng lượng thực tế
-                length: 20,
-                width: 20,
-                height: 10,
-              }),
-              shippingService.calculateDeliveryTime({
-                from_district_id: shopAddress.districtId,
-                from_ward_code: shopAddress.wardCode,
-                to_district_id: parseInt(shippingInfo.districtId),
-                to_ward_code: shippingInfo.wardCode,
-                service_id: service.service_id,
-              }),
-            ]);
-
-            const expectedDeliveryDate = new Date(timeResponse.data.expected_delivery_time);
-            const formattedDate = expectedDeliveryDate.toLocaleDateString('vi-VN', {
-              weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric',
-              timeZone: 'Asia/Ho_Chi_Minh',
-            });
-
-            return {
-              ...service,
-              id: String(service.service_id),
-              name: service.short_name,
-              price: feeResponse.data.total,
-              estimatedTime: `Nhận hàng dự kiến ${formattedDate}`,
-              description: 'Giao hàng tiêu chuẩn',
-              features: ['Giao giờ hành chính'],
-              icon: service.service_type_id === 5 ? 'package' : 'truck',
-            } as ShippingMethod;
-          } catch (error) {
-            console.error(`Failed to process service ${service.service_id}:`, error);
-            return null;
-          }
-        });
-
-        const settledMethods = await Promise.all(methodsPromises);
-        const validMethods = settledMethods.filter((method): method is ShippingMethod => method !== null);
-        
-        setShippingMethods(validMethods);
-      } else {
+      // Get current shop order to get cartItemIds
+      const shopOrder = shopOrders.find(o => o.shopId === effectiveShopId);
+      if (!shopOrder || !shopOrder.cartItemIds.length) {
         setShippingMethods([]);
+        return;
       }
+
+      // Fetch services for each cartItemId
+      const allShippingMethods: ShippingMethod[] = [];
+      
+      for (const cartItemId of shopOrder.cartItemIds) {
+        try {
+          const servicesResponse = await shippingService.getServices({
+            cartItemId
+          });
+
+          if (servicesResponse.data) {
+            const services = Array.isArray(servicesResponse.data) ? servicesResponse.data : [servicesResponse.data];
+            
+            // Process each service for this cartItemId
+            for (const service of services) {
+              try {
+                let feeResponse, timeResponse;
+                let fallbackPrice = 30000; // Giá fallback 30k VND
+                let fallbackTime = 'Nhận hàng dự kiến 3-5 ngày làm việc';
+
+                try {
+                  [feeResponse, timeResponse] = await Promise.all([
+                    shippingService.calculateShippingFee({
+                      height: 10,
+                      weight: 500,
+                      length: 15,
+                      width: 10,
+                      service_id: service.service_id,
+                      cartItemId: cartItemId,
+                    }),
+                    shippingService.calculateDeliveryTime({
+                      service_id: service.service_id,
+                      cartItemId: cartItemId,
+                    }),
+                  ]);
+
+                  const expectedDeliveryDate = new Date(timeResponse.data.expected_delivery_time);
+                  fallbackTime = `Nhận hàng dự kiến ${expectedDeliveryDate.toLocaleDateString('vi-VN', {
+                    weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric',
+                    timeZone: 'Asia/Ho_Chi_Minh',
+                  })}`;
+                } catch (apiError) {
+                  console.warn(`API failed for service ${service.service_id}, using fallback values:`, apiError);
+                  // Sử dụng giá trị fallback khi API lỗi
+                }
+
+                const finalPrice = feeResponse?.data?.total || fallbackPrice;
+                const finalTime = fallbackTime;
+
+                // Check if this service already exists (from other cartItems)
+                const existingMethodIndex = allShippingMethods.findIndex(m => m.service_id === service.service_id);
+                
+                if (existingMethodIndex >= 0) {
+                  // Update existing method with combined price
+                  allShippingMethods[existingMethodIndex].price += finalPrice;
+                } else {
+                  // Add new method
+                  allShippingMethods.push({
+                    ...service,
+                    id: String(service.service_id),
+                    name: service.short_name,
+                    price: finalPrice,
+                    estimatedTime: finalTime,
+                    description: feeResponse?.data?.total ? 'Giao hàng tiêu chuẩn' : 'Giao hàng tiêu chuẩn (giá tạm tính)',
+                    features: ['Giao giờ hành chính'],
+                    icon: service.service_type_id === 5 ? 'package' : 'truck',
+                  } as ShippingMethod);
+                }
+              } catch (error) {
+                console.error(`Failed to process service ${service.service_id} for cartItem ${cartItemId}:`, error);
+                // Thêm service với giá fallback ngay cả khi có lỗi
+                const existingMethodIndex = allShippingMethods.findIndex(m => m.service_id === service.service_id);
+                
+                if (existingMethodIndex < 0) {
+                  allShippingMethods.push({
+                    ...service,
+                    id: String(service.service_id),
+                    name: service.short_name || 'Giao hàng tiêu chuẩn',
+                    price: 30000, // Giá fallback 30k VND
+                    estimatedTime: 'Nhận hàng dự kiến 3-5 ngày làm việc',
+                    description: 'Giao hàng tiêu chuẩn (giá tạm tính)',
+                    features: ['Giao giờ hành chính'],
+                    icon: service.service_type_id === 5 ? 'package' : 'truck',
+                  } as ShippingMethod);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Failed to fetch services for cartItem ${cartItemId}:`, error);
+        }
+      }
+      
+      setShippingMethods(allShippingMethods);
     } catch (err: any) {
       console.error('Error fetching shipping services:', err);
       setError('Không thể tải danh sách dịch vụ vận chuyển.');
@@ -108,12 +146,12 @@ export const useShipping = (shopId?: string) => {
     }
   };
   
-  // Auto fetch when shipping info or shop address changes
+  // Auto fetch when shipping info changes
   useEffect(() => {
-    if (shippingInfo?.districtId && shippingInfo?.wardCode && shopAddress && !addressLoading) {
+    if (shippingInfo?.districtId && shippingInfo?.wardCode && !addressLoading) {
       fetchShippingServices();
     }
-  }, [shippingInfo?.districtId, shippingInfo?.wardCode, shopAddress, addressLoading]);
+  }, [shippingInfo?.districtId, shippingInfo?.wardCode, effectiveShopId, shopOrders, addressLoading]);
   
   return {
     shippingMethods,
