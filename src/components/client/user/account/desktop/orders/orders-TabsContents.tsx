@@ -52,6 +52,11 @@ const statusLabel: Record<OrderStatus, StatusInfo> = {
     className:
       "bg-gradient-to-r from-red-50 to-rose-100 text-red-700 border border-red-200",
   },
+  VERIFY_PAYMENT: {
+    label: "Đã xác nhận thanh toán",
+    className:
+      "bg-gradient-to-r from-emerald-50 to-green-100 text-emerald-700 border border-emerald-200",
+  },
 };
 
 interface Props {

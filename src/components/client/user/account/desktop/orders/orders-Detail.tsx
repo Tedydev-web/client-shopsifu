@@ -124,7 +124,9 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
 
       <section className="bg-white rounded-lg border p-4 space-y-3">
         <h2 className="text-lg font-semibold">Tiến trình đơn hàng</h2>
-        <OrderTimeline/>
+        <OrderTimeline
+          status={order.status} createdAt={order.createdAt} finalAmount={order.totalPayment}
+        />
       </section>
 
       {/* Tổng quan */}
@@ -226,7 +228,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
         <div className="md:col-span-5 flex flex-col space-y-3">
           {/* Thông tin khách hàng */}
           <section className="bg-white rounded-lg border p-4 space-y-3">
-            <h2 className="text-lg">Thông tin khách hàng</h2>
+            <h2 className="text-lg font-semibold">Thông tin khách hàng</h2>
             <div className="px-2 space-y-2 text-base">
               <div className="flex justify-between border-b pb-2">
                 <span className="text-muted-foreground">Họ và tên:</span>
@@ -287,7 +289,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
 
         {/* Thông tin thanh toán */}
         <section className="bg-white rounded-lg border p-6 space-y-4 md:col-span-5 flex flex-col shadow-sm h-full">
-          <h2 className="text-xl font-semibold">Thông tin thanh toán</h2>
+          <h2 className="text-lg font-semibold">Thông tin thanh toán</h2>
 
           {/* Sản phẩm */}
           <div className="p-2 space-y-3">

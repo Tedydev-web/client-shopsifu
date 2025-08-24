@@ -10,11 +10,12 @@ export interface OrderGetAllParams extends PaginationRequest {
 export enum OrderStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
   PENDING_PACKAGING = "PENDING_PACKAGING",
-  PENDING_PICKUP = "PENDING_PICKUP",
+  PICKUPED = "PENDING_PICKUP",
   PENDING_DELIVERY = "PENDING_DELIVERY",
   DELIVERED = "DELIVERED",
   RETURNED = "RETURNED",
   CANCELLED = "CANCELLED",
+  VERIFY_PAYMENT = "VERIFY_PAYMENT",
 }
 
 // --- Interfaces cho Tạo Đơn hàng (Create Order) ---
