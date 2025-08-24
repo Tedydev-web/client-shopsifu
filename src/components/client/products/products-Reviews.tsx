@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import { format, isValid } from "date-fns";
@@ -36,26 +35,6 @@ const StarRating = ({
     ))}
   </div>
 );
-
-const { reviews, totalItems, loading, fetchReviews, summary, fetchSummary } =
-  useProductReview(productId);
-
-useEffect(() => {
-  fetchSummary(); // chỉ gọi 1 lần để lấy tổng quan
-}, [fetchSummary]);
-
-useEffect(() => {
-  fetchReviews({
-    page,
-    limit,
-    ...(filter !== "all"
-      ? filter === "media"
-        ? { hasMedia: true }
-        : { rating: filter }
-      : {}),
-  });
-}, [fetchReviews, page, filter]);
-
 
 const ReviewItem = ({ review }: { review: Review }) => {
   const userName = review.user?.name || "Người dùng ẩn danh";
@@ -108,30 +87,35 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
   const [page, setPage] = useState(1);
   const limit = 5;
 
-  const searchParams = useSearchParams();
-  const { reviews, totalItems, loading, fetchReviews } =
-    useProductReview(productId);
-  useProductReview(productId);
+  const { reviews, loading, fetchReviews } = useProductReview(productId);
 
+  // chỉ fetch 1 lần toàn bộ reviews
   useEffect(() => {
-    fetchReviews({
-      page,
-      limit,
-      ...(filter !== "all"
-        ? filter === "media"
-          ? { hasMedia: true }
-          : { rating: filter }
-        : {}),
-    });
-  }, [fetchReviews, page, filter]);
+    fetchReviews();
+  }, [fetchReviews]);
 
-  const totalPages = Math.ceil(totalItems / limit);
+  // lọc dữ liệu ở FE
+  const filteredReviews = useMemo(() => {
+    if (filter === "all") return reviews;
+    if (filter === "media") {
+      return reviews.filter((r) => r.medias && r.medias.length > 0);
+    }
+    return reviews.filter((r) => r.rating === filter);
+  }, [reviews, filter]);
 
+  // phân trang dựa trên reviews đã lọc
+  const totalPages = Math.ceil(filteredReviews.length / limit);
+  const paginatedReviews = useMemo(() => {
+    const start = (page - 1) * limit;
+    return filteredReviews.slice(start, start + limit);
+  }, [filteredReviews, page]);
+
+  // summary tính trên toàn bộ reviews gốc
   const summary = useMemo(() => {
     if (!reviews || reviews.length === 0) {
       return {
         average: 0,
-        total: totalItems,
+        total: 0,
         counts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
         mediaCount: 0,
       };
@@ -148,8 +132,8 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
     const mediaCount = reviews.filter(
       (r) => r.medias && r.medias.length > 0
     ).length;
-    return { average, total: totalItems, counts, mediaCount };
-  }, [reviews, totalItems]);
+    return { average, total: reviews.length, counts, mediaCount };
+  }, [reviews]);
 
   const FilterButton = ({
     value,
@@ -220,8 +204,8 @@ export const ProductsReviews = ({ productId }: { productId: string }) => {
       ) : (
         <>
           <div className="mt-6 divide-y divide-gray-200">
-            {reviews.length > 0 ? (
-              reviews.map((review) => (
+            {paginatedReviews.length > 0 ? (
+              paginatedReviews.map((review) => (
                 <ReviewItem key={review.id} review={review} />
               ))
             ) : (
