@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { CheckoutHeader } from './checkout-Header';
 import { CheckoutSteps } from './checkout-Steps';
 import { InformationTabs } from './information-Tabs/information-Index';
@@ -23,6 +24,7 @@ import {
   CardDescription, 
   CardContent 
 } from '@/components/ui/card';
+import { clearCheckoutState } from '@/store/features/checkout/ordersSilde';
 
 
 interface CheckoutMainProps {
@@ -33,6 +35,7 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
   // 1. Lấy state và các hàm từ hook đã được cập nhật
   const { state, goToStep, handleCreateOrder, isSubmitting } = useCheckout();
   const router = useRouter();
+  const dispatch = useDispatch();
   const { connect, disconnect, payments, isConnected } = useShopsifuSocket();
   
   // Debug log cartItemIds
@@ -345,4 +348,19 @@ export function CheckoutMain({ cartItemIds = [] }: CheckoutMainProps) {
       </div>
     </div>
   );
+}
+
+// Add cleanup effect to clear checkout state when component unmounts
+export function CheckoutMainWithCleanup({ cartItemIds = [] }: CheckoutMainProps) {
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    // Cleanup function - clear state when leaving checkout page
+    return () => {
+      console.log('🧹 Clearing checkout state on page exit');
+      dispatch(clearCheckoutState());
+    };
+  }, [dispatch]);
+  
+  return <CheckoutMain cartItemIds={cartItemIds} />;
 }

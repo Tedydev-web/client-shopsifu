@@ -102,8 +102,8 @@ export const serviceItems = [
   { icon: '/images/client/categories/m/6.png', label: 'Mã Giảm Giá' },
   { icon: '/images/client/categories/m/5.png', label: 'Khách Hàng Thân Thiết' },
   { icon: '/images/client/categories/m/4.png', label: 'Hàng Chọn Giá Hời' },
-  { icon: '/images/client/categories/m/3.png', label: 'Shopee Style Voucher 30%' },
-  { icon: '/images/client/categories/m/1.png', label: 'Shopee Mall' },
+  { icon: '/images/client/categories/m/3.png', label: 'Shopsifu Style Voucher 30%' },
+  { icon: '/images/client/categories/m/1.png', label: 'Shopsifu Mall' },
   { icon: '/images/client/categories/m/2.png', label: 'Săn Ngay 100.000 Xu' },
 ];
 

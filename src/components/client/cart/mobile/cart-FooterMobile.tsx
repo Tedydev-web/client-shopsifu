@@ -28,7 +28,7 @@ export default function CartFooterMobile({
           <div className="flex items-center justify-between text-xs h-8 px-4">
             <span className="font-medium text-primary flex items-center gap-1">
               <Ticket className="w-4 h-4 text-primary" />
-              Shopee Voucher
+              Shopsifu Voucher
             </span>
             <div className="flex items-center text-muted-foreground">
               <span className="mr-1">Nhập mã</span>

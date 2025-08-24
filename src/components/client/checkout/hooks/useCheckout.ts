@@ -3,8 +3,8 @@
 import { useContext, useState } from 'react';
 import { CheckoutContext } from '@/providers/CheckoutContext';
 import { orderService } from '@/services/orderService';
-import { useSelector } from 'react-redux';
-import { selectShopOrders, selectShopProducts, selectAppliedVouchers, selectAppliedPlatformVoucher, selectCommonOrderInfo } from '@/store/features/checkout/ordersSilde';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectShopOrders, selectShopProducts, selectAppliedVouchers, selectAppliedPlatformVoucher, selectCommonOrderInfo, clearCheckoutState } from '@/store/features/checkout/ordersSilde';
 import { SHIPPING_CONFIG } from '@/constants/shipping';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ import { CheckoutStep } from '@/providers/CheckoutContext';
 export const useCheckout = () => {
   const context = useContext(CheckoutContext);
   const router = useRouter();
+  const dispatch = useDispatch();
   
   // 1. Get data from Redux
   const shopOrders = useSelector(selectShopOrders);
@@ -85,16 +86,7 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
     setIsSubmitting(true);
     try {
       // Create order payload with new structure
-      const shopDiscountCodes: string[] = [];
       const platformDiscountCodes: string[] = [];
-
-      // Collect shop-specific voucher codes
-      shopOrders.forEach(order => {
-        const shopVoucher = appliedVouchers[order.shopId];
-        if (shopVoucher && shopVoucher.code && !shopDiscountCodes.includes(shopVoucher.code)) {
-          shopDiscountCodes.push(shopVoucher.code);
-        }
-      });
 
       // Collect platform voucher codes
       if (appliedPlatformVoucher && appliedPlatformVoucher.code) {
@@ -102,29 +94,38 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
       }
 
       const orderPayload = {
-        shops: shopOrders.map(order => ({
-          shopId: order.shopId,
-          receiver: {
-            name: commonInfo.receiver!.name,
-            phone: commonInfo.receiver!.phone,
-            address: commonInfo.receiver!.address,
-            provinceId: commonInfo.receiver!.provinceId,
-            districtId: commonInfo.receiver!.districtId,
-            wardCode: commonInfo.receiver!.wardCode
-          },
-          cartItemIds: order.cartItemIds,
-          discountCodes: shopDiscountCodes,
-          shippingInfo: {
-            length: SHIPPING_CONFIG.DEFAULT_PACKAGE.length,
-            weight: SHIPPING_CONFIG.DEFAULT_PACKAGE.weight,
-            width: SHIPPING_CONFIG.DEFAULT_PACKAGE.width,
-            height: SHIPPING_CONFIG.DEFAULT_PACKAGE.height,
-            service_id: order.selectedShippingMethod?.service_id || 53321,
-            service_type_id: order.selectedShippingMethod?.service_type_id || 2,
-            shippingFee: order.shippingFee || 0
-          },
-          isCod: isCodPayment
-        })),
+        shops: shopOrders.map(order => {
+          // Get shop-specific voucher codes for this shop only
+          const shopDiscountCodes: string[] = [];
+          const shopVoucher = appliedVouchers[order.shopId];
+          if (shopVoucher && shopVoucher.code) {
+            shopDiscountCodes.push(shopVoucher.code);
+          }
+
+          return {
+            shopId: order.shopId,
+            receiver: {
+              name: commonInfo.receiver!.name,
+              phone: commonInfo.receiver!.phone,
+              address: commonInfo.receiver!.address,
+              provinceId: commonInfo.receiver!.provinceId,
+              districtId: commonInfo.receiver!.districtId,
+              wardCode: commonInfo.receiver!.wardCode
+            },
+            cartItemIds: order.cartItemIds,
+            discountCodes: shopDiscountCodes, // Riêng biệt cho từng shop
+            shippingInfo: {
+              length: SHIPPING_CONFIG.DEFAULT_PACKAGE.length,
+              weight: SHIPPING_CONFIG.DEFAULT_PACKAGE.weight,
+              width: SHIPPING_CONFIG.DEFAULT_PACKAGE.width,
+              height: SHIPPING_CONFIG.DEFAULT_PACKAGE.height,
+              service_id: order.selectedShippingMethod?.service_id || 53321,
+              service_type_id: order.selectedShippingMethod?.service_type_id || 2,
+              shippingFee: order.shippingFee || 0
+            },
+            isCod: isCodPayment
+          };
+        }),
         platformDiscountCodes: platformDiscountCodes
       };
 
@@ -201,6 +202,10 @@ const handleCreateOrder = async (totalAmount?: number): Promise<OrderHandlerResu
       } else if (selectedPaymentGateway === 'COD' || isCodPayment) {
         // Thanh toán khi nhận hàng (COD)
         toast.success('Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng.');
+        
+        // Clear checkout state sau khi đặt hàng thành công
+        dispatch(clearCheckoutState());
+        
         const orderId = orderData.orders && orderData.orders.length > 0 
           ? orderData.orders[0].id 
           : undefined;

@@ -182,7 +182,11 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm text-black">Phương thức vận chuyển:</span>
-                    <span className="text-sm text-black">{selectedShippingMethod.name}</span>
+                    <span className="text-sm text-black">
+                      {selectedShippingMethod.name === 'Hàng nhẹ' ? 'Tiêu chuẩn' : 
+                       selectedShippingMethod.name === 'Hàng nặng' ? 'Siêu tốc' : 
+                       selectedShippingMethod.name}
+                    </span>
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-xs text-[rgb(38,170,153)]">
@@ -209,22 +213,13 @@ function ShopSection({ shopId, products }: { shopId: string; products: ProductIn
           
           {/* Applied Voucher */}
           {appliedVoucher && (
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-3 px-6">
               <span className="text-sm text-gray-600">Giảm giá voucher:</span>
               <span className="text-lg font-semibold text-green-600">
                 -₫{appliedVoucher.discountAmount.toLocaleString()}
               </span>
             </div>
           )}
-
-          {/* Shipping Fee
-          <div className="flex items-center justify-end gap-3">
-            <span className="text-sm text-gray-600">Phí vận chuyển:</span>
-            <span className="text-lg font-semibold text-blue-600">
-              ₫{selectedShippingMethod.price.toLocaleString()}
-            </span>
-          </div> */}
-
           {/* Total */}
           <div className="flex items-center justify-end gap-3 pt-2 px-6 border-t border-dashed">
             <span className="text-sm text-gray-600">Tổng tiền:</span>
