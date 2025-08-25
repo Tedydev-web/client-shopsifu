@@ -12,6 +12,8 @@ import {
   Order,
 } from "@/types/order.interface";
 import { PaginationMetadata } from "@/types/base.interface";
+import { useGetProfile } from "@/hooks/useGetProfile";
+import { date } from "zod";
 
 export function useOrder() {
   const [orders, setOrders] = useState<OrderGetAllResponse["data"]>([]);
@@ -19,6 +21,7 @@ export function useOrder() {
   const [orderDetail, setOrderDetail] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchProfile = useGetProfile(); // Hàm để fetch lại dữ liệu người dùng
 
   // 🔹 Lấy tất cả đơn hàng
   const fetchAllOrders = useCallback(async (page = 1, limit = 10) => {
@@ -28,6 +31,7 @@ export function useOrder() {
       const res = await orderService.getAll({ page, limit });
       setOrders(res.data);
       setMetadata(res.metadata);
+      await fetchProfile.fetchProfile(); // Fetch lại dữ liệu người dùng sau khi lấy đơn hàng
       return res;
     } catch (err: any) {
       setError(err.message || "Lỗi khi tải danh sách đơn hàng");
@@ -119,3 +123,4 @@ export function useOrder() {
     cancelOrder,
   };
 }
+

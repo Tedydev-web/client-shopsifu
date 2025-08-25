@@ -14,32 +14,39 @@ interface OrderTimelineProps {
   status: OrderStatus;
   createdAt: string;
   finalAmount?: number;
+  orderCode: string; // thêm orderCode
 }
 
 export function OrderTimeline({
   status,
   finalAmount,
   createdAt,
+  orderCode,
 }: OrderTimelineProps) {
   // Hủy đơn -> không hiển thị timeline
   if (status === OrderStatus.CANCELLED) {
     return (
       <div className="flex flex-col items-center justify-center p-10 bg-red-50 rounded-2xl border border-red-200">
         <XCircle className="w-16 h-16 text-red-500 mb-3" />
-        <p className="text-lg font-semibold text-red-600">Đơn hàng đã bị hủy</p>
+        <p className="text-lg font-semibold text-red-600">
+          Đơn hàng {orderCode ? `#${orderCode}` : ""} đã bị hủy
+        </p>
+
         <p className="text-sm text-gray-500 mt-1">
           Nếu có thắc mắc, vui lòng liên hệ bộ phận hỗ trợ.
         </p>
       </div>
     );
+    console.log("Order timeline", orderCode);
   }
+
 
   const isPickuped =
     (OrderStatus as any).PENDING_PICKUP === status ||
     status === (OrderStatus as any).PICKUPED;
 
   // ===== Labels =====
-  let step2Label = "Đã Xác Nhận Thông Tin Thanh Toán"; // Simplified step 2
+  let step2Label = "Đã Xác Nhận Thông Tin Thanh Toán";
   let step3Label = "Đang Chuẩn Bị Hàng";
 
   if (status === OrderStatus.PENDING_PACKAGING) {
@@ -68,13 +75,13 @@ export function OrderTimeline({
     status === OrderStatus.VERIFY_PAYMENT ||
     status === OrderStatus.PENDING_PACKAGING
   ) {
-    currentStepIndex = 2; // cột 3
+    currentStepIndex = 2;
   } else if (isPickuped || status === OrderStatus.PENDING_DELIVERY) {
-    currentStepIndex = 3; // cột 4
+    currentStepIndex = 3;
   } else if (status === OrderStatus.DELIVERED) {
-    currentStepIndex = 4; // cột 5
+    currentStepIndex = 4;
   } else if (status === OrderStatus.PENDING_PAYMENT) {
-    currentStepIndex = 0; // cột 1
+    currentStepIndex = 0;
   }
 
   return (

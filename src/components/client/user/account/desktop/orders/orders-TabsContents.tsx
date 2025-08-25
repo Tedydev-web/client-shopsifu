@@ -10,6 +10,9 @@ import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { createProductSlug } from "@/components/client/products/shared/productSlug";
 import { ReviewsModal } from "@/components/client/products/products-ReviewsModal";
+import { ShoppingCart, Truck, TicketPercent, Wallet, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+
 
 interface StatusInfo {
   label: string;
@@ -93,7 +96,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   }, [currentTab, fetchAllOrders, fetchOrdersByStatus]);
 
   const handleViewDetail = (orderId: string) => {
-    router.push(`/user/orders/${orderId}`);
+    router.push(`/user/orders/${orderId}?code=${orders.find(o => o.id === orderId)?.orderCode}`);
   };
 
   const tabs = ["all", ...Object.values(OrderStatus)];
@@ -124,10 +127,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
             <div className="space-y-3">
               {displayedOrders.map((order) => {
                 const firstItem = order.items[0];
-                const totalAmount = order.items.reduce(
-                  (sum, item) => sum + item.skuPrice * item.quantity,
-                  0
-                );
+                const totalAmount = order.totalPayment
 
                 return (
                   <div

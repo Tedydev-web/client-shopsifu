@@ -20,7 +20,9 @@ import { z } from "zod";
 import { showToast } from "@/components/ui/toastify";
 import { useUpdateProfile } from "./../../profile/useProfile-Update";
 import { useUserData } from "@/hooks/useGetData-UserLogin";
-import { useUploadMedia } from "@/hooks/useUploadMedia";
+import useUploadMediaPresign, {
+  FileWithPreview,
+} from "@/hooks/useUploadMediaPresign";
 
 interface ProfileUpdateSheetProps {
   open: boolean;
@@ -42,10 +44,18 @@ export function ProfileUpdateSheet({
   const userData = useUserData();
   const t = useTranslations();
   const formSchema = UpdateProfileSchema(t);
+
   const { updateProfile, loading } = useUpdateProfile(() =>
     onOpenChange(false)
   );
-  const { handleAddFiles, uploadedUrls, isUploading, reset } = useUploadMedia();
+
+  // Hook upload mới
+  const {
+    handleAddFiles,
+    uploadToS3Multiple,
+    reset: resetUpload,
+    files,
+  } = useUploadMediaPresign();
 
   type ProfileFormData = z.infer<typeof formSchema>;
 
@@ -64,20 +74,11 @@ export function ProfileUpdateSheet({
       form.reset({
         name: userData.name || "",
         phoneNumber: userData.phoneNumber || "",
-        // address: userData.address || "",
         avatar: userData.avatar || "",
       });
       setAvatar(userData.avatar || "");
     }
   }, [open, initialData, form, userData]);
-
-  useEffect(() => {
-      if (uploadedUrls.length > 0) {
-        const newUrl = uploadedUrls[0];
-        setAvatar(newUrl);
-        form.setValue("avatar", newUrl, { shouldDirty: true });
-      }
-    }, [uploadedUrls, form]);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -89,42 +90,40 @@ export function ProfileUpdateSheet({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    reset(); // clear state của hook upload
-    await handleAddFiles([file]);
+    resetUpload(); // clear state cũ
+    const { processedFiles } = await handleAddFiles([file]);
+    if (processedFiles.length > 0) {
+      const previewFile = processedFiles[0] as FileWithPreview;
+      setAvatar(previewFile.preview || "");
+      form.setValue("avatar", previewFile.preview || "", { shouldDirty: true });
+    }
   };
 
-  // const onSubmit = (data: ProfileFormData) => {
-  //   const dirtyFields = form.formState.dirtyFields;
-  //   const changedData: Partial<ProfileFormData & { avatar?: string }> = {};
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      let avatarUrl = userData?.avatar;
 
-  //   (Object.keys(dirtyFields) as Array<keyof ProfileFormData>).forEach((key) => {
-  //     changedData[key] = data[key];
-  //   });
+      if (files.length > 0) {
+        const urls = await uploadToS3Multiple();
+        if (urls.length > 0) {
+          avatarUrl = urls[0];
+        }
+      }
 
-  //   if (avatar !== initialData.avatar) {
-  //     changedData.avatar = avatar;
-  //   }
+      const hasChanges =
+        data.name !== userData?.name ||
+        data.phoneNumber !== userData?.phoneNumber ||
+        avatarUrl !== userData?.avatar;
 
-  //   if (Object.keys(changedData).length === 0) {
-  //     showToast("Không có thay đổi nào để lưu.", "info");
-  //     return;
-  //   }
+      if (!hasChanges) {
+        showToast("Không có thay đổi nào để lưu.", "info");
+        return;
+      }
 
-  //   updateProfile(changedData);
-  // };
-
-  const onSubmit = (data: ProfileFormData) => {
-    const hasChanges =
-      data.name !== userData?.name ||
-      data.phoneNumber !== userData?.phoneNumber ||
-      data.avatar !== userData?.avatar;
-
-    if (!hasChanges) {
-      showToast("Không có thay đổi nào để lưu.", "info");
-      return;
+      updateProfile({ ...data, avatar: avatarUrl });
+    } catch (err) {
+      console.error("Lỗi khi cập nhật profile:", err);
     }
-
-    updateProfile(data);
   };
 
   const name = form.watch("name");
