@@ -41,6 +41,8 @@ export default function SearchProductGrid({ categoryId }: SearchProductGridProps
 
   const { totalPages, hasNextPage, hasPrevPage } = paginationData;
 
+  console.log(" check: ", products)
+
   // Hiển thị loading state
   if (isLoading) {
     return (

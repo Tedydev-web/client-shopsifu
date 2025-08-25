@@ -1,5 +1,9 @@
 // utils/slugify.ts
 
+import { url } from "inspector";
+import URLHashUtils from "./hash";
+import { ENUM } from "@/configs/common";
+
 // Hàm slugify ban đầu (giữ nguyên)
 export function slugify(str: string) {
   return str
@@ -30,9 +34,10 @@ export function createCategorySlug(name: string, ids: string[] | string | null |
   
   // Tạo phần ID với format cat.ID1.ID2...
   const idPart = idsArray.length > 0 ? `cat.${idsArray.join('.')}` : '';
+  const urlHashUtils = new URLHashUtils(ENUM.VINCENTKEY);
   
   // Tạo slug theo format: /Tên-cat.Id1.Id2...
-  return `/${urlFriendlyName}-${idPart}`;
+  return `/${urlFriendlyName}-${urlHashUtils.encryptId(idPart)}`;
 }
 
 // Cập nhật hàm trích xuất ID để trả về mảng các ID

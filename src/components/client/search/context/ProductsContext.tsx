@@ -78,6 +78,8 @@ export function ProductsProvider({ children, currentCategoryId, querySearch }: P
     categoryId: effectiveCategoryId, 
     key: dataKey, // Truyền key để làm điểm phân biệt,
     querySearch: searchQuery})
+
+    console.log ("check1: ", productsData)
   
   // Thêm các giá trị bổ sung cho context
   // useEffect để log khi searchQuery hoặc categoryId thay đổi
