@@ -26,6 +26,9 @@ export function MobileSearchInput() {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
+  setIsFocused(false);
+  inputRef.current?.blur();
+
   // Load lịch sử từ localStorage khi mount
   useEffect(() => {
     const stored = localStorage.getItem("searchHistory");

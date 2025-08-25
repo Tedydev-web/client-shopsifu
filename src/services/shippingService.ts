@@ -11,14 +11,19 @@ import {
   DeliveryTimeRequest,
   DeliveryTimeResponse,
   ShippingServiceResponse,
+  GetOrderInfoParams,
+  GetOrderInfoResponse,
 } from "@/types/shipping.interface";
 
 export const shippingService = {
   // 1. Get All Provinces
   getProvinces: async (signal?: AbortSignal): Promise<GetProvincesResponse> => {
-    const response = await publicAxios.get(API_ENDPOINTS.ADDRESS.GET_PROVINCES, {
-      signal,
-    });
+    const response = await publicAxios.get(
+      API_ENDPOINTS.ADDRESS.GET_PROVINCES,
+      {
+        signal,
+      }
+    );
     return response.data;
   },
 
@@ -27,10 +32,13 @@ export const shippingService = {
     params: GetDistrictsParams,
     signal?: AbortSignal
   ): Promise<GetDistrictsResponse> => {
-    const response = await publicAxios.get(API_ENDPOINTS.ADDRESS.GET_DISTRICTS, {
-      params,
-      signal,
-    });
+    const response = await publicAxios.get(
+      API_ENDPOINTS.ADDRESS.GET_DISTRICTS,
+      {
+        params,
+        signal,
+      }
+    );
     return response.data;
   },
 
@@ -78,6 +86,18 @@ export const shippingService = {
     signal?: AbortSignal
   ): Promise<ShippingServiceResponse> => {
     const response = await privateAxios.get(API_ENDPOINTS.SHIPPING.SERVICE, {
+      params,
+      signal,
+    });
+    return response.data;
+  },
+
+  // 7. Get Order Info by orderCode
+  getOrderInfo: async (
+    params: GetOrderInfoParams,
+    signal?: AbortSignal
+  ): Promise<GetOrderInfoResponse> => {
+    const response = await privateAxios.get(API_ENDPOINTS.SHIPPING.ORDER_INFO, {
       params,
       signal,
     });

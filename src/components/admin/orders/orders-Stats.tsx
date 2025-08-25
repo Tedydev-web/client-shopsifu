@@ -69,7 +69,7 @@ export function OrdersStats({ orders }: OrdersStatsProps) {
     const deliveryRate = totalOrders > 0 ? (deliveredOrders / totalOrders) * 100 : 0;
 
     // Đơn chờ lấy hàng
-    const pendingPickup = orders.filter(order => order.status === 'PENDING_PICKUP').length;
+    const pendingPickup = orders.filter(order => order.status === 'PICKUPED').length;
 
     // Phân bổ phương thức thanh toán
     const paymentMethods = orders.reduce((acc, order) => {

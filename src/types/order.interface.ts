@@ -10,7 +10,7 @@ export interface OrderGetAllParams extends PaginationRequest {
 export enum OrderStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
   PENDING_PACKAGING = "PENDING_PACKAGING",
-  PICKUPED = "PENDING_PICKUP",
+  PICKUPED = "PICKUPED",
   PENDING_DELIVERY = "PENDING_DELIVERY",
   DELIVERED = "DELIVERED",
   RETURNED = "RETURNED",
@@ -125,6 +125,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   userId: string;
+  orderCode: string;
   status: OrderStatus;
   receiver: OrderReceiver;
   shopId: string;

@@ -11,9 +11,11 @@ import {
   OrderCancelResponse,
   Order,
 } from "@/types/order.interface";
+import { PaginationMetadata } from "@/types/base.interface";
 
 export function useOrder() {
   const [orders, setOrders] = useState<OrderGetAllResponse["data"]>([]);
+  const [metadata, setMetadata] = useState<PaginationMetadata | null>(null);
   const [orderDetail, setOrderDetail] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +27,7 @@ export function useOrder() {
     try {
       const res = await orderService.getAll({ page, limit });
       setOrders(res.data);
+      setMetadata(res.metadata);
       return res;
     } catch (err: any) {
       setError(err.message || "Lỗi khi tải danh sách đơn hàng");
@@ -42,6 +45,7 @@ export function useOrder() {
       try {
         const res = await orderService.getByStatus(status, { page, limit });
         setOrders(res.data);
+        setMetadata(res.metadata);
         return res;
       } catch (err: any) {
         setError(err.message || "Lỗi khi tải đơn hàng theo trạng thái");
@@ -107,6 +111,7 @@ export function useOrder() {
     orderDetail,
     loading,
     error,
+    metadata,
     fetchAllOrders,
     fetchOrdersByStatus,
     fetchOrderDetail,

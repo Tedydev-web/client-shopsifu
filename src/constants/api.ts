@@ -190,6 +190,7 @@ export const API_ENDPOINTS = {
   SHIPPING:{
     CALCULATE_FEE: `${API_BASE}/shipping/ghn/calculate-fee`,
     SERVICE: `${API_BASE}/shipping/ghn/services`,
-    DELIVERY_TIME: `${API_BASE}/shipping/ghn/delivery-time`
+    DELIVERY_TIME: `${API_BASE}/shipping/ghn/delivery-time`,
+    ORDER_INFO: `${API_BASE}/shipping/ghn/order-info`
   }
 }

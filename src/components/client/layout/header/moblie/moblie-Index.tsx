@@ -11,6 +11,7 @@ import { DropdownProvider } from "../dropdown-context";
 import { MobileSearchInput } from "./moblie-SearchInput";
 import "../style.css";
 import { MobileCategories } from "./moblie-Categories";
+import Link from "next/link";
 
 export function MobileHeader() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -35,12 +36,14 @@ export function MobileHeader() {
                 />
               </MobileCategories>
               <div className="relative h-8 w-28">
-                <Image
-                  src="/images/logo/png-jpeg/Logo-Full-White.png"
-                  alt="Shopsifu Logo"
-                  fill
-                  className="object-contain"
-                />
+                <Link href="/">
+                  <Image
+                    src="/images/logo/png-jpeg/Logo-Full-White.png"
+                    alt="Shopsifu Logo"
+                    fill
+                    className="object-contain cursor-pointer"
+                  />
+                </Link>
               </div>
             </div>
 
@@ -52,7 +55,7 @@ export function MobileHeader() {
 
           {/* Row 2 */}
           <div className="w-full px-1">
-            <MobileSearchInput/>
+            <MobileSearchInput />
           </div>
         </div>
       </header>

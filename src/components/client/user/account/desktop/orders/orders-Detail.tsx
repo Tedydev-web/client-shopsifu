@@ -18,6 +18,7 @@ import { Order, OrderItem } from "@/types/order.interface";
 import Link from "next/link";
 import { createProductSlug } from "@/components/client/products/shared/productSlug"; // Đường dẫn đến hàm tạo slug
 import { OrderTimeline } from "./orders-Timeline";
+import OrderInfo from "./orders-Info";
 
 interface OrderDetailProps {
   readonly orderId: string;
@@ -123,10 +124,23 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
       </Link>
 
       <section className="bg-white rounded-lg border p-4 space-y-3">
-        <h2 className="text-lg font-semibold">Tiến trình đơn hàng</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Tiến trình đơn hàng</h2>
+          <span className="text-sm font-medium">
+            {order.status === "DELIVERED"
+              ? `Đơn hàng đã hoàn thành: ${order.orderCode}`
+              : `Mã đơn hàng: ${order.orderCode}`}
+          </span>
+        </div>
         <OrderTimeline
-          status={order.status} createdAt={order.createdAt} finalAmount={order.totalPayment}
+          status={order.status}
+          createdAt={order.createdAt}
+          finalAmount={order.totalPayment}
         />
+      </section>
+
+      <section className="bg-white rounded-lg border p-4 space-y-3">
+        <OrderInfo orderCode={order.orderCode} />
       </section>
 
       {/* Tổng quan */}
@@ -155,7 +169,9 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               className="w-20 h-20 object-cover rounded"
             />
             <div>
-              <p className="font-medium line-clamp-2">{selectedItem?.productName}</p>
+              <p className="font-medium line-clamp-2">
+                {selectedItem?.productName}
+              </p>
               <div className="flex items-center gap-2">
                 <span className="text-[#d70018] font-semibold">
                   {(selectedItem?.skuPrice ?? 0).toLocaleString()}đ
@@ -192,7 +208,8 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               )}
 
               {/* Nút Thanh toán lại - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
-              {(order.status === "PENDING_PAYMENT" || order.status === "PENDING_PACKAGING") && (
+              {(order.status === "PENDING_PAYMENT" ||
+                order.status === "PENDING_PACKAGING") && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -207,7 +224,8 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               )}
 
               {/* Nút Hủy đơn hàng - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
-              {(order.status === "PENDING_PAYMENT"|| order.status === "PENDING_PACKAGING") && (
+              {(order.status === "PENDING_PAYMENT" ||
+                order.status === "PENDING_PACKAGING") && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -333,7 +351,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
             <div className="flex px-2 justify-between text-red-600">
               <span>Tổng số tiền đã thanh toán</span>
               <span>
-                {order.status === "PENDING_PICKUP" ||
+                {order.status === "PICKUPED" ||
                 order.status === "PENDING_DELIVERY" ||
                 order.status === "DELIVERED"
                   ? order.totalPayment.toLocaleString()

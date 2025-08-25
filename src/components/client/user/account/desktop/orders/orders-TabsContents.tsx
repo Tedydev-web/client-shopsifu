@@ -27,7 +27,7 @@ const statusLabel: Record<OrderStatus, StatusInfo> = {
     className:
       "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 border border-orange-200",
   },
-  PENDING_PICKUP: {
+  PICKUPED: {
     label: "Chờ lấy hàng",
     className:
       "bg-gradient-to-r from-sky-50 to-blue-100 text-sky-700 border border-sky-200",
@@ -66,9 +66,10 @@ interface Props {
 
 export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   const router = useRouter();
-  const { orders, loading, error, fetchAllOrders, fetchOrdersByStatus } =
+  const { orders, loading, error, metadata, fetchAllOrders, fetchOrdersByStatus } =
     useOrder();
   const [visibleCount, setVisibleCount] = useState(6);
+  const [fetchedAll, setFetchedAll] = useState(false);
 
   // state mở modal review
   const [reviewProduct, setReviewProduct] = useState<{
@@ -227,11 +228,26 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                 );
               })}
 
-              {visibleCount < orders.length && (
+              {metadata?.totalItems && visibleCount < metadata.totalItems && (
                 <div className="flex justify-center mt-4">
                   <Button
                     variant="ghost"
-                    onClick={() => setVisibleCount(orders.length)}
+                    onClick={async () => {
+                      // 🔹 Nếu chưa load hết thì gọi API với limit = totalItems
+                      if (orders.length < (metadata?.totalItems ?? 0)) {
+                        if (currentTab === "all") {
+                          await fetchAllOrders(1, metadata.totalItems);
+                        } else {
+                          await fetchOrdersByStatus(
+                            currentTab as OrderStatus,
+                            1,
+                            metadata.totalItems
+                          );
+                        }
+                      }
+                      // 🔹 Sau đó hiển thị thêm
+                      setVisibleCount((prev) => prev + 10);
+                    }}
                     className="text-xs sm:text-sm md:text-base text-[#3B82F6]"
                   >
                     Xem thêm

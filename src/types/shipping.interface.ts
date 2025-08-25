@@ -112,3 +112,49 @@ export interface ShippingMethod {
   standard_config_fee_id: string | null;
   standard_extra_cost_id: string | null;
 }
+
+// Order Info Interfaces
+export interface OrderInfo {
+  order_code: string;
+  client_order_code: string;
+  status: string;
+  created_date: string;
+  updated_date: string;
+  from_name: string;
+  from_phone: string;
+  from_address: string;
+  from_ward_code: string;
+  from_district_id: number;
+  to_name: string;
+  to_phone: string;
+  to_address: string;
+  to_ward_code: string;
+  to_district_id: number;
+  weight: number;
+  converted_weight: number;
+  length: number;
+  width: number;
+  height: number;
+  content: string;
+  service_id: number;
+  service_type_id: number;
+  payment_type_id: number;
+  cod_amount: number;
+  insurance_value: number;
+  order_value: number;
+  order_date: string;
+  leadtime: string;
+  finish_date: string | null;
+  pick_warehouse_id: number;
+  deliver_warehouse_id: number;
+  current_warehouse_id: number;
+  tag: string[];
+  note: string;
+  required_note: string;
+}
+
+export interface GetOrderInfoResponse extends BaseShippingResponse<OrderInfo> {}
+
+export interface GetOrderInfoParams {
+  orderCode: string;
+}
