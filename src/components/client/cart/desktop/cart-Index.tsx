@@ -37,6 +37,21 @@ export default function DesktopCartPageMobile() {
   // Track manual selections để tránh bị override bởi API sync
   const manualSelectionsRef = useRef<Set<string>>(new Set());
 
+  // Gọi API get cart khi component mount để luôn có data mới nhất
+  useEffect(() => {
+    // Force refresh cart khi vào trang
+    const refreshCart = async () => {
+      try {
+        await forceRefresh();
+      } catch (error) {
+        console.error('Error refreshing cart on mount:', error);
+        // API error sẽ được handle bởi CartContext, không cần toast thêm
+      }
+    };
+    
+    refreshCart();
+  }, []); // Empty dependency để chỉ chạy 1 lần khi mount
+
   // Listen for manual item selection events (từ Buy Now flow)
   useEffect(() => {
     const handleForceSelectItem = (event: CustomEvent) => {
