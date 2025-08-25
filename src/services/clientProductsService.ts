@@ -49,6 +49,7 @@ export const clientProductsService = {
     try {
       console.log("🔍 Searching products with params:", params);
       const response = await publicAxios.get(API_ENDPOINTS.PRODUCTS.SEARCH, { params });
+      console.log("🔍 Search response:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error searching products:", error);

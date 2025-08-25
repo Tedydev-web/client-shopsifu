@@ -3,13 +3,14 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ClientProductsResponse,
   ClientProduct,
   ClientSearchResultItem,
 } from "@/types/client.products.interface";
 import { clientProductsService } from "@/services/clientProductsService";
 import { useServerDataTable } from "@/hooks/useServerDataTable";
 import { PaginationRequest } from "@/types/base.interface";
+import URLHashUtils from "@/utils/hash";
+import {ENUM} from "@/configs/common";
 
 // Định nghĩa interface cho pagination để tránh lỗi undefined
 interface PaginationData {
@@ -84,20 +85,22 @@ export function useProducts({
     {
       fetchData: async (params: PaginationRequest, signal?: AbortSignal) => {
         // Thêm các params đặc biệt
-        console.log("Fetching products with params:", params);
+        // console.log("Fetching products with params:", params);
         const apiParams: any = { ...params };
 
         // Nếu có từ khóa tìm kiếm, ưu tiên API search và bỏ qua category filter
-        if (searchQuery) {
-          // Xóa category param nếu đang tìm kiếm để đảm bảo tìm kiếm trên toàn bộ sản phẩm
-          delete apiParams.categoryId;
-        } else if (categoryId) {
+        const urlHashUtils = new URLHashUtils(ENUM.VINCENTKEY);
+        if (categoryId) {
           // Chỉ áp dụng filter theo category khi không có search query
-          apiParams.categoryId = categoryId;
+          apiParams.categoryId = urlHashUtils.decryptId(categoryId);
         }
+        // if (searchQuery) {
+        //   // Xóa category param nếu đang tìm kiếm để đảm bảo tìm kiếm trên toàn bộ sản phẩm
+        //   delete apiParams.categoryId;
+        // } 
 
         // Nếu có từ khóa tìm kiếm, sử dụng API search
-        if (searchQuery) {
+        // if (searchQuery) {
           apiParams.q = searchQuery; // Sử dụng param 'q' thay vì 'search' cho API search
 
           // LUÔN sử dụng đúng timestamp từ URL để đảm bảo request khớp với URL hiện tại
@@ -107,12 +110,12 @@ export function useProducts({
           }
 
           // Thêm log để debug nguồn gốc của request
-          console.log("Searching products with params:", {
-            q: searchQuery,
-            timestamp: apiParams._t,
-            source: "useProducts.hook",
-            ...apiParams,
-          });
+          // console.log("Searching products with params:", {
+          //   q: searchQuery,
+          //   timestamp: apiParams._t,
+          //   source: "useProducts.hook",
+          //   ...apiParams,
+          // });
 
           console.log("Using search API with params:", apiParams);
 
@@ -124,7 +127,8 @@ export function useProducts({
           );
 
           // Chuyển đổi dữ liệu từ search API sang định dạng tương thích với ClientProduct
-          const convertedData = searchResponse.data.map((item) => ({
+          // console.log("Raw search response:", searchResponse);
+          const convertedData = searchResponse.data.map((item) => ({ 
             id: item.productId,
             name: item.productName,
             description: item.productDescription || "",
@@ -166,9 +170,9 @@ export function useProducts({
             products:  convertedData,
             metadata: searchResponse.metadata,
           };
-        }
+        // }
 
-        return await clientProductsService.getProducts(apiParams);
+        // return await clientProductsService.getProducts(apiParams);
       },
       getResponseData: (response: any) => response.data || [],
       getResponseMetadata: (response: any) => response.metadata,

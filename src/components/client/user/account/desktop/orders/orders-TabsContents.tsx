@@ -10,9 +10,14 @@ import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { createProductSlug } from "@/components/client/products/shared/productSlug";
 import { ReviewsModal } from "@/components/client/products/products-ReviewsModal";
-import { ShoppingCart, Truck, TicketPercent, Wallet, ArrowRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-
+import {
+  ShoppingCart,
+  Truck,
+  TicketPercent,
+  Wallet,
+  ArrowRight,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface StatusInfo {
   label: string;
@@ -69,8 +74,14 @@ interface Props {
 
 export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   const router = useRouter();
-  const { orders, loading, error, metadata, fetchAllOrders, fetchOrdersByStatus } =
-    useOrder();
+  const {
+    orders,
+    loading,
+    error,
+    metadata,
+    fetchAllOrders,
+    fetchOrdersByStatus,
+  } = useOrder();
   const [visibleCount, setVisibleCount] = useState(6);
   const [fetchedAll, setFetchedAll] = useState(false);
 
@@ -95,8 +106,13 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
     setVisibleCount(6);
   }, [currentTab, fetchAllOrders, fetchOrdersByStatus]);
 
+  // OrderTabContent.tsx
   const handleViewDetail = (orderId: string) => {
-    router.push(`/user/orders/${orderId}?code=${orders.find(o => o.id === orderId)?.orderCode}`);
+    router.push(
+      `/user/orders/${orderId}?code=${
+        orders.find((o) => o.id === orderId)?.orderCode
+      }`
+    );
   };
 
   const tabs = ["all", ...Object.values(OrderStatus)];
@@ -127,7 +143,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
             <div className="space-y-3">
               {displayedOrders.map((order) => {
                 const firstItem = order.items[0];
-                const totalAmount = order.totalPayment
+                const totalAmount = order.totalPayment;
 
                 return (
                   <div
