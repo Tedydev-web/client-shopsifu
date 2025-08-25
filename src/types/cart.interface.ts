@@ -23,6 +23,7 @@ export interface ProductInfo {
     virtualPrice: number;
     brandId: string;
     images: string[];
+    sku: SkuInfo;
     variants: Array<{
         value: string;
         options: string[];
