@@ -122,7 +122,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           </span>
         </span>
       </Link>
-
+      
       <section className="bg-white rounded-lg border p-4 space-y-3">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Tiến trình đơn hàng</h2>
@@ -136,6 +136,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           status={order.status}
           createdAt={order.createdAt}
           finalAmount={order.totalPayment}
+          orderCode={order.orderCode}
         />
       </section>
 
@@ -155,7 +156,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           <span className="text-muted-foreground">•</span>
           <Badge
             variant={currentStatus.variant || "default"}
-            className="text-xs"
+            className="text-xs text-white"
           >
             {currentStatus.label}
           </Badge>
@@ -322,17 +323,17 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               <span>Tổng tiền hàng:</span>
               <span>{totalAmount.toLocaleString()}đ</span>
             </div>
-            <div className="flex px-2 justify-between border-b pb-2 text-green-600">
-              <span>Giảm giá:</span>
-              <span>{discount.toLocaleString()}đ</span>
-            </div>
-            <div className="flex px-2 justify-between text-green-600">
+            <div className="flex px-2 justify-between border-b pb-2">
               <span>Phí vận chuyển:</span>
               <span>
                 {shippingFee === 0
                   ? "Miễn phí"
                   : `${shippingFee.toLocaleString()}đ`}
               </span>
+            </div>
+            <div className="flex px-2 justify-between border-b pb-2 text-green-600">
+              <span>Giảm giá:</span>
+              <span>-{discount.toLocaleString()}đ</span>
             </div>
           </div>
 
@@ -392,6 +393,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
               variant="destructive"
               onClick={handleConfirmCancel}
               disabled={isCancelling}
+              className="text-white"
             >
               {isCancelling ? "Đang hủy..." : "Có, hủy đơn hàng"}
             </Button>

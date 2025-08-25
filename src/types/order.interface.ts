@@ -125,11 +125,11 @@ export interface OrderItem {
 export interface Order {
   id: string;
   userId: string;
-  orderCode: string;
   status: OrderStatus;
   receiver: OrderReceiver;
   shopId: string;
   paymentId: string;
+  orderCode: string;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];

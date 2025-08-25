@@ -113,6 +113,13 @@ export interface ShippingMethod {
   standard_extra_cost_id: string | null;
 }
 
+export interface OrderLog {
+  status: string;
+  payment_type_id: number;
+  trip_code: string;
+  updated_date: string;
+}
+
 // Order Info Interfaces
 export interface OrderInfo {
   order_code: string;
@@ -148,6 +155,7 @@ export interface OrderInfo {
   pick_warehouse_id: number;
   deliver_warehouse_id: number;
   current_warehouse_id: number;
+  log: OrderLog[];   
   tag: string[];
   note: string;
   required_note: string;
