@@ -308,17 +308,17 @@ export const OrdersColumns = ({
     },
   },
   {
-    accessorFn: (row) => row.items.reduce((total, item) => total + (item.skuPrice * item.quantity), 0),
-    id: "totalAmount",
+    accessorFn: (row) => row.totalPayment,
+    id: "totalPayment",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={t("totalAmount")}
+        title={t("totalPayment")}
         className="justify-center text-center px-2"
       />
     ),
     cell: ({ getValue, row }) => {
-      const totalAmount = getValue<number>();
+      const totalPayment = getValue<number>();
       const items = row.original.items;
       const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
       
@@ -328,7 +328,7 @@ export const OrdersColumns = ({
       return (
         <div className="w-[140px] text-center py-3">
           <div className="font-bold text-lg text-green-600 mb-1">
-            {formatCurrency(totalAmount)}₫
+            {formatCurrency(totalPayment)}₫
           </div>
           <div className="text-xs text-gray-500">
             {itemCount} sản phẩm

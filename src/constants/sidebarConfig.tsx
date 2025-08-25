@@ -18,6 +18,7 @@ import {
   Tags // Thêm icon cho Brand
 } from 'lucide-react'
 import { useTranslations } from "next-intl";
+import { useUserData } from '@/hooks/useGetData-UserLogin';
 
 export type SidebarItem = {
   title: string
@@ -29,8 +30,13 @@ export type SidebarItem = {
 
 export const useSidebarConfig = (): SidebarItem[] => {
   const t = useTranslations("admin.sidebar");
+  const userData = useUserData();
+  
+  // Lấy role name từ user data
+  const userRole = userData?.role?.name;
 
-  return [
+  // Base items cho tất cả role
+  const baseItems: SidebarItem[] = [
     {
       title: t('dashboard'),
       href: '/admin',
@@ -70,7 +76,7 @@ export const useSidebarConfig = (): SidebarItem[] => {
         }
       ],
     },
-     {
+    {
       title: t('voucher.voucher'),
       href: '/admin/voucher',
       icon: <Tickets  className="w-5 h-5" />,
@@ -86,7 +92,11 @@ export const useSidebarConfig = (): SidebarItem[] => {
           icon: null,
         }
       ],
-    },
+    }
+  ];
+
+  // Items chỉ dành cho ADMIN
+  const adminOnlyItems: SidebarItem[] = [
     {
       title: t('system.system'),
       href: '/admin/system',
@@ -136,12 +146,26 @@ export const useSidebarConfig = (): SidebarItem[] => {
         }
       ],
     }
-  ]
+  ];
+
+  // Trả về items dựa trên role
+  if (userRole === 'ADMIN') {
+    return [...baseItems, ...adminOnlyItems];
+  } else {
+    // SELLER hoặc role khác chỉ có access vào base items
+    return baseItems;
+  }
 }
 
 export const useSettingsSidebarConfig = (): SidebarItem[] => {
   const t = useTranslations("admin.sidebar.settings");
-  return [
+  const userData = useUserData();
+  
+  // Lấy role name từ user data
+  const userRole = userData?.role?.name;
+
+  // Base settings cho tất cả role
+  const baseSettingsItems: SidebarItem[] = [
     {
       title: t('systemSettings'),
       href: '/admin',
@@ -162,6 +186,18 @@ export const useSettingsSidebarConfig = (): SidebarItem[] => {
         },
       ]
     }
-    // Add more settings items as needed
-  ]
+  ];
+
+  // Settings chỉ dành cho ADMIN (có thể mở rộng sau)
+  const adminOnlySettingsItems: SidebarItem[] = [
+    // Có thể thêm các settings chỉ dành cho admin ở đây nếu cần
+  ];
+
+  // Trả về settings items dựa trên role
+  if (userRole === 'ADMIN') {
+    return [...baseSettingsItems, ...adminOnlySettingsItems];
+  } else {
+    // SELLER hoặc role khác chỉ có access vào base settings
+    return baseSettingsItems;
+  }
 }

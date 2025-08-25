@@ -91,13 +91,20 @@ export function Sidebar({
   }, [isSettingsPage, settingsSidebarConfig, sidebarConfig]);
 
   useEffect(() => {
-    if (isSettingsPage) {
-      const allWithSub = settingsSidebarConfig
-        .filter((item) => item.subItems && item.subItems.length > 0)
-        .map((item) => item.href);
-      setExpandedItems(allWithSub);
-    }
-  }, []); // ✅ only run once
+    // Auto expand tất cả items có subItems khi component mount
+    const allWithSub = currentSidebarConfig
+      .filter((item) => item.subItems && item.subItems.length > 0)
+      .map((item) => item.href);
+    
+    // Chỉ set nếu expandedItems khác với allWithSub để tránh infinite loop
+    setExpandedItems(prev => {
+      const newItems = allWithSub.filter(item => !prev.includes(item));
+      if (newItems.length > 0) {
+        return [...prev, ...newItems];
+      }
+      return prev;
+    });
+  }, [isSettingsPage]); // Chỉ dependency vào isSettingsPage thay vì currentSidebarConfig
 
   const renderSettingsSidebar = () => (
     <div>
@@ -107,10 +114,10 @@ export function Sidebar({
             <div key={item.href} className="mb-2">
               <Link
                 href={item.href}
-                className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-[#52525B] hover:bg-gray-100 font-semibold text-sm"
+                className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-black hover:bg-gray-100 font-semibold text-sm"
               >
                 {item.icon && (
-                  <span className="mr-1 text-[#52525B]">{item.icon}</span>
+                  <span className="mr-1 text-black">{item.icon}</span>
                 )}
                 <span>{item.title}</span>
               </Link>
@@ -123,7 +130,7 @@ export function Sidebar({
         return (
           <div key={item.href} className="mb-2">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold text-[#52525B] tracking-wide mb-1 mt-2">
+              <div className="text-sm font-semibold text-black tracking-wide mb-1 mt-2">
                 {item.title}
               </div>
             </div>
@@ -134,7 +141,7 @@ export function Sidebar({
                     key={sub.href}
                     href={sub.href}
                     className={cn(
-                      "px-3 py-2 rounded-md text-sm font-normal text-[#52525B] hover:bg-primary/10 hover:text-primary transition-colors duration-200",
+                      "px-3 py-2 rounded-md text-sm font-normal text-black hover:text-primary transition-colors duration-200",
                       pathname === sub.href &&
                         "bg-primary/10 text-primary font-medium"
                     )}
@@ -148,7 +155,7 @@ export function Sidebar({
               <Link
                 href={item.href}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium block text-gray-500 hover:bg-primary/10 hover:text-primary transition-colors duration-200",
+                  "px-3 py-2 rounded-md text-sm font-medium block text-black hover:text-primary transition-colors duration-200",
                   pathname === item.href &&
                     "bg-primary/10 text-primary font-medium"
                 )}
@@ -191,15 +198,15 @@ export function Sidebar({
               item.icon.type
                 ? React.createElement(item.icon.type, {
                     className: cn(
-                      "w-5 h-5",
-                      isItemActive ? "text-primary" : "text-[#52525B]"
+                      "w-5 h-5", // Quay lại size cũ
+                      isItemActive ? "text-primary" : "text-black"
                     ),
                   })
                 : null}
               <span
                 className={cn(
-                  "text-sm font-medium text-[#52525B]",
-                  level > 0 && "text-muted-foreground capitalize",
+                  "text-sm font-semibold text-black", // Quay lại size và font cũ
+                  level > 0 && "text-black font-normal hover:text-primary",
                   isItemActive && "text-primary"
                 )}
               >
@@ -214,15 +221,15 @@ export function Sidebar({
               item.icon.type
                 ? React.createElement(item.icon.type, {
                     className: cn(
-                      "w-5 h-5",
-                      isItemActive ? "text-primary" : "text-[#52525B]"
+                      "w-5 h-5", // Quay lại size cũ
+                      isItemActive ? "text-primary" : "text-black"
                     ),
                   })
                 : null}
               <span
                 className={cn(
-                  "text-sm font-medium text-[#52525B]",
-                  level > 0 && "text-muted-foreground capitalize",
+                  "text-sm font-semibold text-black", // Quay lại size và font cũ
+                  level > 0 && "text-black font-normal hover:text-primary",
                   isItemActive && "text-primary"
                 )}
               >
@@ -231,6 +238,7 @@ export function Sidebar({
             </Link>
           )}
 
+          {/* Hiện lại chevron icon để người dùng có thể toggle */}
           {hasSubItems && (
             <ChevronDown
               className={cn(
@@ -241,6 +249,7 @@ export function Sidebar({
           )}
         </div>
 
+        {/* Chỉ hiển thị subItems khi isExpanded = true */}
         {hasSubItems && isExpanded && (
           <div className="mt-1 space-y-0.5">
             {item.subItems?.map((subItem) => renderItem(subItem, level + 1))}
@@ -275,7 +284,7 @@ export function Sidebar({
           <div className="flex items-center justify-between h-16 px-4 border-b">
             <Link href="/admin" className="flex items-center">
               <Image
-                src="/images/logo/logofullred.png"
+                src="/images/logo/png-jpeg/Logo-Full-Red.png"
                 alt="Shopsifu Logo"
                 width={116}
                 height={66}
@@ -309,9 +318,9 @@ export function Sidebar({
           <div className="px-4 py-2">
             <Link
               href="/admin/settings/profile"
-              className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-[#52525B] hover:bg-primary/10 font-semibold text-sm"
+              className="flex items-center gap-2 py-2 px-4 rounded-lg transition-colors duration-150 text-black hover:bg-primary/10 hover:text-primary font-semibold text-sm"
             >
-              <Settings className="w-5 h-5 text-[#52525B]" />
+              <Settings className="w-5 h-5 text-black" />
               <span>{t("admin.sidebar.settings.settings")}</span>
             </Link>
           </div>

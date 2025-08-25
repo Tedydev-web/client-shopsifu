@@ -33,6 +33,7 @@ interface RolesModalUpsertProps {
     isActive: boolean
     permissionIds: string[]  // Thay đổi từ number[] sang string[] cho UUID
   }) => Promise<void>
+  // permissionsData chỉ cần thiết khi mode = 'edit'
   permissionsData: Record<string, PermissionDetail[]> | PermissionDetail[];
   isPermissionsLoading: boolean;
 }
@@ -76,17 +77,20 @@ export default function RolesModalUpsert({
       setName('')
       setDescription('')
       setIsActive(true)
-      setSelectedPermissionIds(new Set<string>())
+      setSelectedPermissionIds(new Set<string>()) // Reset permissions cho mode add
     }
   }, [mode, role, open])
 
-  // Additional effect to update selected permissions when data changes
+  // Additional effect to update selected permissions when data changes - chỉ cho edit mode
   useEffect(() => {
+    // Chỉ xử lý permissions khi ở chế độ edit
+    if (mode !== 'edit') return;
+    
     // Log permissions data whenever it changes
     console.log("Current permissionsData:", permissionsData);
     console.log("isPermissionsLoading:", isPermissionsLoading);
     
-    if (mode === 'edit' && role?.permissions && !isPermissionsLoading) {
+    if (role?.permissions && !isPermissionsLoading) {
       console.log("Updating permissions from useEffect due to permissionsData change");
       const initialPermissionIds = role.permissions.map((p: Permission) => {
         console.log("Processing permission:", p);
@@ -165,25 +169,24 @@ export default function RolesModalUpsert({
 
     setLoading(true)
     try {
-      // Tạo request data khác nhau cho add và edit
-      // Lấy danh sách permissionIds đã chọn
-      const permissionIds = Array.from(selectedPermissionIds)
-      console.log("Submitting with permission IDs:", permissionIds)
-      
       if (mode === 'add') {
+        // Khi thêm mới, chỉ gửi thông tin cơ bản (name, description, isActive)
         await onSubmit({
           name,
           description,
           isActive,
-          permissionIds: permissionIds, // Gửi permissionIds đã chọn khi tạo mới
+          permissionIds: [], // Không gửi permissions khi thêm mới
         })
       } else {
-        // Mode edit
+        // Mode edit - gửi cả permissionIds
+        const permissionIds = Array.from(selectedPermissionIds)
+        console.log("Submitting with permission IDs:", permissionIds)
+        
         await onSubmit({
           name,
           description,
           isActive,
-          permissionIds: permissionIds, // permissionIds đã là string[] nên không cần chuyển đổi
+          permissionIds: permissionIds,
         })
       }
       
@@ -237,8 +240,9 @@ export default function RolesModalUpsert({
               <Switch checked={isActive} onCheckedChange={setIsActive} />
             </div>
 
-            {/* Hiển thị phần permission cho cả Add và Edit */}
-            <div className="space-y-2 pt-2">
+            {/* Chỉ hiển thị phần permission khi ở chế độ Edit */}
+            {mode === 'edit' && (
+              <div className="space-y-2 pt-2">
                 <div>
                   <h3 className="font-semibold leading-none tracking-tight">{t("admin.roles.modal.permissions")}</h3>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -341,6 +345,7 @@ export default function RolesModalUpsert({
                   )}
                 </div>
               </div>
+            )}
           </div>
 
           <DialogFooter className="pt-4 border-t mt-4 flex-shrink-0">

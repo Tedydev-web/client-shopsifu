@@ -1094,6 +1094,7 @@
         "delete": "Xóa người dùng"
       },
       "modal": {
+        "selectRole":"Chọn vai trò",
         "addTitle": "Thêm người dùng mới",
         "addDescription": "Nhập thông tin người dùng để thêm mới vào hệ thống.",
         "editTitle": "Chỉnh sửa người dùng",
