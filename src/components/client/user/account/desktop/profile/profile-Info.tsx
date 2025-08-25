@@ -25,7 +25,9 @@ import { useUserData } from "@/hooks/useGetData-UserLogin";
 import { useUpdateProfile } from "@/components/client/user/account/profile/useProfile-Update";
 import { UpdateProfileRequest } from "@/types/auth/profile.interface";
 import Image from "next/image";
-import useUploadMedia from "@/hooks/useUploadMedia";
+import useUploadMediaPresign, {
+  FileWithPreview,
+} from "@/hooks/useUploadMediaPresign";
 import { useResponsive } from "@/hooks/useResponsive";
 import {
   Drawer,
@@ -49,7 +51,9 @@ export default function ProfileInfo() {
   const userData = useUserData();
   const { isMobile } = useResponsive();
   const [open, setOpen] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<FileWithPreview | null>(
+    null
+  );
 
   // Lấy địa chỉ mặc định
   const defaultAddress = userData?.addresses?.find((a) => a.isDefault);
@@ -72,14 +76,21 @@ export default function ProfileInfo() {
     setOpen(false);
   });
 
-  const { handleAddFiles, uploadFiles, reset: resetUpload } = useUploadMedia();
+  // Dùng hook mới
+  const {
+    handleAddFiles,
+    uploadToS3Multiple,
+    reset: resetUpload,
+    files,
+  } = useUploadMediaPresign();
 
   const onSubmit = async (data: Partial<UpdateProfileRequest>) => {
     try {
       let avatarUrl = userData?.avatar;
 
-      if (selectedAvatar) {
-        const urls = await uploadFiles();
+      if (files.length > 0) {
+        // Upload tất cả file đã chọn (ở đây chỉ có 1 avatar)
+        const urls = await uploadToS3Multiple();
         if (urls.length > 0) {
           avatarUrl = urls[0];
         }
@@ -106,8 +117,8 @@ export default function ProfileInfo() {
         <div className="relative w-24 h-24">
           <Image
             src={
-              selectedAvatar
-                ? URL.createObjectURL(selectedAvatar)
+              selectedAvatar?.preview
+                ? selectedAvatar.preview
                 : userData.avatar || "/default-avatar.png"
             }
             alt="avatar"
@@ -129,11 +140,13 @@ export default function ProfileInfo() {
           id="avatarUpload"
           accept="image/*"
           className="hidden"
-          onChange={(e) => {
+          onChange={async (e) => {
             const file = e.target.files?.[0];
             if (file) {
-              handleAddFiles([file]);
-              setSelectedAvatar(file);
+              const { processedFiles } = await handleAddFiles([file]);
+              if (processedFiles.length > 0) {
+                setSelectedAvatar(processedFiles[0]);
+              }
             }
           }}
         />
@@ -248,7 +261,6 @@ export default function ProfileInfo() {
               <DrawerTitle>Cập nhật thông tin cá nhân</DrawerTitle>
             </DrawerHeader>
 
-            {/* Vùng nội dung cuộn */}
             <div className="px-4 overflow-y-auto max-h-[calc(80vh-100px)]">
               {formContent}
             </div>

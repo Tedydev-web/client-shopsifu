@@ -10,7 +10,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -63,7 +62,7 @@ export function ReviewsModal({
       orderId: product.orderId,
       medias: uploadedUrls.map((url) => ({
         url,
-        type: "IMAGE" as const, // default IMAGE vì đang upload ảnh
+        type: "IMAGE" as const, // default IMAGE
       })),
     });
 
@@ -126,15 +125,36 @@ export function ReviewsModal({
 
           {/* Upload hình ảnh */}
           <div className="space-y-3">
-            <Input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => {
-                if (e.target.files) handleAddFiles(e.target.files);
-              }}
-              className="cursor-pointer"
-            />
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl"
+                onClick={() => document.getElementById("file-upload")?.click()}
+              >
+                Thêm ảnh
+              </Button>
+              <Input
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  if (e.target.files) handleAddFiles(e.target.files);
+                }}
+                className="hidden"
+              />
+              {files.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleRemoveAllFiles}
+                  className="text-red-500 hover:bg-red-50 rounded-xl"
+                >
+                  Xóa tất cả
+                </Button>
+              )}
+            </div>
 
             {files.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
@@ -149,6 +169,8 @@ export function ReviewsModal({
                         alt={file.name}
                         className="w-full h-24 object-cover rounded-lg"
                       />
+
+                      {/* Nút xoá */}
                       <Button
                         type="button"
                         size="icon"
@@ -158,25 +180,20 @@ export function ReviewsModal({
                       >
                         <X className="w-4 h-4" />
                       </Button>
+
+                      {/* Progress từng ảnh */}
+                      {isUploading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <Progress
+                            value={progress}
+                            className="h-2 w-3/4 rounded-full"
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
               </div>
-            )}
-
-            {isUploading && (
-              <Progress value={progress} className="h-2 w-full rounded-full" />
-            )}
-
-            {files.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={handleRemoveAllFiles}
-                className="text-red-500 hover:bg-red-50 rounded-xl"
-              >
-                Xóa tất cả
-              </Button>
             )}
           </div>
         </div>
